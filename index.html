@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>게임 로비</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{
+  --ink:#0d1b24;--sea:#17323f;--panel:#1f4252;--line:#35586a;
+  --foam:#e9e2cf;--cinnabar:#c8402b;--gold:#d9a441;--muted:#8fa4ad;
+  --f-display:"Nanum Myeongjo","Batang",serif;
+  --f-body:"Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--foam);font-family:var(--f-body)}
+button{font:inherit;color:inherit;cursor:pointer}
+
+/* ===== 로비 ===== */
+#lobby{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:40px 16px 32px;
+  background:radial-gradient(1200px 500px at 50% -10%,#1b3a49 0%,transparent 70%),var(--ink)}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,5vw,2.6rem);letter-spacing:.12em;margin:0;text-wrap:balance;text-align:center}
+.sub{color:var(--gold);font-family:var(--f-display);font-weight:700;letter-spacing:.3em;font-size:.85rem;margin:8px 0 0;text-align:center}
+.grid{width:min(100%,980px);margin-top:36px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.card{position:relative;display:flex;flex-direction:column;text-align:left;padding:0;overflow:hidden;
+  background:var(--panel);border:2px solid var(--line);border-radius:6px;transition:transform .15s,border-color .15s}
+.card:hover:not(:disabled),.card:focus-visible{transform:translateY(-3px);border-color:var(--gold);outline:none}
+.card:disabled{cursor:not-allowed;background:#14252d;border-style:dashed}
+.thumb{aspect-ratio:16/9;width:100%;display:block;background:var(--sea)}
+.info{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.name{font-family:var(--f-display);font-weight:800;font-size:1.25rem;letter-spacing:.06em}
+.name small{color:var(--gold);font-size:.7rem;letter-spacing:.2em;margin-left:6px}
+.desc{color:var(--muted);font-size:.88rem;line-height:1.5;margin:0}
+.keys{margin-top:auto;padding-top:8px;color:var(--muted);font-size:.78rem}
+.play{margin-top:10px;align-self:flex-start;background:var(--cinnabar);color:var(--foam);font-family:var(--f-display);font-weight:800;
+  padding:7px 18px;border-radius:3px;letter-spacing:.1em;font-size:.95rem}
+.card:disabled .play{background:#2c4652;color:#6f858e}
+.badge{position:absolute;top:10px;right:10px;background:rgba(13,27,36,.85);border:1px solid var(--gold);color:var(--gold);
+  font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:3px}
+.last{margin-top:22px;color:var(--muted);font-size:.85rem;min-height:1.2em}
+footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-align:center}
+
+/* ===== 플레이 화면 ===== */
+#stage{position:fixed;inset:0;display:none;flex-direction:column;background:var(--ink);z-index:10}
+#stage.on{display:flex}
+.bar{display:flex;align-items:center;gap:10px;padding:6px 10px;background:#0a151c;border-bottom:1px solid var(--line);flex:none}
+.bar button{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:5px 12px;font-size:.85rem}
+.bar button:hover{border-color:var(--gold)}
+#title{font-family:var(--f-display);font-weight:700;letter-spacing:.08em;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#frame{flex:1;width:100%;border:0;background:var(--ink)}
+@media (pointer:coarse){.bar{padding:4px 8px}}
+</style>
+</head>
+<body>
+
+<main id="lobby">
+  <h1>게임 로비</h1>
+  <p class="sub">GAME LOBBY</p>
+  <div class="grid" id="grid"></div>
+  <p class="last" id="last"></p>
+  <footer>게임을 추가하려면 코드 안의 GAMES 배열에 항목을 한 줄 추가하세요.</footer>
+</main>
+
+<section id="stage" aria-label="게임 화면">
+  <div class="bar">
+    <button id="back">← 로비로</button>
+    <span id="title"></span>
+    <button id="reload" title="게임 다시 시작">↻ 새로고침</button>
+    <button id="full" title="전체 화면">⛶ 전체화면</button>
+  </div>
+  <iframe id="frame" title="게임" allow="autoplay; fullscreen; gamepad"></iframe>
+</section>
+
+<script>
+/* ============================================================
+   게임 목록 — 새 게임은 여기에 객체 하나만 추가하면 됩니다.
+   src   : 게임 HTML 파일 경로 (이 로비 파일 기준 상대경로)
+   ready : false 면 "준비 중" 카드로 표시 (코드 받으면 true + src 채우기)
+   thumb : 카드 그림 (SVG 문자열). 비워두면 기본 그림 사용
+   ============================================================ */
+const GAMES=[
+  {
+    id:'hansan',
+    title:'한산도 해전', hanja:'閑山島',
+    desc:'판옥선을 몰아 왜선을 격파하라. 학익진, 거북선 개조, 백병전과 나포까지 즐기는 해전 액션.',
+    keys:'WASD 이동 · Space 포격 · 1~5 진형',
+    src:'games/hansando.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#17323f"/>
+      <g stroke="#e9e2cf" stroke-opacity=".12" stroke-width="2" fill="none" stroke-linecap="round">
+        <path d="M0 40q20-6 40 0t40 0 40 0 40 0 40 0 40 0 40 0 40 0"/><path d="M0 95q20-6 40 0t40 0 40 0 40 0 40 0 40 0 40 0 40 0"/><path d="M0 150q20-6 40 0t40 0 40 0 40 0 40 0 40 0 40 0 40 0"/></g>
+      <path d="M250 150q20-34 52-20l18 12v38h-90z" fill="#3f5e3b"/><path d="M250 150q20-34 52-20" stroke="#cdbd8f" stroke-width="4" fill="none"/>
+      <g transform="translate(110 92) rotate(-8)"><path d="M54 0Q38-17 0-17L-48-14-56-6v12l8 8L0 17Q38 17 54 0Z" fill="#8a5a34" stroke="#4b2d17" stroke-width="3"/>
+        <rect x="-20" y="-9" width="38" height="18" fill="#c8402b" stroke="#d9a441" stroke-width="2"/><rect x="4" y="-22" width="4" height="44" fill="#eee6cf"/><rect x="-32" y="-18" width="4" height="36" fill="#eee6cf"/></g>
+      <g transform="translate(232 62) rotate(190) scale(.8)"><path d="M54 0Q38-17 0-17L-48-14-56-6v12l8 8L0 17Q38 17 54 0Z" fill="#3a3a40" stroke="#16161a" stroke-width="3"/>
+        <rect x="-20" y="-9" width="38" height="18" fill="#1a1a1f" stroke="#6a1c1c" stroke-width="2"/></g>
+      <circle cx="168" cy="82" r="4" fill="#f2c14e"/><circle cx="182" cy="78" r="3" fill="#f2c14e" opacity=".6"/>
+    </svg>`
+  },
+  {
+    id:'silentbreach',
+    title:'Silent Breach', hanja:'',
+    desc:'탑다운 인질 구출 전술 액션. 문을 열고 섬광탄·수류탄을 벽에 튕겨 방 안으로 던진 뒤 돌입하라. 4개 작전, 경보와 처형 타이머, 기습 매복까지.',
+    keys:'클릭 이동 · G 섬광탄 · H 수류탄 · E 문 · B 돌입 · P 정지',
+    src:'games/silentbreach.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#0a0d0f"/>
+      <g fill="#42505a"><rect x="20" y="20" width="130" height="64" fill="#4a3a28"/><rect x="170" y="20" width="130" height="64" fill="#2f4249"/>
+        <rect x="20" y="100" width="130" height="60" fill="#2f4249"/><rect x="170" y="100" width="130" height="60" fill="#33383c"/></g>
+      <g fill="#98a2a5"><rect x="14" y="14" width="292" height="6"/><rect x="14" y="86" width="136" height="6"/><rect x="170" y="86" width="136" height="6"/><rect x="14" y="92" width="292" height="3" fill="#1a2024"/><rect x="150" y="14" width="20" height="146"/></g>
+      <rect x="60" y="84" width="24" height="8" fill="#8b6a3c"/><rect x="226" y="84" width="24" height="8" fill="#8b6a3c"/>
+      <g stroke="#ff8a1f" stroke-width="2" stroke-dasharray="5 4" fill="none"><path d="M40 130 L90 130 L90 88 L110 50"/><path d="M110 50 L180 28" stroke="#ffd08a"/></g>
+      <circle cx="180" cy="28" r="4" fill="#fff"/><circle cx="180" cy="28" r="30" fill="none" stroke="#ff8a1f" stroke-opacity=".5" stroke-dasharray="4 4"/>
+      <circle cx="40" cy="130" r="8" fill="#b98b3e"/>
+      <g fill="#6d2a2a"><circle cx="230" cy="48" r="7"/><circle cx="268" cy="130" r="7"/><circle cx="70" cy="48" r="7"/></g>
+      <path d="M230 48 L190 70 L190 30Z" fill="#ff4637" opacity=".25"/>
+      <g fill="#e0791f"><circle cx="280" cy="40" r="6"/><circle cx="40" cy="48" r="6"/></g>
+    </svg>`
+  }
+];
+
+/* ---------- 렌더링 ---------- */
+const $=id=>document.getElementById(id);
+const grid=$('grid'),stage=$('stage'),frame=$('frame');
+let current=null;
+let lastId=null;
+try{lastId=localStorage.getItem('lobby-last');}catch(e){}
+
+const defaultThumb=`<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#14252d"/>
+  <g stroke="#35586a" stroke-width="2" fill="none" stroke-dasharray="6 6"><rect x="110" y="50" width="100" height="80" rx="6"/></g>
+  <text x="160" y="102" text-anchor="middle" font-size="30" fill="#6f858e" font-family="serif">?</text></svg>`;
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+GAMES.forEach(g=>{
+  const b=document.createElement('button');
+  b.className='card';b.type='button';b.disabled=!g.ready;
+  b.innerHTML=
+    `<span class="thumb">${g.thumb||defaultThumb}</span>`+
+    `<span class="info">`+
+      `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
+      `<p class="desc">${esc(g.desc)}</p>`+
+      (g.keys?`<span class="keys">${esc(g.keys)}</span>`:'')+
+      `<span class="play">${g.ready?'플레이':'준비 중'}</span>`+
+    `</span>`+
+    (g.ready?'':'<span class="badge">COMING SOON</span>');
+  if(g.ready)b.addEventListener('click',()=>open(g));
+  grid.appendChild(b);
+});
+
+const lastGame=GAMES.find(g=>g.id===lastId&&g.ready);
+if(lastGame)$('last').textContent='최근 플레이: '+lastGame.title;
+
+/* ---------- 게임 열기 / 닫기 ---------- */
+function open(g){
+  current=g;
+  try{localStorage.setItem('lobby-last',g.id);}catch(e){}
+  $('title').textContent=g.title;
+  frame.src=g.src;
+  stage.classList.add('on');
+  document.body.style.overflow='hidden';
+  frame.addEventListener('load',focusGame,{once:true});
+}
+function focusGame(){try{frame.focus();frame.contentWindow.focus();}catch(e){}}
+function close(){
+  stage.classList.remove('on');
+  frame.src='about:blank'; /* 게임(소리·타이머)을 완전히 종료 */
+  document.body.style.overflow='';
+  current=null;
+  const g=GAMES.find(x=>x.id===lastId)||null;
+  try{lastId=localStorage.getItem('lobby-last');}catch(e){}
+  const lg=GAMES.find(x=>x.id===lastId);
+  if(lg)$('last').textContent='최근 플레이: '+lg.title;
+}
+$('back').addEventListener('click',close);
+$('reload').addEventListener('click',()=>{if(current){frame.src='about:blank';setTimeout(()=>{frame.src=current.src;frame.addEventListener('load',focusGame,{once:true});},50);}});
+$('full').addEventListener('click',()=>{
+  const el=stage;
+  if(document.fullscreenElement)document.exitFullscreen();
+  else if(el.requestFullscreen)el.requestFullscreen().then(focusGame).catch(()=>{});
+});
+/* 게임 안에서 Esc 는 게임이 쓰므로, 로비 복귀는 상단 버튼으로만 */
+</script>
+</body>
+</html>
