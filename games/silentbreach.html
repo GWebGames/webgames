@@ -356,6 +356,8 @@ const fogData=fctx.createImageData(W,H);
 
 /* keyboard movement: WASD or arrow keys */
 const keys={w:false,a:false,s:false,d:false}, KM={arrowup:'w',arrowleft:'a',arrowdown:'s',arrowright:'d'};
+/* physical key, so it works with the Korean (Hangul) IME on too */
+const keyOf=e=>{ const c=e.code||''; if(c.startsWith('Key'))return c.slice(3).toLowerCase(); if(c.startsWith('Digit'))return c.slice(5); return (e.key||'').toLowerCase(); };
 
 /* ---------- audio ---------- */
 let ac=null, nbuf=null, master=null, musicBus=null, sfxBus=null, muted=false;
@@ -974,13 +976,13 @@ cv.addEventListener('pointerdown',e=>{
 });
 addEventListener('keydown',e=>{
   if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
-  const k=e.key.toLowerCase();
+  const k=keyOf(e);
   const mk=KM[k]||((k.length===1&&'wasd'.includes(k))?k:null);
   if(mk){ keys[mk]=true; if(KM[k])e.preventDefault(); }
   if(k==='g')toggleThrow('flash'); else if(k==='h')toggleThrow('frag'); else if(k==='m')setMuted(!muted); else if(k==='e')openDoor(); else if(k==='b')breach(); else if(k==='p')setPause(!paused);
   else if(k==='escape')toggleThrow(false); else if(k>='1'&&k<='4')selectOp(+k-1);
 });
-addEventListener('keyup',e=>{ const k=e.key.toLowerCase(), mk=KM[k]||((k.length===1&&'wasd'.includes(k))?k:null); if(mk)keys[mk]=false; });
+addEventListener('keyup',e=>{ const k=keyOf(e), mk=KM[k]||((k.length===1&&'wasd'.includes(k))?k:null); if(mk)keys[mk]=false; });
 addEventListener('blur',()=>{ keys.w=keys.a=keys.s=keys.d=false; });
 $('start').addEventListener('click',startGame);
 $('again').addEventListener('click',startGame);
