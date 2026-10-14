@@ -109,7 +109,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
       <p id="briefText"></p>
       <div class="missions" id="missionList"></div>
       <div class="keys">
-        <kbd>클릭</kbd><span>이동한다. 시야 안의 적은 자동으로 사격한다. 닫힌 문은 시야와 총알을 막는다.</span>
+        <kbd>WASD / 클릭</kbd><span>키보드(방향키도 가능)로 직접 걷거나 클릭한 곳으로 이동한다. 시야 안의 적은 자동으로 사격한다. 닫힌 문은 시야와 총알을 막는다.</span>
         <kbd>E</kbd><span>옆 칸(문에서 한 칸 이내)에서 문을 연다. 문 앞까지 걸어가면 자동으로 열리기도 한다.</span>
         <kbd>G → 클릭</kbd><span>섬광탄을 던지고 떨어진 자리로 돌입한다 (THROW AND GO). 우클릭은 던지기만 한다.</span>
         <kbd>벽 튕기기</kbd><span>섬광탄은 벽에 튕긴다. 조준선에 반사 경로가 표시되니 문 옆 벽을 맞혀 방 안으로 넣어라.</span>
@@ -353,6 +353,9 @@ function paintVignette(){
 const vigL=paintVignette();
 const fogCv=document.createElement('canvas'); fogCv.width=W; fogCv.height=H; const fctx=fogCv.getContext('2d');
 const fogData=fctx.createImageData(W,H);
+
+/* keyboard movement: WASD or arrow keys */
+const keys={w:false,a:false,s:false,d:false}, KM={arrowup:'w',arrowleft:'a',arrowdown:'s',arrowright:'d'};
 
 /* ---------- audio ---------- */
 let ac=null, nbuf=null, master=null, musicBus=null, sfxBus=null, muted=false;
@@ -630,6 +633,8 @@ function update(dt){
     if(o.hp<=0)continue;
     o.hurt=Math.max(0,o.hurt-dt); o.cd-=dt;
     const spd=boost?175:115; let moved=false;
+    const kx=(keys.d?1:0)-(keys.a?1:0), ky=(keys.s?1:0)-(keys.w?1:0), kb=(kx!==0||ky!==0)&&o.i===sel;
+    if(kb){ const kl=Math.hypot(kx,ky); o.path=null; o.mx=kx/kl; o.my=ky/kl; moveEnt(o,o.mx*spd*dt,o.my*spd*dt); moved=true; }
     if(o.path&&o.path.length){
       const nx=o.path[0], dd=doorMap[Math.floor(nx.y/T)*W+Math.floor(nx.x/T)];
       if(dd&&!dd.open){
@@ -639,7 +644,7 @@ function update(dt){
         } else moved=followPath(o,spd,dt);
       } else moved=followPath(o,spd,dt);
     }
-    else if(rank>0&&!o.manual){
+    else if(!kb&&rank>0&&!o.manual){
       const t=trailAt(rank*30), dx=t.x-o.x, dy=t.y-o.y, d=Math.hypot(dx,dy);
       if(d>6){ const s=Math.min((spd+25)*dt,d); o.mx=dx/d; o.my=dy/d; moveEnt(o,o.mx*s,o.my*s); moved=true; }
     }
@@ -970,9 +975,13 @@ cv.addEventListener('pointerdown',e=>{
 addEventListener('keydown',e=>{
   if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
   const k=e.key.toLowerCase();
+  const mk=KM[k]||((k.length===1&&'wasd'.includes(k))?k:null);
+  if(mk){ keys[mk]=true; if(KM[k])e.preventDefault(); }
   if(k==='g')toggleThrow('flash'); else if(k==='h')toggleThrow('frag'); else if(k==='m')setMuted(!muted); else if(k==='e')openDoor(); else if(k==='b')breach(); else if(k==='p')setPause(!paused);
   else if(k==='escape')toggleThrow(false); else if(k>='1'&&k<='4')selectOp(+k-1);
 });
+addEventListener('keyup',e=>{ const k=e.key.toLowerCase(), mk=KM[k]||((k.length===1&&'wasd'.includes(k))?k:null); if(mk)keys[mk]=false; });
+addEventListener('blur',()=>{ keys.w=keys.a=keys.s=keys.d=false; });
 $('start').addEventListener('click',startGame);
 $('again').addEventListener('click',startGame);
 $('quit').addEventListener('click',toMenu);
