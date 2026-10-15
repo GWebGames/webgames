@@ -54,15 +54,20 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
 #breach i{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);width:0}
 .overlay{position:absolute;inset:0;background:radial-gradient(ellipse at center,#0b1214ee,#030507f5);display:grid;place-items:center;padding:2cqw;overflow:auto}
 .overlay[hidden]{display:none}
-.sheet{max-width:62cqw;display:grid;gap:1.4cqw}
+.sheet{max-width:80cqw;display:grid;gap:1.4cqw}
 .sheet h1{margin:0;font-size:max(26px,5.2cqw);letter-spacing:.14em;line-height:1;text-transform:uppercase}
 .sheet h1 span{color:var(--accent)}
 .sheet .sub{color:var(--muted);letter-spacing:.2em;text-transform:uppercase;font-size:max(10px,1.4cqw)}
 .sheet p{margin:0;font-size:max(11px,1.55cqw);line-height:1.6;color:#c4d2cf;max-width:60ch}
-.keys{display:grid;grid-template-columns:auto 1fr;gap:.5cqw 1.4cqw;font-size:max(10px,1.4cqw);line-height:1.45;color:#c4d2cf}
+.keys{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:.4cqw 1.4cqw;font-size:max(10px,1.4cqw);line-height:1.45;color:#c4d2cf}
 .keys kbd{font:inherit;font-weight:700;color:var(--accent);white-space:nowrap}
 .go{justify-self:start;font-size:max(12px,1.8cqw);padding:.7em 2em;background:var(--accent);color:#170b02;border-color:var(--accent);font-weight:700}
-.stats{display:grid;grid-template-columns:repeat(4,auto);gap:.4cqw 2.4cqw;font-size:max(11px,1.6cqw)}
+.diffrow{display:flex;align-items:stretch;gap:1.2cqw;flex-wrap:wrap}
+.dlab{align-self:center;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-size:max(10px,1.2cqw)}
+.missions.diff{grid-template-columns:repeat(3,minmax(9cqw,1fr));flex:1;min-width:0}
+.missions.diff .mbtn{text-align:center}
+@container (max-width:700px){.keys{grid-template-columns:auto 1fr}}
+.stats{display:grid;grid-template-columns:repeat(5,auto);gap:.4cqw 2.4cqw;font-size:max(11px,1.6cqw)}
 .stats dt{color:var(--muted);font-size:max(9px,1.1cqw);letter-spacing:.1em;text-transform:uppercase}
 .stats dd{margin:0;font-weight:700;font-size:max(14px,2.4cqw)}
 .rank{font-size:max(34px,8cqw);font-weight:700;color:var(--accent);line-height:1}
@@ -93,6 +98,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
       <button class="btn" id="doorBtn" type="button">문 열기 [E]</button>
       <button class="btn" id="fragBtn" type="button">수류탄 [H] ×6</button>
       <button class="btn" id="pauseBtn" type="button">일시정지 [P]</button>
+      <button class="btn" id="lightBtn" type="button">손전등 켜짐 [F]</button>
       <button class="btn" id="muteBtn" type="button">소리 켜짐 [M]</button>
     </div>
     <div class="toast" id="toast"></div>
@@ -108,19 +114,24 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
       <h1>Silent <span>Breach</span></h1>
       <p id="briefText"></p>
       <div class="missions" id="missionList"></div>
+      <div class="diffrow"><span class="dlab">난이도</span><div class="missions diff" id="diffList"></div></div>
+      <button class="btn go" id="start" type="button">작전 개시</button>
       <div class="keys">
         <kbd>WASD / 클릭</kbd><span>키보드(방향키도 가능)로 직접 걷거나 클릭한 곳으로 이동한다. 시야 안의 적은 자동으로 사격한다. 닫힌 문은 시야와 총알을 막는다.</span>
         <kbd>E</kbd><span>옆 칸(문에서 한 칸 이내)에서 문을 연다. 문 앞까지 걸어가면 자동으로 열리기도 한다.</span>
-        <kbd>G → 클릭</kbd><span>섬광탄을 던지고 떨어진 자리로 돌입한다 (THROW AND GO). 우클릭은 던지기만 한다.</span>
+        <kbd>G → 클릭</kbd><span>섬광탄을 던지고 떨어진 자리로 돌입한다 (THROW AND GO). 우클릭은 던지기만 한다. 너무 가까이서 터지면 나도 눈이 먼다.</span>
         <kbd>벽 튕기기</kbd><span>섬광탄은 벽에 튕긴다. 조준선에 반사 경로가 표시되니 문 옆 벽을 맞혀 방 안으로 넣어라.</span>
         <kbd>H → 클릭</kbd><span>수류탄. 같은 반사 경로로 던진다. 폭발 반경 안의 적은 죽지만 인질도 죽고 가까우면 본인도 다친다.</span>
         <kbd>지급량</kbd><span>섬광탄과 수류탄은 각각 그 작전의 방 개수만큼 지급된다.</span>
         <kbd>기습</kbd><span>들렀던 방을 클리어하지 않고 멀리 지나치면 그 방의 적이 문을 열고 뒤에서 쫓아온다.</span>
         <kbd>B</kbd><span>BREACH. 3.5초 동안 이동과 사격이 빨라진다.</span>
+        <kbd>F</kbd><span>손전등. 켜면 멀리 보이지만 적에게도 더 멀리서 들킨다.</span>
+        <kbd>방패병</kbd><span>정면 사격이 막힌다. 측면으로 돌거나 섬광탄, 수류탄을 써라.</span>
+        <kbd>저격수</kbd><span>붉은 레이저가 겨누면 곧 쏜다. 시야 밖으로 빠져라.</span>
+        <kbd>매복병</kbd><span>문 바로 뒤에 서 있다. 문 앞에서 기척이 들리면 열자마자 쏜다.</span>
         <kbd>M</kbd><span>소리 켜기/끄기. 발소리와 총소리는 방향과 거리에 따라 들린다.</span>
         <kbd>인질 곁</kbd><span>인질 옆에 1.5초 머무르면 결박을 풀고 구출한다.</span>
       </div>
-      <button class="btn go" id="start" type="button">작전 개시</button>
     </div>
   </div>
 
@@ -198,10 +209,64 @@ const MISSIONS = [
    doors:[[11,12],[7,5],[7,10],[16,5],[16,10],[11,3]],
    rooms:[{r:[8,4,15,11],theme:'dark'},{r:[1,1,6,6],theme:'tile'},{r:[1,9,6,14],theme:'tile'},{r:[17,1,22,6],theme:'tile'},{r:[17,9,22,14],theme:'tile'},{r:[9,1,14,2],theme:'dark'},{r:[9,13,14,14],theme:'dark'}],
    enemies:[{x:10,y:5,a:.3,room:0},{x:13,y:10,a:3.9,room:0},{x:3,y:4,a:.5,room:1},{x:4,y:10,a:.2,room:2},{x:19,y:4,a:3.3,room:3},{x:21,y:5,a:3.1,room:3},{x:19,y:10,a:3.2,room:4},{x:10,y:2,a:1.57,room:5}],
-   hostages:[[2,13],[21,13],[13,1]] }
+   hostages:[[2,13],[21,13],[13,1]] },
+ { name:'WAREHOUSE', sub:'물류 창고', par:260, exec0:110, execN:70, start:[2.5,13.5],
+   brief:'넓은 창고 홀에 적 둘이 컨테이너 사이를 지키고, 위쪽 사무실 네 곳과 냉동 창고에 나머지가 숨어 있다. 홀은 시야가 트여 있으니 문을 열기 전에 섬광탄 경로부터 잡아라. 적 8명, 인질 3명.',
+   carve:[[1,13,22,14]],
+   props:[[4,7],[5,7],[4,8],[8,8],[9,8],[12,7],[12,10],[13,10],[6,10],[7,10],[14,8],[1,1],[2,1],[11,1],[17,1],[22,4],[22,3],[22,6],[22,7],[18,11]],
+   doors:[[3,5],[9,5],[15,5],[20,5],[17,8],[8,12],[20,12]],
+   rooms:[{r:[1,1,5,4],theme:'wood'},{r:[7,1,11,4],theme:'tile'},{r:[13,1,17,4],theme:'dark'},{r:[19,1,22,4],theme:'carpet'},{r:[1,6,16,11],theme:'conc'},{r:[18,6,22,11],theme:'tile'}],
+   enemies:[{x:3,y:2,a:1.2,room:0},{x:8,y:3,a:.9,room:1},{x:14,y:2,a:1.5,room:2},{x:16,y:3,a:2.0,room:2},{x:20,y:2,a:2.4,room:3},{x:6,y:8,a:.3,room:4},{x:11,y:9,a:3.9,room:4},{x:19,y:9,a:3.3,room:5}],
+   hostages:[[21,3],[20,10],[10,3]] },
+ { name:'EMBASSY', sub:'대사관 별관', par:270, exec0:100, execN:65, start:[11.5,13.5],
+   brief:'중앙 홀 위에 대기실이, 양옆에 사무실과 접견실이 대칭으로 붙어 있다. 로비에서 들어가 방을 하나씩 정리하면 안쪽 문으로 이어진다. 홀 기둥 뒤를 조심하라. 적 8명, 인질 3명.',
+   carve:[[1,12,22,14]],
+   pillars:[[11,7],[12,8]],
+   props:[[2,1],[3,1],[20,1],[21,1],[6,7],[6,10],[17,7],[17,10],[5,13],[6,13],[16,13],[17,13]],
+   doors:[[11,11],[4,11],[19,11],[8,8],[15,8],[11,4],[8,2],[15,2],[4,5],[19,5]],
+   rooms:[{r:[9,5,14,10],theme:'carpet'},{r:[1,1,7,4],theme:'wood'},{r:[16,1,22,4],theme:'wood'},{r:[1,6,7,10],theme:'tile'},{r:[16,6,22,10],theme:'tile'},{r:[9,1,14,3],theme:'dark'}],
+   enemies:[{x:3,y:2,a:.8,room:1},{x:19,y:2,a:2.3,room:2},{x:3,y:8,a:0.3,room:3},{x:5,y:7,a:.2,room:3},{x:20,y:8,a:3.2,room:4},{x:18,y:9,a:3.6,room:4},{x:13,y:6,a:2.6,room:0},{x:10,y:2,a:.1,room:5}],
+   hostages:[[2,9],[21,3],[12,2]] },
+ { name:'PRISON', sub:'교도소 수용동', par:290, exec0:100, execN:60, start:[11.5,13.5],
+   brief:'중앙 복도 양쪽에 수용실이 세 칸씩 늘어선 교도소. 위쪽 경비실이 복도를 내려다본다. 수용실끼리는 안쪽 문으로 이어져서 한 칸을 뚫으면 옆 칸 적이 소리를 듣는다. 적 8명, 인질 3명.',
+   carve:[[10,5,13,14]],
+   props:[[5,1],[6,1],[6,6],[7,6],[6,13],[7,13],[17,3],[18,3],[16,8],[17,8],[16,13],[17,13],[11,8],[12,11]],
+   doors:[[11,4],[8,2],[4,5],[9,7],[9,12],[4,10],[15,2],[19,5],[14,7],[14,12],[19,10]],
+   rooms:[{r:[9,1,14,3],theme:'tile'},{r:[1,1,7,4],theme:'dark'},{r:[1,6,8,9],theme:'dark'},{r:[1,11,8,14],theme:'dark'},{r:[16,1,22,4],theme:'dark'},{r:[15,6,22,9],theme:'dark'},{r:[15,11,22,14],theme:'dark'}],
+   enemies:[{x:10,y:2,a:.2,room:0},{x:13,y:2,a:3.0,room:0},{x:3,y:3,a:.5,room:1},{x:6,y:8,a:3.3,room:2},{x:3,y:13,a:.4,room:3},{x:20,y:2,a:2.6,room:4},{x:20,y:8,a:3.0,room:5},{x:18,y:12,a:3.6,room:6}],
+   hostages:[[2,7],[21,13],[21,3]] },
+ { name:'PENTHOUSE', sub:'고층 펜트하우스', par:330, exec0:90, execN:55, start:[2.5,13.5],
+   brief:'바깥 복도가 중앙 방 여섯 개를 한 바퀴 감싸고 있다. 방마다 복도 쪽 문과 옆방으로 통하는 안쪽 문이 있어서 어디로든 기습당한다. 금고실에 둘이 있다. 마지막 작전. 적 9명, 인질 3명.',
+   carve:[[1,1,22,2],[1,13,22,14],[1,1,2,14],[21,1,22,14]],
+   props:[[13,4],[10,7],[4,4],[8,7],[15,7],[19,7],[4,11],[8,9],[15,9],[19,11],[9,2],[14,1],[9,13],[14,14]],
+   doors:[[6,3],[11,3],[17,3],[6,12],[11,12],[17,12],[3,5],[3,10],[20,5],[20,10],[9,5],[14,6],[9,10],[14,10],[6,8],[11,8],[17,8]],
+   rooms:[{r:[4,4,8,7],theme:'carpet'},{r:[10,4,13,7],theme:'wood'},{r:[15,4,19,7],theme:'carpet'},{r:[4,9,8,11],theme:'tile'},{r:[10,9,13,11],theme:'dark'},{r:[15,9,19,11],theme:'tile'}],
+   enemies:[{x:5,y:5,a:.7,room:0},{x:7,y:6,a:.2,room:0},{x:11,y:5,a:1.5,room:1},{x:16,y:5,a:2.4,room:2},{x:18,y:6,a:3.0,room:2},{x:5,y:10,a:.4,room:3},{x:11,y:10,a:4.2,room:4},{x:12,y:9,a:3.5,room:4},{x:18,y:10,a:3.3,room:5}],
+   hostages:[[4,7],[13,11],[19,4]] }
 ];
-let grid, DOORS=[], doorMap={}, MIS=MISSIONS[0], ROOMS=MIS.rooms, missionIdx=0, floorL=null, wallL=null, unlocked=1;
-try{ unlocked=Math.max(1,Math.min(MISSIONS.length,parseInt(localStorage.getItem('sb-unlocked'))||1)); }catch(e){}
+/* Enemy kinds per mission. i = index in that mission's enemies list; x,y,a override position and facing. */
+const KINDS = { rifle:{hp:100,tag:''}, shield:{hp:130,tag:'방패'}, sniper:{hp:70,tag:'저격'}, ambush:{hp:70,tag:'매복'} };
+const PATCH = {
+  VAULT:[{i:6,k:'shield'},{i:5,k:'ambush',x:14,y:10,a:4.71}],
+  HOTEL:[{i:3,k:'ambush',x:15,y:5,a:1.57},{i:5,k:'ambush',x:9,y:10,a:4.71}],
+  'BLACK SITE':[{i:0,k:'sniper',x:9,y:5,a:.6},{i:3,k:'shield'},{i:7,k:'ambush',x:11,y:2,a:1.57}],
+  WAREHOUSE:[{i:0,k:'ambush',x:3,y:4,a:1.57},{i:5,k:'shield'},{i:6,k:'sniper',x:15,y:9,a:3.14}],
+  EMBASSY:[{i:2,k:'shield'},{i:5,k:'shield'},{i:3,k:'ambush',x:4,y:10,a:1.57},{i:6,k:'sniper',x:13,y:5,a:1.57}],
+  PRISON:[{i:1,k:'sniper',x:12,y:2,a:1.57},{i:2,k:'shield'},{i:7,k:'shield'},{i:5,k:'ambush',x:16,y:2,a:3.14},{i:6,k:'ambush',x:15,y:7,a:3.14}],
+  PENTHOUSE:[{i:1,k:'shield'},{i:4,k:'shield'},{i:8,k:'shield'},{i:0,k:'ambush',x:4,y:5,a:3.14},{i:3,k:'ambush',x:17,y:4,a:4.71},{i:5,k:'ambush',x:4,y:10,a:3.14},{i:6,k:'sniper',x:10,y:10,a:0}]
+};
+function enemyDefs(m){ const P=PATCH[m.name]||[]; return m.enemies.map((e,i)=>{ const p=P.find(q=>q.i===i); return p?{...e,...p}:{...e}; }); }
+/* Difficulty: enemy damage and accuracy, execution timer, sight range, reaction time, flashbang blindness on the player. */
+const DIFF = {
+  easy:{name:'쉬움',dmg:15,acc:.3,exec:1.5,sight:.9,react:1.25,blind:.6},
+  normal:{name:'보통',dmg:30,acc:.4,exec:1,sight:1,react:1,blind:1},
+  hard:{name:'어려움',dmg:45,acc:.5,exec:.75,sight:1.12,react:.8,blind:1.2}
+};
+let diffKey='normal';
+try{ const v=localStorage.getItem('sb-diff'); if(DIFF[v])diffKey=v; }catch(e){}
+const D=()=>DIFF[diffKey];
+let grid, DOORS=[], doorMap={}, MIS=MISSIONS[0], ROOMS=MIS.rooms, missionIdx=0, floorL=null, wallL=null, cleared=new Set();
+try{ (localStorage.getItem('sb-cleared')||'').split(',').forEach(s=>{ const n=parseInt(s); if(n>=0&&n<MISSIONS.length)cleared.add(n); }); }catch(e){}
 function buildGrid(m){
   let g;
   if(m.map) g=m.map.map(r=>r.split('').map(c=>c==='D'?'.':c));
@@ -374,6 +439,7 @@ function initAudio(){
     mus.on=true; mus.next=ac.currentTime+.1; setInterval(musicTick,50);
   }catch(e){ ac=null; }
 }
+function toggleLight(){ flashlightOn=!flashlightOn; const b=$('lightBtn'); if(b)b.textContent=flashlightOn?'손전등 켜짐 [F]':'손전등 꺼짐 [F]'; if(state==='play')toast(flashlightOn?'손전등 켬':'손전등 끔. 어둡지만 덜 들킨다'); }
 function setMuted(v){ muted=v; if(master)master.gain.value=v?0:.9; const b=$('muteBtn'); if(b)b.textContent=v?'소리 꺼짐 [M]':'소리 켜짐 [M]'; }
 function outNode(pan){
   if(pan&&ac.createStereoPanner){ const p=ac.createStereoPanner(); p.pan.value=clamp(pan,-1,1); p.connect(sfxBus); return p; }
@@ -412,6 +478,10 @@ function sfx(n,x,y){
     case 'bounce': tone(1700,.05,.12*v,1100,'triangle',p); burst(.03,.15*v,3200,p,'highpass'); break;
     case 'flash': burst(.7,.9*v,3200,p,'highpass'); tone(95,.5,.6*v,34,'sine',p); tone(4200,1.6,.06*Math.max(v,.25),3900,'sine',p); break;
     case 'boom': burst(1,v,160,p,'lowpass'); tone(68,.9,.95*v,26,'sine',p); burst(.5,.55*v,950,p); break;
+    case 'clang': burst(.08,.5*v,3500,p,'highpass'); tone(1900,.14,.25*v,1300,'triangle',p); tone(2700,.1,.15*v,2200,'square',p); break;
+    case 'sniper': burst(.3,.9*v,1100,p); burst(.9,.5*v,260,p,'lowpass'); tone(110,.6,.7*v,30,'sine',p); break;
+    case 'lock': tone(1500,.07,.14*v,0,'square',p); tone(1500,.07,.14*v,0,'square',p,.16); break;
+    case 'rustle': burst(.35,.24*v,500,p,'bandpass'); burst(.25,.15*v,1800,p,'bandpass',.18); break;
     case 'rescue': tone(520,.16,.2,0,'triangle'); tone(780,.2,.2,0,'triangle',0,.13); tone(1040,.28,.2,0,'triangle',0,.28); break;
     case 'exec': burst(.1,.5,1000); tone(120,.3,.4,40,'sine'); break;
     case 'breach': tone(200,.5,.2,900,'sawtooth'); burst(.5,.25,1800,0,'highpass'); break;
@@ -464,6 +534,9 @@ function musicTick(){
 /* ---------- state ---------- */
 let ops, enemies, hostages, corpses, tracers, noises, projs, flashFx, trail, visible, explored, boomFx=[], scorches=[], RS=[];
 let grenades=0, combatHold=0, sirenT=0, shake=0;
+const lightCv=document.createElement('canvas'); lightCv.width=960; lightCv.height=640; const lctx=lightCv.getContext('2d');
+let flashlightOn=true, blind=0, shieldHint=false, cueHint=false, blindHint=false;
+const ex0=()=>Math.round(MIS.exec0*D().exec), exN=()=>Math.round(MIS.execN*D().exec);
 let sel, throwMode, flashes, breachT, breachCd, alarm, execT, saved, kills, lost, time, state='intro', paused=false, screenFlash=0, fogTick=0, announcedClear=false;
 let mouse={x:480,y:320};
 const OPDEF=[
@@ -473,14 +546,15 @@ const OPDEF=[
 function reset(){
   loadMission(missionIdx);
   ops=OPDEF.map((d,i)=>({...d,i,x:MIS.start[0]*T,y:MIS.start[1]*T,hp:100,angle:-Math.PI/2,cd:0,path:null,manual:false,mx:0,my:-1,hurt:0,moving:false}));
-  enemies=MIS.enemies.map((d,i)=>({x:(d.x+.5)*T,y:(d.y+.5)*T,hp:100,angle:d.a,base:d.a,state:'idle',stun:0,cd:rand(0,.6),t:rand(0,5),ph:rand(0,6),
-    path:null,pathT:0,lostT:0,lastX:0,lastY:0,mx:0,my:0,room:ROOMS[d.room].r,ri:d.room,hunt:false,huntT:0,stepAcc:0}));
+  enemies=enemyDefs(MIS).map((d,i)=>{ const K=d.k||'rifle'; return {x:(d.x+.5)*T,y:(d.y+.5)*T,hp:KINDS[K].hp,kind:K,hold:K==='sniper'||K==='ambush',react:0,aim:0,aimTx:0,aimTy:0,door:null,cueT:0,angle:d.a,base:d.a,state:'idle',stun:0,cd:rand(0,.6),t:rand(0,5),ph:rand(0,6),
+    path:null,pathT:0,lostT:0,lastX:0,lastY:0,mx:0,my:0,room:ROOMS[d.room].r,ri:d.room,hunt:false,huntT:0,stepAcc:0}; });
+  enemies.forEach(e=>{ if(e.kind!=='ambush')return; let b=null,bd=1e9; for(const d of DOORS){ const dd=Math.hypot(d.x*T+T/2-e.x,d.y*T+T/2-e.y); if(dd<bd){ bd=dd; b=d; } } e.door=b; });
   hostages=MIS.hostages.map(([x,y])=>({x:(x+.5)*T,y:(y+.5)*T,st:'captive',prog:0}));
   corpses=[];tracers=[];noises=[];projs=[];flashFx=[];boomFx=[];scorches=[];
   RS=ROOMS.map(()=>({touched:false,ambushed:false,armed:false,at:0}));
   trail=[{x:ops[0].x,y:ops[0].y}];
   visible=new Uint8Array(W*H); explored=new Uint8Array(W*H);
-  sel=0; throwMode=false; flashes=MIS.rooms.length; grenades=MIS.rooms.length; combatHold=0; sirenT=0; shake=0; breachT=0; breachCd=0; alarm=false; execT=MIS.exec0; saved=0; kills=0; lost=0; time=0; announcedClear=false; screenFlash=0;
+  sel=0; throwMode=false; flashes=MIS.rooms.length; grenades=MIS.rooms.length; combatHold=0; sirenT=0; shake=0; breachT=0; breachCd=0; alarm=false; execT=ex0(); blind=0; saved=0; kills=0; lost=0; time=0; announcedClear=false; screenFlash=0;
   $('alarm').hidden=true; updateHud(true);
 }
 
@@ -501,7 +575,7 @@ function updateHud(force){
   const alive=ops.filter(o=>o.hp>0).length, ea=enemies.filter(e=>e.hp>0).length, lead=leaderIdx();
   const o=selOp();
   $('cmd').innerHTML=`Command panel / <b>${o.name}</b> (${throwMode==='flash'?'THROW AND GO':throwMode==='frag'?'FRAG OUT':'MOVE'})`;
-  $('obj').innerHTML=`OP${missionIdx+1} <b>${MIS.name}</b> · 적 <b>${ea}</b> · 인질 <b>${saved}/${hostages.length}</b> · 섬광탄 <b>${flashes}</b> · 수류탄 <b>${grenades}</b> · <b>${fmt(time)}</b>`;
+  $('obj').innerHTML=`OP${missionIdx+1} <b>${MIS.name}</b> · 적 <b>${ea}</b> · 인질 <b>${saved}/${hostages.length}</b> · 섬광탄 <b>${flashes}</b> · 수류탄 <b>${grenades}</b> · <b>${fmt(time)}</b> · ${D().name}`;
   $('flashBtn').textContent=`섬광탄 [G] ×${flashes}`; $('flashBtn').classList.toggle('on',throwMode==='flash'); $('flashBtn').disabled=flashes<=0&&throwMode!=='flash';
   $('fragBtn').textContent=`수류탄 [H] ×${grenades}`; $('fragBtn').classList.toggle('on',throwMode==='frag'); $('fragBtn').disabled=grenades<=0&&throwMode!=='frag';
   $('breachBar').style.width=breachT>0?(breachT/3.5*100)+'%':(breachCd>0?(1-breachCd/18)*100+'%':'100%');
@@ -524,25 +598,31 @@ function makeNoise(x,y,r,src){
     if(eff<r){ e.state='search'; e.lastX=x; e.lastY=y; e.lostT=0; e.path=null; e.pathT=0; }
   }
 }
-function raiseAlarm(){ if(!alarm){ alarm=true; execT=MIS.exec0; toast('경보 발령! 인질이 위험하다','warn'); tone(220,.5,.12,330); } }
+function raiseAlarm(){ if(!alarm){ alarm=true; execT=ex0(); toast('경보 발령! 인질이 위험하다','warn'); tone(220,.5,.12,330); } }
 function killEnemy(e){
   e.hp=0; kills++; corpses.push({x:e.x,y:e.y,a:e.angle,en:true}); sfx('die',e.x,e.y);
 }
+/* A shield blocks bullets and half the blast from its front arc, unless the carrier is stunned. */
+function frontBlocked(src,e){ return e.kind==='shield'&&e.stun<=0&&Math.abs(angDiff(e.angle,Math.atan2(src.y-e.y,src.x-e.x)))<1.05; }
 function shootOp(o,e){
   o.cd=breachT>0?.2:.34;
   const d=Math.hypot(e.x-o.x,e.y-o.y);
-  const hit=Math.random()<(e.stun>0?.96:clamp(.82-d/650,.4,.82));
+  let pHit=e.stun>0?.96:clamp(.82-d/650,.4,.82); if(blind>.6)pHit*=.5;
+  const hit=Math.random()<pHit;
   const jit=hit?0:rand(-26,26);
   tracers.push({x1:o.x+Math.cos(o.angle)*18,y1:o.y+Math.sin(o.angle)*18,x2:e.x+jit,y2:e.y+jit,life:.07,c:'255,226,140'});
   sfx('shot',o.x,o.y); makeNoise(o.x,o.y,230,'op');
   if(hit){ e.hp-=36; if(e.hp<=0)killEnemy(e); }
 }
 function shootEn(e,o){
-  e.cd=rand(.65,.95);
-  const hit=Math.random()<.4;
-  tracers.push({x1:e.x+Math.cos(e.angle)*18,y1:e.y+Math.sin(e.angle)*18,x2:o.x+(hit?0:rand(-30,30)),y2:o.y+(hit?0:rand(-30,30)),life:.07,c:'255,120,80'});
-  sfx('eshot',e.x,e.y); makeNoise(e.x,e.y,240,'enemy');
-  if(hit){ o.hp-=30; o.hurt=.35; sfx('hit'); if(o.hp<=0){ o.hp=0; lost++; corpses.push({x:o.x,y:o.y,a:o.angle,en:false,col:o.col}); toast(`${o.name} 전사`,'warn'); if(sel===o.i)sel=Math.max(0,leaderIdx()); trail=[{x:ops[Math.max(0,leaderIdx())].x,y:ops[Math.max(0,leaderIdx())].y}]; } }
+  const K=e.kind, dd=D();
+  e.cd=K==='sniper'?2.4:K==='shield'?rand(.95,1.4):rand(.65,.95);
+  const hit=Math.random()<(K==='sniper'?Math.min(.95,dd.acc+.5):dd.acc);
+  const dmg=Math.round(dd.dmg*(K==='sniper'?1.8:K==='shield'?.8:1));
+  const lf=K==='sniper'?.16:.07;
+  tracers.push({x1:e.x+Math.cos(e.angle)*18,y1:e.y+Math.sin(e.angle)*18,x2:o.x+(hit?0:rand(-30,30)),y2:o.y+(hit?0:rand(-30,30)),life:lf,m:lf,c:K==='sniper'?'255,70,60':'255,120,80'});
+  sfx(K==='sniper'?'sniper':'eshot',e.x,e.y); makeNoise(e.x,e.y,K==='sniper'?420:240,'enemy');
+  if(hit){ o.hp-=dmg; o.hurt=.35; sfx('hit'); if(o.hp<=0){ o.hp=0; lost++; corpses.push({x:o.x,y:o.y,a:o.angle,en:false,col:o.col}); toast(`${o.name} 전사`,'warn'); if(sel===o.i)sel=Math.max(0,leaderIdx()); trail=[{x:ops[Math.max(0,leaderIdx())].x,y:ops[Math.max(0,leaderIdx())].y}]; } }
 }
 function trailAt(d){
   let acc=0;
@@ -585,7 +665,8 @@ function explode(p){
     if(e.hp<=0)continue;
     const d=Math.hypot(e.x-p.x,e.y-p.y);
     if(d<125&&los(p.x,p.y,e.x,e.y)){
-      e.hp-=d<60?220:d<95?110:55;
+      let dmg=d<60?220:d<95?110:55; if(frontBlocked(p,e))dmg*=.4;
+      e.hp-=dmg;
       if(e.hp<=0)killEnemy(e); else { e.stun=Math.max(e.stun,2.5); e.path=null; if(e.state==='idle'){ e.state='search'; e.lastX=p.x; e.lastY=p.y; e.lostT=0; } }
     }
   }
@@ -617,6 +698,13 @@ function detonate(p){
   if(p.kind==='frag'){ explode(p); return; }
   flashFx.push({x:p.x,y:p.y,t:0}); screenFlash=.6; sfx('flash',p.x,p.y);
   makeNoise(p.x,p.y,300,'op');
+  for(const o of ops){
+    if(o.hp<=0)continue; const dp=Math.hypot(o.x-p.x,o.y-p.y);
+    if(dp<190&&los(p.x,p.y,o.x,o.y)){
+      const b=(1+(1-dp/190)*1.4)*D().blind; if(b>blind)blind=b;
+      if(!blindHint){ blindHint=true; toast('섬광에 눈이 부시다. 가까이서 터뜨리면 나도 당한다','warn'); }
+    }
+  }
   for(const e of enemies){ if(e.hp>0&&Math.hypot(e.x-p.x,e.y-p.y)<200&&los(p.x,p.y,e.x,e.y)){ e.stun=5; e.path=null; if(e.state==='idle')e.state='search'; } }
   const o=p.owner;
   if(p.go&&o.hp>0){ const [sx,sy]=tileOf(o); const path=bfs(sx,sy,p.go[0],p.go[1]); if(path){ o.path=path; o.manual=o.i!==leaderIdx(); } }
@@ -627,6 +715,7 @@ function update(dt){
   time+=dt; if(breachT>0)breachT-=dt; else if(breachCd>0)breachCd-=dt;
   for(const d of DOORS){ if(d.opening&&!d.open){ d.t+=dt/.6; if(d.t>=1){ d.t=1; d.open=true; } } }
   if(screenFlash>0)screenFlash-=dt*1.6;
+  if(blind>0)blind=Math.max(0,blind-dt);
   const lead=leaderIdx(); if(lead<0)return;
   const boost=breachT>0;
   /* ops */
@@ -652,8 +741,12 @@ function update(dt){
     }
     o.moving=moved;
     if(moved){ o.stepAcc=(o.stepAcc||0)+spd*dt; if(o.stepAcc>=(boost?32:25)){ o.stepAcc=0; sfx('step',o.x,o.y); } }
-    let tgt=null,best=1e9;
-    for(const e of enemies){ if(e.hp<=0)continue; const d=Math.hypot(e.x-o.x,e.y-o.y); if(d<350&&d<best&&los(o.x,o.y,e.x,e.y)){best=d;tgt=e;} }
+    let tgt=null,best=1e9,shieldSeen=false;
+    for(const e of enemies){
+      if(e.hp<=0)continue; const d=Math.hypot(e.x-o.x,e.y-o.y);
+      if(d<350&&los(o.x,o.y,e.x,e.y)){ if(frontBlocked(o,e)){ shieldSeen=true; continue; } if(d<best){ best=d; tgt=e; } }
+    }
+    if(shieldSeen&&!tgt&&!shieldHint){ shieldHint=true; toast('방패 정면은 막힌다. 측면으로 돌거나 섬광탄, 수류탄을 써라','warn'); }
     if(tgt){
       const a=Math.atan2(tgt.y-o.y,tgt.x-o.x); o.angle=turn(o.angle,a,12*dt);
       if(o.cd<=0&&Math.abs(angDiff(o.angle,a))<.35)shootOp(o,tgt);
@@ -670,6 +763,15 @@ function update(dt){
   /* enemies */
   for(const e of enemies)updateEnemy(e,dt);
   updateAmbush();
+  /* sound cue: someone is standing behind a closed door you are close to */
+  const PL=ops[lead];
+  for(const e of enemies){
+    if(e.kind!=='ambush'||e.hp<=0||e.state!=='idle'||!e.door||e.door.open||e.door.opening)continue;
+    if(Math.hypot(e.door.x*T+T/2-PL.x,e.door.y*T+T/2-PL.y)<120){
+      e.cueT-=dt;
+      if(e.cueT<=0){ e.cueT=2.3; sfx('rustle',e.x,e.y); if(!cueHint){ cueHint=true; toast('문 너머에 기척이 있다. 열면 바로 쏜다','warn'); } }
+    } else e.cueT=Math.min(e.cueT,.6);
+  }
   if(enemies.some(e=>e.hp>0&&e.state==='alert'))combatHold=5; else combatHold=Math.max(0,combatHold-dt);
   if(shake>0)shake=Math.max(0,shake-dt*2.2);
   /* hostages */
@@ -682,7 +784,7 @@ function update(dt){
   const captives=hostages.filter(h=>h.st==='captive');
   if(alarm&&captives.length){
     execT-=dt; sirenT-=dt; if(sirenT<=0){ sirenT=1.8; tone(560,.9,.045,860,'sawtooth'); }
-    if(execT<=0){ const h=captives[(Math.random()*captives.length)|0]; h.st='dead'; execT=MIS.execN; toast('인질이 처형당했다','warn'); sfx('exec'); }
+    if(execT<=0){ const h=captives[(Math.random()*captives.length)|0]; h.st='dead'; execT=exN(); toast('인질이 처형당했다','warn'); sfx('exec'); }
   }
   /* projectiles & fx */
   for(let i=projs.length-1;i>=0;i--){
@@ -718,7 +820,7 @@ function updateAmbush(){
   const L=ops[Math.max(0,leaderIdx())]; if(!L||L.hp<=0)return;
   ROOMS.forEach((o,i)=>{
     const S=RS[i]; if(S.ambushed)return;
-    const es=enemies.filter(e=>e.hp>0&&e.ri===i&&!e.hunt); if(!es.length)return;
+    const es=enemies.filter(e=>e.hp>0&&e.ri===i&&!e.hunt&&e.kind!=='sniper'); if(!es.length)return;
     if(es.some(e=>e.state==='alert'))return;
     const r=o.r, inside=L.x>=r[0]*T&&L.x<(r[2]+1)*T&&L.y>=r[1]*T&&L.y<(r[3]+1)*T;
     let dMin=1e9; for(const d of o.doors)dMin=Math.min(dMin,Math.hypot(d.x*T+T/2-L.x,d.y*T+T/2-L.y));
@@ -736,28 +838,45 @@ function startAmbush(i,es){
 }
 function updateEnemy(e,dt){
   if(e.hp<=0)return;
-  e.cd-=dt; e.t+=dt;
-  if(e.stun>0){ e.stun-=dt; e.angle+=dt*2.5; return; }
+  const K=e.kind, dd=D();
+  e.cd-=dt; e.t+=dt; if(e.react>0)e.react-=dt;
+  if(e.stun>0){ e.stun-=dt; e.angle+=dt*2.5; e.aim=0; return; }
+  const half=K==='sniper'?.42:.95, maxD=(K==='sniper'?580:340)*dd.sight*(flashlightOn?1.1:.9), near=K==='ambush'?130:70;
   let seen=null,best=1e9;
   for(const o of ops){
     if(o.hp<=0)continue;
-    const dx=o.x-e.x, dy=o.y-e.y, d=Math.hypot(dx,dy); if(d>340)continue;
-    const cone=Math.abs(angDiff(e.angle,Math.atan2(dy,dx)))<.95;
-    if((cone||d<70||e.state==='alert')&&los(e.x,e.y,o.x,o.y)&&d<best){ best=d; seen=o; }
+    const dx=o.x-e.x, dy=o.y-e.y, d=Math.hypot(dx,dy); if(d>maxD)continue;
+    const cone=Math.abs(angDiff(e.angle,Math.atan2(dy,dx)))<half;
+    if((cone||d<near||e.state==='alert')&&los(e.x,e.y,o.x,o.y)&&d<best){ best=d; seen=o; }
   }
+  if(!seen&&e.aim>0)e.aim=Math.max(0,e.aim-dt*2);
   if(seen){
     if(e.state!=='alert'){
-      e.state='alert'; raiseAlarm();
+      e.state='alert'; raiseAlarm(); if(K==='ambush')e.react=.55*dd.react;
       for(const f of enemies){ if(f!==e&&f.hp>0&&f.state==='idle'&&Math.hypot(f.x-e.x,f.y-e.y)<260){ f.state='search'; f.lastX=seen.x; f.lastY=seen.y; f.lostT=0; f.path=null; f.pathT=0; } }
     }
     e.lastX=seen.x; e.lastY=seen.y; e.lostT=0;
-    const ang=Math.atan2(seen.y-e.y,seen.x-e.x); e.angle=turn(e.angle,ang,9*dt);
-    let mx=0,my=0;
-    if(best>190){mx=Math.cos(ang);my=Math.sin(ang);} else if(best<100){mx=-Math.cos(ang);my=-Math.sin(ang);} else { const s=Math.sin(e.t*1.3+e.ph); mx=-Math.sin(ang)*s; my=Math.cos(ang)*s; }
-    moveEnt(e,mx*70*dt,my*70*dt);
-    if(e.cd<=0&&Math.abs(angDiff(e.angle,ang))<.3)shootEn(e,seen);
+    const ang=Math.atan2(seen.y-e.y,seen.x-e.x);
+    if(K==='sniper'){
+      /* holds position, slowly tracks you with a red laser, then fires once the lock completes */
+      e.angle=turn(e.angle,ang,3.2*dt);
+      if(e.cd<=0&&Math.abs(angDiff(e.angle,ang))<.14){
+        if(e.aim<=0)sfx('lock',e.x,e.y);
+        e.aim+=dt; e.aimTx=seen.x; e.aimTy=seen.y;
+        if(e.aim>=1.15*dd.react){ shootEn(e,seen); e.aim=0; }
+      } else e.aim=Math.max(0,e.aim-dt*2);
+    } else {
+      e.angle=turn(e.angle,ang,(K==='shield'?1.2:9)*dt);
+      let mx=0,my=0;
+      if(K==='shield'){ if(best>95){ mx=Math.cos(ang); my=Math.sin(ang); } }
+      else if(best>190){mx=Math.cos(ang);my=Math.sin(ang);} else if(best<100){mx=-Math.cos(ang);my=-Math.sin(ang);} else { const s=Math.sin(e.t*1.3+e.ph); mx=-Math.sin(ang)*s; my=Math.cos(ang)*s; }
+      const sp=K==='shield'?52:70;
+      moveEnt(e,mx*sp*dt,my*sp*dt);
+      if(e.cd<=0&&e.react<=0&&Math.abs(angDiff(e.angle,ang))<.3)shootEn(e,seen);
+    }
   } else if(e.state==='alert'||e.state==='search'){
     e.state='search'; e.lostT+=dt; e.pathT-=dt;
+    if(e.hold&&!e.hunt){ e.angle=turn(e.angle,Math.atan2(e.lastY-e.y,e.lastX-e.x),2.4*dt); if(e.lostT>6)e.state='idle'; return; }
     if(e.hunt){ e.huntT-=dt; if(e.huntT<=0){ const P=ops[Math.max(0,leaderIdx())]; e.lastX=P.x; e.lastY=P.y; e.huntT=1.2; e.path=null; e.lostT=0; } }
     if((!e.path||!e.path.length)&&e.pathT<=0){
       const r=e.room, [sx,sy]=tileOf(e);
@@ -772,11 +891,11 @@ function updateEnemy(e,dt){
       const nx=e.path[0], dd=doorMap[Math.floor(nx.y/T)*W+Math.floor(nx.x/T)];
       if(dd&&!dd.open&&Math.hypot(nx.x-e.x,nx.y-e.y)<56){ if(!dd.opening){ dd.opening=true; sfx('door',dd.x*T+T/2,dd.y*T+T/2); } wait=true; }
     }
-    const spd=e.hunt?105:82, mv=wait?false:followPath(e,spd,dt);
+    const spd=(e.hunt?105:82)*(K==='shield'?.65:1), mv=wait?false:followPath(e,spd,dt);
     if(mv){ e.angle=turn(e.angle,Math.atan2(e.my,e.mx),8*dt); e.stepAcc=(e.stepAcc||0)+spd*dt; if(e.stepAcc>=26){ e.stepAcc=0; sfx('estep',e.x,e.y); } }
     else e.angle+=dt*1.4;
     if(e.lostT>6&&!e.hunt){ e.state='idle'; e.path=null; }
-  } else e.angle=e.base+Math.sin(e.t*.7+e.ph)*.8;
+  } else e.angle=e.base+Math.sin(e.t*.7+e.ph)*(K==='sniper'?.3:K==='ambush'?.12:.8);
   const r=e.room;
   if(r){ e.x=clamp(e.x,r[0]*T+11,(r[2]+1)*T-11); e.y=clamp(e.y,r[1]*T+11,(r[3]+1)*T-11); }
 }
@@ -784,7 +903,7 @@ function computeFog(){
   const alive=ops.filter(o=>o.hp>0);
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){
     const cx=x*T+T/2, cy=y*T+T/2; let v=0;
-    for(const o of alive){ const d=Math.hypot(cx-o.x,cy-o.y); if(d<T*1.4||(d<440&&los(o.x,o.y,cx,cy))){v=1;break;} }
+    for(const o of alive){ const d=Math.hypot(cx-o.x,cy-o.y); if(d<T*1.4||(d<(flashlightOn?440:310)&&los(o.x,o.y,cx,cy))){v=1;break;} }
     visible[y*W+x]=v; if(v)explored[y*W+x]=1;
   }
   for(let i=0;i<W*H;i++){ const a=visible[i]?0:explored[i]?150:238; fogData.data[i*4]=4; fogData.data[i*4+1]=7; fogData.data[i*4+2]=10; fogData.data[i*4+3]=a; }
@@ -793,11 +912,20 @@ function computeFog(){
 const tileVisible=(x,y)=>visible[clamp(Math.floor(y/T),0,H-1)*W+clamp(Math.floor(x/T),0,W-1)]===1;
 
 /* ---------- render ---------- */
-function body(x,y,angle,col,hl,hurt,stun){
+function body(x,y,angle,col,hl,hurt,stun,kind){
   ctx.save(); ctx.translate(x,y);
   ctx.fillStyle='rgba(0,0,0,.38)'; ctx.beginPath(); ctx.ellipse(2,3,12,12,0,0,7); ctx.fill();
   ctx.rotate(angle);
   ctx.fillStyle='#14171a'; ctx.fillRect(5,2,21,4); ctx.fillRect(18,1,3,6);
+  if(kind==='sniper'){ ctx.fillRect(26,2,14,3); ctx.fillStyle='#3a4248'; ctx.fillRect(12,-1,8,3); }
+  if(kind==='shield'){
+    ctx.globalAlpha=stun?.45:1;
+    ctx.fillStyle='rgba(0,0,0,.35)'; ctx.fillRect(15,-17,7,38);
+    ctx.fillStyle='#7f8b94'; ctx.fillRect(13,-19,7,38);
+    ctx.fillStyle='#a9b6bf'; ctx.fillRect(13,-19,2,38);
+    ctx.fillStyle='#3f4b54'; ctx.fillRect(17,-12,2,24);
+    ctx.globalAlpha=1;
+  }
   ctx.fillStyle=hurt>0?'#e5483d':col; ctx.beginPath(); ctx.ellipse(0,0,8,12.5,0,0,7); ctx.fill();
   ctx.fillStyle='rgba(0,0,0,.25)'; ctx.fillRect(-2,-9,3,18);
   ctx.fillStyle='#22282b'; ctx.beginPath(); ctx.arc(1,0,6.8,0,7); ctx.fill();
@@ -809,14 +937,50 @@ function label(txt,x,y,col){
   ctx.font='700 10px "Chakra Petch",sans-serif'; ctx.textAlign='center'; ctx.fillStyle='rgba(0,0,0,.6)'; ctx.fillText(txt,x+1,y+1); ctx.fillStyle=col; ctx.fillText(txt,x,y);
 }
 function cone(e){
-  const R=e.state==='alert'?260:230; ctx.beginPath(); ctx.moveTo(e.x,e.y);
+  const sn=e.kind==='sniper', hf=sn?.42:.95, R=sn?(e.state==='alert'?470:420):(e.state==='alert'?260:230); ctx.beginPath(); ctx.moveTo(e.x,e.y);
   for(let i=0;i<=18;i++){
-    const a=e.angle-.95+1.9*i/18; let r=0;
+    const a=e.angle-hf+hf*2*i/18; let r=0;
     while(r<R){ const px=e.x+Math.cos(a)*(r+6), py=e.y+Math.sin(a)*(r+6); if(blocksSight(Math.floor(px/T),Math.floor(py/T)))break; r+=6; }
     ctx.lineTo(e.x+Math.cos(a)*r,e.y+Math.sin(a)*r);
   }
   ctx.closePath(); const g=ctx.createRadialGradient(e.x,e.y,8,e.x,e.y,R);
   const al=e.state==='alert'?.34:.24; g.addColorStop(0,`rgba(255,70,55,${al})`); g.addColorStop(1,'rgba(255,70,55,0)'); ctx.fillStyle=g; ctx.fill();
+}
+/* Lighting: a dark layer is cut away by the player's glow, the flashlight cone (both stopped by walls and closed doors),
+   muzzle flashes, flashbangs and explosions. */
+function rayPoly(c,x,y,a0,a1,R,n){
+  const full=(a1-a0)>6.2, pts=[];
+  for(let i=0;i<=n;i++){
+    const a=a0+(a1-a0)*i/n; let r=0;
+    while(r<R){ const px=x+Math.cos(a)*(r+6), py=y+Math.sin(a)*(r+6); if(blocksSight(Math.floor(px/T),Math.floor(py/T)))break; r+=6; }
+    pts.push([x+Math.cos(a)*(r+4),y+Math.sin(a)*(r+4)]);
+  }
+  c.beginPath(); if(!full)c.moveTo(x,y);
+  pts.forEach((p,i)=>{ if(i===0&&full)c.moveTo(p[0],p[1]); else c.lineTo(p[0],p[1]); });
+  c.closePath();
+}
+function glow(c,x,y,r,a){ const g=c.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(0,0,0,${a})`); g.addColorStop(1,'rgba(0,0,0,0)'); c.fillStyle=g; c.fillRect(x-r,y-r,r*2,r*2); }
+function drawLighting(){
+  const li=leaderIdx(); if(li<0)return; const L=ops[li];
+  lctx.globalCompositeOperation='source-over'; lctx.clearRect(0,0,CW,CH);
+  lctx.fillStyle=`rgba(2,5,9,${flashlightOn?.3:.55})`; lctx.fillRect(0,0,CW,CH);
+  lctx.globalCompositeOperation='destination-out';
+  let g=lctx.createRadialGradient(L.x,L.y,12,L.x,L.y,175); g.addColorStop(0,'rgba(0,0,0,.95)'); g.addColorStop(1,'rgba(0,0,0,0)');
+  rayPoly(lctx,L.x,L.y,0,Math.PI*2,175,40); lctx.fillStyle=g; lctx.fill();
+  if(flashlightOn){
+    g=lctx.createRadialGradient(L.x,L.y,20,L.x,L.y,400); g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(.7,'rgba(0,0,0,.6)'); g.addColorStop(1,'rgba(0,0,0,0)');
+    rayPoly(lctx,L.x,L.y,L.angle-.5,L.angle+.5,400,30); lctx.fillStyle=g; lctx.fill();
+  }
+  for(const t of tracers)glow(lctx,t.x1,t.y1,150,.9*clamp(t.life/(t.m||.07),0,1));
+  for(const f of flashFx)glow(lctx,f.x,f.y,300,1-f.t/.7);
+  for(const b of boomFx)glow(lctx,b.x,b.y,260,1-b.t/.9);
+  lctx.globalCompositeOperation='source-over';
+  ctx.drawImage(lightCv,0,0);
+  if(flashlightOn){
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    const w=ctx.createRadialGradient(L.x,L.y,20,L.x,L.y,380); w.addColorStop(0,'rgba(255,214,150,.17)'); w.addColorStop(1,'rgba(255,214,150,0)');
+    rayPoly(ctx,L.x,L.y,L.angle-.5,L.angle+.5,380,30); ctx.fillStyle=w; ctx.fill(); ctx.restore();
+  }
 }
 function render(){
   ctx.clearRect(0,0,CW,CH);
@@ -841,11 +1005,13 @@ function render(){
       label('인질',h.x,h.y-24,'#ffb45a');
     } else if(h.st==='free'){ label('구출',h.x,h.y-20,'#8be85a'); }
   }
-  for(const e of enemies){ if(e.hp>0&&tileVisible(e.x,e.y)&&e.stun<=0)cone(e); }
+  for(const e of enemies){ if(e.hp>0&&tileVisible(e.x,e.y)&&e.stun<=0&&!(e.kind==='ambush'&&e.state==='idle'))cone(e); }
   for(const e of enemies){
     if(e.hp<=0||!tileVisible(e.x,e.y))continue;
-    body(e.x,e.y,e.angle,'#6d2a2a','#a84a45',0,e.stun>0);
+    const kc=e.kind==='shield'?['#59636b','#8a97a0']:e.kind==='sniper'?['#35503f','#6f8f78']:e.kind==='ambush'?['#6b4f2a','#a98250']:['#6d2a2a','#a84a45'];
+    body(e.x,e.y,e.angle,kc[0],kc[1],0,e.stun>0,e.kind);
     if(e.state==='alert')label('!',e.x,e.y-20,'#ff6a5a');
+    if(KINDS[e.kind].tag)label(KINDS[e.kind].tag,e.x,e.y+27,'#ffb25a');
   }
   /* orders */
   for(const o of ops){
@@ -886,12 +1052,26 @@ function render(){
   }
   ctx.drawImage(wallL,0,0);
   ctx.imageSmoothingEnabled=true; ctx.drawImage(fogCv,0,0,CW,CH);
+  drawLighting();
   /* noise rings */
   for(const n of noises){
     const k=n.t/.9;
     for(let r=0;r<3;r++){ const kk=clamp(k-r*.14,0,1); if(kk<=0)continue; ctx.strokeStyle=`rgba(255,45,35,${(1-kk)*.8})`; ctx.lineWidth=2.5; ctx.beginPath(); ctx.arc(n.x,n.y,n.r*kk*.55,0,7); ctx.stroke(); }
   }
-  for(const t of tracers){ ctx.strokeStyle=`rgba(${t.c},${t.life/.07})`; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(t.x1,t.y1); ctx.lineTo(t.x2,t.y2); ctx.stroke(); }
+  /* sniper lock-on laser: drawn even through fog so the warning is always visible */
+  for(const e of enemies){
+    if(e.kind!=='sniper'||e.hp<=0||e.stun>0||e.aim<=0)continue;
+    const pr=clamp(e.aim/(1.15*D().react),0,1), mx=e.x+Math.cos(e.angle)*18, my=e.y+Math.sin(e.angle)*18;
+    ctx.strokeStyle=`rgba(255,40,40,${.22+.6*pr})`; ctx.lineWidth=1+pr*1.5; ctx.beginPath(); ctx.moveTo(mx,my); ctx.lineTo(e.aimTx,e.aimTy); ctx.stroke();
+    ctx.fillStyle=`rgba(255,60,50,${.5+.5*pr})`; ctx.beginPath(); ctx.arc(e.aimTx,e.aimTy,3+5*pr,0,7); ctx.fill();
+    ctx.strokeStyle=`rgba(255,60,50,${.4+.5*pr})`; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(e.aimTx,e.aimTy,13-5*pr,0,7); ctx.stroke();
+  }
+  for(const t of tracers){
+    const k=clamp(t.life/(t.m||.07),0,1);
+    ctx.strokeStyle=`rgba(${t.c},${k})`; ctx.lineWidth=t.m>.1?2.4:1.6; ctx.beginPath(); ctx.moveTo(t.x1,t.y1); ctx.lineTo(t.x2,t.y2); ctx.stroke();
+    const mg=ctx.createRadialGradient(t.x1,t.y1,0,t.x1,t.y1,16); mg.addColorStop(0,`rgba(255,240,190,${k*.95})`); mg.addColorStop(1,'rgba(255,200,90,0)');
+    ctx.fillStyle=mg; ctx.fillRect(t.x1-16,t.y1-16,32,32);
+  }
   for(const f of flashFx){ const k=f.t/.7, g=ctx.createRadialGradient(f.x,f.y,0,f.x,f.y,200*(.3+k)); g.addColorStop(0,`rgba(255,255,255,${1-k})`); g.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=g; ctx.fillRect(f.x-220,f.y-220,440,440); }
   for(const b of boomFx){
     const k=b.t/.9, g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,130*(.3+k));
@@ -911,6 +1091,13 @@ function render(){
   ctx.drawImage(vigL,0,0);
   if(screenFlash>0){ ctx.fillStyle=`rgba(255,255,255,${clamp(screenFlash,0,1)*.45})`; ctx.fillRect(0,0,CW,CH); }
   ctx.restore();
+  if(blind>0){
+    /* blinded by your own flashbang: ghosted double vision plus a white wash that fades out */
+    const k=clamp(blind/1.4,0,1), s=3+9*k;
+    ctx.save(); ctx.globalAlpha=.05+.22*k;
+    for(const [ox,oy] of [[s,0],[-s,0],[0,s],[0,-s]])ctx.drawImage(cv,ox,oy);
+    ctx.globalAlpha=1; ctx.fillStyle=`rgba(255,255,255,${k*.8})`; ctx.fillRect(0,0,CW,CH); ctx.restore();
+  }
 }
 
 /* ---------- flow ---------- */
@@ -927,14 +1114,14 @@ function endGame(win,why){
   const capt=hostages.filter(h=>h.st==='dead').length;
   let rank='C';
   const last=missionIdx>=MISSIONS.length-1;
-  if(win){ unlocked=Math.max(unlocked,Math.min(MISSIONS.length,missionIdx+2)); try{ localStorage.setItem('sb-unlocked',String(unlocked)); }catch(e){} }
+  if(win){ cleared.add(missionIdx); try{ localStorage.setItem('sb-cleared',[...cleared].join(',')); }catch(e){} }
   $('nextBtn').hidden=!(win&&!last); $('again').textContent=win?'재도전':'다시 작전';
   if(win){ const par=time<MIS.par&&lost===0&&capt===0?'S':capt===0&&lost<=1?'A':capt<=1?'B':'C'; rank=par; }
   else rank='F';
   $('endSub').textContent=win?(last?'ALL MISSIONS COMPLETE':`OP ${missionIdx+1} · MISSION COMPLETE`):`OP ${missionIdx+1} · MISSION FAILED`;
   $('endTitle').textContent=win?(last?'전 작전 완료':'작전 성공'):(why||'작전 실패');
   $('endRank').textContent=rank; sfx(win?'win':'lose');
-  $('endStats').innerHTML=`<div><dt>소요 시간</dt><dd>${fmt(time)}</dd></div><div><dt>구출</dt><dd>${saved}/${hostages.length}</dd></div><div><dt>적 제압</dt><dd>${kills}/${enemies.length}</dd></div><div><dt>대원 손실</dt><dd>${lost}</dd></div>`;
+  $('endStats').innerHTML=`<div><dt>소요 시간</dt><dd>${fmt(time)}</dd></div><div><dt>구출</dt><dd>${saved}/${hostages.length}</dd></div><div><dt>적 제압</dt><dd>${kills}/${enemies.length}</dd></div><div><dt>대원 손실</dt><dd>${lost}</dd></div><div><dt>난이도</dt><dd>${D().name}</dd></div>`;
   setTimeout(()=>{ $('end').hidden=false; },900);
 }
 function startGame(){ initAudio(); reset(); computeFog(); $('intro').hidden=true; $('end').hidden=true; state='play'; paused=false; toast(`작전 ${missionIdx+1}: ${MIS.name}`,'good'); }
@@ -943,10 +1130,18 @@ function renderIntro(){
   $('briefText').textContent=MIS.brief;
   const list=$('missionList'); list.innerHTML='';
   MISSIONS.forEach((m,i)=>{
-    const b=document.createElement('button'); b.type='button'; b.className='mbtn'+(i===missionIdx?' sel':''); b.disabled=i>=unlocked;
-    b.innerHTML=`<b>OP ${i+1} ${m.name}</b><span>${i<unlocked?m.sub:'잠김'}</span>`;
+    const b=document.createElement('button'); b.type='button'; b.className='mbtn'+(i===missionIdx?' sel':'');
+    b.innerHTML=`<b>OP ${i+1} ${m.name}</b><span>${m.sub}${cleared.has(i)?' · 클리어':''}</span>`;
     b.addEventListener('click',()=>{ missionIdx=i; reset(); computeFog(); renderIntro(); });
     list.appendChild(b);
+  });
+  const dl=$('diffList'); dl.innerHTML='';
+  const dsub={easy:'적 피해와 정확도 낮음, 인질 시간 1.5배',normal:'기본',hard:'적 피해와 정확도 높음, 인질 시간 0.75배'};
+  Object.keys(DIFF).forEach(k=>{
+    const b=document.createElement('button'); b.type='button'; b.className='mbtn'+(k===diffKey?' sel':'');
+    b.innerHTML=`<b>${DIFF[k].name}</b><span>${dsub[k]}</span>`;
+    b.addEventListener('click',()=>{ diffKey=k; try{ localStorage.setItem('sb-diff',k); }catch(e){} renderIntro(); });
+    dl.appendChild(b);
   });
 }
 function toMenu(){ reset(); computeFog(); state='intro'; $('end').hidden=true; $('intro').hidden=false; renderIntro(); }
@@ -979,7 +1174,7 @@ addEventListener('keydown',e=>{
   const k=keyOf(e);
   const mk=KM[k]||((k.length===1&&'wasd'.includes(k))?k:null);
   if(mk){ keys[mk]=true; if(KM[k])e.preventDefault(); }
-  if(k==='g')toggleThrow('flash'); else if(k==='h')toggleThrow('frag'); else if(k==='m')setMuted(!muted); else if(k==='e')openDoor(); else if(k==='b')breach(); else if(k==='p')setPause(!paused);
+  if(k==='g')toggleThrow('flash'); else if(k==='h')toggleThrow('frag'); else if(k==='m')setMuted(!muted); else if(k==='f')toggleLight(); else if(k==='e')openDoor(); else if(k==='b')breach(); else if(k==='p')setPause(!paused);
   else if(k==='escape')toggleThrow(false); else if(k>='1'&&k<='4')selectOp(+k-1);
 });
 addEventListener('keyup',e=>{ const k=keyOf(e), mk=KM[k]||((k.length===1&&'wasd'.includes(k))?k:null); if(mk)keys[mk]=false; });
@@ -992,6 +1187,7 @@ $('nextBtn').addEventListener('click',()=>{ if(missionIdx<MISSIONS.length-1){ mi
 $('flashBtn').addEventListener('click',()=>toggleThrow('flash'));
 $('fragBtn').addEventListener('click',()=>toggleThrow('frag'));
 $('muteBtn').addEventListener('click',()=>setMuted(!muted));
+$('lightBtn').addEventListener('click',toggleLight);
 document.addEventListener('pointerdown',()=>initAudio());
 $('doorBtn').addEventListener('click',openDoor);
 $('breach').addEventListener('click',breach);
