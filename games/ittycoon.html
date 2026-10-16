@@ -1,12 +1,4 @@
-<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{color-scheme:light}body{margin:0}[hidden]{display:none!important}</style>
-</head>
-<body>
-<title>IT 컴퍼니 타이쿤</title>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>[hidden]{display:none!important}</style></head><body><title>IT 컴퍼니 타이쿤</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +39,7 @@ p{margin:0}
 .ctrl{display:flex;gap:6px;flex-wrap:wrap}
 .mbar{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-bottom:12px}
 .mbar i{display:block;height:100%;width:0;background:var(--accent)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px;margin-bottom:14px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
 .stat small{display:block;color:var(--muted);font-size:11px;letter-spacing:.06em}
 .stat b{display:block;font:600 17px/1.3 var(--f-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -124,6 +116,59 @@ svg.spark .t{fill:var(--muted);font:500 10px var(--f-mono)}
 .toast.bad{box-shadow:inset 4px 0 0 var(--bad),0 6px 18px -8px rgba(0,0,0,.5)}
 .chk{display:flex;gap:8px;font-size:13px;padding:2px 0}
 .chk i{font-style:normal;font-family:var(--f-mono);width:14px;flex:none}
+.modal .choices .btn small{display:block;font-weight:500;font-size:12px;opacity:.75;margin-top:2px;line-height:1.4}
+.modal .sect{margin-top:12px}
+.modal textarea{width:100%;font:500 11px/1.4 var(--f-mono);color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:7px;padding:8px;resize:vertical;margin:6px 0}
+.slot{display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.slot .grow{flex:1;min-width:140px;font-size:12.5px}
+.slot .grow small{display:block;color:var(--muted);font-size:11.5px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin:4px 0}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}
+.badge{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--surface2);opacity:.55;min-width:0}
+.badge.on{opacity:1;border-color:var(--accent)}
+.badge b{display:block;font-size:13px}
+.badge span{font-size:11.5px;color:var(--muted)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:2px 14px;margin:6px 0}
+.kv div{display:flex;justify-content:space-between;gap:8px;font-size:13px;border-bottom:1px dashed var(--line);padding:3px 0}
+.kv b{font-family:var(--f-mono);font-weight:600}
+#fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:70}
+#fx i{position:absolute;top:-16px;border-radius:2px;animation:fall 2.1s cubic-bezier(.3,.5,.6,1) forwards}
+@keyframes fall{to{transform:translate(var(--dx),105vh) rotate(var(--r))}}
+.working .desk b{animation:bob .8s steps(2,end) infinite;animation-delay:var(--d,0s)}
+@keyframes bob{50%{transform:translateY(-2px)}}
+.desk b{transition:transform .5s,opacity .5s}
+.desk.brk b{transform:translateX(16px);opacity:.3;animation:none}
+.desk.brk::after{content:'휴식';position:absolute;top:-8px;right:-4px;font:600 9px var(--f-mono);background:var(--ink);color:var(--bg);padding:1px 6px;border-radius:99px}
+@media (prefers-reduced-motion:reduce){.working .desk b{animation:none}.desk b{transition:none}#fx{display:none}}
+.row .act.h{flex-direction:row;flex-wrap:wrap;justify-content:flex-end;max-width:270px}
+.thead{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:16px 0 4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.thead .grow{flex:1;min-width:150px}
+.thead b{font:600 13px var(--f-mono)}
+.zone{grid-column:1/-1;font:600 11px var(--f-mono);color:var(--muted);letter-spacing:.04em;margin-top:4px}
+.desk.head::before{content:'팀장';position:absolute;top:-8px;left:-4px;font:600 9px var(--f-mono);background:var(--accent);color:var(--accent-ink);padding:1px 6px;border-radius:99px}
+.bub{position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);width:max-content;max-width:140px;background:var(--ink);color:var(--bg);font:500 11px/1.35 inherit;font-family:inherit;padding:4px 8px;border-radius:8px;z-index:6;pointer-events:none;animation:bubin .2s ease-out}
+.bub::after{content:'';position:absolute;top:100%;left:50%;margin-left:-4px;border:4px solid transparent;border-top-color:var(--ink)}
+@keyframes bubin{from{opacity:0;transform:translate(-50%,4px)}}
+ul.chron{list-style:none;margin:6px 0;padding:0;font-size:12.5px}
+ul.chron li{display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--line)}
+ul.chron time{font:500 11px var(--f-mono);color:var(--muted);min-width:76px}
+.modal input[type=text]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface2);color:var(--ink);font:inherit;margin-top:6px}
+.goals li.lh{grid-column:1/-1;font:600 11px var(--f-mono);color:var(--muted);letter-spacing:.04em;margin-top:6px;border:0}
+.tname{font:600 12px var(--f-mono);color:var(--muted);margin:12px 0 4px;letter-spacing:.04em}
+.working .desk.idle b{animation:none}.working .desk.idle .mon{animation:none;opacity:.45}
+.tip{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.tip .lab{font:600 11px var(--f-mono);color:var(--accent-ink);background:var(--accent);border-radius:99px;padding:2px 10px;letter-spacing:.04em;white-space:nowrap}
+.tip.warn{border-color:var(--bad)}
+.tip.warn .lab{background:var(--bad);color:var(--accent-ink)}
+.tip .tx{flex:1;min-width:200px;font-size:13.5px}
+.tip .tx small{display:block;color:var(--muted);font-size:12px;margin-top:2px;line-height:1.5}
+.tab.hint::after{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:6px;vertical-align:middle;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.tab.hint::after{animation:none}}
+ul.chem{margin:4px 0 0;padding-left:18px;font-size:13px}
+.modal ul.help{color:var(--ink);line-height:1.6}
+.modal .sect.h{margin-top:14px}
 </style>
 
 <div class="wrap">
@@ -137,6 +182,9 @@ svg.spark .t{fill:var(--muted);font:500 10px var(--f-mono)}
       <button class="btn sm" data-act="speed" data-v="1">1x</button>
       <button class="btn sm" data-act="speed" data-v="2">2x</button>
       <button class="btn sm" data-act="speed" data-v="4">4x</button>
+      <button class="btn sm" data-act="menu">저장·불러오기</button>
+      <button class="btn sm" data-act="settings">설정</button>
+      <button class="btn sm" data-act="help">도움말</button>
       <button class="btn sm" id="bReset" data-act="reset">새로 시작</button>
     </div>
   </header>
@@ -147,9 +195,14 @@ svg.spark .t{fill:var(--muted);font:500 10px var(--f-mono)}
     <div class="stat"><small>월 수입</small><b id="s-inc"></b><em id="s-incsub"></em></div>
     <div class="stat"><small>월 지출</small><b id="s-exp"></b><em id="s-expsub"></em></div>
     <div class="stat"><small>평판</small><b id="s-rep"></b><em id="s-repsub"></em></div>
+    <div class="stat"><small>인지도</small><b id="s-brand"></b><em id="s-brandsub"></em></div>
     <div class="stat"><small>팀 사기</small><b id="s-mor"></b><div class="bar thin"><i id="s-morbar"></i></div></div>
     <div class="stat"><small>직원</small><b id="s-staff"></b><em id="s-staffsub"></em></div>
+    <div class="stat"><small>시장</small><b id="s-mkt"></b><em id="s-mktsub"></em></div>
+    <div class="stat"><small id="s-valL">기업 가치</small><b id="s-val"></b><em id="s-valsub"></em></div>
   </section>
+
+  <section class="tip" id="tip" aria-live="polite" hidden></section>
 
   <div class="main">
     <div class="col">
@@ -173,6 +226,7 @@ svg.spark .t{fill:var(--muted);font:500 10px var(--f-mono)}
 
 <div class="overlay" id="ov" hidden><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
+<div id="fx" aria-hidden="true"></div>
 
 <script>
 (function(){
@@ -186,7 +240,8 @@ var OFFICES=[
   {n:'차고 사무실',cap:3,rent:20,cost:0},
   {n:'소형 오피스',cap:8,rent:120,cost:1500},
   {n:'중형 오피스',cap:20,rent:500,cost:6000},
-  {n:'판교 사옥',cap:50,rent:2200,cost:30000}
+  {n:'판교 사옥',cap:50,rent:2200,cost:30000},
+  {n:'AI 캠퍼스',cap:120,rent:9000,cost:120000}
 ];
 var TECHS=[
   {id:'git',n:'Git 워크플로',d:'개발 속도 +15%',cost:600,months:2,req:[],fx:{dev:.15}},
@@ -195,14 +250,18 @@ var TECHS=[
   {id:'brand',n:'브랜드 가이드',d:'평판 획득량 +40%',cost:2000,months:3,req:[]},
   {id:'cloud',n:'클라우드 인프라',d:'제품 수익 +10%, 협업 SaaS 해금',cost:2500,months:4,req:['git'],prod:.10},
   {id:'ai',n:'AI 코파일럿 도입',d:'전 직군 속도 +25%, AI 비서 서비스 해금',cost:9000,months:6,req:['cloud','agile'],fx:{all:.25}},
-  {id:'plat',n:'플랫폼 아키텍처',d:'제품 수익 +20%, 슈퍼앱 플랫폼 해금',cost:25000,months:8,req:['ai'],prod:.20}
+  {id:'plat',n:'플랫폼 아키텍처',d:'제품 수익 +20%, 슈퍼앱 플랫폼 해금',cost:25000,months:8,req:['ai'],prod:.20},
+  {id:'global',n:'글로벌 진출',d:'제품 수익 +15%, 글로벌 클라우드 해금',cost:60000,months:10,req:['plat'],prod:.15},
+  {id:'agi',n:'AGI 연구소',d:'전 직군 속도 +30%, 제품 수익 +10%, AGI 플랫폼 해금',cost:150000,months:14,req:['global'],fx:{all:.30},prod:.10}
 ];
 var PRODUCTS=[
   {id:'app',n:'생활 편의 앱',d:'가볍게 만드는 첫 자체 제품. 수익은 서서히 줄어듭니다.',need:{dev:120,des:90,pm:60},cost:200,inc:520,g:-0.03},
   {id:'game',n:'캐주얼 모바일 게임',d:'대박이 날 수도, 묻힐 수도 있습니다.',need:{dev:200,des:180,pm:100},cost:300,inc:380,g:-0.05,risky:true},
   {id:'saas',n:'협업 SaaS',d:'구독형이라 해마다 꾸준히 성장합니다.',need:{dev:450,des:150,pm:220},cost:800,inc:1500,g:0.012,tech:'cloud'},
   {id:'ai',n:'AI 비서 서비스',d:'수요가 폭발하는 분야. 개발 규모도 큽니다.',need:{dev:1000,des:300,pm:450},cost:3000,inc:6500,g:0.015,tech:'ai'},
-  {id:'plat',n:'슈퍼앱 플랫폼',d:'국민 앱을 노리는 최종 사업입니다.',need:{dev:3000,des:1100,pm:1500},cost:10000,inc:26000,g:0.01,tech:'plat',office:2}
+  {id:'plat',n:'슈퍼앱 플랫폼',d:'국민 앱을 노리는 대형 사업입니다.',need:{dev:3000,des:1100,pm:1500},cost:10000,inc:26000,g:0.01,tech:'plat',office:2},
+  {id:'cloudg',n:'글로벌 클라우드',d:'전 세계 기업이 쓰는 인프라 서비스입니다.',need:{dev:8000,des:2500,pm:4000},cost:30000,inc:90000,g:0.01,tech:'global',office:3},
+  {id:'agi',n:'AGI 플랫폼',d:'일하는 방식을 바꾸는 궁극의 플랫폼입니다.',need:{dev:25000,des:7000,pm:12000},cost:100000,inc:320000,g:0.012,tech:'agi',office:4}
 ];
 var CONTRACTS=[
   {t:'랜딩 페이지',need:[40,20,10],r:1500,m:5,rep:0},
@@ -211,7 +270,9 @@ var CONTRACTS=[
   {t:'모바일 앱 외주',need:[190,100,80],r:10500,m:8,rep:20},
   {t:'기업용 ERP 모듈',need:[420,120,210],r:30000,m:12,rep:45},
   {t:'핀테크 백엔드',need:[650,150,280],r:52000,m:14,rep:70},
-  {t:'공공 차세대 SI',need:[1500,420,700],r:160000,m:20,rep:110}
+  {t:'공공 차세대 SI',need:[1500,420,700],r:160000,m:20,rep:110},
+  {t:'글로벌 대기업 SI',need:[3500,1000,1600],r:400000,m:18,rep:140},
+  {t:'국가 인프라 프로젝트',need:[9000,2600,4200],r:1100000,m:24,rep:200}
 ];
 var CLIENTS=['한강식품','오렌지랩','대성물류','미래병원','블루뱅크','스타일샵','서울시청','다온건설','하늘여행'];
 var SN=['김','이','박','최','정','강','조','윤','장','임','한','오','서','신','권','황'];
@@ -231,7 +292,80 @@ var GOALS=[
   ['직원 10명 달성',function(s){return s.staff.length>=10}],
   ['월 매출 1억원',function(s){return avgRev(s)>=10000}],
   ['판교 사옥 입주',function(s){return s.office>=3}],
-  ['코스닥 상장',function(s){return !!s.over&&s.over.type==='ipo'}]
+  ['코스닥 상장',function(s){return s.listed>=1}],
+  ['코스피 상장',function(s){return s.listed>=2}],
+  ['시가총액 5,000억원',function(){return S.listed>0&&capVal()>=5e7}],
+  ['시가총액 1조원',function(){return S.listed>0&&capVal()>=1e8}],
+  ['시가총액 3조원',function(){return S.listed>0&&capVal()>=3e8}],
+  ['모든 연구 완료',function(s){return TECHS.every(function(t){return s.techs[t.id]})}],
+  ['라이벌 인수',function(s){return s.acq>=1}],
+  ['해외 진출',function(s){return s.branches.length>=1}]
+];
+var DIFFS={
+  easy:{n:'쉬움',d:'수입 +15%, 급여 -15%, 라이벌 약함, 시작 자금 4,500만원, 적자를 3개월까지 버팁니다.',inc:1.15,sal:.85,riv:.8,cash:4500,grace:3},
+  normal:{n:'보통',d:'균형 잡힌 기본 난이도. 시작 자금 3,000만원.',inc:1,sal:1,riv:1,cash:3000,grace:2},
+  hard:{n:'어려움',d:'수입 -10%, 급여 +10%, 라이벌 강함, 시작 자금 2,000만원.',inc:.9,sal:1.1,riv:1.3,cash:2000,grace:2}
+};
+var SCENS={
+  std:{n:'표준 창업',d:'차고에서 혼자 시작합니다.'},
+  slump:{n:'불황기 창업',d:'경기 침체 한가운데서 시작합니다. 불황이 끝나면 호황이 찾아옵니다.'},
+  vc:{n:'투자 받고 시작',d:'지분 20%를 넘기고 자금 1억원, 소형 오피스, 직원 2명으로 시작합니다.'},
+  ex:{n:'대기업 출신 창업',d:'평판 25와 숙련된 개발자 1명으로 시작하지만 자금이 적습니다.'},
+  rival:{n:'라이벌 속 창업',d:'강한 라이벌 3곳이 시장을 차지하고 있습니다. 대신 자금이 넉넉합니다.'}
+};
+var REGIONS=[
+  {id:'jp',n:'일본 지사',cur:'엔',cost:3000,rent:150,share:.15,rep:30,off:1},
+  {id:'us',n:'미국 지사',cur:'달러',cost:12000,rent:600,share:.30,rep:70,off:2},
+  {id:'eu',n:'유럽 지사',cur:'유로',cost:40000,rent:1500,share:.22,rep:110,off:3}
+];
+var TRAITS={
+  none:{n:'평범',d:'특별한 성향은 없습니다.',sal:0,w:30},
+  genius:{n:'천재형',d:'산출 +30%, 월급 +25%',sal:.25,w:8},
+  grind:{n:'야근형',d:'야근 모드에서 산출 +40%',sal:0,w:12},
+  mentor:{n:'멘토형',d:'다른 직원의 성장 확률 +25%, 본인 산출 -10%',sal:0,w:10},
+  mood:{n:'분위기메이커',d:'팀 사기 목표 +3 (최대 +9), 월급 +5%',sal:.05,w:12},
+  perf:{n:'완벽주의',d:'제품의 기술 부채가 덜 쌓임, 월급 +10%',sal:.1,w:10,roles:['dev']},
+  burn:{n:'불꽃형',d:'산출 +25%, 사기 50 미만이면 번아웃 퇴사 위험',sal:0,w:10},
+  loyal:{n:'충성형',d:'경쟁사 스카우트를 거절, 월급 -5%',sal:-.05,w:8}
+};
+var LONGS=[
+  ['시가총액 10조원',function(){return capVal()>=1e9}],
+  ['시가총액 30조원',function(){return capVal()>=3e9}],
+  ['월 매출 100억원',function(s){return avgRev(s)>=1e6}],
+  ['인지도 95 이상',function(s){return s.brand>=95}],
+  ['직원 100명',function(s){return s.staff.length>=100}],
+  ['세 팀 동시 가동',function(s){return s.projs.filter(Boolean).length>=3}],
+  ['해외 지사 3곳',function(s){return s.branches.length>=3}],
+  ['라이벌 5곳 인수',function(s){return s.acq>=5}],
+  ['베테랑 군단 (20명 이상, 전원 ★4+)',function(s){return s.staff.length>=20&&s.staff.every(function(p){return p.skill>=4})}],
+  ['팀 전문성 Lv5',function(s){return s.texp.some(function(m){return Object.keys(m).some(function(k){return m[k]>=5})})}]
+];
+var LEG={
+  cash:{n:'두둑한 종잣돈',c:1,d:'시작 자금 +2,000만원',fn:function(){S.cash+=2000}},
+  rep:{n:'업계 인맥',c:1,d:'평판 +20, 인지도 +10',fn:function(){S.rep+=20;S.brand+=10}},
+  tech:{n:'연구 노트',c:1,d:'Git 워크플로 연구 완료 상태로 시작',fn:function(){S.techs.git=true}},
+  vet:{n:'베테랑 합류',c:2,d:'★4 개발자 한 명이 처음부터 함께합니다',fn:function(){S.staff.push(mkStaff('dev',4))}},
+  office:{n:'소형 오피스 시작',c:2,d:'소형 오피스(8석)에서 시작합니다',fn:function(){S.office=1}}
+};
+var ACHS=[
+  {id:'multi',n:'멀티 프로젝트',d:'세 팀이 동시에 프로젝트 진행',f:function(){return S.projs.filter(Boolean).length>=3}},
+  {id:'famous',n:'국민 브랜드',d:'인지도 80 달성',f:function(){return S.brand>=80}},
+  {id:'ot',n:'야근왕',d:'야근 모드를 누적 12개월 가동',f:function(){return S.st.otMonths>=12}},
+  {id:'clean',n:'클린 코드',d:'리팩토링 10회',f:function(){return S.st.refCount>=10}},
+  {id:'ctr',n:'외주 장인',d:'계약 20건 납품',f:function(){return S.contractsDone>=20}},
+  {id:'legion',n:'제품 군단',d:'제품 5개 동시 운영',f:function(){return S.products.length>=5}},
+  {id:'academy',n:'인재 사관학교',d:'★5 직원 5명 보유',f:function(){return S.staff.filter(function(p){return p.skill>=5}).length>=5}},
+  {id:'rev',n:'기사회생',d:'적자 위기에서 현금을 회복',f:function(){return S.st.revived}},
+  {id:'slump',n:'불황의 승자',d:'불황 중 흑자 결산 3회',f:function(){return S.st.slumpProfit>=3}},
+  {id:'acq1',n:'첫 인수',d:'라이벌 1곳 인수',f:function(){return S.acq>=1}},
+  {id:'acq3',n:'시장 독점',d:'라이벌 3곳 인수',f:function(){return S.acq>=3}},
+  {id:'glob',n:'글로벌 기업',d:'해외 지사 3곳 운영',f:function(){return S.branches.length>=3}},
+  {id:'cash',n:'현금 부자',d:'현금 100억원 보유',f:function(){return S.st.peakCash>=1e6}},
+  {id:'speed',n:'스피드런',d:'60개월 안에 코스닥 상장',f:function(){return S.st.kosdaqM!==undefined&&S.st.kosdaqM<=60}},
+  {id:'nodebt',n:'무차입 상장',d:'대출 없이 코스닥 상장',f:function(){return S.listed>=1&&!S.st.loanEver}},
+  {id:'kospi',n:'코스피 입성',d:'코스피 상장',f:function(){return S.listed>=2}},
+  {id:'t1',n:'조 단위 기업',d:'기업 가치 1조원 달성',f:function(){return S.st.peakCap>=1e8}},
+  {id:'exit',n:'화려한 엑싯',d:'회사를 대기업에 매각',f:function(){return !!S.over&&S.over.type==='sold'}}
 ];
 
 /* ---------- 유틸 ---------- */
@@ -242,53 +376,441 @@ var pick=function(a){return a[Math.floor(Math.random()*a.length)]};
 var clamp=function(v,a,b){return Math.max(a,Math.min(b,v))};
 var fix=function(n){return Math.round(n)};
 function pickW(list){var t=0,i;for(i=0;i<list.length;i++)t+=list[i][1];var r=Math.random()*t;for(i=0;i<list.length;i++){r-=list[i][1];if(r<=0)return list[i][0]}return list[0][0]}
-function money(n){var a=Math.abs(n),s=n<0?'-':'';if(a>=10000){var v=a/10000;v=v>=100?Math.round(v):Math.round(v*100)/100;return s+v.toLocaleString('ko-KR')+'억원'}return s+Math.round(a).toLocaleString('ko-KR')+'만원'}
+function money(n){var a=Math.abs(n),s=n<0?'-':'';if(a>=1e8){var t=a/1e8;t=t>=100?Math.round(t):Math.round(t*100)/100;return s+t.toLocaleString('ko-KR')+'조원'}if(a>=10000){var v=a/10000;v=v>=100?Math.round(v):Math.round(v*100)/100;return s+v.toLocaleString('ko-KR')+'억원'}return s+Math.round(a).toLocaleString('ko-KR')+'만원'}
 function monthLabel(m){var idx=10+m;return (2026+Math.floor(idx/12))+'년 '+(idx%12+1)+'월'}
 function setT(id,t){var e=$(id);if(e&&e.textContent!==String(t))e.textContent=t}
 function setW(id,p){var e=$(id);if(e)e.style.width=p.toFixed(1)+'%'}
 function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n)}
 function roleTag(r){return '<span class="tag" style="--role:var(--'+r+')">'+ROLES[r].full+'</span>'}
 function needTxt(n){return '개발 '+n.dev+' · 디자인 '+n.des+' · 기획 '+n.pm}
-function salary(s){return 150+120*s}
+function D(){return DIFFS[(S&&S.diff)||'normal']}
+function salary(s){return Math.round((150+120*s)*D().sal)}
 function repTier(r){return r<10?'무명 스타트업':r<30?'동네 개발사':r<70?'알려진 IT 업체':r<120?'업계 강자':'테크 대기업'}
 
 /* ---------- 상태 ---------- */
 var S=null, TAB='contracts', modalOpen=false, mq=[], armed=null, armT=0;
+var META={ach:{},rec:{}},SOUND=true,BGMON=true,HINTS=true,STORY=true,chT=0,AC=null,brkT=0,tipKey='',tipTab=null,tipC=0;
+try{var _m=JSON.parse(localStorage.getItem('itTycoon.meta')||'null');if(_m&&_m.ach)META=_m;if(!META.rec)META.rec={};if(!META.lp)META.lp=0}catch(e){}
+try{SOUND=localStorage.getItem('itTycoon.snd')!=='0';BGMON=localStorage.getItem('itTycoon.bgm')!=='0';HINTS=localStorage.getItem('itTycoon.hints')!=='0';STORY=localStorage.getItem('itTycoon.story')!=='0'}catch(e){}
+function saveMeta(){try{localStorage.setItem('itTycoon.meta',JSON.stringify(META))}catch(e){}}
+function recRec(k,v,min){var r=META.rec;if(r[k]===undefined||(min?v<r[k]:v>r[k])){r[k]=v;saveMeta()}}
 
-function newState(){
-  return {v:1,month:0,mf:0,cash:3000,rep:0,morale:70,office:0,speed:1,paused:true,
-    staff:[],nid:1,pool:[],contracts:[],techs:{},research:null,products:[],project:null,perks:{},loans:[],
-    overtime:false,campaign:0,log:[],hist:[],revHist:[],contractIncome:0,neg:0,contractsDone:0,launched:0,goals:[],over:null};
+function newState(dk,sk){
+  var dd=DIFFS[dk||'normal'];
+  return {v:1,diff:dk||'normal',scen:sk||'std',slot:1,month:0,mf:0,cash:dd.cash,rep:0,morale:70,office:0,speed:1,paused:true,
+    staff:[],nid:1,pool:[],contracts:[],techs:{},research:null,products:[],projs:[null,null,null],brand:0,prM:{},tn:['','',''],tdel:[false,false,false],tspec:[null,null,null],texp:[{},{},{}],chron:[],lpGot:{},longs:[],tcount:1,perks:{},loans:[],
+    overtime:false,campaign:0,log:[],hist:[],revHist:[],contractIncome:0,neg:0,contractsDone:0,launched:0,goals:[],over:null,eq:100,round:0,listed:0,sent:1,qPrev:0,lastIssue:-99,mkt:{cycle:'normal',cl:ri(6,10),trend:null,tl:6},rivals:genRivals(0),fx:{jp:1,us:1,eu:1},branches:[],hedge:0,acq:0,rq:[],nextCycle:null,rh:[],eh:[],st:{rev:0,exp:0,peakCash:0,peakCap:0,otMonths:0,refCount:0,slumpProfit:0,loanEver:false,revived:false}};
 }
-function save(){try{if(S&&!S.over)localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){}}
-function loadSave(){try{var t=localStorage.getItem(SAVE_KEY);if(!t)return null;var o=JSON.parse(t);if(o&&o.v===1&&!o.over)return o}catch(e){}return null}
-function clearSave(){try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
+function slotKey(n){return 'itTycoon.slot'+n}
+function readSlot(n){try{var t=localStorage.getItem(slotKey(n));if(!t)return null;var o=JSON.parse(t);if(o&&o.v===1&&!o.over)return migrate(o)}catch(e){}return null}
+function writeSlot(n,o){try{localStorage.setItem(slotKey(n),JSON.stringify(o));return true}catch(e){return false}}
+function save(){if(S&&!S.over&&S.slot)writeSlot(S.slot,S)}
+function migrateLegacy(){try{var t=localStorage.getItem(SAVE_KEY);if(t){if(!localStorage.getItem(slotKey(1)))localStorage.setItem(slotKey(1),t);localStorage.removeItem(SAVE_KEY)}}catch(e){}}
+function migrate(o){
+  if(o.projs===undefined)o.projs=[o.project||null,null,null];
+  delete o.project;
+  if(o.brand===undefined)o.brand=Math.min(40,Math.round((o.rep||0)/4));
+  if(!o.prM)o.prM={};
+  if(!o.tn)o.tn=['','',''];
+  if(!o.tdel)o.tdel=[false,false,false];
+  if(!o.tspec)o.tspec=[null,null,null];
+  if(!o.texp)o.texp=[{},{},{}];
+  if(!o.chron)o.chron=[];
+  if(!o.lpGot)o.lpGot={};
+  if(!o.longs)o.longs=[];
+  if(!o.tcount)o.tcount=o.office>=3?3:o.office>=2?2:1;
+  o.staff.forEach(function(p){if(p.team===undefined)p.team=0});
+  if(o.eq===undefined)o.eq=100;
+  if(o.round===undefined)o.round=0;
+  if(o.listed===undefined)o.listed=0;
+  if(o.sent===undefined)o.sent=1;
+  if(o.qPrev===undefined)o.qPrev=0;
+  if(o.lastIssue===undefined)o.lastIssue=-99;
+  if(!o.mkt)o.mkt={cycle:'normal',cl:ri(6,10),trend:null,tl:6};
+  if(!o.rivals)o.rivals=genRivals(o.month);
+  o.staff.forEach(function(p){if(!p.trait)p.trait=newTrait(p.role)});
+  if(!o.diff)o.diff='normal';
+  if(!o.scen)o.scen='std';
+  if(!o.slot)o.slot=1;
+  if(!o.fx)o.fx={jp:1,us:1,eu:1};
+  if(!o.branches)o.branches=[];
+  if(o.hedge===undefined)o.hedge=0;
+  if(o.acq===undefined)o.acq=0;
+  if(!o.rq)o.rq=[];
+  if(o.nextCycle===undefined)o.nextCycle=null;
+  if(!o.rh){o.rh=[];o.eh=[]}
+  if(!o.st)o.st={rev:0,exp:0,peakCash:Math.max(0,o.cash),peakCap:0,otMonths:0,refCount:0,slumpProfit:0,loanEver:!!(o.loans&&o.loans.length),revived:false};
+  o.products.forEach(function(p){if(p.debt===undefined){p.debt=Math.min(60,Math.max(0,(o.month-p.born)*2));p.upd=-99;p.ref=-99}});
+  return o;
+}
+function clearSlot(n){try{localStorage.removeItem(slotKey(n))}catch(e){}}
+function encodeSave(o){return 'ITT1:'+btoa(unescape(encodeURIComponent(JSON.stringify(o))))}
+function decodeSave(t){
+  t=(t||'').trim();if(t.indexOf('ITT1:')!==0)return null;
+  try{
+    var o=JSON.parse(decodeURIComponent(escape(atob(t.slice(5)))));
+    if(o&&o.v===1&&Array.isArray(o.staff)&&Array.isArray(o.products)&&typeof o.cash==='number'&&typeof o.month==='number'&&o.techs){o.over=null;return migrate(o)}
+  }catch(e){}
+  return null;
+}
 
 /* ---------- 계산 ---------- */
 function techMul(role){var m=1;TECHS.forEach(function(t){if(S.techs[t.id]&&t.fx)m+=(t.fx[role]||0)+(t.fx.all||0)});return m}
 function prodTech(){var m=0;TECHS.forEach(function(t){if(S.techs[t.id]&&t.prod)m+=t.prod});return m}
 function moraleMul(){return .7+.5*S.morale/100}
-function calcOut(){
+function calcOut(t){
+  t=t||0;
   var o={dev:0,des:0,pm:0},mm=moraleMul()*(S.overtime?1.3:1),ceo={dev:10,des:5,pm:5};
-  ROLE_KEYS.forEach(function(k){o[k]+=ceo[k]*techMul(k)});
-  S.staff.forEach(function(p){if(o[p.role]!==undefined)o[p.role]+=10*p.skill*techMul(p.role)});
-  ROLE_KEYS.forEach(function(k){o[k]*=mm});
+  if(t===0)ROLE_KEYS.forEach(function(k){o[k]+=ceo[k]*techMul(k)});
+  teamStaff(t).forEach(function(p){if(o[p.role]!==undefined)o[p.role]+=10*p.skill*techMul(p.role)*traitMul(p)*bondMul(p)});
+  var tm=teamMul(t);ROLE_KEYS.forEach(function(k){o[k]*=mm*roleMul(k,t)*tm});
   return o;
 }
-function marketPower(){var s=0;S.staff.forEach(function(p){if(p.role==='mkt')s+=p.skill});return s}
-function prodMul(){return 1+.04*marketPower()+prodTech()+(S.campaign>0?.3:0)}
-function productIncome(p){return p.cur*prodMul()*(1+S.rep/250)}
-function income(){return S.products.reduce(function(a,p){return a+productIncome(p)},0)}
+function nTeams(){return S.office>=3?3:S.office>=2?2:1}
+function teamStaff(t){return S.staff.filter(function(p){return (p.team||0)===t})}
+function anyProj(){return S.projs.some(function(p){return !!p})}
+function freeTeams(){var r=[],i;for(i=0;i<nTeams();i++)if(!S.projs[i])r.push(i);return r}
+function teamName(t){return (S.tn&&S.tn[t])||(t+1)+'팀'}
+function J(w,k){
+  var c=w.charCodeAt(w.length-1),f=c>=0xAC00&&c<=0xD7A3,b=f&&(c-0xAC00)%28!==0,r=f&&(c-0xAC00)%28===8;
+  if(k==='i')return w+(f?(b?'이':'가'):'이(가)');
+  if(k==='eun')return w+(f?(b?'은':'는'):'은(는)');
+  return w+(f?((b&&!r)?'으로':'로'):'(으)로');
+}
+function headOf(t){return teamStaff(t).filter(function(p){return p.head})[0]}
+function canHead(p){
+  var cost=p.sal*3;
+  if(p.head)return {ok:false,why:'이미 팀장입니다',cost:cost};
+  if(p.t<6)return {ok:false,why:'근속 6개월 이상 필요',cost:cost};
+  if(p.skill<3)return {ok:false,why:'★3 이상 필요',cost:cost};
+  if(headOf(p.team||0))return {ok:false,why:'이 팀에는 이미 팀장이 있습니다',cost:cost};
+  return {ok:true,why:'',cost:cost};
+}
+function specName(k){return k==='ctr'?'외주':prodName(k)}
+function specList(){return [null,'ctr'].concat(PRODUCTS.map(function(d){return d.id}))}
+function specLv(t,k){return k?Math.min(5,(S.texp[t]&&S.texp[t][k])||0):0}
+function specMul(t){
+  var p=S.projs[t];if(!p)return 1;
+  var k=p.kind==='contract'?'ctr':p.def;
+  if(S.tspec[t]!==k)return 1;
+  return 1.1+.03*specLv(t,k);
+}
+function teamMul(t){
+  var m=1,h=headOf(t);
+  if(h)m*=1.05;
+  if(S.tdel[t])m*=h?(.85+.03*h.skill):1;
+  return m*specMul(t);
+}
+function bondMul(p){
+  if(!p.bond)return 1;
+  var q=S.staff.filter(function(x){return x.id===p.bond})[0];
+  return (q&&(q.team||0)===(p.team||0))?1.05:1;
+}
+function bondTxt(p){var q=p.bond&&S.staff.filter(function(x){return x.id===p.bond})[0];return q?' · 단짝 '+q.name:''}
+function dropStaff(p){var i=S.staff.indexOf(p);if(i>=0)S.staff.splice(i,1)}
+function chron(t){S.chron.push({m:S.month,t:t});if(S.chron.length>120)S.chron.shift()}
+function startContract(t,c){S.projs[t]={kind:'contract',name:c.name,need:{dev:c.need.dev,des:c.need.des,pm:c.need.pm},prog:{dev:0,des:0,pm:0},reward:c.reward,left:c.months,months:c.months,late:0,chg:0}}
+function startProduct(t,d){S.projs[t]={kind:'product',def:d.id,name:d.n,need:{dev:d.need.dev,des:d.need.des,pm:d.need.pm},prog:{dev:0,des:0,pm:0},late:0,left:null}}
+function delegTick(){
+  var t,n=nTeams();
+  for(t=0;t<3;t++){
+    if(!S.tdel[t])continue;
+    if(t===0||t>=n||!headOf(t)){S.tdel[t]=false;say(teamName(t)+' 위임이 해제됐습니다. (팀장 없음)','bad');continue}
+    if(!S.projs[t])delegPick(t,headOf(t));
+  }
+}
+function delegPick(t,hd){
+  var best=null,bs=0,spec=S.tspec[t],poor=S.cash<payroll()*4;
+  S.contracts.forEach(function(c){
+    var e=estMonths(c.need,t);if(e===Infinity||e>c.months*.85)return;
+    var sc=c.reward/Math.max(e,1)*(spec==='ctr'?1.3:1)*(poor?1.5:1);
+    if(sc>bs){bs=sc;best={k:'c',o:c}}
+  });
+  var keep=payroll()*3+300;
+  PRODUCTS.forEach(function(d){
+    if(prodLock(d)||S.cash-d.cost<keep)return;
+    var e=estMonths(d.need,t);if(e===Infinity||e>20)return;
+    var sc=(d.inc*18-d.cost)/Math.max(e,1)*(spec===d.id?1.3:1)*(poor?.4:1);
+    if(S.products.some(function(q){return q.def===d.id})||S.projs.some(function(q){return q&&q.def===d.id}))sc*=.5;
+    if(sc>bs){bs=sc;best={k:'p',o:d}}
+  });
+  if(!best)return;
+  if(best.k==='c'){
+    var i=S.contracts.indexOf(best.o);if(i>=0)S.contracts.splice(i,1);
+    startContract(t,best.o);
+    say('['+teamName(t)+'] 팀장 '+hd.name+'님이 \''+best.o.name+'\' 계약을 따왔습니다. (대금 '+money(best.o.reward)+')');
+  }else{
+    S.cash-=best.o.cost;startProduct(t,best.o);
+    say('['+teamName(t)+'] 팀장 '+hd.name+'님이 \''+best.o.n+'\' 개발을 시작했습니다. (착수금 '+money(best.o.cost)+')');
+  }
+  renderAll();
+}
+function tcCheck(){
+  var n=nTeams();
+  if(n>(S.tcount||1)){S.tcount=n;chron('팀 확장: '+n+'개 팀 체제');toast('새 팀을 운영할 수 있게 됐어요! 팀 탭을 확인하세요.','good')}
+}
+function teamHead(t){
+  var ts=teamStaff(t),hd=headOf(t),sp=S.tspec[t],pj=S.projs[t];
+  var h='<div class="thead"><div class="grow"><b>'+teamName(t)+'</b> <span class="muted">'+ts.length+'명'+(t===0?' + CEO':'')+' · '+(pj?pj.name:'쉬는 중')+'</span><div class="meta">팀장: '+(hd?hd.name:'없음')+' · 전문: '+(sp?specName(sp)+' Lv'+specLv(t,sp):'없음')+(S.tdel[t]?' · <span class="good">위임 중</span>':'')+'</div></div>';
+  h+='<button class="btn sm" data-act="rename" data-team="'+t+'">이름 변경</button><button class="btn sm" data-act="spec" data-team="'+t+'" title="전문 분야의 프로젝트를 하면 산출 +10%, 완료할수록 최대 +25%">전문 분야 ▶</button>';
+  if(t>0)h+='<button class="btn sm'+(S.tdel[t]?' primary':'')+'" data-act="deleg" data-team="'+t+'"'+((hd||S.tdel[t])?'':' disabled')+' title="'+(hd?'팀장이 알아서 계약과 제품 개발을 맡습니다':'팀장을 임명해야 위임할 수 있어요')+'">'+(S.tdel[t]?'위임 해제':'팀장에게 위임')+'</button>';
+  else h+='<span class="muted" style="font-size:11px">CEO 팀은 위임 불가</span>';
+  return h+'</div>';
+}
+function openRename(t){
+  modal({title:'팀 이름 변경',body:'<p>최대 8글자입니다. 비우면 기본 이름으로 돌아갑니다.</p><input id="tnIn" type="text" maxlength="8" value="'+(S.tn[t]||'')+'" placeholder="'+(t+1)+'팀">',choices:[
+    {t:'저장',p:true,fn:function(){var v=($('tnIn').value||'').replace(/[<>&"'`]/g,'').trim().slice(0,8);S.tn[t]=v;say('팀 이름을 \''+teamName(t)+'\'(으)로 바꿨습니다.');renderAll()}},
+    {t:'취소',fn:function(){}}
+  ]});
+  var e=$('tnIn');if(e){e.focus();e.select()}
+}
+
+function autoTeam(role){return 0}
+function brandTier(b){return b<10?'무명':b<25?'신생':b<45?'업계 인지':b<70?'대중 인지':'국민 브랜드'}
+function newTrait(role){
+  var l=[];
+  Object.keys(TRAITS).forEach(function(k){var t=TRAITS[k];if(!t.roles||t.roles.indexOf(role)>=0)l.push([k,t.w])});
+  return pickW(l);
+}
+function trk(p){return TRAITS[p.trait||'none']||TRAITS.none}
+function calcSal(p){return Math.round(salary(p.skill)*(1+trk(p).sal)*(p.lead?1.25:1)*(p.head?1.2:1))}
+function mkStaff(role,skill){var tr=newTrait(role);return {id:S.nid++,name:pick(SN)+pick(GN),role:role,skill:skill,trait:tr,sal:calcSal({skill:skill,trait:tr}),t:0,team:0}}
+function traitMul(p){
+  var t=p.trait;
+  if(t==='genius')return 1.3;
+  if(t==='grind')return S.overtime?1.4:1;
+  if(t==='mentor')return .9;
+  if(t==='burn')return 1.25;
+  return 1;
+}
+function roleMul(k,t){
+  var m=1,has={dev:0,des:0,pm:0},st=teamStaff(t||0);
+  st.forEach(function(p){if(has[p.role]!==undefined)has[p.role]++});
+  if(has.dev&&has.des&&has.pm)m*=1.05;
+  if(st.some(function(p){return p.role===k&&p.lead}))m*=1.04;
+  if(st.filter(function(p){return p.role===k&&p.skill>=5}).length>=2)m*=1.05;
+  return m;
+}
+function moodBonus(){return Math.min(9,S.staff.filter(function(p){return p.trait==='mood'}).length*3)}
+function perfBonus(){return Math.min(1.5,S.staff.filter(function(p){return p.trait==='perf'&&p.role==='dev'}).length*.5)}
+function traitTag(t){var T=TRAITS[t||'none'];return t&&t!=='none'?' <span class="tag" title="'+T.d+'" style="--role:var(--muted)">'+T.n+'</span>':''}
+function traitDesc(t){return (TRAITS[t||'none']||TRAITS.none).d}
+function trainCost(p){return p.sal*4}
+function canPromote(p){
+  var cost=p.sal*3;
+  if(p.lead)return {ok:false,why:'이미 리드입니다',cost:cost};
+  if(p.t<12)return {ok:false,why:'근속 12개월 이상 필요',cost:cost};
+  if(p.skill<3)return {ok:false,why:'★3 이상 필요',cost:cost};
+  if(S.staff.some(function(x){return x.role===p.role&&x.lead&&(x.team||0)===(p.team||0)}))return {ok:false,why:'이 팀의 같은 직군에는 이미 리드가 있습니다',cost:cost};
+  return {ok:true,why:'',cost:cost};
+}
+function chemHtml(){
+  var n=nTeams(),t,h='<div class="sect h" style="margin-top:10px">팀 케미</div>',any=false;
+  for(t=0;t<n;t++){
+    var st=teamStaff(t),l=[],has={dev:0,des:0,pm:0};
+    st.forEach(function(p){if(has[p.role]!==undefined)has[p.role]++});
+    if(has.dev&&has.des&&has.pm)l.push('개발·디자인·기획이 모두 있어 전 직군 산출 +5%');
+    ROLE_KEYS.forEach(function(k){
+      if(st.some(function(p){return p.role===k&&p.lead}))l.push(ROLES[k].n+' 리드 효과: '+ROLES[k].n+' 산출 +4%');
+      if(st.filter(function(p){return p.role===k&&p.skill>=5}).length>=2)l.push(ROLES[k].n+' 베테랑(★5) 2명 이상: '+ROLES[k].n+' 산출 +5%');
+    });
+    if(l.length){any=true;h+=(n>1?'<div class="meta" style="margin-top:4px"><b>'+teamName(t)+'</b></div>':'')+'<ul class="chem"><li>'+l.join('</li><li>')+'</li></ul>'}
+  }
+  var g=[];
+  if(moodBonus())g.push('분위기메이커 효과: 사기 목표 +'+moodBonus());
+  if(perfBonus())g.push('완벽주의 개발자 효과: 기술 부채 증가 둔화');
+  if(S.staff.some(function(p){return p.trait==='mentor'}))g.push('멘토형 재직 중: 다른 직원 성장 확률 +25%');
+  if(g.length){any=true;h+='<ul class="chem"><li>'+g.join('</li><li>')+'</li></ul>'}
+  if(!any)h+='<p class="sub" style="margin:4px 0 0">개발·디자인·기획을 고루 갖추면 보너스가 생깁니다.</p>';
+  return h;
+}
+function marketPower(){var s=0;S.staff.forEach(function(p){if(p.role==='mkt')s+=p.skill*traitMul(p)});return s}
+function prodMul(){return 1+.04*marketPower()+prodTech()+(S.campaign>0?.3:0)+S.brand*.004}
+function cycMul(){return S.mkt.cycle==='boom'?1.15:S.mkt.cycle==='slump'?.85:1}
+function prodName(id){var d=PRODUCTS.filter(function(x){return x.id===id})[0];return d?d.n:id}
+function updCost(p){return Math.max(100,Math.round(p.base/10)*10)}
+function refCost(p){return Math.max(80,Math.round(p.base*.7/10)*10)}
+function pressure(p){
+  var rc=0,own=0;
+  S.rivals.forEach(function(r){if(r.focus===p.def)rc+=r.rev});
+  if(!rc)return 0;
+  S.products.forEach(function(q){if(q.def===p.def)own+=q.cur});
+  var v=Math.min(.6,.3*D().riv*rc/(rc+own))*(1-S.brand*.003);
+  return S.campaign>0?v*.5:v;
+}
+function productIncome(p){
+  return p.cur*prodMul()*(1+S.rep/250)*(1-.006*p.debt)*(1-pressure(p))*cycMul()*(S.mkt.trend===p.def?1.35:1)*D().inc;
+}
+function capVal(){
+  var L=S.listed>0;
+  var base=Math.max(3000,avgRev(S)*12*(L?8:5)+S.rep*(L?500:150)+Math.max(0,S.cash)*(L?1:.5));
+  var cyc=S.mkt.cycle==='boom'?1.15:S.mkt.cycle==='slump'?.8:1;
+  return base*cyc*(L?S.sent:1);
+}
+function region(id){return REGIONS.filter(function(r){return r.id===id})[0]}
+function fxPct(id){var p=Math.round((S.fx[id]-1)*100);return (p>=0?'+':'')+p+'%'}
+function domIncome(){return S.products.reduce(function(a,p){return a+productIncome(p)},0)}
+function ovsIncome(){var d=domIncome(),t=0;S.branches.forEach(function(b){t+=d*region(b.id).share*b.mat*S.fx[b.id]});return t}
+function income(){return domIncome()+ovsIncome()}
+function branchRent(){return S.branches.reduce(function(a,b){return a+region(b.id).rent},0)}
+function hedgeCost(){return Math.max(100,Math.round(ovsIncome()*1.2/10)*10)}
+function acqPrice(r){return Math.max(2000,Math.round(r.rev*12*5/10)*10)}
+function saleOffer(){return capVal()*1.3}
 function perkUpkeep(){var s=0;PERKS.forEach(function(p){if(S.perks[p.id])s+=p.up});return s}
 function payroll(){return S.staff.reduce(function(a,p){return a+p.sal},0)}
-function expense(){return payroll()+OFFICES[S.office].rent+perkUpkeep()+S.loans.reduce(function(a,l){return a+l.pay},0)}
+function expense(){return payroll()+OFFICES[S.office].rent+branchRent()+perkUpkeep()+S.loans.reduce(function(a,l){return a+l.pay},0)}
 function avgRev(s){var h=s.revHist;if(!h.length)return 0;return h.reduce(function(a,b){return a+b},0)/h.length}
-function estMonths(need){var o=calcOut();return Math.max.apply(null,ROLE_KEYS.map(function(k){return need[k]/Math.max(o[k],.1)}))}
+function estMonths(need,t){var o=calcOut(t||0);if(ROLE_KEYS.some(function(k){return o[k]<=.01}))return Infinity;return Math.max.apply(null,ROLE_KEYS.map(function(k){return need[k]/o[k]}))}
+function estTxt(need,lim){
+  var ft=freeTeams(),n=nTeams();if(!ft.length)return '<span class="muted">모든 팀이 작업 중</span>';
+  return ft.map(function(t){var e=estMonths(need,t),c=e===Infinity?'bad':(lim&&e>lim?'bad':'good');return (n>1?teamName(t)+' ':'')+'<span class="'+c+'">'+(e===Infinity?'인력 부족':'약 '+e.toFixed(1)+'개월')+'</span>'}).join(' · ');
+}
+function teamBtns(act,da,label,dis){
+  var ft=freeTeams(),n=nTeams(),h='';
+  if(!ft.length)return '<button class="btn primary sm" disabled>'+label+'</button>';
+  ft.forEach(function(t){h+='<button class="btn primary sm" data-act="'+act+'" '+da+' data-team="'+t+'"'+(dis?' disabled':'')+'>'+(n>1?teamName(t)+' ':'')+label+'</button>'});
+  return h;
+}
 function cap(){return OFFICES[S.office].cap}
 
 /* ---------- 알림 ---------- */
 function say(txt,cls){S.log.unshift({m:monthLabel(S.month),t:txt,c:cls||''});if(S.log.length>60)S.log.pop();renderLog()}
-function toast(msg,cls){
+function ctx(){if(AC===null){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=false}}return AC}
+function tone(f,d,type,v,t0){
+  var c=ctx();if(!c)return;
+  var t=c.currentTime+(t0||0),o=c.createOscillator(),g=c.createGain();
+  o.type=type||'sine';o.frequency.value=f;
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.05,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.03);
+}
+var SFX={
+  click:function(){tone(520,.05,'triangle',.025)},
+  good:function(){tone(660,.09,'sine',.04);tone(880,.12,'sine',.04,.08)},
+  coin:function(){tone(988,.07,'square',.03);tone(1319,.2,'square',.03,.07)},
+  bad:function(){tone(180,.18,'sawtooth',.04);tone(140,.24,'sawtooth',.04,.12)},
+  hire:function(){tone(523,.08,'triangle',.05);tone(659,.08,'triangle',.05,.07);tone(784,.14,'triangle',.05,.14)},
+  launch:function(){[392,523,659,784,1047].forEach(function(f,i){tone(f,.14,'triangle',.05,i*.07)})},
+  bell:function(){[523,659,784,1047].forEach(function(f,i){tone(f,1.4,'sine',.06,i*.18);tone(f*2,.8,'sine',.015,i*.18)})},
+  sad:function(){tone(220,.3,'triangle',.05);tone(165,.5,'triangle',.05,.25)}
+};
+function sfx(n){if(!SOUND)return;try{var c=ctx();if(!c)return;if(c.state==='suspended')c.resume();if(SFX[n])SFX[n]()}catch(e){}}
+function confetti(n){
+  try{if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return}catch(e){}
+  var box=$('fx'),cols=['--accent','--good','--dev','--des','--pm','--mkt'],i;
+  for(i=0;i<(n||40);i++){
+    var e=document.createElement('i');
+    e.style.cssText='left:'+rnd(5,95).toFixed(1)+'%;background:var('+pick(cols)+');animation-delay:'+rnd(0,.5).toFixed(2)+'s;--dx:'+ri(-80,80)+'px;--r:'+ri(-540,540)+'deg;width:'+ri(6,10)+'px;height:'+ri(8,14)+'px';
+    box.appendChild(e);
+    (function(el){setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},2800)})(e);
+  }
+}
+/* BGM: 코드로 만드는 로파이 루프. 상황에 따라 분위기가 바뀐다 */
+var BGM={timer:null,step:0,next:0,bus:null,noise:null,last:2,cur:'calm'};
+var MOODS={
+  calm:{n:'차분',bpm:84,ch:[[57,60,64,67],[53,57,60,64],[55,59,60,64],[55,59,62,64]],rt:[45,41,48,43],sc:[69,72,74,76,79,81],lp:2600,mel:.5},
+  tense:{n:'긴장',bpm:108,ch:[[57,60,63,66],[56,59,62,65],[57,60,63,67],[55,58,61,64]],rt:[45,44,45,43],sc:[69,72,73,76,77,80],lp:1700,mel:.28},
+  bright:{n:'밝음',bpm:96,ch:[[60,64,67,71],[57,60,64,67],[53,57,60,64],[55,59,62,65]],rt:[48,45,41,43],sc:[72,74,76,79,81,84],lp:4200,mel:.7}
+};
+function moodNow(){
+  if(!S||S.over)return 'calm';
+  if(S.cash<0||S.morale<30||S.neg>0||S.projs.some(function(p){return p&&p.late>0}))return 'tense';
+  if(S.listed>=1)return 'bright';
+  return 'calm';
+}
+function mtof(m){return 440*Math.pow(2,(m-69)/12)}
+function bgmBus(c){
+  if(BGM.bus)return BGM.bus;
+  var out=c.createGain(),master=c.createGain(),lp=c.createBiquadFilter(),dl=c.createDelay(1),fb=c.createGain(),dg=c.createGain();
+  out.gain.value=BGMON?1:0;master.gain.value=.55;
+  lp.type='lowpass';lp.frequency.value=MOODS[BGM.cur].lp;lp.Q.value=.4;
+  dl.delayTime.value=.36;fb.gain.value=.32;dg.gain.value=.35;
+  lp.connect(master);master.connect(out);out.connect(c.destination);
+  dl.connect(fb);fb.connect(dl);dl.connect(dg);dg.connect(lp);
+  var nb=c.createBuffer(1,Math.floor(c.sampleRate*.4),c.sampleRate),d=nb.getChannelData(0),i;
+  for(i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  BGM.noise=nb;BGM.bus={inp:lp,send:dl,out:out};
+  return BGM.bus;
+}
+function bNote(c,type,f,t,dur,v,att,send){
+  var o=c.createOscillator(),g=c.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+att);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g);g.connect(BGM.bus.inp);if(send)g.connect(BGM.bus.send);
+  o.start(t);o.stop(t+dur+.05);
+}
+function bKick(c,t){
+  var o=c.createOscillator(),g=c.createGain();
+  o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(42,t+.12);
+  g.gain.setValueAtTime(.16,t);g.gain.exponentialRampToValueAtTime(.0001,t+.22);
+  o.connect(g);g.connect(BGM.bus.inp);o.start(t);o.stop(t+.25);
+}
+function bNoise(c,t,dur,v,type,f){
+  var s=c.createBufferSource(),fl=c.createBiquadFilter(),g=c.createGain();
+  s.buffer=BGM.noise;fl.type=type;fl.frequency.value=f;
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  s.connect(fl);fl.connect(g);g.connect(BGM.bus.inp);s.start(t);s.stop(t+dur+.02);
+}
+function bgmStep(c,step,t,spb,M){
+  var bar=Math.floor(step/16)%4,s=step%16,ch=M.ch[bar],r=M.rt[bar],k=BGM.cur;
+  if(s===0)ch.forEach(function(m,i){bNote(c,i%2?'triangle':'sine',mtof(m),t,spb*15,k==='tense'?.014:.016,.4,false)});
+  if(k==='tense'){
+    if(s%2===0)bNote(c,'sine',mtof(r),t,spb*1.6,.06,.01,false);
+    if(s===0||s===8)bKick(c,t);
+    if(s===4||s===12)bNoise(c,t,.1,.045,'bandpass',2200);
+    bNoise(c,t,.03,s%4===0?.03:.014,'highpass',8000);
+    if(s===14&&Math.random()<.5)bNote(c,'sine',mtof(M.sc[ri(3,5)]),t,spb*3,.02,.01,true);
+  }else if(k==='bright'){
+    if(s===0||s===6||s===10)bNote(c,'sine',mtof(r),t,spb*(s===0?4:3),.07,.02,false);
+    if(s%4===0)bKick(c,t);
+    if(s===4||s===12)bNoise(c,t,.12,.05,'bandpass',2000);
+    if(s%2===0){
+      bNoise(c,t,.04,s%4===2?.035:.018,'highpass',7000);
+      bNote(c,'triangle',mtof(ch[(s/2|0)%4]+12),t,spb*1.8,.016,.008,true);
+    }
+  }else{
+    if(s===0||s===6||s===10)bNote(c,'sine',mtof(s===10&&bar%2?r+7:r),t,spb*(s===0?5:3),.075,.02,false);
+    if(s===0||s===8||(s===10&&bar%2===1))bKick(c,t);
+    if(s===4||s===12)bNoise(c,t,.13,.05,'bandpass',1800);
+    if(s%2===0)bNoise(c,t,.04,s%4===2?.03:.016,'highpass',7000);
+  }
+  if(s%2===0&&Math.random()<M.mel){
+    BGM.last=clamp(BGM.last+pick([-2,-1,-1,0,1,1,2]),0,M.sc.length-1);
+    bNote(c,'triangle',mtof(M.sc[BGM.last]),t,spb*3.5,.03,.012,true);
+  }
+}
+function bgmTick(){
+  var c=ctx();if(!c||c.state!=='running'||!BGM.bus)return;
+  if(BGM.next<c.currentTime)BGM.next=c.currentTime+.05;
+  while(BGM.next<c.currentTime+.5){
+    if(BGM.step%16===0){
+      var m=moodNow();
+      if(m!==BGM.cur){BGM.cur=m;BGM.bus.inp.frequency.setTargetAtTime(MOODS[m].lp,BGM.next,.4)}
+    }
+    var M=MOODS[BGM.cur],spb=60/M.bpm/4;
+    bgmStep(c,BGM.step,BGM.next,spb,M);BGM.next+=spb;BGM.step=(BGM.step+1)%64;
+  }
+}
+function bgmStart(){
+  var c=ctx();if(!c)return;
+  if(c.state==='suspended')c.resume();
+  bgmBus(c).out.gain.setTargetAtTime(BGMON?1:0,c.currentTime,.05);
+  if(BGM.timer)return;
+  BGM.next=c.currentTime+.1;BGM.timer=setInterval(bgmTick,120);
+}
+function bgmStop(){clearInterval(BGM.timer);BGM.timer=null}
+function bgmKick(){if(BGMON&&!BGM.timer)bgmStart()}
+document.addEventListener('pointerdown',bgmKick);
+document.addEventListener('keydown',bgmKick);
+document.addEventListener('visibilitychange',function(){
+  var c=AC;if(!c)return;
+  if(document.hidden)c.suspend();else if(SOUND||BGMON)c.resume();
+});
+function breakDesk(){
+  var ds=document.querySelectorAll('#desks .desk:not(.empty):not(.ceo):not(.idle)');if(!ds.length)return;
+  var e=ds[ri(0,ds.length-1)];e.classList.add('brk');setTimeout(function(){e.classList.remove('brk')},2300);
+}
+function toast(msg,cls,snd){
+  if(snd!==false){if(cls==='good')sfx('good');else if(cls==='bad')sfx('bad')}
   var box=$('toasts');while(box.children.length>=3)box.removeChild(box.firstChild);
   var d=document.createElement('div');d.className='toast '+(cls||'');d.textContent=msg;box.appendChild(d);
   setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d)},3400);
@@ -314,9 +836,26 @@ function genCandidate(){
   var role=pickW([['dev',40],['des',22],['pm',22],['mkt',16]]);
   var smax=Math.min(5,2+Math.floor(S.rep/45)+S.office);
   var skill=clamp(1+Math.floor(Math.pow(Math.random(),1.25)*smax),1,5);
-  return {id:S.nid++,name:pick(SN)+pick(GN),role:role,skill:skill,sal:salary(skill)};
+  var tr=newTrait(role);
+  return {id:S.nid++,name:pick(SN)+pick(GN),role:role,skill:skill,trait:tr,sal:calcSal({skill:skill,trait:tr})};
 }
 function genPool(){var a=[],i;for(i=0;i<4;i++)a.push(genCandidate());if(!a.some(function(c){return c.role==='dev'}))a[0].role='dev';return a}
+var RIVAL_NAMES=['넥스트소프트','제우스테크','아르고시스','블랙마운틴랩','오로라시스템즈','모아데이터'];
+var TIER_T=[0,0,1500,6000,25000,90000,300000];
+var ROUNDS=[
+  {n:'시리즈 A',d:.15,rep:15,rev:800,off:1},
+  {n:'시리즈 B',d:.12,rep:40,rev:4000,off:2},
+  {n:'시리즈 C',d:.10,rep:75,rev:15000,off:2},
+  {n:'프리 IPO',d:.08,rep:105,rev:30000,off:3}
+];
+function genRivals(m){
+  var names=RIVAL_NAMES.slice(),out=[],i;
+  for(i=0;i<3;i++){
+    var nm=names.splice(Math.floor(Math.random()*names.length),1)[0];
+    out.push({name:nm,rev:Math.round(ri(260,460)*Math.pow(1.015,m||0)),focus:pick(['app','game','app'])});
+  }
+  return out;
+}
 function genContracts(){
   var E=CONTRACTS.filter(function(c){return c.rep<=S.rep}),out=[],used={},i;
   for(i=0;i<3;i++){
@@ -324,23 +863,234 @@ function genContracts(){
     if(!cand.length)break;
     var c=pickW(cand);used[c.t]=1;
     var vr=function(v){return Math.max(5,Math.round(v*rnd(.92,1.1)/5)*5)};
-    out.push({id:S.nid++,name:pick(CLIENTS)+' '+c.t,need:{dev:vr(c.need[0]),des:vr(c.need[1]),pm:vr(c.need[2])},reward:Math.round(c.r*rnd(.9,1.25)/10)*10,months:c.m});
+    out.push({id:S.nid++,name:pick(CLIENTS)+' '+c.t,need:{dev:vr(c.need[0]),des:vr(c.need[1]),pm:vr(c.need[2])},reward:Math.round(c.r*rnd(.9,1.25)*cycMul()*(1+S.brand*.002)/10)*10,months:c.m});
   }
   return out;
 }
 
+/* ---------- 안내(지금 할 일)·도움말 ---------- */
+function tabName(id){var r=TABS.filter(function(t){return t[0]===id})[0];return r?r[1]:id}
+function tipOf(){
+  var s=S;if(!s||s.over)return null;
+  var pi=0,i0;for(i0=0;i0<nTeams();i0++){if(s.projs[i0]){pi=i0;break}}
+  var out=calcOut(pi),p=s.projs[pi];
+  var T=function(t,sub,tab,warn){return {t:t,s:sub,tab:tab,w:!!warn}};
+  if(s.cash<0)return T('현금이 마이너스예요','마이너스인 채로 '+D().grace+'개월이 지나면 파산합니다. 계약 대금을 받거나, 회사 탭에서 대출을 받으세요.','company',true);
+  if(p){
+    var worst=0,wk=null,miss=null;
+    ROLE_KEYS.forEach(function(k){
+      var rem=(p.need[k]-p.prog[k])/Math.max(out[k],.01);
+      if(rem>worst){worst=rem;wk=k}
+      if(!miss&&!teamStaff(pi).some(function(x){return x.role===k})&&p.need[k]-p.prog[k]>out[k]*1.5)miss=k;
+    });
+    if(miss&&s.staff.length<cap()&&s.cash>=200)return T(ROLES[miss].n+' 담당이 없어요','지금은 대표 혼자 '+ROLES[miss].n+' 작업을 하고 있어서 느립니다. 채용 탭에서 '+ROLES[miss].full+'를 뽑아 보세요.','hire');
+    if(p.kind==='contract'&&p.late===0&&wk&&worst>p.left+.5)return T('납기를 못 맞출 것 같아요','남은 작업이 약 '+worst.toFixed(1)+'개월인데 납기는 '+Math.max(0,p.left)+'개월 남았어요. 병목인 '+ROLES[wk].n+' 담당을 채용하거나 야근 모드를 켜 보세요.','hire',true);
+    if(s.contractsDone===0&&s.launched===0)return T('프로젝트가 진행 중이에요','개발·디자인·기획 세 게이지가 모두 차면 납품됩니다. 가장 느린 직군이 병목이에요. 기다리는 동안 채용 탭에서 동료를 알아보세요.','hire');
+  }else if(s.contractsDone===0&&s.launched===0){
+    return T('첫 의뢰를 수락해 보세요','계약 탭에서 의뢰 하나를 고르세요. "현재 팀으로 약 N개월"이 납기보다 짧은 의뢰가 안전합니다. 끝내면 대금과 평판을 받아요.','contracts');
+  }
+  if(s.staff.length===0&&s.cash>=300&&s.month>=1)return T('혼자서는 한계가 있어요','채용 탭에서 개발자부터 뽑아 보세요. 월급은 매달 나가니 현금 여유를 확인하세요.','hire');
+  if(nTeams()>1&&s.staff.length>=5&&teamStaff(1).length===0&&!s.projs[1])return T('2팀을 꾸려 보세요','팀 탭의 이동 버튼으로 직원을 나눠 담으면 프로젝트를 동시에 돌릴 수 있어요. 팀마다 개발·디자인·기획이 필요합니다.','team');
+  for(i0=1;i0<nTeams();i0++){if(!s.projs[i0]&&!s.tdel[i0]&&headOf(i0)&&teamStaff(i0).length>=3)return T(teamName(i0)+' 팀장에게 위임해 보세요','팀 탭에서 팀장에게 위임을 켜면 팀장이 알아서 계약과 제품 개발을 맡아요. 일감을 직접 챙기기 번거로울 때 편합니다.','team')}
+  for(i0=1;i0<nTeams();i0++){if(!s.projs[i0]&&!s.tdel[i0]&&teamStaff(i0).length>=3)return T(J(teamName(i0),'i')+' 쉬고 있어요','계약 탭에서 의뢰를 받거나 제품 탭에서 자체 개발을 시켜 주세요. 놀고 있어도 월급은 나갑니다.','contracts')}
+  if(s.morale<40)return T('팀 사기가 낮아요','사기가 25 아래로 떨어지면 직원이 퇴사합니다. 회사 탭에서 복지를 도입하거나 피자 파티를 열고, 야근 모드는 끄세요.','company',true);
+  var dp=s.products.filter(function(x){return x.debt>=45})[0];
+  if(dp)return T(dp.name+'의 기술 부채가 쌓였어요','부채는 수익을 깎아요. 제품 탭에서 리팩토링으로 부채를 줄이고, 업데이트로 수익을 회복하세요.','products',true);
+  if(!p&&s.contractsDone>=2&&s.launched===0&&s.cash>=200)return T('자체 제품에 도전해 보세요','제품 탭에서 생활 편의 앱을 개발하면 매달 꾸준한 수익이 생깁니다. 외주보다 오래 갑니다.','products');
+  if(!p&&s.contracts.length&&(s.contractsDone>0||s.launched>0))return T('쉬고 있는 팀이 있어요','진행 중인 프로젝트가 없습니다. 계약 탭에서 다음 의뢰를 수락하거나 제품 탭에서 자체 개발을 시작하세요.','contracts');
+  var nx=OFFICES[s.office+1];
+  if(nx&&s.staff.length>=cap()&&s.cash>=nx.cost)return T('자리가 가득 찼어요','회사 탭에서 '+nx.n+'(으)로 이전하면 더 많은 직원을 뽑을 수 있어요.','company');
+  if(!s.research&&s.month>=3){
+    var av=TECHS.filter(function(t){return !s.techs[t.id]&&t.req.every(function(r){return s.techs[r]})&&s.cash>=t.cost*1.5})[0];
+    if(av)return T('연구를 시작해 보세요','연구 슬롯이 비어 있어요. '+av.n+'('+av.d+')를 추천합니다.','research');
+  }
+  if(!s.listed){
+    var R=ROUNDS[s.round];
+    if(R&&s.rep>=R.rep&&avgRev(s)>=R.rev&&s.office>=R.off)return T(R.n+' 투자 유치가 가능해요','회사 탭에서 지분 일부를 넘기고 큰 자금을 받을 수 있어요. 지분이 줄어드는 대신 성장 속도가 빨라집니다.','company');
+  }
+  var k=s.listed<1?1:(s.listed<2?2:0);
+  if(k&&listConds(k).every(function(c){return c[1]}))return T((k===1?'코스닥':'코스피')+' 상장 요건을 갖췄어요!','회사 탭에서 상장을 신청하면 큰 자금을 조달할 수 있어요.','company');
+  var gi=-1;GOALS.forEach(function(g,i){if(gi<0&&s.goals.indexOf(i)<0)gi=i});
+  if(gi>=0)return T('다음 목표: '+GOALS[gi][0],'아래 목표 카드에서 진행 상황을 확인하세요. 막히면 위쪽 도움말을 눌러 보세요.',null);
+  return null;
+}
+function renderTip(){
+  var el=$('tip'),t=(HINTS&&S)?tipOf():null;
+  tipTab=t&&t.tab?t.tab:null;
+  if(!t){if(!el.hidden){el.hidden=true;el.innerHTML=''}tipKey='';return}
+  var key=t.t+'|'+t.s+'|'+t.tab+'|'+t.w;
+  if(key===tipKey&&!el.hidden)return;
+  tipKey=key;el.hidden=false;el.className='tip'+(t.w?' warn':'');
+  el.innerHTML='<span class="lab">'+(t.w?'주의':'지금 할 일')+'</span><div class="tx"><b>'+t.t+'</b><small>'+t.s+'</small></div>'+(t.tab?'<button class="btn sm primary" data-act="tab" data-v="'+t.tab+'">'+tabName(t.tab)+' 탭 열기</button>':'');
+}
+function setRow(label,desc,on,act){
+  return '<div class="slot"><div class="grow"><b>'+label+'</b><small>'+desc+'</small></div><button class="btn sm'+(on?' primary':'')+'" data-act="'+act+'" aria-pressed="'+on+'">'+(on?'켜짐':'꺼짐')+'</button></div>';
+}
+function setBody(){
+  return setRow('효과음','클릭, 계약, 알림 소리',SOUND,'snd')+setRow('BGM','상황에 따라 분위기가 바뀝니다 (지금: '+MOODS[BGM.cur].n+')',BGMON,'bgm')+setRow('힌트','화면 위쪽 "지금 할 일" 안내 카드',HINTS,'hints')+setRow('직원 스토리 이벤트','면담, 갈등, 단짝 같은 직원 이야기가 가끔 일어납니다',STORY,'story');
+}
+function openSettings(){if(modalOpen||!S)return;modal({title:'설정',body:'<div id="setBody">'+setBody()+'</div>',choices:[{t:'닫기',p:true,fn:function(){}}]})}
+function refreshSet(){var e=$('setBody');if(e)e.innerHTML=setBody()}
+function openHelp(){
+  if(modalOpen)return;
+  var sec=function(t,items){return '<div class="sect h">'+t+'</div><ul class="help"><li>'+items.join('</li><li>')+'</li></ul>'};
+  var h=sec('계약과 프로젝트',['계약 탭에서 의뢰를 수락하면 프로젝트가 시작됩니다. 개발·디자인·기획 세 게이지가 모두 차야 납품됩니다.','가장 느린 직군이 병목이에요. 그 직군을 채용하면 빨라집니다.','납기 전에 끝내면 보너스, 늦으면 대금이 깎이고 평판이 떨어집니다.','계약 도중 고객이 요구를 바꾸기도 합니다. 대금과 작업량, 평판을 따져서 받아들일지 정하세요.'])
+    +sec('직원',['채용 탭에서 개발자·디자이너·기획자·마케터를 뽑습니다. 월급은 매달 나갑니다.','직원마다 특성이 있어요. 팀 탭에서 교육(성장 기회)과 승진(리드 보너스)을 시킬 수 있습니다.','사기가 낮으면 일이 느려지고 25 아래에서는 퇴사자가 나옵니다. 복지와 피자 파티로 올리세요.'])
+    +sec('팀 운영',['중형 오피스부터 팀을 하나 더, 판교 사옥부터 세 번째 팀을 운영할 수 있어요.','팀 탭의 이동 버튼으로 직원을 팀에 나눕니다. 대표는 1팀에 속하고, 팀마다 개발·디자인·기획이 있어야 프로젝트가 돌아갑니다.','신입은 항상 1팀으로 들어가니, 팀 탭에서 직접 옮겨 주세요.','팀 이름을 바꾸고 전문 분야를 정할 수 있어요. 전문 분야 프로젝트를 하면 산출이 오르고 완료할수록 더 올라갑니다.','근속 6개월 이상, ★3 이상 직원을 팀장으로 임명할 수 있어요. 팀장이 있는 팀은 위임을 켜면 계약과 제품 개발을 알아서 맡습니다. 대신 산출이 팀장 실력에 따라 85~100%가 되고, CEO가 있는 1팀은 위임할 수 없습니다.'])+sec('브랜드',['평판과 별개로 인지도가 있습니다. 높을수록 제품 수익과 의뢰 단가가 오르고 라이벌 압박이 줄어요.','시장 탭의 홍보와 마케터 채용으로 올리고, 논란이나 악성 리뷰가 터지면 떨어집니다.'])+sec('제품과 기술 부채',['제품 탭에서 자체 제품을 개발하면 매달 수익이 들어옵니다.','시간이 지나면 기술 부채가 쌓여 수익이 줄어요. 리팩토링으로 부채를, 업데이트로 수익을 되돌립니다.'])
+    +sec('시장과 경쟁',['시장 탭에서 경기, 분야별 유행, 라이벌을 확인하세요. 같은 분야의 큰 라이벌은 내 수익을 깎습니다.','자금이 충분하면 라이벌을 인수할 수 있어요.'])
+    +sec('돈과 상장',['회사 탭에서 대출, 투자 유치, 해외 지사, 상장, 매각을 다룹니다.','투자를 받으면 지분이 줄고, 상장 뒤에는 시가총액으로 성과를 겨룹니다.','현금이 마이너스인 채로 오래 두면 파산합니다.'])
+    +sec('조작',['스페이스바로 일시정지, 위쪽 버튼으로 배속과 저장을 합니다. 설정에서 효과음, BGM, 힌트, 직원 스토리 이벤트를 끌 수 있어요.','상장, 엑싯, 장기 목표를 달성하면 회차 포인트가 쌓입니다. 새 게임을 시작할 때 보너스로 쓸 수 있어요.']);
+  modal({title:'게임 방법',body:h,choices:[{t:'닫기',p:true,fn:function(){}}]});
+}
+
+/* ---------- 시작·저장 메뉴 ---------- */
+function applyScen(k){
+  var s=S;
+  if(k==='slump'){s.mkt.cycle='slump';s.mkt.cl=14;s.nextCycle='boom';s.cash+=500}
+  else if(k==='vc'){
+    s.cash+=7000;s.eq=80;s.office=1;s.rep=5;
+    s.staff.push(mkStaff('dev',2));
+    s.staff.push(mkStaff('des',2));
+  }else if(k==='ex'){
+    s.rep=25;s.cash-=500;s.morale=80;
+    s.staff.push(mkStaff('dev',4));
+  }else if(k==='rival'){
+    s.cash+=2000;s.rivals.forEach(function(r){r.rev=Math.round(r.rev*1.7)});
+  }
+}
+function spawnRival(inc){
+  var used=S.rivals.map(function(r){return r.name}),av=RIVAL_NAMES.filter(function(n){return used.indexOf(n)<0});
+  var nm=av.length?pick(av):pick(RIVAL_NAMES)+' 2',rv=Math.max(300,Math.round(inc*.35*rnd(.8,1.2))),opts=[];
+  PRODUCTS.forEach(function(d,i){if(rv>=TIER_T[i])opts.push(d.id)});
+  S.rivals.push({name:nm,rev:rv,focus:opts[Math.max(0,opts.length-1-ri(0,1))]});
+  say('신생 경쟁사 '+nm+'이(가) 시장에 뛰어들었습니다.','bad');
+}
+function slotInfo(o){return monthLabel(o.month)+' · '+DIFFS[o.diff||'normal'].n+' · '+SCENS[o.scen||'std'].n+' · 현금 '+money(o.cash)+' · 직원 '+(o.staff.length+1)+'명'}
+function pickSlot(cb){
+  var sl=[1,2,3].map(readSlot),e=-1,i;
+  for(i=0;i<3;i++)if(!sl[i]&&e<0)e=i;
+  if(e>=0){cb(e+1);return}
+  var ch=sl.map(function(o,i){return {t:'<b>슬롯 '+(i+1)+'</b><small>'+slotInfo(o)+'</small>',fn:function(){cb(i+1)}}});
+  ch.push({t:'취소',fn:function(){if(!S||S.over)startMenu()}});
+  modal({title:'덮어쓸 슬롯 선택',body:'<p>저장 슬롯 3개가 모두 차 있습니다. 새 게임을 저장할 슬롯을 고르세요. 그 슬롯의 기존 게임은 사라집니다.</p>',choices:ch});
+}
+function startMenu(){
+  var ch=Object.keys(DIFFS).map(function(k){return {t:'<b>'+DIFFS[k].n+'</b><small>'+DIFFS[k].d+'</small>',fn:function(){scenMenu(k)}}});
+  if(S&&!S.over)ch.push({t:'취소',fn:function(){}});
+  modal({title:'난이도 선택',body:'<p>IT 컴퍼니 타이쿤을 시작합니다. 난이도를 고르세요.</p>',choices:ch});
+}
+function legacyMenu(dk,sk,slot,sel){
+  if(!META.lp){newGame(dk,sk,slot);return}
+  sel=sel||{};
+  var used=Object.keys(sel).reduce(function(a,k){return a+LEG[k].c},0),left=META.lp-used;
+  var ch=Object.keys(LEG).map(function(k){
+    var L=LEG[k],on=!!sel[k];
+    return {t:'<b>'+(on?'✓ ':'')+L.n+' ('+L.c+'P)</b><small>'+L.d+'</small>',dis:!on&&L.c>left,fn:function(){if(on)delete sel[k];else sel[k]=1;legacyMenu(dk,sk,slot,sel)}};
+  });
+  ch.push({t:'<b>'+(used?'선택한 보너스로 시작':'보너스 없이 시작')+'</b>',p:true,fn:function(){
+    META.lp-=used;saveMeta();newGame(dk,sk,slot);
+    var names=[];Object.keys(sel).forEach(function(k){LEG[k].fn();names.push(LEG[k].n)});
+    if(names.length){say('회차 보너스: '+names.join(', '),'good');chron('회차 보너스 적용: '+names.join(', '))}
+    renderAll();
+  }});
+  modal({title:'회차 보너스',body:'<p>회차 포인트 <b>'+META.lp+'P</b> 보유 · 선택 후 남는 포인트 <b>'+left+'P</b></p><p class="sub">포인트는 상장, 엑싯, 장기 목표를 달성하면 쌓입니다. 쓰지 않으면 계속 보관됩니다.</p>',choices:ch});
+}
+function scenMenu(dk){
+  var ch=Object.keys(SCENS).map(function(k){return {t:'<b>'+SCENS[k].n+'</b><small>'+SCENS[k].d+'</small>',fn:function(){pickSlot(function(n){legacyMenu(dk,k,n)})}}});
+  ch.push({t:'뒤로',fn:startMenu});
+  modal({title:'시나리오 선택',body:'<p>'+DIFFS[dk].n+' 난이도입니다. 어떤 상황에서 창업할까요?</p>',choices:ch});
+}
+function loadMenu(){
+  var ch=[];
+  [1,2,3].forEach(function(n){
+    var o=readSlot(n);
+    if(o)ch.push({t:'<b>슬롯 '+n+'</b><small>'+slotInfo(o)+'</small>',fn:function(){S=o;S.slot=n;S.paused=false;renderAll()}});
+  });
+  ch.push({t:'<b>새 게임</b><small>난이도와 시나리오를 고릅니다.</small>',fn:startMenu});
+  modal({title:'저장된 게임',body:'<p>이어서 할 게임을 고르세요.</p>',choices:ch});
+}
+function openMenu(){
+  if(modalOpen||!S)return;
+  var h='<div class="sect">저장 슬롯</div>';
+  [1,2,3].forEach(function(n){
+    var o=readSlot(n),cur=S.slot===n;
+    h+='<div class="slot"><div class="grow"><b>슬롯 '+n+(cur?' (현재)':'')+'</b><small>'+(o?slotInfo(o):'비어 있음')+'</small></div>';
+    h+='<button class="btn sm" data-act="slotSave" data-id="'+n+'">'+(o&&!cur&&armed==='sv'+n?'덮어쓰기 확인':'저장')+'</button>';
+    if(o)h+='<button class="btn sm" data-act="slotLoad" data-id="'+n+'">불러오기</button><button class="btn sm" data-act="slotDel" data-id="'+n+'">'+(armed==='del'+n?'삭제 확인':'삭제')+'</button>';
+    h+='</div>';
+  });
+  h+='<div class="sect">저장 코드 내보내기</div><textarea id="xport" rows="3" readonly></textarea><button class="btn sm" data-act="exportCopy">코드 복사</button>';
+  h+='<div class="sect">저장 코드 가져오기</div><textarea id="imp" rows="3" placeholder="ITT1: 로 시작하는 저장 코드를 붙여넣으세요"></textarea><button class="btn sm" data-act="importGo">가져오기 (현재 게임을 대체)</button>';
+  modal({title:'저장·불러오기',body:h,choices:[{t:'닫기',p:true,fn:function(){}}]});
+  $('xport').value=encodeSave(S);
+}
+function reopenMenu(){closeModal();openMenu()}
+
 /* ---------- 게임 흐름 ---------- */
-function newGame(){
-  clearSave();S=newState();S.contracts=genContracts();S.pool=genPool();
+function newGame(dk,sk,slot){
+  dk=dk||'normal';sk=sk||'std';
+  S=newState(dk,sk);S.slot=slot||1;applyScen(sk);S.contracts=genContracts();S.pool=genPool();
   S.log=[{m:monthLabel(0),t:'차고에서 회사를 설립했습니다. 첫 계약을 따내 보세요.',c:''}];
   armed=null;renderAll();
-  modal({title:'IT 컴퍼니 타이쿤',body:'<p>차고에서 시작하는 1인 IT 회사입니다. 외주 계약으로 종잣돈을 모으고, 팀을 키워 자체 제품을 출시해 코스닥 상장까지 가 보세요.</p><ul><li>프로젝트는 개발·디자인·기획이 모두 채워져야 끝납니다.</li><li>월급과 임대료는 매달 나갑니다. 현금이 두 달 연속 마이너스면 파산합니다.</li><li>스페이스바로 일시정지할 수 있습니다.</li></ul>',choices:[{t:'창업하기',p:true,fn:function(){S.paused=false;renderTop()}}]});
+  modal({title:'IT 컴퍼니 타이쿤',body:'<p><b>'+DIFFS[dk].n+' · '+SCENS[sk].n+'</b></p><p style="margin-top:6px">차고에서 시작하는 1인 IT 회사입니다. 외주 계약으로 종잣돈을 모으고, 팀을 키워 자체 제품을 출시하고, 투자 유치와 코스닥·코스피 상장까지 가 보세요. 상장 뒤에도 게임은 계속됩니다.</p><ul><li>프로젝트는 개발·디자인·기획이 모두 채워져야 끝납니다.</li><li>출시한 제품은 기술 부채가 쌓여 수익이 줄어요. 업데이트와 리팩토링으로 관리하세요.</li><li>경기와 유행, 경쟁사의 움직임을 시장 탭에서 확인하세요.</li><li>월급과 임대료는 매달 나갑니다. 현금이 마이너스인 채로 2개월(쉬움은 3개월)이 지나면 파산합니다.</li><li>라이벌 인수, 해외 지사, 회사 매각(엑싯)도 가능합니다.</li><li>화면 위쪽의 "지금 할 일" 카드가 다음 행동을 안내합니다. 막히면 도움말을 눌러 보세요.</li><li>스페이스바로 일시정지할 수 있습니다.</li></ul>',choices:[{t:'창업하기',p:true,fn:function(){S.paused=false;renderTop()}}]});
+}
+function scaleNeed(p,m){var f=function(v){return Math.max(5,Math.round(v*m/5)*5)};p.need={dev:f(p.need.dev),des:f(p.need.des),pm:f(p.need.pm)}}
+function projChangeRoll(){
+  if(modalOpen||mq.length)return;
+  var c=[];
+  S.projs.forEach(function(p,ti){
+    if(!p||p.kind!=='contract'||(p.chg||0)>=2||p.late>0||p.left<2)return;
+    var fr=0;ROLE_KEYS.forEach(function(k){fr+=p.prog[k]/p.need[k]});fr/=3;
+    if(fr>=.2&&fr<=.85)c.push(ti);
+  });
+  if(!c.length||Math.random()>.22)return;
+  projChange(pick(c));
+}
+function projChange(ti){
+  var p=S.projs[ti];if(!p)return;
+  p.chg=(p.chg||0)+1;
+  var tn=nTeams()>1?' ('+teamName(ti)+')':'',nm='<b>'+p.name+'</b>';
+  var R=function(x){return Math.round(p.reward*x/10)*10};
+  var done=function(msg,cls){say(msg,cls);renderAll()};
+  var sc=[
+    {t:'기능 추가 요청',b:'고객사가 "이 기능도 같이 넣어 주실 수 있나요?"라고 묻습니다. 작업량이 늘지만 대금도 올려 주겠다고 합니다.',c:[
+      {t:'전부 수락 (작업량 +25%, 대금 +35%, 납기 +1개월)',p:true,fn:function(){scaleNeed(p,1.25);p.reward=R(1.35);p.left++;p.months++;done('\''+p.name+'\' 범위가 늘었습니다. 대금 '+money(p.reward))}},
+      {t:'일부만 수락 (작업량 +10%, 대금 +12%)',fn:function(){scaleNeed(p,1.1);p.reward=R(1.12);done('\''+p.name+'\' 일부 기능을 추가했습니다. 대금 '+money(p.reward))}},
+      {t:'거절한다 (평판 -2)',fn:function(){S.rep=Math.max(0,S.rep-2);done('추가 요청을 거절했습니다. 평판 -2')}}]},
+    {t:'납기 단축 요청',b:'행사 일정이 당겨졌다며 한 달 빨리 끝낼 수 있냐고 묻습니다. 대신 대금을 더 주겠다고 합니다.',c:[
+      {t:'수락한다 (납기 -1개월, 대금 +25%)',p:true,fn:function(){p.left--;p.reward=R(1.25);done('\''+p.name+'\' 납기가 당겨졌습니다. 대금 '+money(p.reward))}},
+      {t:'거절한다 (평판 -1)',fn:function(){S.rep=Math.max(0,S.rep-1);done('납기 단축을 거절했습니다. 평판 -1')}}]},
+    {t:'디자인 전면 수정',b:'"디자인 방향이 마음에 안 들어요. 처음부터 다시 부탁합니다."라는 연락입니다.',c:[
+      {t:'다시 한다 (디자인 진행 절반으로, 대금 +15%)',p:true,fn:function(){p.prog.des*=.5;p.reward=R(1.15);done('디자인을 갈아엎었습니다. 대금 '+money(p.reward),'bad')}},
+      {t:'버틴다 (대금 -8%, 평판 -1)',fn:function(){p.reward=R(.92);S.rep=Math.max(0,S.rep-1);done('수정 요구를 거절하며 대금이 깎였습니다.','bad')}}]},
+    {t:'예산 삭감 통보',b:'"예산이 줄어서 대금을 깎아야 할 것 같아요."라고 합니다. 협상할 여지는 있어 보입니다.',c:[
+      {t:'받아들인다 (대금 -15%, 평판 +2)',fn:function(){p.reward=R(.85);S.rep+=2;done('대금을 양보했습니다. 평판 +2')}},
+      {t:'협상한다 (50% 성공)',p:true,fn:function(){if(Math.random()<.5){p.reward=R(.95);done('협상에 성공했습니다. 대금 -5%만 깎였어요.','good')}else{p.reward=R(.8);S.rep=Math.max(0,S.rep-2);done('협상이 결렬됐습니다. 대금 -20%, 평판 -2','bad')}}},
+      {t:'단호히 거절한다 (35% 확률로 계약 해지)',fn:function(){if(Math.random()<.35){S.projs[ti]=null;S.rep=Math.max(0,S.rep-3);done('\''+p.name+'\' 계약이 해지됐습니다. 평판 -3','bad')}else done('고객이 한발 물러섰습니다.')}}]},
+    {t:'유지보수 무상 요청',b:'"출시 후 3개월 무상 유지보수도 부탁드립니다."라고 합니다. 대금을 조금 올려 주겠다고 해요.',c:[
+      {t:'수락한다 (대금 +10%, 사기 -3)',fn:function(){p.reward=R(1.1);S.morale=Math.max(0,S.morale-3);done('유지보수를 약속했습니다. 대금 '+money(p.reward))}},
+      {t:'정중히 거절한다',p:true,fn:function(){done('기존 조건 그대로 진행합니다.')}}]},
+    {t:'기술 스택 변경',b:'"기존 기술 대신 최신 프레임워크로 가 주세요."라고 합니다. 이미 짠 코드의 일부를 버려야 합니다.',c:[
+      {t:'수락한다 (개발 진행 30% 후퇴, 대금 +20%)',fn:function(){p.prog.dev*=.7;p.reward=R(1.2);done('기술 스택을 바꿨습니다. 대금 '+money(p.reward))}},
+      {t:'거절한다 (평판 -2)',p:true,fn:function(){S.rep=Math.max(0,S.rep-2);done('기술 변경을 거절했습니다. 평판 -2')}}]},
+    {t:'VIP 고객의 기대',b:'"이번에 잘 해 주시면 다음 프로젝트도 맡기려고요."라고 합니다. 부담이 커지지만 평판을 크게 쌓을 기회입니다.',c:[
+      {t:'기대에 부응한다 (사기 -2, 납품 시 평판 2배)',p:true,fn:function(){p.vip=true;S.morale=Math.max(0,S.morale-2);done('\''+p.name+'\' 납품 평판이 2배가 됩니다.')}},
+      {t:'정중히 사양한다',fn:function(){done('평소대로 진행합니다.')}}]}
+  ];
+  var x=pick(sc);
+  if(S.tdel[ti]){
+    var ch=x.c.filter(function(c){return c.p})[0]||x.c[0];
+    say('['+teamName(ti)+'] 팀장 판단: '+x.t+' → '+ch.t.replace(/\s*\(.*$/,''));ch.fn();return;
+  }
+  modal({title:x.t+tn,body:'<p>'+nm+' 고객사에서 연락이 왔습니다. '+x.b+'</p>',choices:x.c});
 }
 function advance(dt){
-  if(S.project){
-    var out=calcOut(),p=S.project;
+  var ti,nt=nTeams();
+  for(ti=0;ti<nt;ti++){
+    var p=S.projs[ti];if(!p)continue;
+    var out=calcOut(ti);
     ROLE_KEYS.forEach(function(k){p.prog[k]=Math.min(p.need[k],p.prog[k]+out[k]*dt)});
-    if(ROLE_KEYS.every(function(k){return p.prog[k]>=p.need[k]-1e-6})){completeProject();renderAll()}
+    if(ROLE_KEYS.every(function(k){return p.prog[k]>=p.need[k]-1e-6})){completeProject(ti);delegTick();renderAll()}
   }
   if(S.research){S.research.left-=dt;if(S.research.left<=0)finishResearch()}
   S.mf+=dt;if(S.mf>=1){S.mf-=1;monthEnd()}
@@ -350,31 +1100,33 @@ function finishResearch(){
   S.techs[t.id]=true;S.research=null;
   say('연구 완료: '+t.n+' ('+t.d+')','good');toast('연구 완료: '+t.n,'good');checkGoals();renderAll();
 }
-function completeProject(){
-  var p=S.project;S.project=null;
+function completeProject(ti){
+  var p=S.projs[ti];S.projs[ti]=null;
+  var sk=p.kind==='contract'?'ctr':p.def,te=S.texp[ti];te[sk]=(te[sk]||0)+1;
+  if(S.tspec[ti]===sk&&te[sk]<=5)say(teamName(ti)+' 전문성이 올랐습니다. ('+specName(sk)+' Lv'+te[sk]+')','good');
   if(p.kind==='contract'){
     var mult=1,note='';
     if(p.late>0){mult=Math.max(.4,1-.2*p.late);note=' (납기 초과 '+p.late+'개월, 대금 '+Math.round(mult*100)+'%)'}
     else if(p.left>=1){var b=Math.min(.3,.1*p.left);mult=1+b;note=' (조기 납품 보너스 +'+Math.round(b*100)+'%)'}
     var pay=Math.round(p.reward*mult);
     S.cash+=pay;S.contractIncome+=pay;S.contractsDone++;
-    var rg=Math.round(Math.sqrt(p.reward/60)*(1+(S.techs.brand?.4:0))*(p.late>0?.5:1));
+    var rg=Math.round(Math.sqrt(p.reward/60)*(1+(S.techs.brand?.4:0))*(p.late>0?.5:1)*(p.vip?2:1));
     S.rep+=rg;
     say('\''+p.name+'\' 납품 완료! +'+money(pay)+note+' · 평판 +'+rg,'good');
-    toast('납품 완료: +'+money(pay),'good');
+    toast('납품 완료: +'+money(pay),'good',false);sfx('coin');
   }else{
     var def=PRODUCTS.filter(function(d){return d.id===p.def})[0],mul=1,tag='',r=Math.random();
     if(def.risky){if(r<.2){mul=5;tag=' 대박 조짐입니다!'}else if(r>.65){mul=.5;tag=' 반응이 미지근합니다.'}}
     else mul=rnd(.9,1.15);
     var n=S.products.filter(function(x){return x.def===def.id}).length;
     var base=Math.round(def.inc*mul);
-    S.products.push({id:S.nid++,def:def.id,name:def.n+(n?' '+(n+1)+'호':''),base:base,cur:base,g:def.g,born:S.month});
+    S.products.push({id:S.nid++,def:def.id,name:def.n+(n?' '+(n+1)+'호':''),base:base,cur:base,g:def.g,born:S.month,debt:6+(S.overtime?20:0),upd:-99,ref:-99});
     S.launched++;
     var tot=p.need.dev+p.need.des+p.need.pm;
     var rg2=Math.round(Math.sqrt(tot)/1.5*(1+(S.techs.brand?.4:0)));
     S.rep+=rg2;
     say('\''+def.n+'\' 출시! 월 수익 '+money(base)+' 예상.'+tag+' · 평판 +'+rg2,'good');
-    toast('제품 출시: '+def.n,'good');
+    toast('제품 출시: '+def.n,'good',false);sfx('launch');confetti(26);
   }
   checkGoals();
 }
@@ -383,29 +1135,44 @@ function monthEnd(){
   var inc=income(),exp=expense();
   S.cash+=inc-exp;
   S.loans.forEach(function(l){l.left--});S.loans=S.loans.filter(function(l){return l.left>0});
-  S.hist.push(Math.round(S.cash));if(S.hist.length>30)S.hist.shift();
-  S.revHist.push(inc+S.contractIncome);S.contractIncome=0;if(S.revHist.length>3)S.revHist.shift();
+  S.hist.push(Math.round(S.cash));if(S.hist.length>60)S.hist.shift();
+  recordMonth(inc,exp);S.revHist.push(inc+S.contractIncome);S.contractIncome=0;if(S.revHist.length>3)S.revHist.shift();
   S.products.forEach(function(p){
-    if(p.g<0)p.cur=Math.max(p.base*.15,p.cur*(1+p.g));
-    else p.cur=Math.min(p.base*3,p.cur*(1+p.g));
+    p.debt=Math.min(100,p.debt+Math.max(1.5,(p.g<0?3:2)-perfBonus()));
+    var g=p.g-.0004*p.debt;
+    if(g<0)p.cur=Math.max(p.base*.15,p.cur*(1+g));
+    else p.cur=Math.min(p.base*3,p.cur*(1+g));
   });
+  S.branches.forEach(function(b){b.mat=Math.min(1,b.mat+.07)});
+  fxTick();
+  marketTick(inc);
+  listedTick(inc-exp);
   S.staff.forEach(function(p){
     p.t++;
-    if(p.t%12===0&&p.skill<5&&Math.random()<.6){p.skill++;p.sal=salary(p.skill);say(p.name+'님이 성장했어요 (★'+p.skill+', 월급 '+money(p.sal)+').','good')}
+    if(p.t%12===0&&p.skill<5&&Math.random()<.6+(S.staff.some(function(m){return m!==p&&m.trait==='mentor'})?.25:0)){p.skill++;p.sal=calcSal(p);say(p.name+'님이 성장했어요 (★'+p.skill+', 월급 '+money(p.sal)+').','good')}
   });
+  if(S.morale<50){
+    S.staff.filter(function(p){return p.trait==='burn'&&Math.random()<.15}).forEach(function(p){
+      var i=S.staff.indexOf(p);
+      if(i>=0){S.staff.splice(i,1);say(p.name+'님이 번아웃으로 퇴사했습니다.','bad');toast(p.name+'님 퇴사 (번아웃)','bad')}
+    });
+  }
   var mp=marketPower();
   if(mp)S.rep+=.15*mp*(1+(S.techs.brand?.4:0));
+  S.brand=clamp(S.brand+mp*.5*(1-S.brand/100)+(S.campaign>0?1.5:0)-S.brand*.02,0,100);
   if(S.campaign>0){S.campaign--;S.rep+=1}
-  if(S.project&&S.project.kind==='contract'){
-    var p=S.project;p.left--;
+  S.projs.forEach(function(p,ti){
+    if(!p||p.kind!=='contract')return;
+    p.left--;
     if(p.left<0){
       p.late=(p.late||0)+1;S.rep=Math.max(0,S.rep-2);
       say('\''+p.name+'\' 납기 초과 '+p.late+'개월째입니다.','bad');
-      if(p.late>=3){S.rep=Math.max(0,S.rep-8);say('고객사가 \''+p.name+'\' 계약을 해지했습니다. 평판 -10','bad');toast('계약 해지: '+p.name,'bad');S.project=null}
+      if(p.late>=3){S.rep=Math.max(0,S.rep-8);say('고객사가 \''+p.name+'\' 계약을 해지했습니다. 평판 -10','bad');toast('계약 해지: '+p.name,'bad');S.projs[ti]=null}
     }else if(p.left===1)toast('납기 1개월 전: '+p.name,'bad');
-  }
-  var perk=0;PERKS.forEach(function(x){if(S.perks[x.id])perk+=x.mor});
-  var target=clamp(55+perk-(S.overtime?22:0)-(S.project&&S.project.late>0?8:0)-(S.cash<0?10:0),0,100);
+  });
+  projChangeRoll();
+  var perk=moodBonus();PERKS.forEach(function(x){if(S.perks[x.id])perk+=x.mor});
+  var target=clamp(55+perk-(S.overtime?22:0)-(S.projs.some(function(q){return q&&q.late>0})?8:0)-(S.cash<0?10:0),0,100);
   S.morale=clamp(S.morale+(target-S.morale)*.4,0,100);
   if(S.morale<25&&S.staff.length&&Math.random()<.4){
     var q=S.staff.splice(Math.floor(Math.random()*S.staff.length),1)[0];
@@ -413,43 +1180,170 @@ function monthEnd(){
   }
   if(S.month%2===0)S.contracts=genContracts();
   if(S.month%3===0)S.pool=genPool();
+  tcCheck();delegTick();
   say(monthLabel(S.month)+' 결산: 수익 +'+money(inc)+' / 지출 -'+money(exp)+' / 현금 '+money(S.cash),S.cash<0?'bad':'');
   if(S.cash<0){
     S.neg++;
-    if(S.neg>=2){gameOver('bankrupt');return}
+    if(S.neg>=D().grace){gameOver('bankrupt');return}
     toast('현금이 마이너스입니다! 다음 달까지 회복하세요.','bad');
-  }else S.neg=0;
+  }else{if(S.neg>0)S.st.revived=true;S.neg=0}
   checkGoals();
   if(S.month>=3&&Math.random()<.34)rollEvent();
   save();renderAll();
 }
 function checkGoals(){
   GOALS.forEach(function(g,i){
-    if(S.goals.indexOf(i)<0&&g[1](S)){S.goals.push(i);if(i<8){toast('목표 달성: '+g[0],'good');say('목표 달성: '+g[0],'good')}}
+    if(S.goals.indexOf(i)<0&&g[1](S)){S.goals.push(i);toast('목표 달성: '+g[0],'good');say('목표 달성: '+g[0],'good');chron('목표 달성: '+g[0])}
   });
-  var c=ipoConds();
-  if(c.every(function(x){return x[1]})&&!S.ipoNotified){S.ipoNotified=true;toast('상장 요건을 모두 갖췄습니다! 회사 탭을 확인하세요.','good')}
+  var k=S.listed<1?1:(S.listed<2?2:0);
+  if(k&&listConds(k).every(function(x){return x[1]})){
+    var key='ipoN'+k;
+    if(!S[key]){S[key]=true;toast((k===1?'코스닥':'코스피')+' 상장 요건을 모두 갖췄습니다! 회사 탭을 확인하세요.','good')}
+  }
+  if(S.listed>=1)LONGS.forEach(function(g,i){
+    if(S.longs.indexOf(i)<0&&g[1](S)){
+      S.longs.push(i);S.rep+=10;toast('장기 목표 달성: '+g[0],'good');say('장기 목표 달성: '+g[0]+' (평판 +10)','good');chron('장기 목표: '+g[0]);
+      if(S.longs.length%3===0)lpAward(1,'장기 목표 '+S.longs.length+'개');
+    }
+  });
+  checkAch();
 }
-function ipoConds(){
-  return [
+function lpAward(n,why){META.lp=(META.lp||0)+n;saveMeta();toast('회차 포인트 +'+n+' ('+why+')','good');say('회차 포인트 +'+n+' ('+why+') · 보유 '+META.lp+'P','good')}
+function checkAch(){
+  ACHS.forEach(function(a){
+    if(META.ach[a.id])return;
+    var ok=false;try{ok=a.f()}catch(e){}
+    if(ok){META.ach[a.id]=S.month+1;saveMeta();toast('업적 달성: '+a.n,'good');say('업적 달성: '+a.n+' ('+a.d+')','good')}
+  });
+}
+function recordMonth(inc,exp){
+  var tot=inc+S.contractIncome,st=S.st;
+  st.rev+=tot;st.exp+=exp;
+  S.rh.push(Math.round(tot));S.eh.push(Math.round(exp));
+  if(S.rh.length>60){S.rh.shift();S.eh.shift()}
+  if(S.overtime)st.otMonths++;
+  if(S.mkt.cycle==='slump'&&tot-exp>0)st.slumpProfit++;
+  st.peakCash=Math.max(st.peakCash,S.cash);
+  st.peakCap=Math.max(st.peakCap,capVal());
+  recRec('cap',st.peakCap,false);
+}
+function fxTick(){
+  if(!S.branches.length)return;
+  if(S.hedge>0){S.hedge--;if(S.hedge===0)say('환 헤지 기간이 끝났습니다.');return}
+  REGIONS.forEach(function(R){
+    var f=S.fx[R.id];
+    f=f+(1-f)*.08+rnd(-.035,.035);
+    if(Math.random()<.05){var sh=rnd(.1,.18)*(Math.random()<.5?-1:1);f*=1+sh;say(R.cur+' 환율 급변: '+(sh>0?'+':'')+Math.round(sh*100)+'%',sh>0?'good':'bad')}
+    S.fx[R.id]=clamp(f,.7,1.35);
+  });
+}
+function listConds(k){
+  if(k===1)return [
     ['판교 사옥 입주',S.office>=3,OFFICES[S.office].n],
     ['평판 120 이상',S.rep>=120,Math.floor(S.rep)+''],
     ['최근 3개월 월평균 매출 3억원',avgRev(S)>=30000,money(avgRev(S))],
     ['직원 20명 이상',S.staff.length>=20,S.staff.length+'명'],
     ['상장 비용 5,000만원 보유',S.cash>=5000,money(S.cash)]
   ];
+  return [
+    ['코스닥 상장 완료',S.listed>=1,S.listed>=1?'완료':'미완료'],
+    ['AI 캠퍼스 입주',S.office>=4,OFFICES[S.office].n],
+    ['평판 220 이상',S.rep>=220,Math.floor(S.rep)+''],
+    ['최근 3개월 월평균 매출 15억원',avgRev(S)>=150000,money(avgRev(S))],
+    ['직원 60명 이상',S.staff.length>=60,S.staff.length+'명'],
+    ['상장 비용 3억원 보유',S.cash>=30000,money(S.cash)]
+  ];
+}
+function doListing(k){
+  var fee=k===1?5000:30000,frac=k===1?.15:.10,cap0=capVal();
+  var got=Math.round(cap0*frac/10)*10;
+  S.cash+=got-fee;S.eq*=1-frac;S.listed=k;S.sent=1;S.qPrev=0;S.rep+=k===1?15:40;
+  if(k===1){S.st.kosdaqM=S.month;recRec('kosdaq',S.month,true)}else{S.st.kospiM=S.month;recRec('kospi',S.month,true)}
+  sfx('bell');confetti(60);
+  var cap1=capVal(),mine=cap1*S.eq/100,nm=k===1?'코스닥':'코스피';
+  var grade=k===1?(S.month<=72?'전설의 창업가':S.month<=120?'유니콘 CEO':'견실한 CEO'):(S.month<=120?'재계의 신화':S.month<=180?'국민 기업가':'장수 기업의 CEO');
+  say(nm+' 상장! 공모로 '+money(got)+'을 조달했습니다.','good');
+  chron(nm+' 상장 (시가총액 '+money(cap1)+')');
+  if(!S.lpGot['l'+k]){S.lpGot['l'+k]=1;lpAward(k===1?1:2,nm+' 상장')}
+  checkGoals();renderAll();
+  var stats='<ul><li>시가총액 '+money(cap1)+' · 내 지분 '+S.eq.toFixed(1)+'% (가치 '+money(mine)+')</li><li>공모 조달 '+money(got)+' (상장 비용 '+money(fee)+')</li><li>경영 '+S.month+'개월 · 직원 '+(S.staff.length+1)+'명 · 제품 '+S.products.length+'개</li></ul>';
+  modal({title:nm+' 상장 성공!',body:'<p>회사가 거래소의 종을 울렸습니다. 등급: <b>'+grade+'</b></p>'+stats+'<p style="margin-top:10px">'+(k===1?'게임은 계속됩니다. 다음 목표는 코스피 이전 상장과 시가총액 키우기입니다.':'게임은 계속됩니다. 시가총액 1조원, 3조원에 도전해 보세요.')+'</p>',choices:[{t:'계속 경영하기',p:true,fn:function(){}}]});
+}
+function marketTick(inc){
+  var m=S.mkt;
+  m.cl--;
+  if(m.cl<=0){
+    var nw=pickW([['normal',50],['boom',25],['slump',25]]);
+    if(S.nextCycle){nw=S.nextCycle;S.nextCycle=null}
+    if(nw===m.cycle)nw=nw==='normal'?pickW([['boom',1],['slump',1]]):'normal';
+    m.cycle=nw;m.cl=ri(8,14);
+    var msg=nw==='boom'?'경기 호황! 제품 수익과 의뢰 단가가 오릅니다.':nw==='slump'?'경기 침체. 제품 수익과 의뢰 단가가 내려갑니다.':'경기가 평년 수준으로 돌아왔습니다.';
+    var cl=nw==='boom'?'good':nw==='slump'?'bad':'';
+    say(msg,cl);toast(msg,cl);
+  }
+  m.tl--;
+  if(m.tl<=0){
+    var cats=PRODUCTS.filter(function(d){return (!d.tech||S.techs[d.tech])&&d.id!==m.trend});
+    if(cats.length){m.trend=pick(cats).id;m.tl=ri(10,16);say('시장 유행: '+prodName(m.trend)+' 분야가 뜨고 있습니다. 이 분야 제품 수익 +35%','good')}
+    else m.tl=6;
+  }
+  S.rivals.forEach(function(r){
+    var g=rnd(-.012,.026)+(m.cycle==='boom'?.01:m.cycle==='slump'?-.016:0)+Math.min(.035,Math.max(0,inc/r.rev-1.5)*.0025);
+    r.rev=Math.max(150,r.rev*(1+g));
+    var opts=[];PRODUCTS.forEach(function(d,i){if(r.rev>=TIER_T[i])opts.push(d.id)});
+    if(opts.indexOf(r.focus)<0||Math.random()<.1){
+      r.focus=(m.trend&&opts.indexOf(m.trend)>=0&&Math.random()<.5)?m.trend:opts[Math.max(0,opts.length-1-ri(0,1))];
+    }
+  });
+  if(S.rq.length&&S.month>=S.rq[0]){S.rq.shift();spawnRival(inc)}
+  if(S.month>=2&&S.contracts.length&&S.rivals.length&&Math.random()<.2){
+    var c=S.contracts.splice(ri(0,S.contracts.length-1),1)[0];
+    say(pick(S.rivals).name+'이(가) \''+c.name+'\' 의뢰를 가져갔습니다.','bad');
+  }
+}
+function listedTick(net){
+  if(!S.listed)return;
+  S.sent=clamp(S.sent+(net>0?.008:-.02)+rnd(-.05,.05)+(1-S.sent)*.06+(S.mkt.cycle==='boom'?.01:S.mkt.cycle==='slump'?-.015:0),.6,1.7);
+  if(S.month%3===0){
+    var cur=S.revHist.reduce(function(a,b){return a+b},0);
+    if(S.qPrev>0){
+      var chg=cur/S.qPrev-1;
+      S.sent=clamp(S.sent+clamp(chg,-.3,.3)*.4,.6,1.7);
+      say('분기 실적 발표: 매출 '+(chg>=0?'+':'')+Math.round(chg*100)+'% · '+(chg>=.03?'호재':chg<=-.03?'악재':'무난한 실적'),chg>=.03?'good':chg<=-.03?'bad':'');
+    }
+    S.qPrev=cur;
+  }
+}
+function chronList(short){
+  var c=S.chron.slice();
+  if(short&&c.length>12)c=c.slice(0,4).concat([{m:-1,t:'…'}]).concat(c.slice(-7));
+  if(!c.length)return '<p class="empty">아직 기록이 없습니다.</p>';
+  return '<ul class="chron">'+c.map(function(x){return '<li><time>'+(x.m<0?'':monthLabel(x.m))+'</time><span>'+x.t+'</span></li>'}).join('')+'</ul>';
+}
+function endingHtml(){
+  var st=S.st,ach=0;ACHS.forEach(function(a){if(META.ach[a.id])ach++});
+  return '<div class="sect">회사 연대기</div>'+chronList(true)+'<ul><li>최고 기업 가치 '+money(st.peakCap)+' · 누적 매출 '+money(st.rev)+'</li><li>팀 '+nTeams()+'개 · 인지도 '+Math.floor(S.brand)+' · 목표 '+S.goals.length+'/'+GOALS.length+(S.listed?' · 장기 '+S.longs.length+'/'+LONGS.length:'')+' · 업적 '+ach+'/'+ACHS.length+'</li><li>회차 포인트 보유 '+(META.lp||0)+'P (새 게임 시작 때 사용)</li></ul>';
 }
 function gameOver(type){
-  S.over={type:type};clearSave();S.paused=true;checkGoals();
+  S.over={type:type};clearSlot(S.slot);S.paused=true;checkGoals();chron('파산');
+  if(S.month>=48)lpAward(1,'48개월 이상 생존');
   var stats='<ul><li>경영 기간 '+S.month+'개월</li><li>직원 '+S.staff.length+'명 · 출시 제품 '+S.launched+'개 · 납품 '+S.contractsDone+'건</li><li>평판 '+Math.floor(S.rep)+' · 현금 '+money(S.cash)+'</li></ul>';
-  if(type==='ipo'){
-    var grade=S.month<=72?'전설의 창업가':S.month<=120?'유니콘 CEO':'견실한 CEO';
-    say('코스닥 상장 성공!','good');
-    modal({title:'코스닥 상장 성공!',body:'<p>회사가 종이 울리는 날을 맞았습니다. 등급: <b>'+grade+'</b></p>'+stats,choices:[{t:'새로 시작',p:true,fn:newGame}]});
-  }else{
-    say('파산했습니다.','bad');
-    modal({title:'파산',body:'<p>두 달 연속 현금이 바닥났습니다. 회사는 문을 닫습니다.</p>'+stats,choices:[{t:'새로 시작',p:true,fn:newGame}]});
-  }
+  say('파산했습니다.','bad');
+  sfx('sad');
+  modal({title:'파산',body:'<p>현금이 바닥난 채로 시간이 지났습니다. 회사는 문을 닫습니다.</p>'+stats+endingHtml(),choices:[{t:'새로 시작',p:true,fn:startMenu}]});
+  renderAll();
+}
+
+function doSale(price){
+  var mine=price*S.eq/100;
+  S.over={type:'sold',price:price,mine:mine};S.paused=true;
+  recRec('exit',mine,false);chron('회사 매각 ('+money(price)+')');lpAward(3+(mine>=1e6?1:0),'회사 매각');
+  checkGoals();clearSlot(S.slot);
+  sfx('bell');confetti(70);
+  var grade=mine>=1e8?'전설의 엑싯':mine>=1e7?'엑싯 신화':mine>=1e6?'대박 엑싯':mine>=1e5?'성공적인 엑싯':'소박한 엑싯';
+  say('회사를 '+money(price)+'에 매각했습니다.','good');
+  var stats='<ul><li>매각 대금 '+money(price)+' · 내 몫 '+money(mine)+' (지분 '+S.eq.toFixed(1)+'%)</li><li>경영 '+S.month+'개월 · '+DIFFS[S.diff].n+' · '+SCENS[S.scen].n+'</li><li>직원 '+(S.staff.length+1)+'명 · 제품 '+S.products.length+'개 · 납품 '+S.contractsDone+'건</li></ul>';
+  modal({title:'회사 매각 완료',body:'<p>대기업이 회사를 인수했습니다. 등급: <b>'+grade+'</b></p>'+stats+endingHtml(),choices:[{t:'새로 시작',p:true,fn:startMenu}]});
   renderAll();
 }
 
@@ -461,7 +1355,21 @@ function rollEvent(){
   if(S.month>=6&&S.loans.length<3)list.push([evInvest,2]);
   list.push([evConf,2]);list.push([evGrant,2]);
   if(S.products.length)list.push([evViral,2]);
-  if(S.project&&S.project.prog.dev>20)list.push([evBug,2]);
+  if(S.projs.some(function(q){return q&&q.prog.dev>20}))list.push([evBug,2]);
+  if(S.month>=4)list.push([evPress,2]);
+  if(S.month>=5&&S.cash>=400)list.push([evInfluencer,2]);
+  if(S.month>=8&&S.brand>=15)list.push([evScandal,2]);
+  if(S.products.length&&S.month>=6)list.push([evReview,2]);
+  if(STORY&&S.staff.length>=2)list.push([evStory,4]);
+  if(S.staff.length>=3&&S.month>=8&&S.rivals.length)list.push([evPoach,2]);
+  if(S.products.some(function(p){return p.debt>=60}))list.push([evDebt,3]);
+  if(S.month>=5)list.push([evHack,S.techs.sec?1:2]);
+  if(S.products.length||S.listed)list.push([evReg,1]);
+  if(S.eq<100)list.push([evInvestor,2]);
+  if(S.staff.length>=8)list.push([evUnion,2]);
+  if(S.month>=10)list.push([evAward,1]);
+  if(S.rivals.length>=2&&S.month>=12)list.push([evRivalMerge,1]);
+  if(S.month>=36&&capVal()>=2e6)list.push([evBuyout,2]);
   pickW(list)();
 }
 function evOutage(){
@@ -472,16 +1380,16 @@ function evOutage(){
   ]});
 }
 function evScout(){
-  var role=pick(['dev','des','pm']),skill=ri(4,5),sal=salary(skill),fee=sal*2,name=pick(SN)+pick(GN);
-  modal({title:'스카우트 제안',body:'<p>대기업 출신 '+ROLES[role].full+' <b>'+name+'</b>님(★'+skill+')이 합류 의사를 밝혔습니다. 계약금 '+money(fee)+', 월급 '+money(sal)+'.</p>',choices:[
-    {t:'영입한다 (-'+money(fee)+')',p:true,dis:S.cash<fee||S.staff.length>=cap(),fn:function(){S.cash-=fee;S.staff.push({id:S.nid++,name:name,role:role,skill:skill,sal:sal,t:0});say(name+'님이 합류했습니다. ('+ROLES[role].full+' ★'+skill+')','good');renderAll()}},
+  var role=pick(['dev','des','pm']),skill=ri(4,5),tr=newTrait(role),sal=calcSal({skill:skill,trait:tr}),fee=sal*2,name=pick(SN)+pick(GN);
+  modal({title:'스카우트 제안',body:'<p>대기업 출신 '+ROLES[role].full+' <b>'+name+'</b>님(★'+skill+', '+TRAITS[tr].n+')이 합류 의사를 밝혔습니다. 계약금 '+money(fee)+', 월급 '+money(sal)+'.</p>',choices:[
+    {t:'영입한다 (-'+money(fee)+')',p:true,dis:S.cash<fee||S.staff.length>=cap(),fn:function(){S.cash-=fee;S.staff.push({id:S.nid++,name:name,role:role,skill:skill,trait:tr,sal:sal,t:0,team:autoTeam(role)});say(name+'님이 합류했습니다. ('+ROLES[role].full+' ★'+skill+')','good');renderAll()}},
     {t:'정중히 거절한다',fn:function(){}}
   ]});
 }
 function evInvest(){
   var amt=Math.round((2500+S.rep*80)/100)*100,pay=Math.round(amt*1.25/12);
-  modal({title:'투자 제안',body:'<p>벤처 캐피털이 <b>'+money(amt)+'</b> 투자를 제안했습니다. 12개월 동안 매달 '+money(pay)+'씩 상환하는 조건입니다.</p>',choices:[
-    {t:'수락한다 (+'+money(amt)+')',p:true,fn:function(){S.cash+=amt;S.loans.push({left:12,pay:pay});say('투자 '+money(amt)+'을 유치했습니다.','good');renderAll()}},
+  modal({title:'벤처 대출 제안',body:'<p>벤처 캐피털이 지분 없이 <b>'+money(amt)+'</b>을 빌려주겠다고 합니다. 12개월 동안 매달 '+money(pay)+'씩 상환하는 조건입니다. 지분 투자는 회사 탭에서 받을 수 있어요.</p>',choices:[
+    {t:'수락한다 (+'+money(amt)+')',p:true,fn:function(){S.cash+=amt;S.st.loanEver=true;S.loans.push({left:12,pay:pay});say('벤처 대출 '+money(amt)+'을 받았습니다.','good');renderAll()}},
     {t:'거절한다',fn:function(){}}
   ]});
 }
@@ -503,24 +1411,250 @@ function evViral(){
     {t:'좋아요',p:true,fn:function(){p.cur*=1.3;p.base*=1.2;say(p.name+' 수익이 30% 늘었습니다.','good');renderAll()}}
   ]});
 }
+function stPick(f){var l=S.staff.filter(f);return l.length?pick(l):null}
+function stRel(a,b){return a.role!==b.role&&(a.team||0)===(b.team||0)}
+var STORIES=[
+  {w:3,ok:function(){return S.morale<68&&S.staff.some(function(p){return p.t>=6&&p.trait!=='loyal'})},run:function(){
+    var p=stPick(function(x){return x.t>=6&&x.trait!=='loyal'});
+    modal({title:p.name+'님의 면담 요청',body:'<p><b>'+p.name+'</b>님이 조용히 면담을 요청했습니다. 요즘 일이 손에 안 잡히고, 다른 회사에서 제안도 받았다고 합니다.</p>',choices:[
+      {t:'연봉 10% 인상',p:true,fn:function(){p.sal=Math.round(p.sal*1.1);S.morale=Math.min(100,S.morale+3);say(p.name+'님이 연봉 인상에 만족하고 남기로 했습니다.','good');renderAll()}},
+      {t:'휴가를 보낸다 (-월급 1개월치, 사기 +5)',dis:S.cash<p.sal,fn:function(){S.cash-=p.sal;S.morale=Math.min(100,S.morale+5);say(p.name+'님이 휴가 뒤 한결 밝아졌습니다.','good');renderAll()}},
+      {t:'붙잡지 않는다 (퇴사)',fn:function(){dropStaff(p);S.morale=Math.max(0,S.morale-3);say(p.name+'님이 회사를 떠났습니다.','bad');renderAll()}}
+    ]});
+  }},
+  {w:3,ok:function(){return S.staff.some(function(p){return p.trait==='mentor'})&&S.staff.some(function(p){return p.skill<=3&&p.trait!=='mentor'})},run:function(){
+    var m=stPick(function(x){return x.trait==='mentor'}),j=stPick(function(x){return x.skill<=3&&x!==m});
+    if(!m||!j)return;
+    modal({title:'멘토와 후배',body:'<p>멘토형 <b>'+m.name+'</b>님이 후배 <b>'+j.name+'</b>님의 코드를 밤새 같이 봐 줬습니다. 팀 분위기가 따뜻해졌어요.</p>',choices:[
+      {t:'멘토링 프로그램 지원 (-'+money(m.sal)+')',p:true,dis:S.cash<m.sal,fn:function(){S.cash-=m.sal;if(Math.random()<.7&&j.skill<5){j.skill++;j.sal=calcSal(j);say(j.name+'님이 멘토링으로 성장했습니다. (★'+j.skill+')','good')}else{S.morale=Math.min(100,S.morale+3);say('멘토링으로 팀 분위기가 좋아졌습니다.','good')}renderAll()}},
+      {t:'칭찬만 한다 (사기 +2)',fn:function(){S.morale=Math.min(100,S.morale+2);say(m.name+'님을 칭찬했습니다.');renderAll()}}
+    ]});
+  }},
+  {w:2,ok:function(){return S.staff.some(function(p){return p.trait==='genius'})},run:function(){
+    var g=stPick(function(x){return x.trait==='genius'});
+    modal({title:'천재의 사이드 프로젝트',body:'<p>천재형 <b>'+g.name+'</b>님이 "퇴근 후에 만든 게 있는데 공개해도 될까요?"라고 묻습니다. 대박이 날 수도, 시간 낭비일 수도 있습니다.</p>',choices:[
+      {t:'허락한다 (50% 성공)',p:true,fn:function(){if(Math.random()<.5){S.rep+=6;S.brand=Math.min(100,S.brand+4);say(g.name+'님의 오픈소스가 화제가 됐습니다! 평판 +6, 인지도 +4','good')}else{S.morale=Math.max(0,S.morale-2);say(g.name+'님의 사이드 프로젝트는 조용히 묻혔습니다.')}renderAll()}},
+      {t:'본업에 집중시킨다 (사기 -3)',fn:function(){S.morale=Math.max(0,S.morale-3);say(g.name+'님이 아쉬워했습니다.');renderAll()}}
+    ]});
+  }},
+  {w:3,ok:function(){return (S.overtime||S.morale<65)&&S.staff.some(function(p){return p.trait==='grind'})},run:function(){
+    var g=stPick(function(x){return x.trait==='grind'});
+    modal({title:g.name+'님의 연속 야근',body:'<p>야근형 <b>'+g.name+'</b>님이 며칠째 사무실에서 밤을 새우고 있습니다. 눈 밑이 퀭합니다.</p>',choices:[
+      {t:'강제 휴가 (-월급 1개월치, 사기 +5)',p:true,dis:S.cash<g.sal,fn:function(){S.cash-=g.sal;S.morale=Math.min(100,S.morale+5);say(g.name+'님이 푹 쉬고 돌아왔습니다.','good');renderAll()}},
+      {t:'야근 수당 지급 (-월급 1.5개월치, 사기 +3)',dis:S.cash<g.sal*1.5,fn:function(){S.cash-=Math.round(g.sal*1.5);S.morale=Math.min(100,S.morale+3);say('야근 수당으로 마음을 달랬습니다.');renderAll()}},
+      {t:'그냥 둔다 (25% 확률로 퇴사)',fn:function(){if(Math.random()<.25){dropStaff(g);say(g.name+'님이 번아웃으로 떠났습니다.','bad')}else say(g.name+'님이 버텨 냈습니다.');renderAll()}}
+    ]});
+  }},
+  {w:3,ok:function(){return S.staff.some(function(a){return S.staff.some(function(b){return a!==b&&stRel(a,b)})})},run:function(){
+    var a=stPick(function(x){return S.staff.some(function(b){return b!==x&&stRel(x,b)})}),b=stPick(function(x){return x!==a&&stRel(a,x)});
+    if(!a||!b)return;
+    var hd=headOf(a.team||0),ch=[
+      {t:'직접 중재한다 ('+(hd?'80':'50')+'% 성공)',p:true,fn:function(){if(Math.random()<(hd?.8:.5)){S.morale=Math.min(100,S.morale+3);say(a.name+'님과 '+b.name+'님이 화해했습니다.','good')}else{S.morale=Math.max(0,S.morale-3);say('중재가 실패해 분위기가 더 가라앉았습니다.','bad')}renderAll()}},
+      {t:'한 명 편을 든다 (사기 -4)',fn:function(){S.morale=Math.max(0,S.morale-4);say('편을 들자 반발이 생겼습니다.','bad');renderAll()}}
+    ];
+    if(nTeams()>1)ch.splice(1,0,{t:'다른 팀으로 배치한다',fn:function(){b.team=((b.team||0)+1)%nTeams();b.head=false;say(b.name+'님을 '+J(teamName(b.team),'ro')+' 옮겨 갈등을 풀었습니다.','good');renderAll()}});
+    ch.push({t:'방치한다 (사기 -6)',fn:function(){S.morale=Math.max(0,S.morale-6);say('갈등이 번졌습니다.','bad');renderAll()}});
+    modal({title:'직군 간 갈등',body:'<p>'+ROLES[a.role].full+' <b>'+a.name+'</b>님과 '+ROLES[b.role].full+' <b>'+b.name+'</b>님이 일정과 요구사항을 두고 크게 부딪혔습니다.</p>',choices:ch});
+  }},
+  {w:3,ok:function(){return S.staff.some(function(a){return !a.bond&&a.t>=6&&S.staff.some(function(b){return b!==a&&!b.bond&&b.t>=6&&stRel(a,b)})})},run:function(){
+    var a=stPick(function(x){return !x.bond&&x.t>=6&&S.staff.some(function(b){return b!==x&&!b.bond&&b.t>=6&&stRel(x,b)})});
+    var b=a&&stPick(function(x){return x!==a&&!x.bond&&x.t>=6&&stRel(a,x)});
+    if(!a||!b)return;
+    modal({title:'점심 단짝',body:'<p><b>'+a.name+'</b>님과 <b>'+b.name+'</b>님이 매일 점심을 같이 먹는 단짝이 됐습니다. 같은 팀에서 호흡이 잘 맞는다고 합니다.</p>',choices:[
+      {t:'함께 일하게 응원한다 (같은 팀일 때 둘 다 산출 +5%)',p:true,fn:function(){a.bond=b.id;b.bond=a.id;S.morale=Math.min(100,S.morale+2);say(a.name+'님과 '+b.name+'님이 단짝이 됐습니다.','good');renderAll()}},
+      {t:'그냥 지켜본다 (사기 +1)',fn:function(){S.morale=Math.min(100,S.morale+1);renderAll()}}
+    ]});
+  }},
+  {w:2,ok:function(){return S.staff.some(function(p){return p.t>=18&&p.skill>=4&&!p.lead})},run:function(){
+    var p=stPick(function(x){return x.t>=18&&x.skill>=4&&!x.lead});
+    var cp=canPromote(p);
+    modal({title:p.name+'님의 승진 요구',body:'<p><b>'+p.name+'</b>님이 오래 일했으니 리드로 승진시켜 달라고 요청합니다.</p>',choices:[
+      {t:cp.ok?'리드로 승진 (-'+money(cp.cost)+')':'연봉 8% 인상',p:true,dis:cp.ok&&S.cash<cp.cost,fn:function(){
+        if(cp.ok){S.cash-=cp.cost;p.lead=true;p.sal=calcSal(p);S.morale=Math.min(100,S.morale+3);say(p.name+'님을 '+ROLES[p.role].n+' 리드로 승진시켰습니다.','good')}
+        else{p.sal=Math.round(p.sal*1.08);say(p.name+'님의 연봉을 올렸습니다.')}
+        renderAll()}},
+      {t:'다음 기회에 (사기 -3, 20% 확률로 퇴사)',fn:function(){S.morale=Math.max(0,S.morale-3);if(Math.random()<.2){dropStaff(p);say(p.name+'님이 서운해하며 떠났습니다.','bad')}else say(p.name+'님이 아쉬워했지만 남았습니다.');renderAll()}}
+    ]});
+  }},
+  {w:2,ok:function(){return S.staff.length>=4},run:function(){
+    var c=Math.max(100,Math.round(S.staff.length*20/10)*10);
+    modal({title:'사내 동호회 제안',body:'<p>직원들이 풋살·보드게임 동호회를 만들고 싶다며 지원을 요청합니다.</p>',choices:[
+      {t:'지원한다 (-'+money(c)+', 사기 +4)',p:true,dis:S.cash<c,fn:function(){S.cash-=c;S.morale=Math.min(100,S.morale+4);S.brand=Math.min(100,S.brand+1);say('동호회가 생겨 회사 분위기가 좋아졌습니다.','good');renderAll()}},
+      {t:'정중히 거절한다',fn:function(){say('동호회 지원을 거절했습니다.')}}
+    ]});
+  }},
+  {w:2,ok:function(){return S.staff.some(function(p){return p.t<=3})},run:function(){
+    var p=stPick(function(x){return x.t<=3});
+    modal({title:'신입의 아이디어',body:'<p>입사한 지 얼마 안 된 <b>'+p.name+'</b>님이 회의에서 의외로 좋은 아이디어를 냈습니다.</p>',choices:[
+      {t:'바로 채택하고 칭찬한다 (사기 +2, 평판 +1)',p:true,fn:function(){S.morale=Math.min(100,S.morale+2);S.rep+=1;if(Math.random()<.3&&p.skill<5){p.skill++;p.sal=calcSal(p);say(p.name+'님이 자신감을 얻어 쑥쑥 성장했습니다. (★'+p.skill+')','good')}else say(p.name+'님의 아이디어를 채택했습니다.','good');renderAll()}},
+      {t:'일단 보류한다 (사기 -1)',fn:function(){S.morale=Math.max(0,S.morale-1);renderAll()}}
+    ]});
+  }}
+];
+function evStory(){
+  var l=STORIES.filter(function(x){return x.ok()}).map(function(x){return [x,x.w]});
+  if(!l.length)return;
+  pickW(l).run();
+}
+var TCHAT={genius:['이거 이렇게 풀면 되겠네','아, 아이디어가 떠올랐다!'],grind:['오늘도 야근각이죠?','저 안 가도 돼요'],mentor:['여기는 이렇게 하면 돼요','같이 보자, 천천히'],mood:['다들 커피 한 잔 할까요?','오늘도 파이팅!'],perf:['리팩토링 좀 하고 갈게요','이 변수명은 좀…'],burn:['불태우겠습니다!','한계는 넘으라고 있는 거죠'],loyal:['우리 회사 최고!','여기가 제 집이에요']};
+var RCHAT={dev:['컴파일 중…','이 버그 뭐지?','커밋 푸시!'],des:['여백이 부족해요','시안 3번으로 갑시다','폰트 바꿔도 돼요?'],pm:['일정 점검할게요','회의 소집합니다','요구사항 정리 중'],mkt:['인지도 올려 봅시다','캠페인 카피 완성!']};
+function chatLine(p){
+  var t=p.team||0,pj=S.projs[t];
+  if(S.cash<0)return '월급 들어오나요…?';
+  if(pj&&pj.late>0)return '납기 큰일났다…';
+  if(!pj)return pick(['할 일이 없네…','일감 좀 따와요 대표님','커피나 한잔 할까']);
+  if(S.overtime&&Math.random()<.5)return '또 야근이야…';
+  if(S.morale<40)return '집에 가고 싶다…';
+  if(p.head&&Math.random()<.4)return '팀 회의합시다';
+  if(p.trait&&TCHAT[p.trait]&&Math.random()<.6)return pick(TCHAT[p.trait]);
+  return pick(RCHAT[p.role]||['…']);
+}
+function chatter(){
+  if(!S||S.over||S.paused||modalOpen)return;
+  var ds=document.querySelectorAll('#desks .desk[data-sid]');if(!ds.length)return;
+  var e=ds[ri(0,ds.length-1)];if(e.querySelector('.bub'))return;
+  var p=S.staff.filter(function(x){return x.id===+e.dataset.sid})[0];if(!p)return;
+  var b=document.createElement('span');b.className='bub';b.textContent=chatLine(p);e.appendChild(b);
+  setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b)},2600);
+}
+function prDisc(){return Math.min(.3,marketPower()*.02)}
+function evPress(){
+  modal({title:'기술 매체 인터뷰 요청',body:'<p>IT 전문 매체에서 대표님 인터뷰를 요청했습니다. 회사를 알릴 좋은 기회예요.'+(marketPower()>=3?' 마케터가 질문 예상 답변을 미리 준비해 줬습니다.':'')+'</p>',choices:[
+    {t:'응한다',p:true,fn:function(){var b=6+(marketPower()>=3?3:0);S.brand=Math.min(100,S.brand+b);S.rep+=2;say('인터뷰가 공개됐습니다. 인지도 +'+b+', 평판 +2','good');renderAll()}},
+    {t:'정중히 사양한다',fn:function(){say('인터뷰 요청을 사양했습니다.')}}
+  ]});
+}
+function evInfluencer(){
+  var c=Math.round(300*(1+S.office*.5)*(1-prDisc())/10)*10;
+  modal({title:'인플루언서 협찬 제안',body:'<p>구독자가 많은 유튜버가 우리 서비스를 소개하고 싶다며 협찬을 제안했습니다. 반응이 어떨지는 아무도 모릅니다.</p>',choices:[
+    {t:'협찬한다 (-'+money(c)+')',p:true,dis:S.cash<c,fn:function(){S.cash-=c;if(Math.random()<.7){S.brand=Math.min(100,S.brand+8);say('영상이 반응이 좋았습니다. 인지도 +8','good')}else{S.brand=Math.min(100,S.brand+1);say('영상 반응이 미지근했습니다. 인지도 +1','bad')}renderAll()}},
+    {t:'거절한다',fn:function(){say('협찬 제안을 거절했습니다.')}}
+  ]});
+}
+function evScandal(){
+  var c=Math.round(500*(1+S.office*.5)*(1-prDisc())/10)*10;
+  modal({title:'온라인 논란 확산',body:'<p>익명 커뮤니티에 우리 회사에 대한 근거 없는 글이 올라왔고 빠르게 퍼지고 있습니다. 대응 방식을 정해야 합니다.</p>',choices:[
+    {t:'해명 광고를 집행한다 (-'+money(c)+')',p:true,dis:S.cash<c,fn:function(){S.cash-=c;S.brand=Math.max(0,S.brand-3);say('빠른 해명으로 논란이 잦아들었습니다. 인지도 -3');renderAll()}},
+    {t:'공개 사과문을 올린다 (인지도 -5, 사기 +2)',fn:function(){S.brand=Math.max(0,S.brand-5);S.morale=Math.min(100,S.morale+2);say('사과문을 올렸습니다. 인지도 -5');renderAll()}},
+    {t:'무대응한다 (인지도 -10, 평판 -4)',fn:function(){S.brand=Math.max(0,S.brand-10);S.rep=Math.max(0,S.rep-4);say('논란이 커졌습니다. 인지도 -10, 평판 -4','bad');renderAll()}}
+  ]});
+}
+function evReview(){
+  var p=pick(S.products);
+  modal({title:'악성 리뷰 테러',body:'<p><b>'+p.name+'</b>에 별점 1점 리뷰가 몰리고 있습니다. 경쟁 서비스의 조직적 공격이라는 소문도 돕니다.</p>',choices:[
+    {t:'팀을 투입해 대응한다 (사기 -3, 인지도 -2)',p:true,fn:function(){S.morale=Math.max(0,S.morale-3);S.brand=Math.max(0,S.brand-2);say('리뷰 대응으로 피해를 줄였습니다. 인지도 -2');renderAll()}},
+    {t:'방치한다 (수익 -7%, 인지도 -4)',fn:function(){p.cur*=.93;S.brand=Math.max(0,S.brand-4);say(p.name+' 수익이 7% 줄었습니다. 인지도 -4','bad');renderAll()}}
+  ]});
+}
 function evBug(){
+  var tp=pick(S.projs.filter(function(q){return q&&q.prog.dev>20}));
   modal({title:'치명적 버그 발견',body:'<p>출시 직전 코드에서 심각한 버그가 발견됐습니다. 어떻게 수습할까요?</p>',choices:[
     {t:'야근으로 수습한다 (사기 -8)',p:true,fn:function(){S.morale=Math.max(0,S.morale-8);say('야근으로 버그를 막았습니다.');renderAll()}},
-    {t:'일정 지연을 감수한다 (개발 진행 -12%)',fn:function(){if(S.project)S.project.prog.dev*=.88;say('버그 수정으로 개발 진행이 후퇴했습니다.','bad');renderAll()}}
+    {t:'일정 지연을 감수한다 (개발 진행 -12%)',fn:function(){if(tp)tp.prog.dev*=.88;say('버그 수정으로 개발 진행이 후퇴했습니다.','bad');renderAll()}}
+  ]});
+}
+
+function evDebt(){
+  var c=S.products.filter(function(p){return p.debt>=60}),p=pick(c);
+  var fee=Math.max(120,Math.round(p.base*.5/10)*10);
+  modal({title:'대형 장애 위기',body:'<p><b>'+p.name+'</b>에 쌓인 기술 부채(현재 '+Math.round(p.debt)+'%)가 한계에 다다라 서비스가 흔들립니다.</p>',choices:[
+    {t:'긴급 패치 (-'+money(fee)+', 부채 -30)',p:true,dis:S.cash<fee,fn:function(){S.cash-=fee;p.debt=Math.max(0,p.debt-30);say(p.name+' 긴급 패치로 위기를 넘겼습니다.');renderAll()}},
+    {t:'방치한다 (수익 -25%, 평판 -4)',fn:function(){p.cur*=.75;S.rep=Math.max(0,S.rep-4);say(p.name+' 장애로 이용자가 떠났습니다.','bad');renderAll()}}
+  ]});
+}
+function evPoach(){
+  var cs=S.staff.filter(function(x){return x.trait!=='loyal'}).sort(function(a,b){return b.skill-a.skill});
+  if(!cs.length||!S.rivals.length)return;
+  var best=cs[0],r=pick(S.rivals);
+  var raise=Math.round(best.sal*.3),bonus=best.sal*3;
+  modal({title:'경쟁사의 인재 영입',body:'<p><b>'+r.name+'</b>이(가) '+best.name+'님('+ROLES[best.role].full+' ★'+best.skill+')에게 높은 연봉을 제시했습니다.</p>',choices:[
+    {t:'붙잡는다 (월급 +'+money(raise)+', 일시금 '+money(bonus)+')',p:true,dis:S.cash<bonus,fn:function(){S.cash-=bonus;best.sal+=raise;S.morale=Math.min(100,S.morale+3);say(best.name+'님이 남기로 했습니다.','good');renderAll()}},
+    {t:'보내준다',fn:function(){var i=S.staff.indexOf(best);if(i>=0)S.staff.splice(i,1);r.rev*=1.03;say(best.name+'님이 '+r.name+'(으)로 옮겼습니다.','bad');renderAll()}}
+  ]});
+}
+
+function evHack(){
+  if(S.techs.sec){say('해킹 시도를 보안 체계가 차단했습니다.','good');toast('해킹 시도 차단! 평판 +1','good');S.rep+=1;return}
+  var fee=Math.round(rnd(300,700)*(1+S.office*.6)/10)*10;
+  modal({title:'해킹 시도 감지',body:'<p>누군가 서버에 침입을 시도한 흔적이 발견됐습니다. 고객 데이터가 위험합니다.</p>',choices:[
+    {t:'보안 업체를 긴급 투입한다 (-'+money(fee)+')',p:true,dis:S.cash<fee,fn:function(){S.cash-=fee;S.rep+=1;say('보안 업체 덕분에 침해를 막았습니다.','good');renderAll()}},
+    {t:'자체 대응한다 (50% 확률로 정보 유출, 평판 -8)',fn:function(){
+      if(Math.random()<.5){S.rep=Math.max(0,S.rep-8);S.cash-=Math.round(fee*1.5);say('고객 정보가 유출됐습니다. 평판 -8, 보상금 '+money(Math.round(fee*1.5)),'bad')}
+      else say('다행히 자체 대응으로 막았습니다.','good');
+      renderAll();
+    }}
+  ]});
+}
+function evReg(){
+  var n=Math.max(1,S.products.length),fee=Math.round((200+n*150)*(1+S.office*.4)/10)*10;
+  modal({title:'규제 강화',body:'<p>개인정보 보호 규제가 강화됐습니다. 서비스를 새 기준에 맞춰야 합니다.</p>',choices:[
+    {t:'즉시 준수한다 (-'+money(fee)+', 평판 +2)',p:true,dis:S.cash<fee,fn:function(){S.cash-=fee;S.rep+=2;say('새 규제에 맞춰 서비스를 정비했습니다.','good');renderAll()}},
+    {t:'유예를 노리고 버틴다 (50% 확률로 과징금 '+money(fee*2)+')',fn:function(){
+      if(Math.random()<.5){S.cash-=fee*2;S.rep=Math.max(0,S.rep-3);say('규제 당국이 과징금 '+money(fee*2)+'을 부과했습니다.','bad')}
+      else say('유예 기간을 받아냈습니다.','good');
+      renderAll();
+    }}
+  ]});
+}
+function evInvestor(){
+  var add=Math.max(100,Math.round(capVal()*.01/10)*10);
+  modal({title:'투자자 갈등',body:'<p>투자자들이 공격적인 성장을 요구합니다. "이번 분기 안에 성과를 내라"는 압박입니다.</p>',choices:[
+    {t:'요구를 수용한다 (야근 모드 전환, 사기 -6, 추가 자금 '+money(add)+')',p:true,fn:function(){S.overtime=true;S.morale=Math.max(0,S.morale-6);S.cash+=add;say('투자자 요구를 수용했습니다. 야근 모드로 전환됩니다.');renderAll()}},
+    {t:'정면으로 거절한다 (평판 -3'+(S.listed?', 시장 심리 하락':'')+')',fn:function(){S.rep=Math.max(0,S.rep-3);if(S.listed)S.sent=Math.max(.6,S.sent-.08);say('투자자와 갈등이 불거졌습니다.','bad');renderAll()}}
+  ]});
+}
+function evUnion(){
+  var raise=Math.round(payroll()*.05);
+  modal({title:'직원 대표의 요구',body:'<p>직원 대표단이 처우 개선을 요구합니다. 야근 수당과 연봉 인상이 핵심입니다.</p>',choices:[
+    {t:'전 직원 월급 5% 인상 (월 지출 +'+money(raise)+', 사기 +8)',p:true,fn:function(){S.staff.forEach(function(p){p.sal=Math.round(p.sal*1.05)});S.morale=Math.min(100,S.morale+8);say('전 직원 월급을 5% 올렸습니다.','good');renderAll()}},
+    {t:'복지 기금 지원 (-300만원, 사기 +4)',dis:S.cash<300,fn:function(){S.cash-=300;S.morale=Math.min(100,S.morale+4);say('복지 기금을 지원했습니다.');renderAll()}},
+    {t:'요구를 거절한다 (사기 -12, 퇴사 위험)',fn:function(){
+      S.morale=Math.max(0,S.morale-12);
+      if(S.staff.length&&Math.random()<.4){var q=S.staff.splice(Math.floor(Math.random()*S.staff.length),1)[0];say(q.name+'님이 항의하며 퇴사했습니다.','bad')}
+      else say('직원들의 불만이 커졌습니다.','bad');
+      renderAll();
+    }}
+  ]});
+}
+function evAward(){
+  modal({title:'우수 기업 선정',body:'<p>업계 매체가 올해의 유망 IT 기업으로 선정했습니다. 평판이 오릅니다.</p>',choices:[
+    {t:'감사합니다',p:true,fn:function(){var g=Math.round(5*(1+(S.techs.brand?.4:0)));S.rep+=g;say('우수 기업 선정으로 평판 +'+g,'good');renderAll()}}
+  ]});
+}
+function evRivalMerge(){
+  var a=pick(S.rivals),b=pick(S.rivals.filter(function(x){return x!==a}));
+  modal({title:'라이벌 합병',body:'<p><b>'+a.name+'</b>과(와) <b>'+b.name+'</b>이(가) 합병을 발표했습니다. 덩치가 커진 경쟁사가 시장을 압박합니다.</p>',choices:[
+    {t:'확인',p:true,fn:function(){
+      a.rev+=b.rev*.8;S.rivals=S.rivals.filter(function(x){return x!==b});S.rq.push(S.month+ri(10,16));
+      say(a.name+'과(와) '+b.name+' 합병: 라이벌 매출이 크게 늘었습니다.','bad');renderAll();
+    }}
+  ]});
+}
+function evBuyout(){
+  var price=capVal()*rnd(1.25,1.5),mine=price*S.eq/100;
+  modal({title:'인수 제안',body:'<p>글로벌 대기업이 회사 인수를 제안했습니다. 제안가 <b>'+money(price)+'</b>, 내 지분 몫은 <b>'+money(mine)+'</b>입니다. 수락하면 게임이 끝납니다.</p>',choices:[
+    {t:'수락한다 (엑싯)',fn:function(){doSale(price)}},
+    {t:'거절하고 계속 키운다',p:true,fn:function(){S.rep+=2;say('인수 제안을 거절했습니다.')}}
   ]});
 }
 
 /* ---------- 렌더링 ---------- */
 function renderTop(){
   var inc=income(),exp=expense(),net=inc-exp;
-  setT('date',monthLabel(S.month)+' · '+(S.month+1)+'개월차');
+  setT('date',monthLabel(S.month)+' · '+(S.month+1)+'개월차 · '+DIFFS[S.diff].n+' · '+SCENS[S.scen].n);
   setT('s-cash',money(S.cash));$('s-cash').className=S.cash<0?'bad':'';
   setT('s-cashsub','월 순이익 '+(net>=0?'+':'')+money(net));
-  setT('s-inc',money(inc));setT('s-incsub','제품 '+S.products.length+'개 운영');
+  setT('s-inc',money(inc));setT('s-incsub','제품 '+S.products.length+'개'+(S.branches.length?' · 해외 '+S.branches.length+'곳':''));
   setT('s-exp',money(exp));setT('s-expsub','급여 '+money(payroll()));
-  setT('s-rep',Math.floor(S.rep));setT('s-repsub',repTier(S.rep));
+  setT('s-rep',Math.floor(S.rep));setT('s-repsub',repTier(S.rep));setT('s-brand',Math.floor(S.brand));setT('s-brandsub',brandTier(S.brand));
   setT('s-mor',Math.round(S.morale)+'%');setW('s-morbar',S.morale);
   setT('s-staff',(S.staff.length+1)+'명');setT('s-staffsub','자리 '+S.staff.length+'/'+cap());
+  var cy=S.mkt.cycle;
+  setT('s-mkt',{boom:'호황',normal:'보통',slump:'불황'}[cy]);$('s-mkt').className=cy==='boom'?'good':cy==='slump'?'bad':'';
+  setT('s-mktsub',S.mkt.trend?'유행: '+prodName(S.mkt.trend):'유행 없음');
+  var cv=capVal();
+  setT('s-valL',S.listed?'시가총액':'기업 가치');setT('s-val',money(cv));
+  setT('s-valsub','지분 '+Math.round(S.eq)+'% '+money(cv*S.eq/100));
   $('bPause').textContent=S.paused?'재개':'일시정지';
   var sp=document.querySelectorAll('[data-act="speed"]');
   for(var i=0;i<sp.length;i++){sp[i].classList.toggle('on',!S.paused&&+sp[i].dataset.v===S.speed)}
@@ -528,49 +1662,61 @@ function renderTop(){
   setW('mbar',S.mf*100);
 }
 function renderPlan(){
-  var o=OFFICES[S.office];
+  var o=OFFICES[S.office],n=nTeams(),t,i=0;
   setT('officeName',o.n);setT('officeSub','임대료 월 '+money(o.rent)+' · 자리 '+S.staff.length+'/'+o.cap);
-  var h='<div class="desk ceo" style="--role:var(--accent)" title="CEO(나)"><span class="mon"></span><b>CEO</b><span class="sk">나</span></div>';
-  S.staff.forEach(function(p,i){
-    h+='<div class="desk" style="--role:var(--'+p.role+');--d:'+((i*.23)%1.1).toFixed(2)+'s" title="'+p.name+' · '+ROLES[p.role].full+' ★'+p.skill+'"><span class="mon"></span><b>'+ROLES[p.role].k+'</b><span class="sk">'+'★'.repeat(p.skill)+'</span></div>';
-  });
-  for(var i=S.staff.length;i<o.cap;i++)h+='<div class="desk empty" title="빈 자리">+</div>';
-  var d=$('desks');d.innerHTML=h;d.classList.toggle('working',!!S.project);
+  var h='';
+  for(t=0;t<n;t++){
+    if(n>1)h+='<div class="zone">'+teamName(t)+' · '+(S.projs[t]?S.projs[t].name:'쉬는 중')+(S.tdel[t]?' · 위임':'')+'</div>';
+    if(t===0)h+='<div class="desk ceo" style="--role:var(--accent)" title="CEO(나)"><span class="mon"></span><b>CEO</b><span class="sk">나</span></div>';
+    teamStaff(t).forEach(function(p){
+      h+='<div class="desk'+(S.projs[t]?'':' idle')+(p.head?' head':'')+'" data-sid="'+p.id+'" style="--role:var(--'+p.role+');--d:'+((i++*.23)%1.1).toFixed(2)+'s" title="'+p.name+' · '+ROLES[p.role].full+' ★'+p.skill+' · '+TRAITS[p.trait||'none'].n+(n>1?' · '+teamName(t):'')+'"><span class="mon"></span><b>'+ROLES[p.role].k+'</b><span class="sk">'+'★'.repeat(p.skill)+'</span></div>';
+    });
+  }
+  for(var j=S.staff.length;j<o.cap;j++)h+='<div class="desk empty" title="빈 자리">+</div>';
+  var d=$('desks');d.innerHTML=h;d.classList.toggle('working',anyProj());
 }
 function renderProject(){
-  var el=$('projCard'),p=S.project,out=calcOut();
+  var el=$('projCard'),n=nTeams(),i;
   var h='<div class="chead"><h2>진행 중인 프로젝트</h2><button class="btn sm '+(S.overtime?'primary':'')+'" data-act="ot" aria-pressed="'+S.overtime+'">야근 모드 '+(S.overtime?'ON':'OFF')+'</button></div>';
-  if(!p){
-    h+='<p class="empty">진행 중인 프로젝트가 없습니다. 직원들이 놀고 있어요. 오른쪽 <b>계약</b> 탭에서 의뢰를 받거나 <b>제품</b> 탭에서 자체 개발을 시작하세요.</p>';
-  }else{
-    h+='<div class="ptitle"><b>'+p.name+'</b> <span class="pill" id="pdl"></span></div>';
-    ROLE_KEYS.forEach(function(k){
-      h+='<div class="prow" style="--role:var(--'+k+')"><span>'+ROLES[k].n+'</span><div class="bar"><i id="pb-'+k+'"></i></div><span class="num" id="pt-'+k+'"></span></div>';
-    });
-    h+='<p class="hint" id="phint"></p><button class="btn sm" data-act="abandon">'+(armed==='abandon'?'정말 포기할까요?':'프로젝트 포기')+'</button>';
+  for(i=0;i<n;i++){
+    var p=S.projs[i],out=calcOut(i);
+    if(n>1)h+='<div class="tname">'+teamName(i)+' · '+teamStaff(i).length+'명'+(i===0?' + CEO':'')+(S.tdel[i]?' · 팀장 위임 중':'')+'</div>';
+    if(!p){
+      h+='<p class="empty">'+(n>1?J(teamName(i),'i')+' 쉬고 있어요. ':'진행 중인 프로젝트가 없습니다. 직원들이 놀고 있어요. ')+'<b>계약</b> 탭에서 의뢰를 받거나 <b>제품</b> 탭에서 자체 개발을 시작하세요.</p>';
+    }else{
+      h+='<div class="ptitle"><b>'+p.name+'</b> <span class="pill" id="pdl-'+i+'"></span></div>';
+      ROLE_KEYS.forEach(function(k){
+        h+='<div class="prow" style="--role:var(--'+k+')"><span>'+ROLES[k].n+'</span><div class="bar"><i id="pb-'+i+'-'+k+'"></i></div><span class="num" id="pt-'+i+'-'+k+'"></span></div>';
+      });
+      h+='<p class="hint" id="phint-'+i+'"></p><button class="btn sm" data-act="abandon" data-team="'+i+'">'+(armed==='abandon'+i?'정말 포기할까요?':'프로젝트 포기')+'</button>';
+    }
+    h+='<p class="rates">월 생산량 · 개발 '+fix(out.dev)+' · 디자인 '+fix(out.des)+' · 기획 '+fix(out.pm)+(S.overtime?' (야근 적용)':'')+'</p>';
   }
-  h+='<p class="rates">월 생산량 · 개발 '+fix(out.dev)+' · 디자인 '+fix(out.des)+' · 기획 '+fix(out.pm)+(S.overtime?' (야근 적용)':'')+'</p>';
+  if(n<3)h+='<p class="hint">'+OFFICES[n===1?2:3].n+'로 옮기면 팀을 하나 더 운영할 수 있어요.</p>';
   el.innerHTML=h;updateProjectBars();
 }
 function updateProjectBars(){
-  var p=S.project;if(!p)return;
-  var out=calcOut(),worst=null,wv=-1;
-  ROLE_KEYS.forEach(function(k){
-    var pct=Math.min(100,p.prog[k]/p.need[k]*100);
-    setW('pb-'+k,pct);setT('pt-'+k,Math.floor(p.prog[k])+'/'+p.need[k]);
-    if(pct<100){var rem=(p.need[k]-p.prog[k])/Math.max(out[k],.01);if(rem>wv){wv=rem;worst=k}}
-  });
-  var pl=$('pdl');
-  if(pl){
-    var txt,cls='pill';
-    if(p.kind==='contract'){
-      if(p.late>0){txt='납기 초과 '+p.late+'개월';cls+=' bad'}
-      else{txt='납기 D-'+p.left+'개월';if(p.left<=1)cls+=' warn'}
-      txt+=' · 대금 '+money(p.reward);
-    }else txt='자체 개발';
-    if(pl.textContent!==txt)pl.textContent=txt;pl.className=cls;
+  var n=nTeams(),i;
+  for(i=0;i<n;i++){
+    var p=S.projs[i];if(!p)continue;
+    var out=calcOut(i),worst=null,wv=-1;
+    ROLE_KEYS.forEach(function(k){
+      var pct=Math.min(100,p.prog[k]/p.need[k]*100);
+      setW('pb-'+i+'-'+k,pct);setT('pt-'+i+'-'+k,Math.floor(p.prog[k])+'/'+p.need[k]);
+      if(pct<100){var rem=(p.need[k]-p.prog[k])/Math.max(out[k],.01);if(rem>wv){wv=rem;worst=k}}
+    });
+    var pl=$('pdl-'+i);
+    if(pl){
+      var txt,cls='pill';
+      if(p.kind==='contract'){
+        if(p.late>0){txt='납기 초과 '+p.late+'개월';cls+=' bad'}
+        else{txt='납기 D-'+p.left+'개월';if(p.left<=1)cls+=' warn'}
+        txt+=' · 대금 '+money(p.reward)+(p.vip?' · VIP':'');
+      }else txt='자체 개발';
+      if(pl.textContent!==txt)pl.textContent=txt;pl.className=cls;
+    }
+    setT('phint-'+i,worst?'병목: '+ROLES[worst].n+' (남은 작업 약 '+wv.toFixed(1)+'개월)':'');
   }
-  setT('phint',worst?'병목: '+ROLES[worst].n+' (남은 작업 약 '+wv.toFixed(1)+'개월)':'');
 }
 function renderFin(){
   var el=$('finCard'),h=S.hist,inc=income(),exp=expense();
@@ -588,6 +1734,10 @@ function renderFin(){
 }
 function renderGoals(){
   var h='';GOALS.forEach(function(g,i){var d=S.goals.indexOf(i)>=0;h+='<li class="'+(d?'done':'')+'"><i>'+(d?'✓':'○')+'</i><span>'+g[0]+'</span></li>'});
+  if(S.listed>=1){
+    h+='<li class="lh">장기 목표 ('+S.longs.length+'/'+LONGS.length+')</li>';
+    LONGS.forEach(function(g,i){var d=S.longs.indexOf(i)>=0;h+='<li class="'+(d?'done':'')+'"><i>'+(d?'✓':'○')+'</i><span>'+g[0]+'</span></li>'});
+  }
   $('goals').innerHTML=h;setT('goalSub',S.goals.length+'/'+GOALS.length);
 }
 function renderLog(){
@@ -595,19 +1745,18 @@ function renderLog(){
   S.log.slice(0,14).forEach(function(l){h+='<li><time>'+l.m.replace('2026년 ','').replace('년 ','/')+'</time><span class="'+(l.c||'')+'">'+l.t+'</span></li>'});
   $('log').innerHTML=h;
 }
-var TABS=[['contracts','계약'],['products','제품'],['hire','채용'],['team','팀'],['research','연구'],['company','회사']];
+var TABS=[['contracts','계약'],['products','제품'],['market','시장'],['hire','채용'],['team','팀'],['research','연구'],['company','회사'],['stats','통계']];
 function renderTabs(){
-  var h='';TABS.forEach(function(t){h+='<button class="tab" role="tab" aria-selected="'+(TAB===t[0])+'" data-act="tab" data-v="'+t[0]+'">'+t[1]+'</button>'});
+  var h='';TABS.forEach(function(t){h+='<button class="tab'+(tipTab===t[0]&&TAB!==t[0]?' hint':'')+'" role="tab" aria-selected="'+(TAB===t[0])+'" data-act="tab" data-v="'+t[0]+'">'+t[1]+'</button>'});
   $('tabs').innerHTML=h;
 }
 function tabContracts(){
-  var h='<p class="sub" style="margin:4px 0 0">의뢰는 2개월마다 새로 들어옵니다. 평판이 오르면 더 큰 일감이 보여요.</p>';
+  var h='<p class="sub" style="margin:4px 0 0">의뢰는 2개월마다 새로 들어옵니다. 평판이 오르면 더 큰 일감이 보여요. 계약 도중 고객이 요구를 바꾸기도 합니다.</p>';
   if(!S.contracts.length)return h+'<p class="empty">지금은 들어온 의뢰가 없습니다. 다음 달을 기다려 보세요.</p>';
   S.contracts.forEach(function(c){
-    var est=estMonths(c.need),bad=est>c.months;
-    h+='<div class="row"><div class="grow"><div class="t">'+c.name+'</div><div class="meta">'+needTxt(c.need)+'</div><div class="meta">납기 '+c.months+'개월 · 현재 팀으로 <span class="'+(bad?'bad':'good')+'">약 '+est.toFixed(1)+'개월</span></div></div><div class="act"><b class="mono">'+money(c.reward)+'</b><button class="btn primary sm" data-act="accept" data-id="'+c.id+'"'+(S.project?' disabled':'')+'>수락</button></div></div>';
+    h+='<div class="row"><div class="grow"><div class="t">'+c.name+'</div><div class="meta">'+needTxt(c.need)+'</div><div class="meta">납기 '+c.months+'개월 · '+estTxt(c.need,c.months)+'</div></div><div class="act"><b class="mono">'+money(c.reward)+'</b>'+teamBtns('accept','data-id="'+c.id+'"','수락',false)+'</div></div>';
   });
-  if(S.project)h+='<p class="hint">진행 중인 프로젝트가 끝나야 새 계약을 받을 수 있어요.</p>';
+  if(!freeTeams().length)h+='<p class="hint">모든 팀이 작업 중이에요. 프로젝트가 끝나야 새 계약을 받을 수 있어요.</p>';
   return h;
 }
 function prodLock(d){
@@ -618,17 +1767,20 @@ function prodLock(d){
 function tabProducts(){
   var h='<div class="sect">자체 개발</div>';
   PRODUCTS.forEach(function(d){
-    var lock=prodLock(d),est=estMonths(d.need);
-    h+='<div class="row"><div class="grow"><div class="t">'+d.n+'</div><div class="meta">'+d.d+'</div><div class="meta">'+needTxt(d.need)+'</div><div class="meta">월 수익 약 '+money(d.inc)+(lock?' · <span class="warnc">'+lock+'</span>':' · 현재 팀으로 약 '+est.toFixed(1)+'개월')+'</div></div><div class="act"><span class="mono muted">착수금 '+money(d.cost)+'</span><button class="btn primary sm" data-act="startProd" data-v="'+d.id+'"'+((lock||S.project||S.cash<d.cost)?' disabled':'')+'>개발 시작</button></div></div>';
+    var lock=prodLock(d);
+    h+='<div class="row"><div class="grow"><div class="t">'+d.n+'</div><div class="meta">'+d.d+'</div><div class="meta">'+needTxt(d.need)+'</div><div class="meta">월 수익 약 '+money(d.inc)+(lock?' · <span class="warnc">'+lock+'</span>':' · '+estTxt(d.need))+'</div></div><div class="act"><span class="mono muted">착수금 '+money(d.cost)+'</span>'+teamBtns('startProd','data-v="'+d.id+'"','개발 시작',!!(lock||S.cash<d.cost))+'</div></div>';
   });
   h+='<div class="sect">운영 중인 제품</div>';
   if(!S.products.length)h+='<p class="empty">아직 출시한 제품이 없습니다.</p>';
   S.products.forEach(function(p){
     var arrow=p.g>0?'<span class="good">▲ 성장</span>':'<span class="bad">▼ 감소</span>';
-    h+='<div class="row"><div class="grow"><div class="t">'+p.name+'</div><div class="meta">'+arrow+' · 출시 '+monthLabel(p.born)+'</div></div><b class="mono">'+money(productIncome(p))+'/월</b></div>';
+    var pr=Math.round(pressure(p)*100),hot=S.mkt.trend===p.def,uc=updCost(p),rc=refCost(p);
+    var uw=6-(S.month-p.upd),rw=3-(S.month-p.ref);
+    var dk=p.debt>=60?'bad':p.debt>=30?'warn':'good';
+    h+='<div class="row" style="align-items:flex-start"><div class="grow"><div class="t">'+p.name+(hot?' <span class="pill warn">유행</span>':'')+'</div><div class="meta">'+arrow+' · 출시 '+monthLabel(p.born)+(pr?' · 경쟁 압박 -'+pr+'%':'')+'</div><div class="meta">기술 부채 <span class="mono '+(dk==='warn'?'warnc':dk)+'">'+Math.round(p.debt)+'%</span> (수익 -'+Math.round(p.debt*.6)+'%)</div><div class="bar thin"><i style="width:'+p.debt.toFixed(0)+'%;background:var(--'+dk+')"></i></div></div><div class="act"><b class="mono">'+money(productIncome(p))+'/월</b><button class="btn sm" data-act="update" data-id="'+p.id+'"'+((uw>0||S.cash<uc)?' disabled':'')+'>'+(uw>0?'업데이트 '+uw+'개월 후':'업데이트 -'+money(uc))+'</button><button class="btn sm" data-act="refactor" data-id="'+p.id+'"'+((rw>0||S.cash<rc||p.debt<=0)?' disabled':'')+'>'+(rw>0?'리팩토링 '+rw+'개월 후':'리팩토링 -'+money(rc))+'</button></div></div>';
   });
   if(S.products.length){
-    h+='<div class="row"><div class="grow"><div class="t">마케팅 캠페인</div><div class="meta">6개월간 제품 수익 +30%, 매달 평판 +1 '+(S.campaign>0?'· 진행 중 ('+S.campaign+'개월 남음)':'')+'</div></div><button class="btn sm" data-act="campaign"'+((S.campaign>0||S.cash<400)?' disabled':'')+'>시작 (-400만원)</button></div>';
+    h+='<div class="row"><div class="grow"><div class="t">마케팅 캠페인</div><div class="meta">6개월간 제품 수익 +30%, 경쟁 압박 절반, 매달 평판 +1'+(S.campaign>0?'· 진행 중 ('+S.campaign+'개월 남음)':'')+'</div></div><button class="btn sm" data-act="campaign"'+((S.campaign>0||S.cash<400)?' disabled':'')+'>시작 (-400만원)</button></div>';
   }
   return h;
 }
@@ -637,18 +1789,35 @@ function tabHire(){
   if(S.staff.length>=cap())h+='<p class="hint">자리가 가득 찼습니다. <b>회사</b> 탭에서 사무실을 넓히세요.</p>';
   S.pool.forEach(function(c){
     var gain=c.role==='mkt'?'제품 수익 +'+(c.skill*4)+'%':'월 '+ROLES[c.role].n+' +'+(c.skill*10);
-    h+='<div class="row"><div class="grow"><div class="t">'+c.name+' '+roleTag(c.role)+'</div><div class="meta">'+stars(c.skill)+' · 월급 '+money(c.sal)+' · '+gain+'</div></div><button class="btn primary sm" data-act="hire" data-id="'+c.id+'"'+((S.cash<c.sal||S.staff.length>=cap())?' disabled':'')+'>채용 (-'+money(c.sal)+')</button></div>';
+    h+='<div class="row"><div class="grow"><div class="t">'+c.name+' '+roleTag(c.role)+traitTag(c.trait)+'</div><div class="meta">'+stars(c.skill)+' · 월급 '+money(c.sal)+' · '+gain+'</div><div class="meta">'+traitDesc(c.trait)+'</div></div><button class="btn primary sm" data-act="hire" data-id="'+c.id+'"'+((S.cash<c.sal||S.staff.length>=cap())?' disabled':'')+'>채용 (-'+money(c.sal)+')</button></div>';
   });
   if(!S.pool.length)h+='<p class="empty">후보가 모두 채용됐습니다. 새로고침하세요.</p>';
   return h;
 }
 function tabTeam(){
-  var h='<p class="sub" style="margin:4px 0 0">월 급여 합계 '+money(payroll())+' · 팀 사기 '+Math.round(S.morale)+'%</p>';
+  var h='<p class="sub" style="margin:4px 0 0">월 급여 합계 '+money(payroll())+' · 팀 사기 '+Math.round(S.morale)+'%</p>'+chemHtml();
   if(!S.staff.length)return h+'<p class="empty">아직 혼자입니다. 채용 탭에서 첫 동료를 찾아보세요.</p>';
-  S.staff.forEach(function(p){
+  var tn=nTeams(),ti;
+  for(ti=0;ti<tn;ti++){
+  var ts=teamStaff(ti);
+  h+=teamHead(ti);
+  if(!ts.length)h+='<p class="empty">'+(ti===0?'CEO 혼자 일하고 있어요.':'비어 있어요. 다른 팀 직원의 이동 버튼으로 옮겨 오세요.')+'</p>';
+  ts.forEach(function(p){
     var sev=armed==='fire'+p.id;
-    h+='<div class="row"><div class="grow"><div class="t">'+p.name+' '+roleTag(p.role)+'</div><div class="meta">'+stars(p.skill)+' · 월급 '+money(p.sal)+' · 근속 '+p.t+'개월</div></div><button class="btn sm" data-act="fire" data-id="'+p.id+'">'+(sev?'퇴직금 '+money(p.sal)+' 확정':'해고')+'</button></div>';
+    var ch=canHead(p),tc=trainCost(p),tw=12-(S.month-(p.trainM===undefined?-99:p.trainM)),cp=canPromote(p);
+    h+='<div class="row" style="align-items:flex-start"><div class="grow"><div class="t">'+p.name+' '+roleTag(p.role)+traitTag(p.trait)+(p.lead?' <span class="pill warn">리드</span>':'')+(p.head?' <span class="pill">팀장</span>':'')+'</div><div class="meta">'+stars(p.skill)+' · 월급 '+money(p.sal)+' · 근속 '+p.t+'개월'+bondTxt(p)+'</div><div class="meta">'+traitDesc(p.trait)+'</div></div><div class="act h">'
+      +'<button class="btn sm" data-act="train" data-id="'+p.id+'"'+((p.skill>=5||tw>0||S.cash<tc)?' disabled':'')+'>'+(p.skill>=5?'교육 완료(★5)':tw>0?'교육 '+tw+'개월 후':'교육 -'+money(tc))+'</button>'
+      +'<button class="btn sm" data-act="promote" data-id="'+p.id+'" title="'+(cp.ok?'리드가 되면 같은 직군 산출 +4%':cp.why)+'"'+((cp.ok&&S.cash>=cp.cost)?'':' disabled')+'>'+(p.lead?'리드':cp.ok?'승진 -'+money(cp.cost):'승진 불가')+'</button>'
+      +'<button class="btn sm" data-act="head" data-id="'+p.id+'" title="'+(ch.ok?'팀장이 되면 팀 산출 +5%, 위임 가능':ch.why)+'"'+((ch.ok&&S.cash>=ch.cost)?'':' disabled')+'>'+(p.head?'팀장':ch.ok?'팀장 임명 -'+money(ch.cost):'팀장 불가')+'</button>'
+      +mvBtns(p)
+      +'<button class="btn sm" data-act="fire" data-id="'+p.id+'">'+(sev?'퇴직금 '+money(p.sal)+' 확정':'해고')+'</button></div></div>';
   });
+  }
+  return h;
+}
+function mvBtns(p){
+  var n=nTeams(),t,h='';if(n<2)return '';
+  for(t=0;t<n;t++){if(t!==(p.team||0))h+='<button class="btn sm" data-act="move" data-id="'+p.id+'" data-v="'+t+'">→ '+teamName(t)+'</button>'}
   return h;
 }
 function tabResearch(){
@@ -680,54 +1849,204 @@ function tabCompany(){
   });
   h+='<div class="row"><div class="grow"><div class="t">회식·피자 파티</div><div class="meta">사기 즉시 +15</div></div><button class="btn sm" data-act="party"'+(S.cash<150?' disabled':'')+'>열기 (-150만원)</button></div>';
   h+='<div class="sect">자금</div><div class="row"><div class="grow"><div class="t">은행 대출</div><div class="meta">2,000만원을 빌리고 12개월간 매달 200만원 상환 (최대 3건 · 현재 '+S.loans.length+'건)</div></div><button class="btn sm" data-act="loan"'+(S.loans.length>=3?' disabled':'')+'>대출 받기</button></div>';
-  h+='<div class="sect">코스닥 상장</div>';
-  var cs=ipoConds(),all=cs.every(function(c){return c[1]});
-  cs.forEach(function(c){h+='<div class="chk"><i class="'+(c[1]?'good':'muted')+'">'+(c[1]?'✓':'○')+'</i><span>'+c[0]+' <span class="muted mono">('+c[2]+')</span></span></div>'});
-  h+='<div style="margin-top:10px"><button class="btn primary" data-act="ipo"'+(all?'':' disabled')+'>'+(armed==='ipo'?'정말 상장할까요?':'상장 신청 (-5,000만원)')+'</button></div>';
+  h+=ovsHtml();
+  h+=finHtml();
+  h+=saleHtml();
+  return h;
+}
+function prTiers(){
+  var m=(1+S.office*.6)*(1-prDisc());
+  return [
+    {id:0,n:'보도자료 배포',c:Math.round(200*m),b:4,cd:3,d:'인지도 +4'},
+    {id:1,n:'온라인 광고 집행',c:Math.round(800*m),b:10,cd:6,d:'인지도 +10'},
+    {id:2,n:'TV·옥외 광고',c:Math.round(3000*m),b:22,cd:12,d:'인지도 +22',off:2}
+  ];
+}
+function brandHtml(){
+  var h='<div class="sect">브랜드·홍보</div><div class="row"><div class="grow"><div class="t">인지도 '+Math.floor(S.brand)+' <span class="muted">'+brandTier(S.brand)+'</span></div><div class="bar thin"><i style="width:'+S.brand.toFixed(0)+'%;background:var(--accent)"></i></div><div class="meta">제품 수익 +'+(S.brand*.4).toFixed(0)+'% · 새 의뢰 단가 +'+(S.brand*.2).toFixed(0)+'% · 경쟁 압박 -'+(S.brand*.3).toFixed(0)+'%. 시간이 지나면 조금씩 잊혀집니다. 마케터가 있으면 꾸준히 오르고 광고비도 줄어요'+(prDisc()?' (현재 -'+Math.round(prDisc()*100)+'%)':'')+'.</div></div></div>';
+  prTiers().forEach(function(x){
+    var last=S.prM[x.id],w=last===undefined?0:x.cd-(S.month-last),lock=x.off&&S.office<x.off;
+    h+='<div class="row"><div class="grow"><div class="t">'+x.n+'</div><div class="meta">'+x.d+' · 재사용 '+x.cd+'개월'+(lock?' · <span class="warnc">'+OFFICES[x.off].n+' 이상 필요</span>':'')+'</div></div><button class="btn sm" data-act="pr" data-id="'+(x.id+1)+'"'+((lock||w>0||S.cash<x.c)?' disabled':'')+'>'+(w>0?w+'개월 후':'-'+money(x.c))+'</button></div>';
+  });
+  return h;
+}
+function tabMarket(){
+  var m=S.mkt,names={boom:'호황',normal:'보통',slump:'불황'},cls={boom:'good',normal:'',slump:'bad'};
+  var desc={boom:'제품 수익 +15%, 새 의뢰 단가 +15%',normal:'특별한 영향이 없습니다',slump:'제품 수익 -15%, 새 의뢰 단가 -15%'};
+  var h=brandHtml()+'<div class="sect">시장 상황</div>';
+  h+='<div class="row"><div class="grow"><div class="t">경기: <span class="'+cls[m.cycle]+'">'+names[m.cycle]+'</span></div><div class="meta">'+desc[m.cycle]+' · 약 '+Math.max(1,m.cl)+'개월 더 이어질 전망</div></div></div>';
+  h+='<div class="row"><div class="grow"><div class="t">유행: '+(m.trend?'<span class="warnc">'+prodName(m.trend)+'</span>':'<span class="muted">아직 없음</span>')+'</div><div class="meta">'+(m.trend?'이 분야 제품 수익 +35% · 약 '+Math.max(1,m.tl)+'개월 지속':'곧 새로운 유행이 나타납니다')+'</div></div></div>';
+  h+='<div class="sect">경쟁사</div>';
+  var inc=income(),mx=Math.max(inc,1);
+  S.rivals.forEach(function(r){mx=Math.max(mx,r.rev)});
+  h+='<div class="row"><div class="grow"><div class="t">우리 회사</div><div class="meta">월 제품 수익 '+money(inc)+'</div><div class="bar thin"><i style="width:'+(inc/mx*100).toFixed(1)+'%"></i></div></div></div>';
+  S.rivals.forEach(function(r){
+    var vs=S.products.some(function(p){return p.def===r.focus});
+    h+='<div class="row"><div class="grow"><div class="t">'+r.name+' <span class="tag" style="--role:var(--bad)">주력 '+prodName(r.focus)+'</span></div><div class="meta">월 매출 '+money(r.rev)+(vs?' · <span class="warnc">우리 제품과 경쟁 중</span>':'')+'</div><div class="bar thin" style="--role:var(--bad)"><i style="width:'+(r.rev/mx*100).toFixed(1)+'%"></i></div></div><div class="act"><span class="mono muted">'+money(acqPrice(r))+'</span><button class="btn sm" data-act="acquire" data-id="'+S.rivals.indexOf(r)+'"'+(S.cash<acqPrice(r)?' disabled':'')+'>'+(armed==='acq'+S.rivals.indexOf(r)?'정말 인수?':'인수')+'</button></div></div>';
+  });
+  h+='<p class="hint">같은 분야에서 라이벌이 크면 내 제품 수익이 최대 30%까지 깎입니다. 마케팅 캠페인을 하면 압박이 절반으로 줄어요. 라이벌은 가끔 의뢰를 가로채거나 직원을 데려가려 합니다. 라이벌을 인수하면 그 회사의 서비스를 제품으로 얻고 경쟁이 줄지만, 1년쯤 뒤 새 도전자가 나타납니다.</p>';
+  return h;
+}
+function ovsHtml(){
+  var h='<div class="sect">해외 진출</div><p class="hint">지사는 국내 제품 수익의 일부를 해외 매출로 만들어요. 매출은 환율에 따라 달라지고, 개설 후 1년쯤 지나야 자리를 잡습니다.</p>';
+  REGIONS.forEach(function(R){
+    var b=S.branches.filter(function(x){return x.id===R.id})[0],up=S.fx[R.id]>=1;
+    var meta=b?'해외 매출 월 '+money(domIncome()*R.share*b.mat*S.fx[R.id])+' · 성숙도 '+Math.round(b.mat*100)+'% · 임대료 월 '+money(R.rent):'국내 제품 수익의 '+Math.round(R.share*100)+'%까지 · 개설 '+money(R.cost)+' · 임대료 월 '+money(R.rent);
+    var cond=b?'':'조건: 평판 '+R.rep+' · '+OFFICES[R.off].n+' 이상';
+    h+='<div class="row"><div class="grow"><div class="t">'+R.n+' <span class="tag" style="--role:var(--'+(up?'good':'bad')+')">'+R.cur+' '+fxPct(R.id)+'</span></div><div class="meta">'+meta+'</div>'+(cond?'<div class="meta">'+cond+'</div>':'')+'</div>'+(b?'<span class="good mono">운영 중</span>':'<button class="btn primary sm" data-act="branch" data-v="'+R.id+'"'+((S.cash<R.cost||S.rep<R.rep||S.office<R.off)?' disabled':'')+'>개설</button>')+'</div>';
+  });
+  if(S.branches.length){
+    var hc=hedgeCost();
+    h+='<div class="row"><div class="grow"><div class="t">환 헤지</div><div class="meta">6개월 동안 환율을 지금 수준으로 고정'+(S.hedge>0?' · 진행 중 ('+S.hedge+'개월 남음)':'')+'</div></div><button class="btn sm" data-act="hedge"'+((S.hedge>0||S.cash<hc)?' disabled':'')+'>계약 (-'+money(hc)+')</button></div>';
+  }
+  return h;
+}
+function saleHtml(){
+  var p=saleOffer();
+  var h='<div class="sect">회사 매각</div><p class="hint">대기업이 '+(S.listed?'시가총액':'기업 가치')+'의 130%에 인수를 제안해 둔 상태입니다. 매각하면 게임이 끝나고, 내 지분 몫으로 등급이 정해집니다.</p>';
+  h+='<div class="row"><div class="grow"><div class="t">매각 대금 '+money(p)+'</div><div class="meta">내 몫 '+money(p*S.eq/100)+' (지분 '+S.eq.toFixed(1)+'%) · 12개월 이후 가능</div></div><button class="btn sm" data-act="sale"'+(S.month<12?' disabled':'')+'>'+(armed==='sale'?'정말 매각? (게임 종료)':'회사 매각')+'</button></div>';
+  return h;
+}
+function kv(a,b){return '<div><span>'+a+'</span><b>'+b+'</b></div>'}
+function twoLine(a,b){
+  var n=a.length;
+  if(n<2)return '<p class="empty">결산이 두 번 이상 쌓이면 그래프가 나타납니다.</p>';
+  var W=330,H=130,pl=62,pr=8,pt=8,pb=18,mx=Math.max.apply(null,a.concat(b).concat([1]));
+  var X=function(i){return pl+(W-pl-pr)*i/(n-1)},Y=function(v){return pt+(H-pt-pb)*(1-v/mx)};
+  var pts=function(arr){return arr.map(function(v,i){return X(i).toFixed(1)+','+Y(v).toFixed(1)}).join(' ')};
+  var g='';
+  [0,.5,1].forEach(function(t){var v=mx*t,y=Y(v);g+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="var(--line)" stroke-width="1"/><text class="t" x="'+(pl-5)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end">'+money(v)+'</text>'});
+  return '<svg class="spark" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="월별 수입과 지출">'+g+'<polyline points="'+pts(b)+'" fill="none" stroke="var(--bad)" stroke-width="2" stroke-linejoin="round"/><polyline points="'+pts(a)+'" fill="none" stroke="var(--good)" stroke-width="2" stroke-linejoin="round"/><circle cx="'+X(n-1).toFixed(1)+'" cy="'+Y(a[n-1]).toFixed(1)+'" r="3.5" fill="var(--good)"/><circle cx="'+X(n-1).toFixed(1)+'" cy="'+Y(b[n-1]).toFixed(1)+'" r="3.5" fill="var(--bad)"/><text class="t" x="'+pl+'" y="'+(H-3)+'">'+n+'개월 전</text><text class="t" x="'+(W-pr)+'" y="'+(H-3)+'" text-anchor="end">현재</text></svg>';
+}
+function tabStats(){
+  var st=S.st;
+  var h='<div class="sect">월별 수입과 지출</div><div class="legend"><span><i style="background:var(--good)"></i>수입</span><span><i style="background:var(--bad)"></i>지출</span></div>'+twoLine(S.rh,S.eh);
+  h+='<div class="sect">누적 기록</div><div class="kv">'+kv('누적 매출',money(st.rev))+kv('누적 지출',money(st.exp))+kv('누적 순이익',money(st.rev-st.exp))+kv('최고 현금',money(st.peakCash))+kv('최고 가치',money(st.peakCap))+kv('납품 계약',S.contractsDone+'건')+kv('출시 제품',S.launched+'개')+kv('인수한 경쟁사',S.acq+'곳')+kv('해외 지사',S.branches.length+'곳')+kv('경영 기간',S.month+'개월')+'</div>';
+  var comp=S.products.map(function(p){return [p.name,productIncome(p)]});
+  if(S.branches.length)comp.push(['해외 지사',ovsIncome()]);
+  var mx=Math.max.apply(null,comp.map(function(c){return c[1]}).concat([1]));
+  h+='<div class="sect">현재 수입 구성</div>';
+  if(!comp.length)h+='<p class="empty">제품을 출시하면 수입 구성이 나타납니다.</p>';
+  comp.forEach(function(c){h+='<div class="row" style="padding:6px 0"><div class="grow"><div class="t" style="font-weight:500">'+c[0]+'</div><div class="bar thin"><i style="width:'+(c[1]/mx*100).toFixed(1)+'%"></i></div></div><b class="mono">'+money(c[1])+'</b></div>'});
+  var r=META.rec;
+  h+='<div class="sect">내 기록 (모든 플레이 통틀어)</div><div class="kv">'+kv('최고 기업 가치',r.cap?money(r.cap):'-')+kv('가장 빠른 코스닥',r.kosdaq!==undefined?r.kosdaq+'개월':'-')+kv('가장 빠른 코스피',r.kospi!==undefined?r.kospi+'개월':'-')+kv('최고 엑싯 몫',r.exit?money(r.exit):'-')+'</div>';
+  h+='<div class="sect">회사 연대기</div>'+chronList(false)+'<p class="sub">회차 포인트 보유 '+(META.lp||0)+'P · 상장, 엑싯, 장기 목표로 얻고 새 게임 시작 때 씁니다.</p>';
+  var n=0;ACHS.forEach(function(a){if(META.ach[a.id])n++});
+  h+='<div class="sect">업적 ('+n+'/'+ACHS.length+')</div><div class="badges">';
+  ACHS.forEach(function(a){var on=!!META.ach[a.id];h+='<div class="badge'+(on?' on':'')+'"><b>'+(on?'★ ':'')+a.n+'</b><span>'+a.d+'</span></div>'});
+  h+='</div>';
+  return h;
+}
+function chk(c){return '<div class="chk"><i class="'+(c[1]?'good':'muted')+'">'+(c[1]?'✓':'○')+'</i><span>'+c[0]+' <span class="muted mono">('+c[2]+')</span></span></div>'}
+function finHtml(){
+  var h='<div class="sect">'+(S.listed?'주식 시장':'투자 유치')+'</div>';
+  h+='<p class="hint">'+(S.listed?'시가총액 ':'기업 가치 ')+'<b class="mono">'+money(capVal())+'</b> · 내 지분 <b class="mono">'+S.eq.toFixed(1)+'%</b> (가치 '+money(capVal()*S.eq/100)+')'+(S.listed?' · 시장 심리 '+(S.sent>1.15?'낙관':S.sent<.85?'비관':'중립'):'')+'</p>';
+  if(!S.listed){
+    var R=ROUNDS[S.round];
+    if(R){
+      var amt=Math.round(capVal()*R.d/10)*10,ok=S.rep>=R.rep&&avgRev(S)>=R.rev&&S.office>=R.off;
+      h+='<div class="row"><div class="grow"><div class="t">'+R.n+'</div><div class="meta">지분 '+Math.round(R.d*100)+'%를 넘기고 약 '+money(amt)+' 조달</div><div class="meta">조건: 평판 '+R.rep+' · 월평균 매출 '+money(R.rev)+(R.off?' · '+OFFICES[R.off].n+' 이상':'')+'</div></div><button class="btn primary sm" data-act="round"'+(ok?'':' disabled')+'>투자 유치</button></div>';
+    }else h+='<p class="empty">모든 투자 라운드를 마쳤습니다. 이제 상장으로 자금을 조달하세요.</p>';
+  }else{
+    var li=S.lastIssue===undefined?-99:S.lastIssue,ic=Math.round(capVal()*.05/10)*10,bc=Math.round(capVal()*.01/10)*10,w=6-(S.month-li);
+    h+='<div class="row"><div class="grow"><div class="t">유상증자</div><div class="meta">지분 5%를 새로 발행해 '+money(ic)+' 조달 · 시장 심리 하락</div></div><button class="btn sm" data-act="issue"'+(w>0?' disabled':'')+'>'+(w>0?w+'개월 후':'실행')+'</button></div>';
+    h+='<div class="row"><div class="grow"><div class="t">자사주 매입</div><div class="meta">'+money(bc)+'으로 시장 심리 개선, 내 지분 증가</div></div><button class="btn sm" data-act="buyback"'+((S.cash<bc||S.eq>=100)?' disabled':'')+'>매입</button></div>';
+  }
+  h+='<div class="sect">상장</div>';
+  if(S.listed>=2)h+='<p class="empty good">코스피 상장사입니다. 시가총액 목표에 도전해 보세요.</p>';
+  else{
+    var k=S.listed<1?1:2,nm=k===1?'코스닥':'코스피';
+    if(k===2)h+='<p class="hint">코스닥 상장사입니다. 코스피 이전 상장에 도전해 보세요.</p>';
+    var cs=listConds(k),all=cs.every(function(c){return c[1]});
+    cs.forEach(function(c){h+=chk(c)});
+    h+='<div style="margin-top:10px"><button class="btn primary" data-act="ipo" data-v="'+k+'"'+(all?'':' disabled')+'>'+(armed==='ipo'+k?'정말 상장할까요?':nm+' 상장 신청 (-'+money(k===1?5000:30000)+')')+'</button></div>';
+  }
   return h;
 }
 function renderPanel(){
-  var f={contracts:tabContracts,products:tabProducts,hire:tabHire,team:tabTeam,research:tabResearch,company:tabCompany}[TAB];
+  var f={contracts:tabContracts,products:tabProducts,market:tabMarket,hire:tabHire,team:tabTeam,research:tabResearch,company:tabCompany,stats:tabStats}[TAB];
   $('panel').innerHTML=f();updateResearchBar();
 }
-function renderAll(){renderTop();renderPlan();renderProject();renderFin();renderGoals();renderTabs();renderPanel();renderLog();save()}
-function updateLive(){renderTop();updateProjectBars();updateResearchBar()}
+function renderAll(){renderTop();renderPlan();renderProject();renderFin();renderGoals();renderTip();renderTabs();renderPanel();renderLog();save()}
+function updateLive(){
+  renderTop();updateProjectBars();updateResearchBar();
+  tipC++;
+  if(tipC>=10){tipC=0;var ot=tipTab;renderTip();if(tipTab!==ot)renderTabs()}
+}
 
 /* ---------- 행동 ---------- */
 var ACT={
   tab:function(id,v){TAB=v;renderTabs();renderPanel()},
   pause:function(){S.paused=!S.paused;renderTop()},
   speed:function(id,v){S.speed=+v;S.paused=false;renderTop()},
-  reset:function(){if(armedClick('reset'))newGame();else renderTop()},
+  reset:function(){if(armedClick('reset'))startMenu();else renderTop()},
   ot:function(){S.overtime=!S.overtime;say(S.overtime?'야근 모드 시작: 생산량 +30%, 사기는 점점 떨어집니다.':'야근 모드를 해제했습니다.');renderProject();renderTop()},
-  accept:function(id){
-    if(S.project)return toast('이미 진행 중인 프로젝트가 있어요.','bad');
+  accept:function(id,v,b){
+    var t=(b&&b.dataset.team!==undefined)?+b.dataset.team:freeTeams()[0];
+    if(t===undefined||S.projs[t])return toast('모든 팀이 작업 중이에요.','bad');
     var i=-1;S.contracts.forEach(function(c,ix){if(c.id===id)i=ix});if(i<0)return;
     var c=S.contracts.splice(i,1)[0];
-    S.project={kind:'contract',name:c.name,need:c.need,prog:{dev:0,des:0,pm:0},reward:c.reward,left:c.months,months:c.months,late:0};
-    say('\''+c.name+'\' 계약 체결 (납기 '+c.months+'개월, 대금 '+money(c.reward)+')');renderAll();
+    S.projs[t]={kind:'contract',name:c.name,need:{dev:c.need.dev,des:c.need.des,pm:c.need.pm},prog:{dev:0,des:0,pm:0},reward:c.reward,left:c.months,months:c.months,late:0,chg:0};
+    say('\''+c.name+'\' 계약 체결 (납기 '+c.months+'개월, 대금 '+money(c.reward)+')'+(nTeams()>1?' · '+teamName(t)+' 배정':''));renderAll();
   },
-  startProd:function(id,v){
+  startProd:function(id,v,b){
     var d=PRODUCTS.filter(function(x){return x.id===v})[0];
-    if(S.project||prodLock(d)||S.cash<d.cost)return;
-    S.cash-=d.cost;S.project={kind:'product',def:d.id,name:d.n,need:d.need,prog:{dev:0,des:0,pm:0},late:0,left:null};
-    say('\''+d.n+'\' 개발 착수 (착수금 '+money(d.cost)+')');renderAll();
+    var t=(b&&b.dataset.team!==undefined)?+b.dataset.team:freeTeams()[0];
+    if(t===undefined||S.projs[t]||prodLock(d)||S.cash<d.cost)return;
+    S.cash-=d.cost;S.projs[t]={kind:'product',def:d.id,name:d.n,need:{dev:d.need.dev,des:d.need.des,pm:d.need.pm},prog:{dev:0,des:0,pm:0},late:0,left:null};
+    say('\''+d.n+'\' 개발 착수 (착수금 '+money(d.cost)+')'+(nTeams()>1?' · '+teamName(t)+' 배정':''));renderAll();
   },
-  abandon:function(){
-    if(!S.project)return;
-    if(!armedClick('abandon')){renderProject();return}
-    var p=S.project;
+  abandon:function(id,v,b){
+    var t=(b&&b.dataset.team!==undefined)?+b.dataset.team:0;
+    if(!S.projs[t])return;
+    if(!armedClick('abandon'+t)){renderProject();return}
+    var p=S.projs[t];
     if(p.kind==='contract'){S.rep=Math.max(0,S.rep-3);say('\''+p.name+'\' 계약을 포기했습니다. 평판 -3','bad')}
     else say('\''+p.name+'\' 개발을 중단했습니다.','bad');
-    S.project=null;renderAll();
+    S.projs[t]=null;renderAll();
+  },
+  move:function(id,v){
+    var p=S.staff.filter(function(x){return x.id===id})[0];if(!p)return;
+    p.team=(v!==undefined&&+v<nTeams())?+v:((p.team||0)+1)%nTeams();
+    if(p.head){p.head=false;if(!headOf(p.team)&&false){}}
+    say(p.name+'님을 '+J(teamName(p.team),'ro')+' 이동했습니다.');renderAll();
+  },
+  pr:function(id){
+    var x=prTiers()[id-1];if(!x)return;
+    var last=S.prM[x.id];
+    if((x.off&&S.office<x.off)||S.cash<x.c||(last!==undefined&&S.month-last<x.cd))return;
+    S.cash-=x.c;S.prM[x.id]=S.month;S.brand=Math.min(100,S.brand+x.b);
+    say(x.n+': 인지도 +'+x.b,'good');sfx('coin');checkGoals();renderAll();
+  },
+  settings:function(){openSettings()},
+  story:function(){STORY=!STORY;try{localStorage.setItem('itTycoon.story',STORY?'1':'0')}catch(e){}refreshSet()},
+  rename:function(id,v,b){openRename(+b.dataset.team)},
+  spec:function(id,v,b){
+    var t=+b.dataset.team,l=specList(),i=l.indexOf(S.tspec[t]);
+    S.tspec[t]=l[(i+1)%l.length];
+    say(teamName(t)+' 전문 분야: '+(S.tspec[t]?specName(S.tspec[t]):'없음')+(S.tspec[t]?' (Lv'+specLv(t,S.tspec[t])+')':''));renderAll();
+  },
+  head:function(id){
+    var p=S.staff.filter(function(x){return x.id===id})[0];if(!p)return;
+    var c=canHead(p);if(!c.ok||S.cash<c.cost)return;
+    S.cash-=c.cost;p.head=true;p.sal=calcSal(p);S.morale=Math.min(100,S.morale+2);
+    say(p.name+'님을 '+teamName(p.team||0)+' 팀장으로 임명했습니다. 팀 산출 +5%.','good');sfx('hire');renderAll();
+  },
+  deleg:function(id,v,b){
+    var t=+b.dataset.team;if(t===0)return toast('CEO가 있는 팀은 위임할 수 없어요.','bad');
+    if(!headOf(t)){return toast('팀장을 먼저 임명하세요.','bad')}
+    S.tdel[t]=!S.tdel[t];
+    say(S.tdel[t]?teamName(t)+' 운영을 팀장 '+headOf(t).name+'님에게 위임했습니다. 팀 산출이 팀장 실력에 따라 85~100%가 됩니다.':teamName(t)+' 위임을 해제했습니다.',S.tdel[t]?'good':'');
+    if(S.tdel[t])delegTick();
+    renderAll();
   },
   hire:function(id){
     var i=-1;S.pool.forEach(function(c,ix){if(c.id===id)i=ix});if(i<0)return;
     var c=S.pool[i];
     if(S.staff.length>=cap())return toast('자리가 없어요. 사무실을 넓히세요.','bad');
     if(S.cash<c.sal)return;
-    S.cash-=c.sal;S.pool.splice(i,1);S.staff.push({id:c.id,name:c.name,role:c.role,skill:c.skill,sal:c.sal,t:0});
-    say(c.name+'님('+ROLES[c.role].full+' ★'+c.skill+')이 합류했습니다.','good');checkGoals();renderAll();
+    S.cash-=c.sal;S.pool.splice(i,1);S.staff.push({id:c.id,name:c.name,role:c.role,skill:c.skill,trait:c.trait,sal:c.sal,t:0,team:autoTeam(c.role)});
+    say(c.name+'님('+ROLES[c.role].full+' ★'+c.skill+')이 합류했습니다.'+(nTeams()>1?' (1팀 배치)':''),'good');sfx('hire');checkGoals();renderAll();
   },
   refresh:function(){if(S.cash<50)return;S.cash-=50;S.pool=genPool();renderAll()},
   fire:function(id){
@@ -751,20 +2070,151 @@ var ACT={
     S.cash-=p.cost;S.perks[p.id]=true;say(p.n+'을(를) 도입했습니다.','good');renderAll();
   },
   party:function(){if(S.cash<150)return;S.cash-=150;S.morale=Math.min(100,S.morale+15);say('피자 파티로 사기가 올랐습니다.','good');renderAll()},
-  loan:function(){if(S.loans.length>=3)return;S.cash+=2000;S.loans.push({left:12,pay:200});say('은행 대출 2,000만원을 받았습니다.');renderAll()},
+  loan:function(){if(S.loans.length>=3)return;S.cash+=2000;S.st.loanEver=true;S.loans.push({left:12,pay:200});say('은행 대출 2,000만원을 받았습니다.');renderAll()},
   campaign:function(){if(S.campaign>0||S.cash<400)return;S.cash-=400;S.campaign=6;say('마케팅 캠페인을 시작했습니다.','good');renderAll()},
-  ipo:function(){
-    var all=ipoConds().every(function(c){return c[1]});if(!all)return;
-    if(!armedClick('ipo')){renderPanel();return}
-    S.cash-=5000;gameOver('ipo');
+  ipo:function(id,v){
+    var k=+v;if(k!==(S.listed<1?1:2)||S.listed>=2)return;
+    if(!listConds(k).every(function(c){return c[1]}))return;
+    if(!armedClick('ipo'+k)){renderPanel();return}
+    doListing(k);
+  },
+  round:function(){
+    var R=ROUNDS[S.round];if(!R||S.listed)return;
+    if(!(S.rep>=R.rep&&avgRev(S)>=R.rev&&S.office>=R.off))return;
+    var amt=Math.round(capVal()*R.d/10)*10;
+    S.cash+=amt;S.eq*=1-R.d;S.round++;S.rep+=4;
+    say(R.n+' 투자 유치: 지분 '+Math.round(R.d*100)+'%를 넘기고 '+money(amt)+'을 받았습니다.','good');
+    toast(R.n+' 완료: +'+money(amt),'good');chron(R.n+' 투자 유치 ('+money(amt)+')');renderAll();
+  },
+  issue:function(){
+    if(!S.listed)return;
+    var li=S.lastIssue===undefined?-99:S.lastIssue;if(S.month-li<6)return;
+    var amt=Math.round(capVal()*.05/10)*10;
+    S.cash+=amt;S.eq*=.95;S.lastIssue=S.month;S.sent=Math.max(.6,S.sent-.06);
+    say('유상증자로 '+money(amt)+'을 조달했습니다. 시장 심리가 약해집니다.');renderAll();
+  },
+  buyback:function(){
+    var bc=Math.round(capVal()*.01/10)*10;
+    if(!S.listed||S.cash<bc||S.eq>=100)return;
+    S.cash-=bc;S.eq=Math.min(100,S.eq/.99);S.sent=Math.min(1.7,S.sent+.04);
+    say('자사주 매입 '+money(bc)+': 시장 심리가 좋아지고 내 지분이 늘었습니다.','good');renderAll();
+  },
+  update:function(id){
+    var p=S.products.filter(function(x){return x.id===id})[0];if(!p)return;
+    var c=updCost(p);if(S.month-p.upd<6||S.cash<c)return;
+    S.cash-=c;
+    if(p.cur<p.base)p.cur=Math.min(p.base*1.05,p.cur+(p.base-p.cur)*.65+p.base*.03);
+    else p.cur=Math.min(p.base*3,p.cur*1.1);
+    p.debt=Math.min(100,p.debt+8);p.upd=S.month;
+    say(p.name+' 업데이트: 수익이 회복됐습니다 (기술 부채 +8).','good');renderAll();
+  },
+  refactor:function(id){
+    var p=S.products.filter(function(x){return x.id===id})[0];if(!p)return;
+    var c=refCost(p);if(S.month-p.ref<3||S.cash<c||p.debt<=0)return;
+    S.cash-=c;p.debt=Math.max(0,p.debt-55);p.ref=S.month;S.st.refCount++;S.morale=Math.max(0,S.morale-2);
+    say(p.name+' 리팩토링: 기술 부채 -55','good');renderAll();
+  },
+  bgm:function(){
+    BGMON=!BGMON;try{localStorage.setItem('itTycoon.bgm',BGMON?'1':'0')}catch(e){}
+    var c=ctx();
+    if(BGMON){bgmStart()}
+    else{
+      if(c&&BGM.bus)BGM.bus.out.gain.setTargetAtTime(0,c.currentTime,.1);
+      setTimeout(function(){if(!BGMON)bgmStop()},700);
+    }
+    renderTop();
+  },
+  hints:function(){
+    HINTS=!HINTS;try{localStorage.setItem('itTycoon.hints',HINTS?'1':'0')}catch(e){}
+    tipKey='';renderTip();renderTabs();renderTop();
+  },
+  help:function(){openHelp()},
+  train:function(id){
+    var p=S.staff.filter(function(x){return x.id===id})[0];if(!p||p.skill>=5)return;
+    var c=trainCost(p),last=p.trainM===undefined?-99:p.trainM;
+    if(S.month-last<12||S.cash<c)return;
+    S.cash-=c;p.trainM=S.month;
+    if(Math.random()<.7){p.skill++;p.sal=calcSal(p);say(p.name+'님이 교육을 마치고 성장했어요 (★'+p.skill+', 월급 '+money(p.sal)+').','good');sfx('hire')}
+    else{S.morale=Math.min(100,S.morale+2);say(p.name+'님의 교육이 끝났지만 큰 성장은 없었어요.')}
+    checkGoals();renderAll();
+  },
+  promote:function(id){
+    var p=S.staff.filter(function(x){return x.id===id})[0];if(!p)return;
+    var cp=canPromote(p);if(!cp.ok||S.cash<cp.cost)return;
+    S.cash-=cp.cost;p.lead=true;p.sal=calcSal(p);S.morale=Math.min(100,S.morale+3);
+    say(p.name+'님을 '+ROLES[p.role].n+' 리드로 승진시켰습니다. 해당 직군 산출 +4%.','good');sfx('hire');renderAll();
+  },
+  snd:function(){
+    SOUND=!SOUND;try{localStorage.setItem('itTycoon.snd',SOUND?'1':'0')}catch(e){}
+    if(SOUND){ctx();sfx('good')}
+    renderTop();
+  },
+  menu:function(){openMenu()},
+  slotSave:function(id){
+    var o=readSlot(id);
+    if(o&&S.slot!==id&&!armedClick('sv'+id)){reopenMenu();return}
+    S.slot=id;writeSlot(id,S);toast('슬롯 '+id+'에 저장했습니다.','good',false);reopenMenu();
+  },
+  slotLoad:function(id){
+    var o=readSlot(id);if(!o)return;
+    save();S=o;S.slot=id;S.paused=true;closeModal();renderAll();
+    toast('슬롯 '+id+'을 불러왔습니다. 재개를 누르세요.','good',false);
+  },
+  slotDel:function(id){
+    if(!armedClick('del'+id)){reopenMenu();return}
+    clearSlot(id);toast('슬롯 '+id+'을 삭제했습니다.','',false);reopenMenu();
+  },
+  exportCopy:function(){
+    var t=$('xport');t.select();
+    var ok=function(){toast('저장 코드를 복사했습니다.','good',false)},fail=function(){toast('직접 선택해서 복사해 주세요.','',false)};
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t.value).then(ok,function(){try{document.execCommand('copy')?ok():fail()}catch(e){fail()}});return}
+    }catch(e){}
+    try{document.execCommand('copy')?ok():fail()}catch(e){fail()}
+  },
+  importGo:function(){
+    var o=decodeSave($('imp').value);
+    if(!o){toast('저장 코드가 올바르지 않습니다.','bad');return}
+    o.slot=S.slot||1;o.paused=true;S=o;closeModal();renderAll();
+    toast('저장 코드를 불러왔습니다. 재개를 누르세요.','good');
+  },
+  branch:function(id,v){
+    var R=region(v);if(!R||S.branches.some(function(b){return b.id===R.id}))return;
+    if(S.cash<R.cost||S.rep<R.rep||S.office<R.off)return;
+    S.cash-=R.cost;S.branches.push({id:R.id,mat:.2,open:S.month});
+    say(R.n+'를 열었습니다. 해외 매출이 서서히 늘어납니다.','good');toast(R.n+' 개설','good');chron(R.n+' 개설');checkGoals();renderAll();
+  },
+  hedge:function(){
+    if(!S.branches.length||S.hedge>0)return;
+    var c=hedgeCost();if(S.cash<c)return;
+    S.cash-=c;S.hedge=6;say('환 헤지 계약: 6개월 동안 환율이 고정됩니다.');renderAll();
+  },
+  acquire:function(id){
+    var r=S.rivals[id];if(!r)return;
+    var pr=acqPrice(r);if(S.cash<pr)return;
+    if(!armedClick('acq'+id)){renderPanel();return}
+    S.cash-=pr;S.rivals.splice(id,1);S.acq++;
+    var b=Math.round(r.rev*.8);
+    S.products.push({id:S.nid++,def:r.focus,name:r.name+' 서비스',base:b,cur:b,g:.004,born:S.month,debt:35,upd:-99,ref:-99});
+    S.rep+=8;S.morale=Math.max(0,S.morale-4);S.rq.push(S.month+ri(10,16));
+    say(r.name+'을(를) '+money(pr)+'에 인수했습니다. 서비스가 우리 제품이 됐습니다.','good');toast('인수 완료: '+r.name,'good');chron(r.name+' 인수');
+    checkGoals();renderAll();
+  },
+  sale:function(){
+    if(S.month<12)return;
+    if(!armedClick('sale')){renderPanel();return}
+    doSale(saleOffer());
   },
   choice:function(id){
     var cfg=modal.cur,c=cfg&&cfg.choices[id];closeModal();
     if(c&&c.fn)c.fn();
   }
 };
+['snd','bgm','hints'].forEach(function(k){var f=ACT[k];ACT[k]=function(a,b,c){f(a,b,c);refreshSet()}});
 document.addEventListener('click',function(e){
-  var b=e.target.closest('[data-act]');if(!b||b.disabled||!S)return;
+  var b=e.target.closest('[data-act]');if(!b||b.disabled)return;
+  if(!S&&b.dataset.act!=='choice')return;
+  if(SOUND){ctx();if(b.dataset.act!=='choice')sfx('click')}
   var f=ACT[b.dataset.act];if(f)f(+b.dataset.id||0,b.dataset.v,b);
 });
 document.addEventListener('keydown',function(e){
@@ -778,21 +2228,16 @@ setInterval(function(){
   if(!S)return;
   if(S.paused||modalOpen||S.over){return}
   advance(S.speed*d/MONTH_SEC);updateLive();
+  chT+=d;if(chT>2.4){chT=0;chatter()}
+  if(anyProj()){brkT+=d;if(brkT>3.6){brkT=0;breakDesk()}}
 },100);
 
 function boot(){
-  var sv=loadSave();
-  if(sv){
-    S=sv;S.paused=true;renderAll();
-    modal({title:'저장된 게임이 있어요',body:'<p>'+monthLabel(S.month)+' · 현금 '+money(S.cash)+' · 직원 '+(S.staff.length+1)+'명 · 평판 '+Math.floor(S.rep)+'</p>',choices:[
-      {t:'이어서 하기',p:true,fn:function(){S.paused=false;renderTop()}},
-      {t:'새로 시작',fn:newGame}
-    ]});
-  }else newGame();
+  migrateLegacy();
+  if([1,2,3].some(function(n){return !!readSlot(n)}))loadMenu();
+  else startMenu();
 }
 boot();
 })();
 </script>
-
-</body>
-</html>
+</body></html>
