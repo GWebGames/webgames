@@ -2312,7 +2312,7 @@ function startHosting() {
 function hostAccept(conn) {
   conn.on('data', m => onClientMsg(conn, m));
   conn.on('close', () => onClientLeave(conn));
-  conn.on('error', () => onClientLeave(conn));
+  conn.on('error', e => { try { console.warn('conn error', e); } catch (e2) { } });
 }
 function onClientMsg(conn, m) {
   if (!m || typeof m !== 'object') return;
@@ -2495,9 +2495,15 @@ function hostStartBroadcast() {
   NET.live = true; NET.won = false; NET.names = lobbyNames();
   const msg = {
     t: 'start', drop: { dx: drop.dx, dz: drop.dz, len: drop.len, sx: drop.sx, sz: drop.sz }, names: NET.names, total: NET.total,
-    items: items.filter(i => !i.gone).map(i => [i.id, i.type, r1(i.x), r1(i.z), i.lvl, Math.round(i.dur), r1(i.y0)])
+    ni: 0
   };
-  for (const c of NET.conns) if (c.rp) netSend(c, msg);
+  const all = items.filter(i => !i.gone).map(i => [i.id, i.type, r1(i.x), r1(i.z), i.lvl, Math.round(i.dur), r1(i.y0)]);
+  msg.ni = all.length;
+  // 큰 메시지는 WebRTC 데이터채널에서 막힐 수 있어 작게 쪼개서 보냅니다
+  for (const c of NET.conns) if (c.rp) {
+    netSend(c, msg);
+    for (let i = 0; i < all.length; i += 50) netSend(c, { t: 'items', a: all.slice(i, i + 50) });
+  }
 }
 
 /* ---- 참가자 ---- */
@@ -2540,8 +2546,12 @@ function onHostClose() {
   $('endOverlay').style.display = 'flex';
 }
 function onHostMsg(m) {
+  try { onHostMsg2(m); } catch (e) { console.error(e); try { mpMsg('오류: ' + (e && e.message ? e.message : e)); toast('오류: ' + (e && e.message), 6000); } catch (e2) { } }
+}
+function onHostMsg2(m) {
   if (!m || typeof m !== 'object') return;
   switch (m.t) {
+    case 'items': (m.a || []).forEach(a => { if (!itemById[a[0]]) makeItem(a[1], a[2], a[3], a[4], a[5], a[6], a[0]); }); break;
     case 'welcome': NET.myId = m.id; NET.names = m.names || {}; renderLobby(); break;
     case 'lobby': NET.names = m.names || {}; if (state === 'menu') renderLobby(); break;
     case 'full': mpMsg('방이 가득 찼습니다.'); break;
@@ -2702,7 +2712,7 @@ function resetGame(m) {
       drop.planeActive = false; drop.state = 'landed'; if (drop.planeMesh) drop.planeMesh.visible = false;
       const sp = randomPlayerSpawn(); player.pos.set(sp.x, 0, sp.z); player.air = false;
     }
-    if (m) m.items.forEach(a => makeItem(a[1], a[2], a[3], a[4], a[5], a[6], a[0]));
+    if (m && m.items) m.items.forEach(a => makeItem(a[1], a[2], a[3], a[4], a[5], a[6], a[0]));
   } else {
     initDrop();
     const rem = role === 'host' ? NET.conns.filter(c => c.open && c.pid) : [];
