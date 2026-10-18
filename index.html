@@ -142,22 +142,42 @@ const GAMES=[
   },
   {
     id:'battleground',
-    title:'Battleground 3D', hanja:'',
-    desc:'수송기에서 낙하해 맨손으로 시작, 총과 방어구를 주워 100명 중 최후의 1인이 되는 3D 배틀로얄. 방 코드로 친구와 함께(개인전, 최대 8명) 즐길 수 있어요.',
-    keys:'WASD 이동 · 좌클릭 사격/칼 · R 재장전 · V 시점 · F 낙하 · M 지도',
+    title:'3D Battleground', hanja:'',
+    desc:'3D 배틀로얄 서바이벌 슈터. 맵을 뒤져 총기를 찾고 마지막까지 살아남아라. 방 코드로 친구와 멀티플레이도 가능, PC와 모바일 모두 지원.',
+    keys:'WASD 이동 · 마우스 시점 · Shift 달리기 · Space 점프',
     src:'games/battleground3d.html',
     ready:true,
     thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <defs><linearGradient id="bgsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f87c4"/><stop offset="1" stop-color="#b9dcf0"/></linearGradient></defs>
-      <rect width="320" height="180" fill="url(#bgsky)"/>
-      <rect y="118" width="320" height="62" fill="#4a7a3c"/>
-      <path d="M0 118l40-16 36 12 44-14 52 16 60-12 88 14v14H0z" fill="#3a6030"/>
-      <g fill="#8a8a82"><rect x="196" y="92" width="46" height="30"/><rect x="250" y="100" width="34" height="22"/></g>
-      <g fill="#6b4f2a"><rect x="202" y="84" width="34" height="10"/><rect x="254" y="94" width="26" height="8"/></g>
-      <g fill="#1e4a22"><circle cx="40" cy="108" r="12"/><circle cx="64" cy="112" r="9"/><circle cx="150" cy="110" r="10"/></g>
-      <ellipse cx="110" cy="40" rx="30" ry="7" fill="#9aa4ae"/><rect x="132" y="35" width="10" height="6" fill="#c0392b"/>
-      <g transform="translate(222 42)"><path d="M-20 0Q0-26 20 0Z" fill="#ff8a2a"/><path d="M-20 0L0 28M20 0L0 28" stroke="#222" stroke-width="1.5"/><rect x="-4" y="28" width="8" height="14" fill="#2f6fdd"/><circle cx="0" cy="26" r="4" fill="#e2b48c"/></g>
-      <circle cx="160" cy="150" r="46" fill="none" stroke="#2f7bff" stroke-width="3" stroke-dasharray="6 5" opacity=".75"/>
+      <defs><linearGradient id="bgsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3f55"/><stop offset="1" stop-color="#c9a36a"/></linearGradient></defs>
+      <rect width="320" height="110" fill="url(#bgsky)"/><rect y="110" width="320" height="70" fill="#3b4a2c"/>
+      <path d="M0 110L40 92 70 104 110 84 150 106 190 88 240 104 280 86 320 100V110Z" fill="#26323a"/>
+      <g fill="#1a2024"><rect x="214" y="78" width="30" height="34"/><rect x="250" y="88" width="22" height="24"/></g>
+      <g fill="#c9a36a" opacity=".6"><rect x="220" y="86" width="6" height="6"/><rect x="232" y="86" width="6" height="6"/></g>
+      <path d="M0 180L110 128 160 126 210 128 320 180Z" fill="#4a5a38" opacity=".55"/>
+      <g stroke="#fff" stroke-width="2" opacity=".9"><path d="M160 104v8M160 120v8M146 116h8M166 116h8" /></g>
+      <circle cx="160" cy="116" r="1.5" fill="#ff4637"/>
+      <path d="M236 180L256 142 278 138 300 180Z" fill="#161a1d"/><rect x="268" y="138" width="40" height="8" fill="#0d0f10" transform="rotate(-14 268 138)"/>
+    </svg>`
+  },
+  {
+    id:'tetris',
+    title:'테트리스', hanja:'',
+    desc:'떨어지는 블록을 쌓아 줄을 지워라. 홀드, 다음 블록 미리보기, 배경음악까지 갖춘 클래식 퍼즐. 최고 기록이 저장돼요.',
+    keys:'← → 이동 · ↓ 소프트드롭 · ↑ 회전 · Space 하드드롭 · Shift 홀드',
+    src:'games/tetris.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#0c0f1a"/>
+      <rect x="110" y="8" width="100" height="164" fill="#11162a" stroke="#2a3358" stroke-width="2"/>
+      <g stroke="#1b2240" stroke-width="1"><path d="M130 8V172M150 8V172M170 8V172M190 8V172M110 28H210M110 48H210M110 68H210M110 88H210M110 108H210M110 128H210M110 148H210"/></g>
+      <g stroke="#0c0f1a" stroke-width="1.5">
+        <g fill="#00c2d8"><rect x="110" y="152" width="20" height="20"/><rect x="130" y="152" width="20" height="20"/><rect x="150" y="152" width="20" height="20"/></g>
+        <g fill="#f0b400"><rect x="170" y="152" width="20" height="20"/><rect x="190" y="152" width="20" height="20"/><rect x="170" y="132" width="20" height="20"/><rect x="190" y="132" width="20" height="20"/></g>
+        <g fill="#a346d6"><rect x="110" y="132" width="20" height="20"/><rect x="130" y="132" width="20" height="20"/><rect x="130" y="112" width="20" height="20"/></g>
+        <g fill="#e2483a"><rect x="150" y="132" width="20" height="20"/><rect x="150" y="112" width="20" height="20"/><rect x="170" y="112" width="20" height="20"/></g>
+        <g fill="#3a63f0"><rect x="130" y="28" width="20" height="20"/><rect x="130" y="48" width="20" height="20"/><rect x="150" y="48" width="20" height="20"/><rect x="170" y="48" width="20" height="20"/></g>
+      </g>
+      <g fill="none" stroke="#3a63f0" stroke-width="2" opacity=".4"><rect x="130" y="92" width="20" height="20"/><rect x="150" y="92" width="20" height="20"/><rect x="170" y="92" width="20" height="20"/><rect x="190" y="92" width="20" height="20"/></g>
     </svg>`
   }
 ];
