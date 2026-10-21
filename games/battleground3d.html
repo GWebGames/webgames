@@ -152,6 +152,7 @@ body.mobile #lootPanel small{display:none}
 
 <div id="vignette" class="hud"></div>
 <div id="flashFx" class="hud"></div>
+<div id="heatWrap" class="hud" style="left:50%;bottom:96px;margin-left:-115px;width:230px;display:none;text-align:center"><div id="heatLbl" style="font-size:14px;font-weight:800;margin-bottom:3px"></div><div style="height:12px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.45);border-radius:3px;overflow:hidden"><div id="heatFill" style="height:100%;width:0;transition:width .12s linear"></div></div></div>
 
 <div id="crosshair" class="hud">
   <i class="h l"></i><i class="h r"></i><i class="v t"></i><i class="v b"></i><i class="dot"></i>
@@ -199,7 +200,7 @@ body.mobile #lootPanel small{display:none}
 
 <div id="menu" class="overlay">
   <h1>🎯 BATTLEGROUND 3D</h1>
-  <p>맵에서 최후의 1인이 되어 살아남으세요!<br>수송기에서 원하는 곳에 낙하해, 자기장을 피하고 파밍하며 99명 사이에서 최후의 1인이 되세요.<br>모두 <b>칼 하나</b>로 시작합니다(좌클릭 베기). 주무기(소총·저격총) 1개 + 권총 1개를 들 수 있고, 쓰러진 적은 <b>보급 상자</b>를 떨어뜨립니다(E로 열기). 바닥의 <b>소총(붉은 빛기둥)</b>을 주워야 사격할 수 있고, 봇도 똑같이 아이템을 주워 무장합니다.<br>헬멧(뚝배기)·조끼 Lv.1~3은 줍는 즉시 장착되며, 더 높은 레벨일 때만 교체됩니다.</p>
+  <p>맵에서 최후의 1인이 되어 살아남으세요!<br>수송기에서 원하는 곳에 낙하해, 자기장을 피하고 파밍하며 99명 사이에서 최후의 1인이 되세요.<br>모두 <b>칼 하나</b>로 시작합니다(좌클릭 베기). 주무기 2개(소총·기관단총·산탄총·지정사수총·경기관총·저격총) + 권총 1개를 들 수 있고, 쓰러진 적은 <b>보급 상자</b>를 떨어뜨립니다(E로 열기). 바닥의 <b>소총(붉은 빛기둥)</b>을 주워야 사격할 수 있고, 봇도 똑같이 아이템을 주워 무장합니다.<br>헬멧(뚝배기)·조끼 Lv.1~3은 줍는 즉시 장착되며, 더 높은 레벨일 때만 교체됩니다.</p>
   <div class="keys">
     <div><b>W A S D</b>이동</div><div><b>마우스</b>시점 회전</div>
     <div><b>좌클릭</b>사격</div><div><b>우클릭</b>조준(줌)</div>
@@ -208,10 +209,10 @@ body.mobile #lootPanel small{display:none}
     <div><b>C</b>웅크리기</div><div><b>Z</b>엎드리기(포복)</div>
     <div><b>M</b>전체 지도</div><div><b>Esc</b>일시정지</div>
     <div><b>F</b>낙하 / 낙하산</div><div><b>시선 ↓</b>급강하(낙하 중)</div>
-    <div><b>1 / 2 / 3</b>주무기 / 권총 / 칼</div><div><b>4 / 5</b>수류탄 / 연막탄 (좌클릭 던지기 · 우클릭 가볍게)</div><div><b>E</b>상자 열기 · 무기 교체</div>
+    <div><b>1 / 2</b>주무기 슬롯 1 / 2</div><div><b>3 / 4</b>권총 / 칼</div><div><b>5 / 6</b>수류탄 / 연막탄 (좌클릭 던지기 · 우클릭 가볍게)</div><div><b>E</b>상자 열기 · 무기 교체</div>
     <div><b>X</b>조준 지점에 핑</div><div><b>지도(M) 클릭</b>핑 / 우클릭 해제</div>
   </div>
-  <div class="tkeys">📱 <b>왼쪽 화면</b> 드래그 = 이동(끝까지 밀면 달리기) · <b>오른쪽 화면</b> 드래그 = 시점<br><b>발사</b> 버튼 누르고 있기 = 사격(누른 채 드래그로 조준 이동) · <b>조준</b> = 줌 켜기/끄기<br>점프 · 앉기 · 엎드리기 · 장전 · <b>E</b>(상자 열기/무기 교체) · 1/2/3 무기 · 지도(탭하면 핑) · 시점 · 핑<br>상자 목록은 <b>항목을 탭</b>하면 가져옵니다. 가로 화면으로 플레이하세요.</div>
+  <div class="tkeys">📱 <b>왼쪽 화면</b> 드래그 = 이동(끝까지 밀면 달리기) · <b>오른쪽 화면</b> 드래그 = 시점<br><b>발사</b> 버튼 누르고 있기 = 사격(누른 채 드래그로 조준 이동) · <b>조준</b> = 줌 켜기/끄기<br>점프 · 앉기 · 엎드리기 · 장전 · <b>E</b>(상자 열기/무기 교체) · 1~4 무기 · 지도(탭하면 핑) · 시점 · 핑<br>상자 목록은 <b>항목을 탭</b>하면 가져옵니다. 가로 화면으로 플레이하세요.</div>
   <div id="modeSel"><button data-m="pc">🖥 PC (키보드·마우스)</button><button data-m="mobile">📱 모바일 (터치)</button></div>
   <div id="teamSel"><span>팀 인원</span><button data-n="1">솔로</button><button data-n="2">듀오</button><button data-n="3">트리오</button><button data-n="4">스쿼드(4)</button></div>
   <details id="envBox"><summary id="envSum">🌍 환경 설정</summary>
@@ -239,9 +240,10 @@ body.mobile #lootPanel small{display:none}
   <div class="tb" id="tbE" style="right:112px;bottom:200px">E</div>
   <div class="tb" id="tbF" style="right:196px;bottom:200px;display:none">포</div>
   <div class="tb big" id="tbDrop" style="left:50%;margin-left:-60px;top:36%;width:120px;height:120px;font-size:20px;z-index:12;background:rgba(40,120,220,.7);display:none">낙하<br>낙하산</div>
-  <div class="tb sm" id="tbW1" style="left:50%;margin-left:-76px;bottom:12px">1</div>
-  <div class="tb sm" id="tbW2" style="left:50%;margin-left:-23px;bottom:12px">2</div>
-  <div class="tb sm" id="tbW3" style="left:50%;margin-left:30px;bottom:12px">칼</div>
+  <div class="tb sm" id="tbW1" style="left:50%;margin-left:-106px;bottom:12px">1</div>
+  <div class="tb sm" id="tbW2" style="left:50%;margin-left:-53px;bottom:12px">2</div>
+  <div class="tb sm" id="tbW3" style="left:50%;margin-left:0px;bottom:12px">3</div>
+  <div class="tb sm" id="tbW4" style="left:50%;margin-left:53px;bottom:12px">칼</div>
   <div class="tb sm" id="tbMap" style="left:12px;top:36%">지도</div>
   <div class="tb sm" id="tbView" style="left:12px;top:36%;margin-top:54px">시점</div>
   <div class="tb sm" id="tbGr4" style="left:12px;top:36%;margin-top:162px">수류탄</div>
@@ -286,27 +288,44 @@ const VEST_MAX = [0, 200, 220, 250];
 const ARM_RED = [0, 0.3, 0.4, 0.55];
 const MAG = 30;
 const RELOAD_T = 2.1;
-// 무기: ar=소총, sr=저격총(주무기 슬롯), pi=권총(보조 슬롯)
+// 무기: 주무기 슬롯 2개(1·2번) + 권총(3번). am = 사용 탄약 종류, zoom = 조준 시 FOV 감소량, ads = 조준 시 탄퍼짐 배율, ideal = 봇이 선호하는 교전 거리
 const WP = {
-  ar: { n: '소총', slot: 0, mag: 30, cd: 0.1, dmg: 22, head: 48, reload: 2.1, spread: 0.002, rcl: 0.02, kick: 0.004, kA: 1 },
-  sr: { n: '저격총', slot: 0, mag: 5, cd: 1.3, dmg: 85, head: 230, reload: 3.4, spread: 0.0005, rcl: 0.16, kick: 0.012, kA: 3.2 },
-  tu: { n: '거치포', slot: 2, mag: 0, cd: 0.085, dmg: 26, head: 52, reload: 0, spread: 0.004, rcl: 0.012, kick: 0.002, kA: 0.6 },
-  pi: { n: '권총', slot: 1, mag: 12, cd: 0.26, dmg: 20, head: 42, reload: 1.5, spread: 0.003, rcl: 0.035, kick: 0.006, kA: 0.7 }
+  ar: { n: '소총', s: '소총', slot: 0, am: 'ar', mag: 30, cd: 0.1, dmg: 18, head: 40, reload: 2.1, spread: 0.002, rcl: 0.02, kick: 0.004, kA: 1, zoom: 27, ads: 0.4, ideal: 28, fs: 1.1 },
+  sr: { n: '저격총', s: '저격', slot: 0, am: 'sr', mag: 5, cd: 1.3, dmg: 70, head: 230, reload: 3.4, spread: 0.0005, rcl: 0.16, kick: 0.012, kA: 3.2, zoom: 59, ads: 0.25, hip: 0.03, ideal: 85, fs: 1.7, ft: 0.07, sm: 3, noEject: 1 },
+  smg: { n: '기관단총', s: '기관단', slot: 0, am: 'pi', mag: 35, cd: 0.065, dmg: 11, head: 24, reload: 1.8, spread: 0.004, rcl: 0.012, kick: 0.003, kA: 0.7, zoom: 22, ads: 0.45, ideal: 12, fs: 0.9, snd: 'pi' },
+  sg: { n: '산탄총', s: '산탄', slot: 0, am: 'sh', mag: 6, cd: 0.85, dmg: 9, head: 18, pel: 8, pspread: 0.045, fo: 45, fmin: 0.2, reload: 3.2, spread: 0, rcl: 0.09, kick: 0.02, kA: 2.4, zoom: 18, ads: 0.6, ideal: 7, fs: 1.9, ft: 0.07, sm: 3, noEject: 1, snd: 'sr' },
+  dm: { n: '지정사수총', s: '지정', slot: 0, am: 'sr', mag: 10, cd: 0.36, dmg: 42, head: 105, reload: 2.7, spread: 0.001, rcl: 0.06, kick: 0.008, kA: 1.8, zoom: 44, ads: 0.3, hip: 0.012, ideal: 55, fs: 1.3, ft: 0.055, snd: 'sr' },
+  lm: { n: '경기관총', s: '경기관', slot: 0, am: 'ar', mag: 75, cd: 0.085, dmg: 17, head: 38, reload: 4.6, spread: 0.003, rcl: 0.016, kick: 0.003, kA: 0.9, zoom: 24, ads: 0.5, ideal: 30, fs: 1.3 },
+  tu: { n: '거치포', slot: 2, mag: 0, cd: 0.085, dmg: 34, head: 68, reload: 0, spread: 0.004, rcl: 0.012, kick: 0.002, kA: 0.6 },
+  hu: { n: '험비 기관총', slot: 2, mag: 0, cd: 0.085, dmg: 20, head: 40, reload: 0, spread: 0.004, rcl: 0.012, kick: 0.002, kA: 0.6 },
+  pi: { n: '권총', s: '권총', slot: 1, am: 'pi', mag: 12, cd: 0.26, dmg: 16, head: 34, reload: 1.5, spread: 0.003, rcl: 0.035, kick: 0.006, kA: 0.7, zoom: 27, ads: 0.4, ideal: 10, fs: 0.8 }
 };
-const WC = { knife: 0, ar: 1, sr: 2, pi: 3, tu: 4 }, WL = ['knife', 'ar', 'sr', 'pi', 'tu'];
-const AMMO_PACK = { ar: 30, sr: 10, pi: 24 };
-const ITEM_WP = { gun: 'ar', snipe: 'sr', pistol: 'pi' }, WPN_ITEM = { ar: 'gun', sr: 'snipe', pi: 'pistol' };
-const ITEM_AM = { ammo: 'ar', ammoS: 'sr', ammoP: 'pi' }, AM_ITEM = { ar: 'ammo', sr: 'ammoS', pi: 'ammoP' };
+const WL = ['knife', 'ar', 'sr', 'pi', 'tu', 'smg', 'sg', 'dm', 'lm'], WC = {};
+WL.forEach((k, i) => { WC[k] = i; });   // 네트워크 인덱스: 뒤에 추가만 한다 (기존 번호 유지)
+const AMMO_PACK = { ar: 30, sr: 10, pi: 30, sh: 8 };
+const AM_TYPES = ['ar', 'sr', 'pi', 'sh'], AM_NAME = { ar: '소총탄', sr: '저격탄', pi: '권총탄', sh: '산탄' };
+const newMags = () => ({ ar: 0, sr: 0, pi: 0, smg: 0, sg: 0, dm: 0, lm: 0 }), newRes = () => ({ ar: 0, sr: 0, pi: 0, sh: 0 });
+const ITEM_WP = { gun: 'ar', snipe: 'sr', pistol: 'pi', smg: 'smg', shotgun: 'sg', dmr: 'dm', lmg: 'lm' }, WPN_ITEM = { ar: 'gun', sr: 'snipe', pi: 'pistol', smg: 'smg', sg: 'shotgun', dm: 'dmr', lm: 'lmg' };
+const ITEM_AM = { ammo: 'ar', ammoS: 'sr', ammoP: 'pi', ammoG: 'sh' }, AM_ITEM = { ar: 'ammo', sr: 'ammoS', pi: 'ammoP', sh: 'ammoG' };
+const hasW = (h, w) => !!w && (w === h.prim || w === h.prim2 || (w === 'pi' && !!h.sec));
 const MED_MAX = 2, MED_HEAL = 40;   // 구급상자: 최대 2개 보유, 체력이 40 이상 깎이면 자동 사용
 const GR_MAX = 4, GR_KEYS = ['frag', 'smoke'], GR_NAME = { frag: '수류탄', smoke: '연막탄' };
-const ITEM_NAME = { frag: '수류탄', smoke: '연막탄', gun: '소총', snipe: '저격총', pistol: '권총', ammo: '소총탄 +30', ammoS: '저격탄 +10', ammoP: '권총탄 +24', med: '구급상자', helm: '헬멧', vest: '조끼' };
-const ITEM_CSS = { frag: '#8cff5a', smoke: '#cfd6dc', med: '#3dff6a', ammo: '#ffe04a', ammoS: '#ff9a30', ammoP: '#6ab0ff', gun: '#ff5a4a', snipe: '#c47dff', pistol: '#4adfff' };
+const ITEM_NAME = { frag: '수류탄', smoke: '연막탄', gun: '소총', snipe: '저격총', pistol: '권총', smg: '기관단총', shotgun: '산탄총', dmr: '지정사수총', lmg: '경기관총', ammo: '소총탄 +30', ammoS: '저격탄 +10', ammoP: '권총탄 +30', ammoG: '산탄 +8', med: '구급상자', helm: '헬멧', vest: '조끼' };
+const ITEM_CSS = { frag: '#8cff5a', smoke: '#cfd6dc', med: '#3dff6a', ammo: '#ffe04a', ammoS: '#ff9a30', ammoP: '#6ab0ff', ammoG: '#ff7a5a', gun: '#ff5a4a', snipe: '#c47dff', pistol: '#4adfff', smg: '#ffb13a', shotgun: '#ff6aa8', dmr: '#7dffb0', lmg: '#9aa6ff' };
+// 산탄 등 다중 탄환: 거리에 따른 피해 감소, 방향 흩뿌리기
+const pelletMul = (W, t) => W.fo ? Math.max(W.fmin || 0.2, 1 - t / W.fo) : 1;
+function jitterDir(d, sp) { const v = d.clone(); v.x += (Math.random() - 0.5) * 2 * sp; v.y += (Math.random() - 0.5) * 2 * sp; v.z += (Math.random() - 0.5) * 2 * sp; return v.normalize(); }
 // 봇 무기별 파라미터
 const BW = {
-  ar: { sp0: 0.02, sp1: 0.0016, dp: 5, db: 2.4, range: 48, det: 48, far: 24, near: 8, b0: 2, bn: 3, inner: 0.16, r0: 1.6, r1: 3.4, ray: 130 },
-  sr: { sp0: 0.004, sp1: 0.0004, dp: 34, db: 18, range: 95, det: 95, far: 55, near: 25, b0: 1, bn: 1, inner: 0.5, r0: 2.4, r1: 4.2, ray: 160 },
-  pi: { sp0: 0.03, sp1: 0.0022, dp: 3.4, db: 1.8, range: 32, det: 36, far: 14, near: 5, b0: 2, bn: 3, inner: 0.32, r0: 1.4, r1: 2.8, ray: 90 },
-  tu: { sp0: 0.012, sp1: 0.0012, dp: 7, db: 3.2, range: 85, det: 85, far: 40, near: 10, b0: 5, bn: 5, inner: 0.11, r0: 1.0, r1: 2.0, ray: 150 }
+  ar: { sp0: 0.02, sp1: 0.0016, dp: 4.1, db: 2, range: 48, det: 48, far: 24, near: 8, b0: 2, bn: 3, inner: 0.16, r0: 1.6, r1: 3.4, ray: 130 },
+  sr: { sp0: 0.004, sp1: 0.0004, dp: 28, db: 15, range: 95, det: 95, far: 55, near: 25, b0: 1, bn: 1, inner: 0.5, r0: 2.4, r1: 4.2, ray: 160 },
+  pi: { sp0: 0.03, sp1: 0.0022, dp: 2.8, db: 1.5, range: 32, det: 36, far: 14, near: 5, b0: 2, bn: 3, inner: 0.32, r0: 1.4, r1: 2.8, ray: 90 },
+  tu: { sp0: 0.012, sp1: 0.0012, dp: 9, db: 4.2, range: 85, det: 85, far: 40, near: 10, b0: 5, bn: 5, inner: 0.11, r0: 1.0, r1: 2.0, ray: 150 },
+  hu: { sp0: 0.012, sp1: 0.0012, dp: 5.4, db: 2.5, range: 85, det: 85, far: 40, near: 10, b0: 5, bn: 5, inner: 0.11, r0: 1.0, r1: 2.0, ray: 150 },
+  smg: { sp0: 0.026, sp1: 0.0022, dp: 3.1, db: 1.5, range: 34, det: 38, far: 14, near: 4, b0: 3, bn: 4, inner: 0.1, r0: 1.4, r1: 3.0, ray: 100 },
+  sg: { sp0: 0.034, sp1: 0.003, dp: 2.7, db: 1.3, pel: 6, fo: 40, fmin: 0.2, range: 24, det: 32, far: 10, near: 3, b0: 1, bn: 1, inner: 1.0, r0: 1.4, r1: 2.6, ray: 70 },
+  dm: { sp0: 0.006, sp1: 0.0006, dp: 17, db: 8, range: 85, det: 90, far: 50, near: 20, b0: 1, bn: 2, inner: 0.5, r0: 1.0, r1: 2.2, ray: 150 },
+  lm: { sp0: 0.026, sp1: 0.0018, dp: 3.8, db: 1.8, range: 52, det: 56, far: 26, near: 9, b0: 4, bn: 4, inner: 0.13, r0: 1.8, r1: 3.6, ray: 130 }
 };
 
 /* ================= 멀티플레이 상태 ================= */
@@ -1621,6 +1640,76 @@ const VMS = {};
       vm.handL = mkHand(0, -0.07, -0.45, -0.3, true); vm.handR = mkHand(0, -0.1, 0.22, 0.15, true);
       vm.handHome = [0, -0.07, -0.45];
       vm.flashPos = [0, 0.008, -1.17]; vm.eject = [0.04, 0.03, 0.02]; vm.sightY = 0.108;
+    } else if (kind === 'smg') {
+      add(B(0.062, 0.074, 0.3), dark, 0, -0.01, 0.0);
+      add(B(0.056, 0.05, 0.2), mid, 0, 0.035, -0.04);
+      add(B(0.03, 0.01, 0.3), dark, 0, 0.066, -0.04);
+      add(B(0.06, 0.056, 0.15), poly, 0, 0.0, -0.24);
+      for (let k = 0; k < 3; k++) add(B(0.064, 0.012, 0.024), dark, 0, 0.0, -0.19 - k * 0.045);
+      cylZ(0.012, 0.16, steel, 0, 0.004, -0.4);
+      cylZ(0.021, 0.12, dark, 0, 0.004, -0.5);
+      add(B(0.04, 0.012, 0.07), dark, 0, 0.078, -0.02); add(B(0.006, 0.034, 0.008), dark, -0.017, 0.098, -0.04); add(B(0.006, 0.034, 0.008), dark, 0.017, 0.098, -0.04);
+      add(B(0.006, 0.006, 0.002), red, 0, 0.1, -0.04);
+      add(B(0.028, 0.09, 0.034), poly, 0, -0.07, -0.2);
+      mag(0.04, 0.2, 0.055, -0.14, 0.04);
+      vm.charge = add(B(0.024, 0.02, 0.04), mid, 0.04, 0.03, -0.02);
+      add(B(0.04, 0.1, 0.05), poly, 0, -0.095, 0.14).rotation.x = -0.3;
+      add(B(0.012, 0.008, 0.075), dark, 0, -0.058, 0.07); add(B(0.008, 0.03, 0.008), steel, 0, -0.045, 0.09);
+      add(B(0.012, 0.012, 0.22), steel, 0.022, 0.0, 0.26); add(B(0.012, 0.012, 0.22), steel, -0.022, 0.0, 0.26); add(B(0.05, 0.085, 0.02), dark, 0, -0.01, 0.37);
+      vm.handL = mkHand(0, -0.07, -0.2, -0.2, true); vm.handR = mkHand(0, -0.11, 0.16, 0.15, true); vm.handHome = [0, -0.07, -0.2];
+      vm.flashPos = [0, 0.004, -0.58]; vm.eject = [0.032, 0.03, 0.0]; vm.sightY = 0.1;
+    } else if (kind === 'sg') {
+      add(B(0.07, 0.086, 0.3), dark, 0, 0.0, 0.0);
+      add(B(0.03, 0.01, 0.3), steel, 0, 0.05, -0.02);
+      cylZ(0.021, 0.74, steel, 0, 0.026, -0.52);
+      cylZ(0.02, 0.6, mid, 0, -0.018, -0.44);
+      cylZ(0.025, 0.03, dark, 0, -0.018, -0.75);
+      add(B(0.012, 0.02, 0.012), red, 0, 0.06, -0.88); add(B(0.04, 0.014, 0.02), dark, 0, 0.056, 0.1);
+      vm.slide = new THREE.Group(); root.add(vm.slide); vm.pump = true;
+      add(B(0.066, 0.06, 0.22), wood, 0, -0.016, -0.42, vm.slide);
+      for (let k = 0; k < 5; k++) add(B(0.07, 0.01, 0.01), dark, 0, -0.016, -0.34 - k * 0.04, vm.slide);
+      mag(0.04, 0.07, 0.06, -0.075, 0.05);
+      vm.charge = add(B(0.012, 0.012, 0.012), mid, 0.04, 0.03, 0.05);
+      add(B(0.044, 0.105, 0.052), poly, 0, -0.092, 0.19).rotation.x = -0.35;
+      add(B(0.012, 0.008, 0.075), dark, 0, -0.066, 0.11); add(B(0.008, 0.03, 0.008), steel, 0, -0.047, 0.12);
+      add(B(0.05, 0.09, 0.3), wood, 0, -0.045, 0.4); add(B(0.055, 0.105, 0.026), dark, 0, -0.045, 0.56);
+      vm.handL = mkHand(0, -0.055, -0.42, -0.3, true); vm.handR = mkHand(0, -0.1, 0.2, 0.15, true); vm.handHome = [0, -0.055, -0.42];
+      vm.flashPos = [0, 0.026, -0.92]; vm.eject = [0.04, 0.03, 0.02]; vm.sightY = 0.07;
+    } else if (kind === 'dm') {
+      add(B(0.066, 0.082, 0.34), dark, 0, -0.005, 0.0);
+      add(B(0.058, 0.064, 0.42), poly, 0, 0.0, -0.37);
+      for (let k = 0; k < 3; k++) add(B(0.06, 0.014, 0.036), dark, 0, 0.0, -0.28 - k * 0.09);
+      cylZ(0.0125, 0.42, steel, 0, 0.006, -0.78);
+      cylZ(0.021, 0.08, dark, 0, 0.006, -0.99);
+      add(B(0.044, 0.01, 0.03), steel, 0, 0.006, -0.99);
+      add(B(0.03, 0.012, 0.5), dark, 0, 0.048, -0.14);
+      cylZ(0.026, 0.3, mid, 0, 0.094, -0.1); cylZ(0.036, 0.07, dark, 0, 0.094, -0.27); cylZ(0.03, 0.06, dark, 0, 0.094, 0.07);
+      cylZ(0.032, 0.004, lens, 0, 0.094, -0.306); cylZ(0.02, 0.004, lens, 0, 0.094, 0.102);
+      add(B(0.02, 0.026, 0.04), steel, 0, 0.065, -0.17); add(B(0.02, 0.026, 0.04), steel, 0, 0.065, 0.0);
+      mag(0.045, 0.13, 0.075, -0.12, 0.04);
+      vm.charge = add(B(0.03, 0.03, 0.06), mid, 0.045, 0.04, -0.02);
+      add(B(0.044, 0.105, 0.052), poly, 0, -0.098, 0.2).rotation.x = -0.35;
+      add(B(0.012, 0.008, 0.075), dark, 0, -0.07, 0.115); add(B(0.008, 0.03, 0.008), steel, 0, -0.05, 0.12);
+      add(B(0.056, 0.115, 0.3), tan, 0, -0.025, 0.4); add(B(0.05, 0.032, 0.14), tan, 0, 0.05, 0.37); add(B(0.06, 0.13, 0.026), dark, 0, -0.025, 0.56);
+      vm.handL = mkHand(0, -0.06, -0.42, -0.3, true); vm.handR = mkHand(0, -0.1, 0.22, 0.15, true); vm.handHome = [0, -0.06, -0.42];
+      vm.flashPos = [0, 0.006, -1.06]; vm.eject = [0.036, 0.035, 0.0]; vm.sightY = 0.094;
+    } else if (kind === 'lm') {
+      add(B(0.082, 0.1, 0.42), dark, 0, -0.01, -0.02);
+      add(B(0.074, 0.03, 0.3), mid, 0, 0.055, -0.04);
+      add(B(0.04, 0.05, 0.12), dark, 0, 0.1, -0.1); add(B(0.03, 0.012, 0.22), mid, 0, 0.128, -0.1);
+      cylZ(0.034, 0.5, mid, 0, 0.012, -0.5);
+      for (let k = 0; k < 5; k++) add(B(0.074, 0.014, 0.03), dark, 0, 0.03, -0.34 - k * 0.08);
+      cylZ(0.015, 0.2, steel, 0, 0.012, -0.85); cylZ(0.024, 0.07, dark, 0, 0.012, -0.96);
+      add(B(0.07, 0.02, 0.02), steel, 0, -0.035, -0.5); add(B(0.01, 0.01, 0.26), steel, 0.04, -0.05, -0.62); add(B(0.01, 0.01, 0.26), steel, -0.04, -0.05, -0.62);
+      add(B(0.01, 0.03, 0.01), steel, 0, 0.06, -0.74); add(B(0.04, 0.02, 0.02), dark, 0, 0.07, 0.1);
+      mag(0.1, 0.12, 0.14, -0.12, 0.02);
+      for (let k = 0; k < 4; k++) add(B(0.02, 0.026, 0.07), brass, 0.058, -0.06 - k * 0.012, -0.03 + k * 0.016).rotation.z = 0.5;
+      vm.charge = add(B(0.03, 0.03, 0.06), mid, 0.056, 0.04, -0.05);
+      add(B(0.046, 0.11, 0.056), poly, 0, -0.105, 0.18).rotation.x = -0.35;
+      add(B(0.012, 0.008, 0.08), dark, 0, -0.07, 0.1);
+      add(B(0.06, 0.12, 0.3), poly, 0, -0.025, 0.38); add(B(0.064, 0.13, 0.026), dark, 0, -0.025, 0.54);
+      vm.handL = mkHand(0, -0.07, -0.45, -0.3, true); vm.handR = mkHand(0, -0.11, 0.2, 0.15, true); vm.handHome = [0, -0.07, -0.45];
+      vm.flashPos = [0, 0.012, -1.02]; vm.eject = [0.045, 0.03, 0.0]; vm.sightY = 0.088;
     } else {
       vm.slide = new THREE.Group(); root.add(vm.slide);
       add(B(0.04, 0.04, 0.2), steel, 0, 0.034, -0.01, vm.slide); add(B(0.036, 0.014, 0.2), dark, 0, 0.058, -0.01, vm.slide);
@@ -1649,7 +1738,7 @@ const VMS = {};
     fl.position.set(vm.flashPos[0], vm.flashPos[1], vm.flashPos[2]); root.add(fl); vm.flash = fl;
     return vm;
   }
-  ['ar', 'sr', 'pi'].forEach(k => { VMS[k] = build(k); });
+  ['ar', 'sr', 'pi', 'smg', 'sg', 'dm', 'lm'].forEach(k => { VMS[k] = build(k); });
 })();
 function setVM(kind) {
   for (const k in VMS) VMS[k].root.visible = k === kind;
@@ -1683,10 +1772,10 @@ const player = {
   grounded: true, moving: false, sprint: false, walk: 0, bob: 0, deathT: 0,
   stance: 0, stanceSm: 0, h: 1.85, jumpLock: false
 };
-player.prim = null; player.sec = false; player.weapon = 'knife'; player.gr = { frag: 0, smoke: 0 }; player.med = 0; player.medCd = 0; player.tur = null; player.thr = null; player.throwWind = 0; player.thrDraw = 0; player.thrCd = 0; player.thrLatch = false; player.thrPow = 1;
-player.mags = { ar: 0, sr: 0, pi: 0 }; player.res = { ar: 0, sr: 0, pi: 0 };
+player.prim = null; player.prim2 = null; player.sec = false; player.weapon = 'knife'; player.gr = { frag: 0, smoke: 0 }; player.med = 0; player.medCd = 0; player.tur = null; player.thr = null; player.throwWind = 0; player.thrDraw = 0; player.thrCd = 0; player.thrLatch = false; player.thrPow = 1;
+player.mags = newMags(); player.res = newRes();
 Object.defineProperty(player, 'ammo', { get() { return this.mags[this.weapon] | 0; }, set(v) { if (this.weapon !== 'knife') this.mags[this.weapon] = v; } });
-Object.defineProperty(player, 'reserve', { get() { return this.res[this.weapon] | 0; }, set(v) { if (this.weapon !== 'knife') this.res[this.weapon] = v; } });
+Object.defineProperty(player, 'reserve', { get() { const w = WP[this.weapon]; return w && w.am ? this.res[w.am] | 0 : 0; }, set(v) { const w = WP[this.weapon]; if (w && w.am) this.res[w.am] = v; } });
 Object.defineProperty(player, 'hasGun', { get() { return this.weapon !== 'knife' && !this.thr && !this.tur; } });
 const reloadTime = () => (WP[player.weapon] || WP.ar).reload;
 const playerMesh = makeHuman(0x2f6fdd, 0x2a3a5a, 0x3b4a2a);
@@ -1763,6 +1852,7 @@ function sfxClick(freq, dur, vol) {
 }
 function sfxShot(vol, w) {
   if (!actx || vol < 0.03) return;
+  if (WP[w] && WP[w].snd) w = WP[w].snd;
   const t0 = actx.currentTime;
   if (!tailBuf) {
     tailBuf = actx.createBuffer(1, Math.floor(actx.sampleRate * 1.3), actx.sampleRate);
@@ -2467,9 +2557,13 @@ function kill(t, attacker, head) {
 
 function setArmedVisual(g, kind) {
   const u = g.userData, k = kind === true ? 'ar' : kind, on = !!k && k !== 'knife';
-  u.gunParts.forEach(m => { m.visible = on; }); u.knife.visible = !on; u.scope.visible = on && k === 'sr';
+  u.gunParts.forEach(m => { m.visible = on; }); u.knife.visible = !on; u.scope.visible = on && (k === 'sr' || k === 'dm');
   if (!on) return;
   const [body, barrel, , stock, grip, hguard, sight, muz] = u.gunParts;
+  // 기본(소총) 모양으로 모두 되돌린 뒤 무기별로 덮어쓴다 (이전 무기 형태가 남지 않게)
+  body.scale.set(1, 1, 1); body.position.z = -0.5; barrel.scale.set(1, 1, 1); barrel.position.z = -0.97; u.flash.position.z = -1.18;
+  stock.visible = true; stock.position.set(0, -0.02, 0.28); stock.scale.set(1, 1, 1); hguard.visible = true; hguard.position.z = -0.78; hguard.scale.set(1, 1, 1);
+  sight.visible = true; sight.position.set(0, 0.12, -0.9); sight.scale.set(1, 1, 1); muz.visible = true; muz.position.z = -1.08; grip.position.set(0, -0.12, -0.2); grip.scale.set(1, 1, 1);
   if (k === 'pi') {
     body.scale.set(1, 1, 0.35); barrel.scale.set(1, 0.3, 1); barrel.position.z = -0.66; u.flash.position.z = -0.78;
     stock.visible = false; hguard.visible = false; muz.visible = false; sight.visible = true; sight.position.set(0, 0.09, -0.62); sight.scale.set(0.5, 0.5, 0.5);
@@ -2478,10 +2572,19 @@ function setArmedVisual(g, kind) {
     body.scale.set(1, 1, 1.15); body.position.z = -0.55; barrel.scale.set(1, 1.4, 1); barrel.position.z = -1.12; u.flash.position.z = -1.5;
     stock.visible = true; stock.position.set(0, -0.02, 0.32); stock.scale.set(1, 1.1, 1.25); hguard.visible = true; hguard.position.z = -0.9; hguard.scale.set(1, 0.9, 1.1);
     sight.visible = false; muz.visible = true; muz.position.z = -1.55; grip.position.set(0, -0.12, -0.15); grip.scale.set(1, 1, 1);
-  } else {
-    body.scale.set(1, 1, 1); body.position.z = -0.5; barrel.scale.set(1, 1, 1); barrel.position.z = -0.97; u.flash.position.z = -1.18;
-    stock.visible = true; stock.position.set(0, -0.02, 0.28); stock.scale.set(1, 1, 1); hguard.visible = true; hguard.position.z = -0.78; hguard.scale.set(1, 1, 1);
-    sight.visible = true; sight.position.set(0, 0.12, -0.9); sight.scale.set(1, 1, 1); muz.visible = true; muz.position.z = -1.08; grip.position.set(0, -0.12, -0.2); grip.scale.set(1, 1, 1);
+  } else if (k === 'smg') {
+    body.scale.set(1, 1, 0.72); body.position.z = -0.4; barrel.scale.set(1, 0.9, 0.55); barrel.position.z = -0.72; u.flash.position.z = -0.92;
+    stock.scale.set(0.8, 0.7, 0.55); stock.position.set(0, -0.02, 0.18); hguard.scale.set(1, 1, 0.55); hguard.position.z = -0.6;
+    sight.position.set(0, 0.11, -0.5); sight.scale.set(0.8, 0.8, 0.8); muz.position.z = -0.86; grip.position.set(0, -0.12, -0.12);
+  } else if (k === 'sg') {
+    body.scale.set(1, 1, 1.05); body.position.z = -0.52; barrel.scale.set(1.35, 1, 1.1); barrel.position.z = -1.0; u.flash.position.z = -1.28;
+    hguard.scale.set(1.5, 1.1, 0.8); hguard.position.z = -0.72; sight.visible = false; muz.position.z = -1.18;
+  } else if (k === 'dm') {
+    body.scale.set(1, 1, 1.1); body.position.z = -0.52; barrel.scale.set(1, 1.2, 1); barrel.position.z = -1.05; u.flash.position.z = -1.36;
+    stock.scale.set(1, 1.05, 1.1); hguard.position.z = -0.85; hguard.scale.set(1, 1, 1.05); sight.visible = false; muz.position.z = -1.38;
+  } else if (k === 'lm') {
+    body.scale.set(1.25, 1.35, 1.2); body.position.z = -0.52; barrel.scale.set(1.3, 1, 1.05); barrel.position.z = -1.0; u.flash.position.z = -1.26;
+    stock.scale.set(1.2, 1.2, 1.1); hguard.scale.set(1.6, 1.5, 1.25); hguard.position.z = -0.8; sight.position.set(0, 0.15, -0.9); muz.position.z = -1.14;
   }
 }
 function setGunVisual(kind) { setArmedVisual(playerMesh, kind); }
@@ -2515,35 +2618,43 @@ function playerShoot() {
   const tps = isTPS();
   const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
   let spread = W.spread + player.recoil * 0.12 + (player.moving ? 0.006 : 0) + (player.grounded ? 0 : 0.03);
-  if (wk === 'sr' && !aiming) spread += 0.03;
-  if (aiming) spread *= wk === 'sr' ? 0.25 : 0.4;
+  if (W.hip && !aiming) spread += W.hip;
+  if (aiming) spread *= W.ads;
   spread *= player.stance === 0 ? 1 : player.stance === 1 ? 0.7 : 0.5;
   dir.x += (Math.random() - 0.5) * 2 * spread; dir.y += (Math.random() - 0.5) * 2 * spread; dir.z += (Math.random() - 0.5) * 2 * spread;
   dir.normalize();
   const o = camera.position.clone();
   const minT = tps ? o.distanceTo(tpsPivot) : 0;
-  const res = castRay(o, dir, 400, player, minT);
-  if (res.car && NET.mode !== 'client') hitCar(res, W.dmg, player);
-  const end = o.clone().addScaledVector(dir, Math.min(res.t, 260));
   const start = new THREE.Vector3();
   if (!tps) { gunFlash.visible = true; gunFlash.getWorldPosition(start); gunFlash.updateMatrixWorld(true); }
   else { playerMesh.userData.flash.visible = true; playerMesh.userData.flashT = 0.04; playerMesh.userData.flash.getWorldPosition(start); }
-  spawnTracer(start, end, 'p', wk);
+  const pel = W.pel || 1, hits = new Map();
+  for (let i = 0; i < pel; i++) {
+    const dd = pel > 1 ? jitterDir(dir, W.pspread * (aiming ? 0.7 : 1)) : dir;
+    const res = castRay(o, dd, 400, player, minT);
+    const mul = pelletMul(W, res.t);
+    if (res.car && NET.mode !== 'client') hitCar(res, W.dmg * mul, player);
+    const end = o.clone().addScaledVector(dd, Math.min(res.t, 260));
+    if (i < 5) spawnTracer(start, end, 'p', wk);
+    if (i < 3 && NET.mode === 'host' && NET.live) pushShot(0, start, end, res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0, WC[wk]);
+    if (res.type === 'ent') {
+      spawnSpark(end, 'e');
+      if (NET.mode !== 'client') { const h = hits.get(res.ent) || { dmg: 0, head: false }; h.dmg += (res.head ? W.head : W.dmg) * mul; if (res.head) h.head = true; hits.set(res.ent, h); }
+    } else if (res.type === 'world') spawnSpark(end, 'w');
+  }
+  hits.forEach((h, ent) => damage(ent, h.dmg, player, h.head));
   if (NET.mode === 'client') netSend(NET.hostConn, { t: 'f', o: [o.x, o.y, o.z], d: [dir.x, dir.y, dir.z], mt: minT });
-  else if (NET.mode === 'host' && NET.live) pushShot(0, start, end, res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0, WC[wk]);
-  if (res.type === 'ent') { spawnSpark(end, 'e'); if (NET.mode !== 'client') damage(res.ent, res.head ? W.head : W.dmg, player, res.head); }
-  else if (res.type === 'world') spawnSpark(end, 'w');
-  gunFlashT = wk === 'sr' ? 0.07 : 0.045; muzzleT = 0.07;
-  if (!tps) { gunFlash.rotation.z = Math.random() * 6.28; gunFlash.scale.setScalar((wk === 'sr' ? 1.7 : wk === 'pi' ? 0.8 : 1.1) * (0.8 + Math.random() * 0.5)); }
-  if (!tps && wk !== 'sr') ejectShell();
-  if (!tps) { gunFlash.getWorldPosition(_sm); for (let i = 0; i < (wk === 'sr' ? 3 : 1); i++) spawnPart('smoke', _sm.x, _sm.y, _sm.z, rand(-0.2, 0.2), rand(0.3, 0.8), rand(-0.2, 0.2), 0.05, wk === 'sr' ? 1.1 : 0.7, -0.1, 4); }
+  gunFlashT = W.ft || 0.045; muzzleT = 0.07;
+  if (!tps) { gunFlash.rotation.z = Math.random() * 6.28; gunFlash.scale.setScalar((W.fs || 1.1) * (0.8 + Math.random() * 0.5)); }
+  if (!tps && !W.noEject) ejectShell();
+  if (!tps) { gunFlash.getWorldPosition(_sm); for (let i = 0; i < (W.sm || 1); i++) spawnPart('smoke', _sm.x, _sm.y, _sm.z, rand(-0.2, 0.2), rand(0.3, 0.8), rand(-0.2, 0.2), 0.05, W.sm ? 1.1 : 0.7, -0.1, 4); }
   player.recoil = Math.min(player.recoil + W.rcl, 0.25);
   player.pitch += W.kick; player.yaw += (Math.random() - 0.5) * 0.006;
   gunKick = W.kA;
   sfxShot(0.9, wk);
   if (player.ammo <= 0 && player.reserve > 0) startReload();
 }
-let gunFlashT = 0, knifeT = 0;
+let gunFlashT = 0, knifeT = 0, pumpPh = 1;
 const _sm = new THREE.Vector3(), _er = new THREE.Vector3(), _eu = new THREE.Vector3(), _eo = new THREE.Vector3();
 function ejectShell() {
   const v = VMS[curVM]; if (!v) return;
@@ -2554,34 +2665,41 @@ function ejectShell() {
 
 const _e = new THREE.Vector3(), _t = new THREE.Vector3(), _bd = new THREE.Vector3(), _bs = new THREE.Vector3();
 function botShoot(b, t, wk) {
-  const wkey = wk || b.wp, B = BW[wkey] || BW.ar, wc = WC[wkey] || 1;
+  const wkey = wk || b.wp, B = BW[wkey] || BW.ar, wc = WC[wkey] || (wkey === 'hu' ? 4 : 1);
   const dp = Math.hypot(b.pos.x - player.pos.x, b.pos.z - player.pos.z);
   const nearP = dp < 170;
   _e.set(b.pos.x, b.pos.y + 1.45, b.pos.z);
   _t.set(t.pos.x, t.pos.y + (t.h || 1.85) * 0.62, t.pos.z);
   _bd.subVectors(_t, _e); const dist = _bd.length(); _bd.normalize();
-  const sp = B.sp0 + dist * B.sp1;
-  _bd.x += (Math.random() - 0.5) * 2 * sp; _bd.y += (Math.random() - 0.5) * 2 * sp; _bd.z += (Math.random() - 0.5) * 2 * sp;
-  _bd.normalize();
-  const res = castRay(_e, _bd, B.ray, b, 0);
-  if (res.car) hitCar(res, B.db, b);
-  let end = null;
-  const kind = res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0;
-  const netNear = NET.live && NET.mode === 'host' && nearRemote(b.pos, 190);
-  if (netNear && !nearP) {
-    const e2 = _e.clone().addScaledVector(_bd, Math.min(res.t, B.ray)); _bs.copy(_e).addScaledVector(_bd, 0.9); _bs.y -= 0.2;
-    pushShot(b.id, _bs, e2, kind, wc);
+  const sp = B.sp0 + dist * B.sp1, pel = B.pel || 1, hits = new Map(), bd0 = _bd.clone();
+  let end = null, kind = 0;
+  for (let i = 0; i < pel; i++) {
+    _bd.copy(bd0);
+    _bd.x += (Math.random() - 0.5) * 2 * sp; _bd.y += (Math.random() - 0.5) * 2 * sp; _bd.z += (Math.random() - 0.5) * 2 * sp;
+    _bd.normalize();
+    const res = castRay(_e, _bd, B.ray, b, 0), mul = pelletMul(B, res.t);
+    if (res.car) hitCar(res, B.db * mul, b);
+    if (i === 0) {
+      kind = res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0;
+      const netNear = NET.live && NET.mode === 'host' && nearRemote(b.pos, 190);
+      if (netNear && !nearP) {
+        const e2 = _e.clone().addScaledVector(_bd, Math.min(res.t, B.ray)); _bs.copy(_e).addScaledVector(_bd, 0.9); _bs.y -= 0.2;
+        pushShot(b.id, _bs, e2, kind, wc);
+      }
+      if (nearP) {
+        end = _e.clone().addScaledVector(_bd, Math.min(res.t, B.ray));
+        _bs.copy(_e).addScaledVector(_bd, 0.9); _bs.y -= 0.2;
+        if (netNear) pushShot(b.id, _bs, end, kind, wc);
+        spawnTracer(_bs.clone(), end, 'b');
+        b.mesh.userData.flash.visible = true; b.mesh.userData.flashT = 0.05;
+        sfxShot(clamp(1 - dp / 90, 0, 1) * 0.8, wk ? 'ar' : b.wp);
+      }
+      if (res.type === 'world' && nearP) spawnSpark(end, 'w');
+      if (res.type === 'ent' && nearP) spawnSpark(end, 'e');
+    }
+    if (res.type === 'ent') { const h = hits.get(res.ent) || { dmg: 0, head: false }; h.dmg += ((res.ent.isPlayer || res.ent.remote) ? B.dp : B.db) * (res.head ? 1.6 : 1) * mul; if (res.head) h.head = true; hits.set(res.ent, h); }
   }
-  if (nearP) {
-    end = _e.clone().addScaledVector(_bd, Math.min(res.t, B.ray));
-    _bs.copy(_e).addScaledVector(_bd, 0.9); _bs.y -= 0.2;
-    if (netNear) pushShot(b.id, _bs, end, kind, wc);
-    spawnTracer(_bs.clone(), end, 'b');
-    b.mesh.userData.flash.visible = true; b.mesh.userData.flashT = 0.05;
-    sfxShot(clamp(1 - dp / 90, 0, 1) * 0.8, wk ? 'ar' : b.wp);
-  }
-  if (res.type === 'ent') { if (nearP) spawnSpark(end, 'e'); damage(res.ent, ((res.ent.isPlayer || res.ent.remote) ? B.dp : B.db) * (res.head ? 1.6 : 1), b, res.head); }
-  else if (res.type === 'world' && nearP) spawnSpark(end, 'w');
+  hits.forEach((h, ent) => damage(ent, h.dmg, b, h.head));
 }
 
 /* ================= 봇 AI ================= */
@@ -2673,7 +2791,7 @@ function turretBot(b, dt, d2, outside) {
     b.pt = clamp(Math.atan2(tg.pos.y + (tg.h || 1.85) * 0.62 - (b.pos.y + 1.45), Math.max(dist, 1)), -0.5, 1.0);
     b.react += dt;
     if (b.react > 0.5 && b.fireCd <= 0 && dist < BW.tu.range && Math.abs(angDiff(b.yaw, fy)) < 0.12) {
-      botShoot(b, tg, 'tu'); b.burst--;
+      botShoot(b, tg, c ? 'hu' : 'tu'); b.burst--;
       if (b.burst <= 0) { b.burst = BW.tu.b0 + Math.floor(Math.random() * BW.tu.bn); b.fireCd = rand(BW.tu.r0, BW.tu.r1); } else b.fireCd = BW.tu.inner;
     }
   } else { b.react = 0; b.pt *= 0.9; }
@@ -2763,7 +2881,7 @@ function spawnBot(i) {
   mesh.visible = false; scene.add(mesh);
   setArmorVisual(mesh, 0, 0); setArmedVisual(mesh, false);
   bots.push({
-    id: 1000 + i, team: teamOfId(1000 + i), seat: 0, waitT: 0, helm: 0, helmDur: 0, vest: 0, vestDur: 0, gun: false, prim: null, sec: false, wp: null, itemT: null, swing: 0, meleeCd: 0,
+    id: 1000 + i, team: teamOfId(1000 + i), seat: 0, waitT: 0, helm: 0, helmDur: 0, vest: 0, vestDur: 0, gun: false, prim: null, prim2: null, sec: false, wp: null, wpCd: 0, itemT: null, swing: 0, meleeCd: 0,
     gr: { frag: Math.random() < 0.4 ? (Math.random() < 0.3 ? 2 : 1) : 0, smoke: 0 }, grCd: rand(4, 14),
     isPlayer: false, name: 'BOT-' + String(i + 1).padStart(2, '0'), pos: new THREE.Vector3(drop.sx, drop.alt, drop.sz), yaw: rand(0, Math.PI * 2),
     hp: 100, alive: true, mesh, goal: null, goalT: 0, fireCd: rand(0.5, 1.5), scanT: rand(0, 0.4), target: null, react: 0,
@@ -2833,8 +2951,8 @@ function findHighItem(b) {
   for (let i = 0; i < items.length; i++) {
     const it = items[i]; if (it.gone || !it.route || it.y0 < 0.5 || it === b.itemBlock) continue;
     const ty = it.type;
-    if (ITEM_WP[ty]) { const prim = WP[ITEM_WP[ty]].slot === 0; if ((prim && b.prim) || (!prim && b.sec)) continue; }
-    else if (ty === 'ammo' || ty === 'ammoS' || ty === 'ammoP') { if (!b.gun) continue; }
+    if (ITEM_WP[ty]) { if (!botWantsW(b, ITEM_WP[ty])) continue; }
+    else if (ITEM_AM[ty]) { if (!b.gun) continue; }
     else if (ty === 'med') { if (b.hp > 70) continue; }
     else if (ty === 'helm' || ty === 'vest') { if (!(it.lvl > b[ty] || (it.lvl === b[ty] && it.dur > b[ty + 'Dur'] + 20))) continue; }
     const w = it.route[0], d = Math.hypot(w.x - b.pos.x, w.z - b.pos.z);
@@ -2855,9 +2973,9 @@ function findItem(b) {
         let sc = 1e9; const t = it.type;
         if (ITEM_WP[t]) {
           const w = ITEM_WP[t], prim = WP[w].slot === 0;
-          if (!b.gun) { if (d < 85) sc = d * (w === 'pi' ? 0.8 : 0.5); }
-          else if (prim && !b.prim) { if (d < 60) sc = d * 0.6; }
-          else if (!prim && !b.sec) { if (d < 40) sc = d * 0.9; }
+          if (hasW(b, w)) { /* 이미 보유 */ }
+          else if (!b.gun) { if (d < 85) sc = d * (w === 'pi' ? 0.8 : 0.5); }
+          else if (botWantsW(b, w)) { if (prim) { if (d < 60) sc = d * (b.prim ? 0.9 : 0.6); } else if (d < 40) sc = d * 0.9; }
         } else if (!b.gun) continue;
         else if (t === 'med') { if (b.hp < 65 && d < 50) sc = d * 0.7; }
         else if (t === 'helm' || t === 'vest') { if ((it.lvl > b[t] || (it.lvl === b[t] && it.dur > b[t + 'Dur'] + 20)) && d < 50) sc = d * (1.1 - 0.15 * it.lvl); }
@@ -2867,17 +2985,33 @@ function findItem(b) {
   }
   return best;
 }
+// 봇 무기 관리: 주무기 2 + 권총 1. 사거리에 맞는 무기로 자동 교체한다.
+function botWantsW(b, w) { if (hasW(b, w)) return false; return WP[w].slot === 0 ? !(b.prim && b.prim2) : !b.sec; }
+function botOwned(b) { const a = []; if (b.prim) a.push(b.prim); if (b.prim2) a.push(b.prim2); if (b.sec) a.push('pi'); return a; }
+function botSetWp(b, w) { if (b.wp === w) return false; b.wp = w; b.gun = !!w; setArmedVisual(b.mesh, w || false); return true; }
+function botPickWeapon(b, dist) {
+  const own = botOwned(b); if (!own.length) return false;
+  if (own.length === 1) return botSetWp(b, own[0]);
+  let best = null, bs = 1e9;
+  for (let i = 0; i < own.length; i++) {
+    const w = own[i];
+    let sc = dist == null ? -BW[w].det : Math.abs(WP[w].ideal - dist);
+    if (w === 'pi') sc += 30;
+    if (w === b.wp) sc -= 6;
+    if (sc < bs) { bs = sc; best = w; }
+  }
+  return botSetWp(b, best);
+}
 function botEquip(b, w) {
-  if (WP[w].slot === 0) b.prim = w; else b.sec = true;
-  b.wp = b.prim || (b.sec ? 'pi' : null); b.gun = !!b.wp;
-  setArmedVisual(b.mesh, b.wp || false);
+  if (WP[w].slot === 0) { if (!b.prim) b.prim = w; else b.prim2 = w; } else b.sec = true;
+  b.wp = null; botPickWeapon(b, null);
 }
 function botPickup(b, it) {
   if (it.gone) return;
   const t = it.type;
   if (ITEM_WP[t]) {
-    const w = ITEM_WP[t], prim = WP[w].slot === 0;
-    if ((prim && b.prim) || (!prim && b.sec)) { b.itemT = null; return; }
+    const w = ITEM_WP[t];
+    if (!botWantsW(b, w)) { b.itemT = null; return; }
     botEquip(b, w);
   } else if (t === 'med') b.hp = Math.min(100, b.hp + 40);
   else if (t === 'helm' || t === 'vest') {
@@ -2928,7 +3062,7 @@ function updateBot(b, dt, d2) {
     const t = (outside && dc > zone.r + 4) ? null : findTarget(b);
     if (t) { if (t !== b.target) b.react = 0; b.target = t; b.chaseT = 4; b.last = { x: t.pos.x, z: t.pos.z }; }
     else {
-      b.target = null;
+      b.target = null; if (b.gun && NET.mode !== 'client') botPickWeapon(b, null);
       const tmm = teamMap[b.team];
       if (tmm && tmm.length > 1) for (let q = 0; q < tmm.length; q++) { const m2 = tmm[q]; if (m2 !== b && m2.alive && m2.target && m2.target.alive && Math.hypot(m2.pos.x - b.pos.x, m2.pos.z - b.pos.z) < 60) { b.last = { x: m2.target.pos.x, z: m2.target.pos.z }; b.chaseT = Math.max(b.chaseT, 3); break; } }
     }
@@ -2976,6 +3110,8 @@ function updateBot(b, dt, d2) {
     const fy = Math.atan2(-dx, -dz);
     b.yaw = turnToward(b.yaw, fy, dt * 6);
     b.strafeT -= dt; if (b.strafeT <= 0) { b.strafeT = rand(0.7, 2); b.strafe = Math.random() < 0.5 ? -1 : 1; }
+    b.wpCd -= dt;
+    if (b.wpCd <= 0 && NET.mode !== 'client') { b.wpCd = 1.4; if (botPickWeapon(b, dist)) b.fireCd = Math.max(b.fireCd, 0.45); }
     const BWb = BW[b.wp] || BW.ar;
     if (dist > BWb.far) fwd = 1; else if (dist < BWb.near) fwd = -0.7;
     str = b.strafe * 0.6; spd = 4.2;
@@ -3097,10 +3233,10 @@ const itemGeo = {
 const beamM = c => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.3, depthWrite: false, side: THREE.DoubleSide });
 const itemMat = {
   med: new THREE.MeshLambertMaterial({ color: 0x2fcf4f, emissive: 0x0b3a14 }), ammo: new THREE.MeshLambertMaterial({ color: 0xffd21f, emissive: 0x4a3a00 }),
-  ammoS: new THREE.MeshLambertMaterial({ color: 0xff8a1f, emissive: 0x4a2200 }), ammoP: new THREE.MeshLambertMaterial({ color: 0x4a8fe0, emissive: 0x0a2244 }),
+  ammoS: new THREE.MeshLambertMaterial({ color: 0xff8a1f, emissive: 0x4a2200 }), ammoP: new THREE.MeshLambertMaterial({ color: 0x4a8fe0, emissive: 0x0a2244 }), ammoG: new THREE.MeshLambertMaterial({ color: 0xd8402a, emissive: 0x3a0e06 }), wood: new THREE.MeshLambertMaterial({ color: 0x6a4428 }),
   strip: new THREE.MeshLambertMaterial({ color: 0x8a6a00 }), gunTan: new THREE.MeshLambertMaterial({ color: 0x7a6a4a }),
   white: new THREE.MeshBasicMaterial({ color: 0xffffff }), dark: new THREE.MeshLambertMaterial({ color: 0x2a2d30 }),
-  beamGun: beamM(0xff5a4a), beamSnipe: beamM(0xc47dff), beamPistol: beamM(0x4adfff), beamMed: beamM(0x3dff6a), beamAmmo: beamM(0xffe04a), beamAmmoS: beamM(0xff9a30), beamAmmoP: beamM(0x6ab0ff), beamCrate: beamM(0xffffff),
+  beamGun: beamM(0xff5a4a), beamSnipe: beamM(0xc47dff), beamPistol: beamM(0x4adfff), beamMed: beamM(0x3dff6a), beamAmmo: beamM(0xffe04a), beamAmmoS: beamM(0xff9a30), beamAmmoP: beamM(0x6ab0ff), beamCrate: beamM(0xffffff), beamSmg: beamM(0xffb13a), beamShotgun: beamM(0xff6aa8), beamDmr: beamM(0x7dffb0), beamLmg: beamM(0x9aa6ff), beamAmmoG: beamM(0xff7a5a),
   crate: new THREE.MeshLambertMaterial({ color: 0x6b5a3a }), crateLid: new THREE.MeshLambertMaterial({ color: 0x4f432a }), crateStrap: new THREE.MeshLambertMaterial({ color: 0x2a2a2a })
 };
 itemMat.beamCrate.opacity = 0.2;
@@ -3127,8 +3263,8 @@ function makeItem(type, x, z, lvl, dur, y0, fixedId) {
   const addM = (geo, m, y) => { const me = new THREE.Mesh(geo, m); if (y) me.position.y = y; g.add(me); return me; };
   if (type === 'med') {
     addM(itemGeo.med, itemMat.med).castShadow = true; addM(itemGeo.c1, itemMat.white, 0.22); addM(itemGeo.c2, itemMat.white, 0.22); beamMat = itemMat.beamMed;
-  } else if (type === 'ammo' || type === 'ammoS' || type === 'ammoP') {
-    addM(itemGeo.ammo, itemMat[type]).castShadow = true; addM(itemGeo.strip, itemMat.strip); beamMat = type === 'ammo' ? itemMat.beamAmmo : type === 'ammoS' ? itemMat.beamAmmoS : itemMat.beamAmmoP;
+  } else if (ITEM_AM[type]) {
+    addM(itemGeo.ammo, itemMat[type]).castShadow = true; addM(itemGeo.strip, itemMat.strip); beamMat = itemMat[{ ammo: 'beamAmmo', ammoS: 'beamAmmoS', ammoP: 'beamAmmoP', ammoG: 'beamAmmoG' }[type]];
     if (type === 'ammoS') g.scale.set(0.8, 1.3, 0.8);
   } else if (type === 'gun') {
     const a = addM(itemGeo.gunB, itemMat.dark); a.castShadow = true; a.rotation.y = 0.5;
@@ -3144,6 +3280,28 @@ function makeItem(type, x, z, lvl, dur, y0, fixedId) {
     const ck = addM(itemGeo.snipT, itemMat.gunTan, 0.08); ck.position.set(0.25, 0.0, 0.43); ck.rotation.y = 0.5; ck.scale.set(0.8, 0.3, 0.7);
     const mz = addM(itemGeo.gunS, itemMat.dark, 0.0); mz.position.set(-0.5, 0, -0.6); mz.rotation.y = 0.5; mz.scale.set(0.8, 0.8, 0.35);
     beamMat = itemMat.beamSnipe;
+  } else if (type === 'smg') {
+    const a = addM(itemGeo.gunB, itemMat.dark); a.castShadow = true; a.rotation.y = 0.5; a.scale.set(0.9, 0.9, 0.62);
+    const m = addM(itemGeo.gunM, itemMat.gunTan, -0.16); m.position.set(-0.04, 0, 0.08); m.rotation.y = 0.5; m.scale.set(0.8, 1.5, 0.8);
+    const gp = addM(itemGeo.pisG, itemMat.dark, -0.08); gp.position.set(0.1, 0, 0.2); gp.rotation.x = -0.2; gp.scale.set(0.9, 0.7, 0.9);
+    beamMat = itemMat.beamSmg;
+  } else if (type === 'shotgun') {
+    const a = addM(itemGeo.snipB, itemMat.dark, 0.03); a.castShadow = true; a.rotation.y = 0.5; a.scale.set(0.95, 0.9, 0.85);
+    const pump = addM(itemGeo.gunS, itemMat.wood, -0.05); pump.position.set(-0.2, 0, -0.28); pump.rotation.y = 0.5; pump.scale.set(1.3, 0.8, 0.9);
+    const st = addM(itemGeo.snipT, itemMat.wood, 0.0); st.position.set(0.3, 0.0, 0.5); st.rotation.y = 0.5; st.scale.set(1.1, 1, 1.1);
+    beamMat = itemMat.beamShotgun;
+  } else if (type === 'dmr') {
+    const a = addM(itemGeo.snipB, itemMat.dark); a.castShadow = true; a.rotation.y = 0.5; a.scale.set(0.9, 0.95, 0.85);
+    const sc = addM(itemGeo.snipS, itemMat.dark, 0.12); sc.rotation.x = Math.PI / 2; sc.rotation.z = 0.5; sc.position.x = -0.02; sc.scale.set(0.8, 0.7, 0.8);
+    const m = addM(itemGeo.gunM, itemMat.dark, -0.14); m.position.set(0, 0, 0.12); m.rotation.y = 0.5;
+    const st = addM(itemGeo.snipT, itemMat.gunTan, 0.0); st.position.set(0.28, 0.0, 0.5); st.rotation.y = 0.5;
+    beamMat = itemMat.beamDmr;
+  } else if (type === 'lmg') {
+    const a = addM(itemGeo.gunB, itemMat.dark); a.castShadow = true; a.rotation.y = 0.5; a.scale.set(1.4, 1.35, 1.15);
+    const bx = addM(itemGeo.ammo, itemMat.gunTan, -0.2); bx.position.set(0, 0, 0.1); bx.rotation.y = 0.5; bx.scale.set(0.5, 0.6, 0.5);
+    const st = addM(itemGeo.gunS, itemMat.dark, 0.0); st.position.set(0.3, 0, 0.5); st.rotation.y = 0.5; st.scale.set(1.2, 1.2, 1.3);
+    const bp = addM(itemGeo.gunS, itemMat.dark, -0.12); bp.position.set(-0.26, 0, -0.45); bp.rotation.y = 0.5; bp.scale.set(0.3, 0.3, 1.2);
+    beamMat = itemMat.beamLmg;
   } else if (type === 'pistol') {
     const a = addM(itemGeo.pisB, itemMat.dark, 0.1); a.castShadow = true;
     const gp = addM(itemGeo.pisG, itemMat.gunTan, -0.06); gp.position.z = 0.12; gp.rotation.x = -0.2;
@@ -3200,12 +3358,13 @@ function afterCrateChange(cr) {
 function lootEntries(b) {
   const en = [];
   if (b.prim) en.push({ type: WPN_ITEM[b.prim] });
+  if (b.prim2) en.push({ type: WPN_ITEM[b.prim2] });
   if (b.sec) en.push({ type: 'pistol' });
   if (b.helm > 0 && b.helmDur > 0) en.push({ type: 'helm', lvl: b.helm, dur: Math.round(b.helmDur) });
   if (b.vest > 0 && b.vestDur > 0) en.push({ type: 'vest', lvl: b.vest, dur: Math.round(b.vestDur) });
   const res = b.res;
-  ['ar', 'sr', 'pi'].forEach(w => {
-    const has = w === b.prim || (w === 'pi' && b.sec);
+  AM_TYPES.forEach(w => {
+    const has = [b.prim, b.prim2, b.sec ? 'pi' : null].some(x => x && WP[x].am === w);
     const n = res ? Math.min(3, Math.floor((res[w] || 0) / AMMO_PACK[w])) : (has ? 1 + (Math.random() < 0.5 ? 1 : 0) : 0);
     for (let i = 0; i < n; i++) en.push({ type: AM_ITEM[w] });
   });
@@ -3226,11 +3385,16 @@ function invAccept(h, e, o) {
   if (t === 'med') { if ((h.med | 0) >= MED_MAX) return null; if (!o.dry) h.med = (h.med | 0) + 1; return { out: null, msg: { k: 'med', n: (h.med | 0) + (o.dry ? 1 : 0) } }; }
   if (ITEM_AM[t]) { const w = ITEM_AM[t]; return { out: null, msg: { k: 'ammo', w, n: AMMO_PACK[w] } }; }
   if (ITEM_WP[t]) {
-    const w = ITEM_WP[t], prim = WP[w].slot === 0, cur = prim ? h.prim : (h.sec ? 'pi' : null);
-    if (cur === w) return null;
-    if (cur && o.auto) return null;
-    if (!o.dry) { if (prim) h.prim = w; else h.sec = true; }
-    return { out: cur ? { type: WPN_ITEM[cur] } : null, msg: { k: 'wpn', w, bonus: o.fromCrate ? 0 : AMMO_PACK[w] } };
+    const w = ITEM_WP[t], prim = WP[w].slot === 0, bonus = o.fromCrate ? 0 : AMMO_PACK[WP[w].am];
+    if (hasW(h, w)) return null;
+    if (!prim) { if (!o.dry) h.sec = true; return { out: null, msg: { k: 'wpn', w, sl: 0, bonus } }; }
+    // 주무기 2슬롯: 빈 슬롯부터 채우고, 둘 다 차 있으면 지금 들고 있는 슬롯과 교체 (자동 줍기는 하지 않음)
+    let sl;
+    if (!h.prim) sl = 1; else if (!h.prim2) sl = 2;
+    else { if (o.auto) return null; sl = (h.prim2 && (h.isPlayer ? h.weapon : h.wp) === h.prim2) ? 2 : 1; }
+    const old = sl === 1 ? h.prim : h.prim2;
+    if (!o.dry) { if (sl === 1) h.prim = w; else h.prim2 = w; }
+    return { out: old ? { type: WPN_ITEM[old] } : null, msg: { k: 'wpn', w, sl, old: old || null, bonus } };
   }
   if (t === 'frag' || t === 'smoke') {
     if (!h.gr || h.gr[t] >= GR_MAX) return null;
@@ -3247,7 +3411,7 @@ function invAccept(h, e, o) {
 }
 function switchTo(w) {
   if (player.drv && player.seat === 0) return;
-  if (w !== 'knife' && !(w === player.prim || (w === 'pi' && player.sec))) return;
+  if (w !== 'knife' && !hasW(player, w)) return;
   const wasThr = !!player.thr; player.thr = null; player.throwWind = 0;
   if (player.weapon === w && !wasThr) return;
   player.weapon = w; player.reloadT = 0; player.fireCd = Math.max(player.fireCd, 0.4); aiming = false;
@@ -3255,22 +3419,24 @@ function switchTo(w) {
   toast(w === 'knife' ? '칼' : WP[w].n + '  ' + player.ammo + ' / ' + player.reserve, 900); sfxTone(260, 0.05, 0.06, 'triangle');
 }
 function cycleWeapon(dir) {
-  const list = []; if (player.prim) list.push(player.prim); if (player.sec) list.push('pi'); list.push('knife');
+  const list = []; if (player.prim) list.push(player.prim); if (player.prim2) list.push(player.prim2); if (player.sec) list.push('pi'); list.push('knife');
   const i = list.indexOf(player.weapon); switchTo(list[(i + dir + list.length) % list.length]);
 }
-function equipLocal(w, bonus) {
-  if (WP[w].slot === 0) player.prim = w; else player.sec = true;
-  player.mags[w] = WP[w].mag; player.res[w] += bonus; player.fireCd = Math.max(player.fireCd, 0.3);
-  if (player.weapon === 'knife' || !WP[player.weapon] || WP[player.weapon].slot === WP[w].slot) {
+function equipLocal(w, bonus, sl, old) {
+  const W = WP[w];
+  if (W.slot === 0) { if (sl === 2) player.prim2 = w; else player.prim = w; } else player.sec = true;
+  player.mags[w] = W.mag; player.res[W.am] += bonus; player.fireCd = Math.max(player.fireCd, 0.3);
+  const cw = player.weapon;
+  if (cw === 'knife' || !WP[cw] || (old && cw === old)) {
     player.weapon = null; switchTo(w);
     if (!player.weapon) { player.weapon = w; setVM(w); vmDraw = 1; setGunVisual(w); }   // 운전 중 등 switchTo가 막힌 경우에도 무기 상태가 비지 않게
   }
-  toast('+ ' + WP[w].n + ' 획득  (좌클릭 사격 · R 재장전)', 2200); sfxTone(420, 0.2, 0.14, 'square');
+  toast('+ ' + W.n + ' 획득 → ' + (W.slot === 0 ? (sl === 2 ? 2 : 1) : 3) + '번  (좌클릭 사격 · R 재장전)', 2200); sfxTone(420, 0.2, 0.14, 'square');
 }
 function applyGotLocal(m) {
-  if (m.k === 'gr') { const was = player.gr[m.w] | 0; player.gr[m.w] = m.n | 0; if (m.n > was) { toast('+ ' + GR_NAME[m.w] + '  (' + m.n + '개 · ' + (m.w === 'frag' ? '4' : '5') + '번 키)', 1600); sfxTone(700, 0.12, 0.1, 'triangle'); } }
-  else if (m.k === 'wpn') equipLocal(m.w, m.bonus || 0);
-  else if (m.k === 'ammo') { player.res[m.w] += m.n; toast('+ ' + WP[m.w].n + '탄 ' + m.n + '발', 1400); sfxTone(880, 0.15, 0.12, 'triangle'); }
+  if (m.k === 'gr') { const was = player.gr[m.w] | 0; player.gr[m.w] = m.n | 0; if (m.n > was) { toast('+ ' + GR_NAME[m.w] + '  (' + m.n + '개 · ' + (m.w === 'frag' ? '5' : '6') + '번 키)', 1600); sfxTone(700, 0.12, 0.1, 'triangle'); } }
+  else if (m.k === 'wpn') equipLocal(m.w, m.bonus || 0, m.sl || 1, m.old || null);
+  else if (m.k === 'ammo') { player.res[m.w] += m.n; toast('+ ' + AM_NAME[m.w] + ' ' + m.n + '발', 1400); sfxTone(880, 0.15, 0.12, 'triangle'); }
   else if (m.k === 'med') { player.med = m.n | 0; if (m.u) { toast('✚ 구급상자 자동 사용  HP +' + MED_HEAL + '  (남은 ' + player.med + '개)', 1800); sfxTone(660, 0.25, 0.14); sfxTone(880, 0.2, 0.1, 'triangle'); } else { toast('+ 구급상자  (' + player.med + ' / ' + MED_MAX + ')  — 체력이 ' + MED_HEAL + ' 깎이면 자동 사용', 2000); sfxTone(660, 0.18, 0.1); } }
   else { setArmorVisual(playerMesh, player.helm, player.vest); toast((m.sw ? '↻ ' : '+ ') + (m.k === 'helm' ? '헬멧' : '조끼') + ' Lv.' + m.lvl + (m.sw ? ' 내구도가 더 높은 것으로 교체' : ' 장착') + (m.dur ? ' (내구도 ' + m.dur + ')' : ''), 2000); sfxTone(520, 0.14, 0.12, 'triangle'); }
 }
@@ -3287,7 +3453,7 @@ function renderLoot() {
     const b = document.createElement('b'); b.textContent = '[' + (i + 1) + ']'; d.appendChild(b);
     d.appendChild(document.createTextNode(' ' + entLabel(e))); d.onclick = () => takeLoot(i, false); box.appendChild(d);
   });
-  const sm = document.createElement('small'); sm.textContent = '숫자 = 가져오기 · 0 = 모두 가져오기 · E = 닫기 (주무기·권총은 가진 것과 교체)'; box.appendChild(sm);
+  const sm = document.createElement('small'); sm.textContent = '숫자 = 가져오기 · 0 = 모두 가져오기 · E = 닫기 (주무기 슬롯이 가득 차면 들고 있는 무기와 교체)'; box.appendChild(sm);
   const lb = document.createElement('div'); lb.className = 'lb';
   const a1 = document.createElement('span'); a1.textContent = '모두 가져오기'; a1.onclick = takeAllLoot;
   const a2 = document.createElement('span'); a2.textContent = '닫기'; a2.onclick = closeLoot;
@@ -3339,6 +3505,9 @@ function randomPointInBuilding() {
   const b = pick(lootBuildings);
   return { x: rand(b.minX + 1.8, b.maxX - 1.8), z: rand(b.minZ + 1.8, b.maxZ - 1.8) };
 }
+const ROOF_TBL = [[13, 'gun'], [8, 'dmr'], [7, 'snipe'], [5, 'lmg'], [4, 'shotgun'], [13, 'helm'], [13, 'vest'], [10, 'med'], [8, 'ammo'], [5, 'ammoS'], [4, 'ammoG'], [7, 'frag']];
+const INDOOR_TBL = [[12, 'gun'], [7, 'smg'], [6, 'shotgun'], [7, 'pistol'], [11, 'ammo'], [3, 'ammoG'], [11, 'med'], [9, 'frag'], [7, 'smoke'], [8, 'helm'], [8, 'vest'], [5, 'ammoP'], [2, 'lmg'], [2, 'dmr'], [2, 'snipe']];
+function wpick(tbl) { let r = Math.random() * tbl.reduce((a, e) => a + e[0], 0); for (let i = 0; i < tbl.length; i++) { r -= tbl[i][0]; if (r <= 0) return tbl[i][1]; } return tbl[tbl.length - 1][1]; }
 function spawnItems() {
   const place = (type, inBuilding, lvl) => {
     for (let i = 0; i < 80; i++) {
@@ -3348,13 +3517,18 @@ function spawnItems() {
       if (pointFree(x, z, 1.1)) { makeItem(type, x, z, lvl || 0, lvl ? armorMax(type, lvl) : 0, 0); return; }
     }
   };
-  for (let i = 0; i < 110; i++) place('gun', i < 62);
-  for (let i = 0; i < 36; i++) place('snipe', i < 28);
+  for (let i = 0; i < 90; i++) place('gun', i < 52);
+  for (let i = 0; i < 30; i++) place('snipe', i < 22);
   for (let i = 0; i < 90; i++) place('pistol', i < 50);
+  for (let i = 0; i < 50; i++) place('smg', i < 30);
+  for (let i = 0; i < 36; i++) place('shotgun', i < 24);
+  for (let i = 0; i < 22; i++) place('dmr', i < 14);
+  for (let i = 0; i < 14; i++) place('lmg', i < 10);
   for (let i = 0; i < 80; i++) place('med', i < 40);
   for (let i = 0; i < 90; i++) place('ammo', i < 45);
   for (let i = 0; i < 40; i++) place('ammoS', i < 24);
   for (let i = 0; i < 60; i++) place('ammoP', i < 32);
+  for (let i = 0; i < 50; i++) place('ammoG', i < 28);
   for (let i = 0; i < 90; i++) place('frag', i < 50);
   for (let i = 0; i < 70; i++) place('smoke', i < 38);
   ['helm', 'vest'].forEach(tp => {
@@ -3364,9 +3538,8 @@ function spawnItems() {
   });
   lootSpots.forEach(sp => {
     for (let i = 0; i < sp.n; i++) {
-      const x = sp.x + (i - (sp.n - 1) / 2) * 1.5, z = sp.z, r = Math.random();
-      const tp = sp.roof ? (r < 0.2 ? 'gun' : r < 0.32 ? 'snipe' : r < 0.47 ? 'helm' : r < 0.62 ? 'vest' : r < 0.74 ? 'med' : r < 0.84 ? 'ammo' : r < 0.92 ? 'ammoS' : 'frag')
-        : (r < 0.2 ? 'gun' : r < 0.3 ? 'pistol' : r < 0.45 ? 'ammo' : r < 0.58 ? 'med' : r < 0.7 ? 'frag' : r < 0.78 ? 'smoke' : r < 0.86 ? 'helm' : r < 0.94 ? 'vest' : 'ammoP');
+      const x = sp.x + (i - (sp.n - 1) / 2) * 1.5, z = sp.z;
+      const tp = wpick(sp.roof ? ROOF_TBL : INDOOR_TBL);
       const lv = (tp === 'helm' || tp === 'vest') ? (Math.random() < (sp.roof ? 0.7 : 0.25) ? 2 : 1) : 0;
       const it = makeItem(tp, x, z, lv, lv ? armorMax(tp, lv) : 0, sp.y); if (sp.route) it.route = sp.route;
     }
@@ -3374,7 +3547,7 @@ function spawnItems() {
   roofSpots.forEach(sp => {
     const tp = Math.random() < 0.5 ? 'helm' : 'vest', lv = Math.random() < 0.25 ? 3 : 2;
     makeItem(tp, sp.x - 0.9, sp.z, lv, armorMax(tp, lv), sp.y);
-    if (Math.random() < 0.55) makeItem('snipe', sp.x, sp.z + 1.0, 0, 0, sp.y);
+    if (Math.random() < 0.55) makeItem(wpick([[5, 'snipe'], [3, 'dmr'], [2, 'lmg']]), sp.x, sp.z + 1.0, 0, 0, sp.y);
     if (Math.random() < 0.5) makeItem('med', sp.x + 0.9, sp.z, 0, 0, sp.y); else makeItem(Math.random() < 0.5 ? 'ammoS' : 'ammo', sp.x + 0.9, sp.z, 0, 0, sp.y);
   });
 }
@@ -3574,8 +3747,8 @@ function updateTurrets(dt) {
     t.ay += angDiff(ty, t.ay) * k; t.ap += (tp - t.ap) * k;
     t.pivot.rotation.y = t.car ? t.ay - t.car.yaw : t.ay; t.gun.rotation.x = t.ap;
     t.root.visible = Math.hypot(t.x - camera.position.x, t.z - camera.position.z) < 320;
-    if (t.lock > 0) { t.lock -= dt; if (t.lock <= 0) { t.lock = 0; t.heat = 0.3; } }
-    else t.heat = Math.max(0, t.heat - dt * (player.tur === t ? 0.28 : 0.5));
+    if (t.lock > 0) { t.lock -= dt; if (t.lock <= 0) { t.lock = 0; t.heat = 0.3; } else t.heat = 0.3 + 0.7 * (t.lock / 2.4); }
+    else t.heat = Math.max(0, t.heat - dt * (player.tur === t ? 0.2 : 0.5));
   }
 }
 function turretTick(p, dt) {
@@ -3589,7 +3762,7 @@ function turretTick(p, dt) {
 function turretShoot() {
   const t = player.tur; if (!t || player.fireCd > 0) return;
   if (t.lock > 0) { player.fireCd = 0.3; sfxClick(2000, 0.04, 0.1); return; }
-  const W = WP.tu; player.fireCd = W.cd; t.heat += 0.028;
+  const W = t.car ? WP.hu : WP.tu; player.fireCd = W.cd; t.heat += 0.034;
   if (t.heat >= 1) { t.heat = 1; t.lock = 2.4; toast('⚠ 과열! 냉각 중...', 1400); sfxTone(300, 0.3, 0.12, 'sawtooth'); }
   const tps = isTPS(), dir = new THREE.Vector3(); camera.getWorldDirection(dir);
   const sp = W.spread + player.recoil * 0.15;
@@ -3888,7 +4061,7 @@ const adGeo = { chute: new THREE.SphereGeometry(2.4, 14, 7, 0, Math.PI * 2, 0, M
 function airdropEntries() {
   return [
     { type: 'helm', lvl: 3, dur: armorMax('helm', 3) }, { type: 'vest', lvl: 3, dur: armorMax('vest', 3) },
-    { type: 'snipe' }, { type: 'ammoS' }, { type: 'ammo' }, { type: 'med' }, { type: 'med' }, { type: 'frag' }, { type: 'smoke' }
+    { type: 'snipe' }, { type: 'lmg' }, { type: 'ammoS' }, { type: 'ammo' }, { type: 'med' }, { type: 'med' }, { type: 'frag' }
   ];
 }
 function startAirdrop(id, x, z) {
@@ -4231,8 +4404,8 @@ function updateCamera(dt) {
 
   // FOV (조준 줌)
   adsK += ((aiming && player.alive ? 1 : 0) - adsK) * Math.min(1, dt * 12);
-  const tf = 75 - adsK * (tps ? 15 : (player.weapon === 'sr' ? 59 : 27));
-  const sc2 = !tps && player.weapon === 'sr' && adsK > 0.85 && player.alive && !player.air;
+  const tf = 75 - adsK * (tps ? 15 : (WP[player.weapon] || WP.ar).zoom);
+  const sc2 = !tps && (player.weapon === 'sr' || player.weapon === 'dm') && adsK > 0.85 && player.alive && !player.air;
   if (sc2 !== scoped) { scoped = sc2; $('scope').style.display = sc2 ? 'block' : 'none'; }
   if (Math.abs(camera.fov - tf) > 0.05) { camera.fov = tf; camera.updateProjectionMatrix(); }
 
@@ -4309,7 +4482,16 @@ function updateCamera(dt) {
   let gy = -0.22 * (1 - adsK) - VMc.sightY * adsK + by + Math.sin(tt * 1.9 + 1) * 0.0011 * sway - vmDraw * vmDraw * 0.32, gx = 0.22 * (1 - adsK) + bx + Math.sin(tt * 1.3) * 0.0013 * sway, gz = -0.45 + adsK * (curVM === 'pi' ? 0.05 : 0.02) + gunKick * (curVM === 'sr' ? 0.045 : 0.07);
   let rx = gunKick * (curVM === 'sr' ? 0.05 : 0.07) + vmDraw * 0.9, ry = 0, rz = 0;
   if (muzzleT > 0) { muzzleT -= dt; muzzleLight.intensity = Math.max(0, muzzleT / 0.07) * 2.4; } else muzzleLight.intensity = 0;
-  if (VMc.slide) VMc.slide.position.z = (player.reloadT <= 0 && player.ammo <= 0 && player.weapon === 'pi') ? 0.045 : Math.min(1, gunKick / 0.7) * 0.045;
+  if (VMc.pump) {
+    const fc = player.fireCd > 0 && player.reloadT <= 0 && curVM === 'sg' ? clamp(1 - player.fireCd / WP.sg.cd, 0, 1) : 1;
+    const ph = (a, b) => clamp((fc - a) / (b - a), 0, 1);
+    VMc.slide.position.z = (ph(0.25, 0.45) - ph(0.55, 0.8)) * 0.14;
+    if (player.fireCd > 0 && player.reloadT <= 0 && curVM === 'sg') {
+      if (pumpPh < 0.35 && fc >= 0.35) sfxClick(700, 0.07, 0.2);
+      if (pumpPh < 0.7 && fc >= 0.7) sfxClick(1100, 0.06, 0.2);
+    }
+    pumpPh = fc;
+  } else if (VMc.slide) VMc.slide.position.z = (player.reloadT <= 0 && player.ammo <= 0 && player.weapon === 'pi') ? 0.045 : Math.min(1, gunKick / 0.7) * 0.045;
   if (VMc.bolt && curVM === 'sr') {
     const fc = player.fireCd > 0 && player.reloadT <= 0 ? clamp(1 - player.fireCd / WP.sr.cd, 0, 1) : 1;
     const ph = (a, b) => clamp((fc - a) / (b - a), 0, 1);
@@ -4343,7 +4525,7 @@ function updateCamera(dt) {
     if (prevRl < 0.72 && rl >= 0.72) { sfxClick(900, 0.07, 0.26); sfxTone(110, 0.09, 0.14, 'triangle'); }
     if (prevRl < 0.88 && rl >= 0.88) { sfxClick(1900, 0.05, 0.2); sfxClick(1200, 0.07, 0.18); }
   } else {
-    const HH = VMS[curVM].handHome; handL.position.set(HH[0], HH[1], HH[2]); magMesh.visible = true; magMesh.position.copy(MAG_HOME); magMesh.rotation.x = 0.2;
+    const HH = VMS[curVM].handHome; handL.position.set(HH[0], HH[1], HH[2] + (VMS[curVM].pump ? VMS[curVM].slide.position.z : 0)); magMesh.visible = true; magMesh.position.copy(MAG_HOME); magMesh.rotation.x = 0.2;
     newMag.visible = false; chargeH.position.z = VMS[curVM].chargeZ;
   }
   prevRl = rl;
@@ -4589,7 +4771,17 @@ function updateHUD(dt, now) {
   setText(el.hpText, String(hp));
   el.hpFill.style.width = hp + '%';
   el.hpFill.style.background = hp > 50 ? '#3ddc5a' : hp > 25 ? '#f0a030' : '#e83030';
-  setText(el.ammoLabel, (!player.thr && (player.weapon === 'ar' || player.weapon === 'sr') ? '▶' : '') + '1 ' + (player.prim ? WP[player.prim].n : '—') + '   ' + (!player.thr && player.weapon === 'pi' ? '▶' : '') + '2 ' + (player.sec ? '권총' : '—') + '   ' + (!player.thr && player.weapon === 'knife' ? '▶' : '') + '3 칼' + '   ' + (player.thr === 'frag' ? '▶' : '') + '4 수류탄 ' + player.gr.frag + '   ' + (player.thr === 'smoke' ? '▶' : '') + '5 연막 ' + player.gr.smoke + '   ✚ ' + player.med + '/' + MED_MAX);
+  { const act = k => !player.thr && player.weapon === k ? '▶' : '', nm = k => k ? WP[k].s : '—';
+    setText(el.ammoLabel, act(player.prim) + '1 ' + nm(player.prim) + '  ' + act(player.prim2) + '2 ' + nm(player.prim2) + '  ' + act(player.sec ? 'pi' : '#') + '3 ' + (player.sec ? '권총' : '—') + '  ' + act('knife') + '4 칼' + '  ' + (player.thr === 'frag' ? '▶' : '') + '5 수류탄 ' + player.gr.frag + '  ' + (player.thr === 'smoke' ? '▶' : '') + '6 연막 ' + player.gr.smoke + '  ✚ ' + player.med + '/' + MED_MAX); }
+  {
+    const hw = $('heatWrap');
+    if (player.tur) {
+      const h = player.tur.heat, lk = player.tur.lock > 0, pc = Math.round(h * 100);
+      hw.style.display = 'block'; $('heatFill').style.width = pc + '%';
+      $('heatFill').style.background = lk ? '#ff3030' : h > 0.7 ? '#ff8a2a' : h > 0.4 ? '#ffd23a' : '#7fd0ff';
+      setText($('heatLbl'), lk ? '⚠ 과열 — 냉각 중 ' + pc + '%' : '🔥 열 ' + pc + '%');
+    } else if (hw.style.display !== 'none') hw.style.display = 'none';
+  }
   setText(el.ammoCur, player.tur ? (player.tur.lock > 0 ? '과열' : Math.round(player.tur.heat * 100) + '%') : player.thr ? String(player.gr[player.thr]) : player.hasGun ? String(player.ammo) : '칼');
   setText(el.ammoRes, player.tur ? ' 거치포 열' : player.thr ? ' ' + GR_NAME[player.thr] + (player.thrPow < 1 ? ' (가볍게)' : '') : player.hasGun ? ' / ' + player.reserve : ' 총을 주우세요');
   setText(el.modeText, isTPS() && player.alive ? '3P · 3인칭' : (viewMode === 'fps' ? '1P · 1인칭' : '3P · 3인칭'));
@@ -4738,8 +4930,8 @@ function onClientMsg(conn, m) {
     case 'st':
       if (!rp || !rp.alive) return;
       if (!isFinite(m.x + m.y + m.z + m.yaw)) return;
-      Object.assign(rp.net, { x: clamp(m.x, -MAP_HALF, MAP_HALF), y: clamp(m.y, -5, 900), z: clamp(m.z, -MAP_HALF, MAP_HALF), yaw: m.yaw, pt: clamp(+m.pt || 0, -1.5, 1.5), st: clamp(m.st | 0, 0, 3), ds: clamp(m.ds | 0, 0, 3), w: clamp(m.w | 0, 0, 3) });
-      if (Array.isArray(m.rs) && m.rs.length === 3) { rp.res.ar = clamp(m.rs[0] | 0, 0, 999); rp.res.sr = clamp(m.rs[1] | 0, 0, 999); rp.res.pi = clamp(m.rs[2] | 0, 0, 999); }
+      Object.assign(rp.net, { x: clamp(m.x, -MAP_HALF, MAP_HALF), y: clamp(m.y, -5, 900), z: clamp(m.z, -MAP_HALF, MAP_HALF), yaw: m.yaw, pt: clamp(+m.pt || 0, -1.5, 1.5), st: clamp(m.st | 0, 0, 3), ds: clamp(m.ds | 0, 0, 3), w: clamp(m.w | 0, 0, WL.length - 1) });
+      if (Array.isArray(m.rs) && m.rs.length >= 3) { rp.res.ar = clamp(m.rs[0] | 0, 0, 999); rp.res.sr = clamp(m.rs[1] | 0, 0, 999); rp.res.pi = clamp(m.rs[2] | 0, 0, 999); rp.res.sh = clamp(m.rs[3] | 0, 0, 999); }
       if (rp.drv) {
         const c = rp.drv;
         if (rp.seat === 0 && Array.isArray(m.ci)) { c.in.th = clamp(+m.ci[0] || 0, -1, 1); c.in.sr = clamp(+m.ci[1] || 0, -1, 1); c.in.br = m.ci[2] ? 1 : 0; c.inT = performance.now(); }
@@ -4784,7 +4976,7 @@ function spawnRemote(c) {
   setArmorVisual(mesh, 0, 0); setArmedVisual(mesh, false); mesh.visible = false; scene.add(mesh);
   const b = {
     remote: true, conn: c, id: c.pid, team: teamOfId(c.pid), seat: 0, name: c.nick, isPlayer: false, pos: new THREE.Vector3(drop.sx, drop.alt, drop.sz), yaw: 0,
-    hp: 100, alive: true, mesh, helm: 0, helmDur: 0, vest: 0, vestDur: 0, gun: false, prim: null, sec: false, wp: null, res: { ar: 0, sr: 0, pi: 0 }, gr: { frag: 0, smoke: 0 }, med: 0, medCd: 0, lastThr: 0, kills: 0, deathT: 0, h: 1.85, stance: 0,
+    hp: 100, alive: true, mesh, helm: 0, helmDur: 0, vest: 0, vestDur: 0, gun: false, prim: null, prim2: null, sec: false, wp: null, res: newRes(), gr: { frag: 0, smoke: 0 }, med: 0, medCd: 0, lastThr: 0, kills: 0, deathT: 0, h: 1.85, stance: 0,
     air: true, canopy: null, walk: 0, gone: false, acc: 0, chaseT: 0, last: null, lastFire: 0,
     net: { x: drop.sx, y: drop.alt, z: drop.sz, yaw: 0, st: 0, ds: 0, w: 0 }
   };
@@ -4804,7 +4996,7 @@ function updateRemote(b, dt, d2) {
   b.pos.x += (n.x - b.pos.x) * k; b.pos.y += (n.y - b.pos.y) * k; b.pos.z += (n.z - b.pos.z) * k;
   b.yaw += angDiff(n.yaw, b.yaw) * k;
   b.air = n.ds !== 3; b.stance = n.st; b.h = b.stance === 0 ? 1.85 : b.stance === 2 ? 0.55 : 1.3;
-  { let wk = WL[n.w] || 'knife'; if (wk !== 'knife' && !(wk === b.prim || (wk === 'pi' && b.sec))) wk = 'knife';
+  { let wk = WL[n.w] || 'knife'; if (wk !== 'knife' && !hasW(b, wk)) wk = 'knife';
     const kind = wk === 'knife' ? false : wk; if ((b.wp || false) !== kind) { b.wp = kind || null; b.gun = !!kind; setArmedVisual(b.mesh, kind); } }
   if (zoneOn() && !b.air && Math.hypot(b.pos.x, b.pos.z) > zone.r) { b.hp -= zoneDmg() * dt; if (b.hp <= 0) { kill(b, null, false); return; } }
   if (n.ds === 2 && !b.canopy) { b.canopy = makeCanopy(canopyColors[b.id % canopyColors.length]); scene.add(b.canopy); }
@@ -4846,8 +5038,8 @@ function hostFire(rp, m, stab) {
   const now = performance.now();
   const tur = !stab && !!rp.tur, wk = tur ? 'tu' : WL[rp.net.w | 0];
   if (stab && rp.tur) return;
-  if (!stab && !tur && !(wk === rp.prim || (wk === 'pi' && rp.sec))) return;
-  const W = stab ? null : WP[wk];
+  if (!stab && !tur && !hasW(rp, wk)) return;
+  const W = stab ? null : (tur && rp.tur.car ? WP.hu : WP[wk]);
   if (now - rp.lastFire < (stab ? 350 : W.cd * 700)) return; rp.lastFire = now;
   if (!m.o || !m.d || m.o.length !== 3 || m.d.length !== 3) return;
   const o = new THREE.Vector3(+m.o[0], +m.o[1], +m.o[2]), d = new THREE.Vector3(+m.d[0], +m.d[1], +m.d[2]);
@@ -4860,12 +5052,18 @@ function hostFire(rp, m, stab) {
     if (r2.type === 'ent') damage(r2.ent, 34, rp, false);
     return;
   }
-  const res = castRay(o, d, 400, rp, mt);
-  if (res.car) hitCar(res, W.dmg, rp);
-  const end = o.clone().addScaledVector(d, Math.min(res.t, 220)), st = o.clone().addScaledVector(d, mt + 0.9);
-  const kind = res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0;
-  pushShot(rp.id, st, end, kind, WC[wk]); shotFx(st, end, kind, rp, WC[wk]);
-  if (res.type === 'ent') damage(res.ent, res.head ? W.head : W.dmg, rp, res.head);
+  const pel = W.pel || 1, hits = new Map(), st = o.clone().addScaledVector(d, mt + 0.9);
+  for (let i = 0; i < pel; i++) {
+    const dd = pel > 1 ? jitterDir(d, W.pspread) : d;
+    const res = castRay(o, dd, 400, rp, mt), mul = pelletMul(W, res.t);
+    if (res.car) hitCar(res, W.dmg * mul, rp);
+    const end = o.clone().addScaledVector(dd, Math.min(res.t, 220));
+    const kind = res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0;
+    if (i === 0) { pushShot(rp.id, st, end, kind, WC[wk]); shotFx(st, end, kind, rp, WC[wk]); }
+    else if (i < 3) { pushShot(rp.id, st, end, kind, 0); spawnTracer(st.clone(), end.clone(), 'b'); }
+    if (res.type === 'ent') { const h = hits.get(res.ent) || { dmg: 0, head: false }; h.dmg += (res.head ? W.head : W.dmg) * mul; if (res.head) h.head = true; hits.set(res.ent, h); }
+  }
+  hits.forEach((h, ent) => damage(ent, h.dmg, rp, h.head));
 }
 function hostApply(rp, res) {
   if (res.msg.k === 'helm' || res.msg.k === 'vest') setArmorVisual(rp.mesh, rp.helm, rp.vest);
@@ -5032,7 +5230,7 @@ function clientStart(m) {
 }
 function sendState() {
   const ds = player.air ? (drop.state === 'plane' ? 0 : drop.state === 'fall' ? 1 : 2) : 3, q = v => Math.round(v * 100) / 100;
-  netSend(NET.hostConn, { t: 'st', x: q(player.pos.x), y: q(player.pos.y), z: q(player.pos.z), yaw: q(player.yaw), st: player.slideT > 0 ? 3 : player.stance, ds, pt: Math.round(player.pitch * 100) / 100, w: player.thr || player.tur ? 0 : WC[player.weapon], rs: [player.res.ar, player.res.sr, player.res.pi], ci: player.drv && player.seat === 0 ? [driveIn.th, driveIn.sr, driveIn.br] : undefined });
+  netSend(NET.hostConn, { t: 'st', x: q(player.pos.x), y: q(player.pos.y), z: q(player.pos.z), yaw: q(player.yaw), st: player.slideT > 0 ? 3 : player.stance, ds, pt: Math.round(player.pitch * 100) / 100, w: player.thr || player.tur ? 0 : WC[player.weapon], rs: [player.res.ar, player.res.sr, player.res.pi, player.res.sh], ci: player.drv && player.seat === 0 ? [driveIn.th, driveIn.sr, driveIn.br] : undefined });
 }
 function applyGot(m) { applyGotLocal(m); }
 function makeGhost(id, x, y, z, yaw) {
@@ -5173,7 +5371,7 @@ function resetGame(m) {
   bigMapOpen = false; $('bigmap').style.display = 'none';
   clearPing(); clearTeamPings(); mapCur.x = 320; mapCur.y = 320;
   setArmorVisual(playerMesh, 0, 0);
-  player.prim = null; player.sec = false; player.weapon = 'knife'; player.mags = { ar: 0, sr: 0, pi: 0 }; player.res = { ar: 0, sr: 0, pi: 0 };
+  player.prim = null; player.prim2 = null; player.sec = false; player.weapon = 'knife'; player.mags = newMags(); player.res = newRes();
   player.gr = { frag: 0, smoke: 0 }; player.med = 0; player.medCd = 0; player.tur = null; player.thr = null; player.throwWind = 0; player.thrDraw = 0; player.thrCd = 0; resetGrens(); resetAirdrops(); resetTurrets();
   setVM('ar'); VMS.ar.root.visible = false; scoped = false; $('scope').style.display = 'none';
   setGunVisual(false);
@@ -5330,10 +5528,11 @@ window.addEventListener('keydown', e => {
   if (e.code === 'KeyV' && !e.repeat) { viewMode = viewMode === 'fps' ? 'tps' : 'fps'; toast(viewMode === 'fps' ? '1인칭 시점' : '3인칭 시점', 900); }
   if (lootCrate && !e.repeat && /^Digit[0-9]$/.test(e.code)) { const n = +e.code.slice(5); if (n === 0) takeAllLoot(); else takeLoot(n - 1, false); return; }
   if (e.code === 'Digit1' && !e.repeat && player.alive && !player.air && player.prim) switchTo(player.prim);
-  if (e.code === 'Digit2' && !e.repeat && player.alive && !player.air && player.sec) switchTo('pi');
-  if (e.code === 'Digit3' && !e.repeat && player.alive && !player.air) switchTo('knife');
-  if (e.code === 'Digit4' && !e.repeat && player.alive && !player.air) equipThrow('frag');
-  if (e.code === 'Digit5' && !e.repeat && player.alive && !player.air) equipThrow('smoke');
+  if (e.code === 'Digit2' && !e.repeat && player.alive && !player.air && player.prim2) switchTo(player.prim2);
+  if (e.code === 'Digit3' && !e.repeat && player.alive && !player.air && player.sec) switchTo('pi');
+  if (e.code === 'Digit4' && !e.repeat && player.alive && !player.air) switchTo('knife');
+  if (e.code === 'Digit5' && !e.repeat && player.alive && !player.air) equipThrow('frag');
+  if (e.code === 'Digit6' && !e.repeat && player.alive && !player.air) equipThrow('smoke');
   if (e.code === 'KeyE' && !e.repeat && !bigMapOpen) interact();
   if (e.code === 'KeyR' && !e.repeat) startReload();
   if (e.code === 'KeyM' && !e.repeat) { bigMapOpen = !bigMapOpen; $('bigmap').style.display = bigMapOpen ? 'block' : 'none'; if (bigMapOpen) { mouseDown = false; aiming = false; toast('지도: 클릭 = 핑 · 우클릭 = 해제', 2200); } }
@@ -5440,10 +5639,11 @@ function enterMobile() {
     if (drop.state === 'plane') doJump(); else if (drop.state === 'fall') openChute();
   };
   ['touchstart', 'pointerdown', 'click'].forEach(ev => $('tbDrop').addEventListener(ev, dropAct, { passive: false }));
-  btn('tbFl', () => tap('KeyL')); btn('tbMap', () => tap('KeyM')); btn('tbView', () => tap('KeyV')); btn('tbPing', () => tap('KeyX')); btn('tbGr4', () => tap('Digit4')); btn('tbGr5', () => tap('Digit5'));
+  btn('tbFl', () => tap('KeyL')); btn('tbMap', () => tap('KeyM')); btn('tbView', () => tap('KeyV')); btn('tbPing', () => tap('KeyX')); btn('tbGr4', () => tap('Digit5')); btn('tbGr5', () => tap('Digit6'));
   btn('tbW1', () => { if (player.alive && !player.air && player.prim) switchTo(player.prim); });
-  btn('tbW2', () => { if (player.alive && !player.air && player.sec) switchTo('pi'); });
-  btn('tbW3', () => { if (player.alive && !player.air) switchTo('knife'); });
+  btn('tbW2', () => { if (player.alive && !player.air && player.prim2) switchTo(player.prim2); });
+  btn('tbW3', () => { if (player.alive && !player.air && player.sec) switchTo('pi'); });
+  btn('tbW4', () => { if (player.alive && !player.air) switchTo('knife'); });
   let tv = null;
   setInterval(() => {
     const vis = MOBILE && state === 'playing';
@@ -5453,8 +5653,8 @@ function enterMobile() {
     $('tbAds').classList.toggle('on', aiming);
     $('tbE').classList.toggle('pulse', !!(nearCrate || nearSwap || lootCrate));
     $('tbF').style.display = nearGun ? 'flex' : 'none';
-    $('tbW1').textContent = player.prim ? (player.prim === 'sr' ? '저격' : '소총') : '—'; $('tbW2').textContent = player.sec ? '권총' : '—';
-    $('tbW1').classList.toggle('on', player.weapon === 'ar' || player.weapon === 'sr'); $('tbW2').classList.toggle('on', player.weapon === 'pi'); $('tbW3').classList.toggle('on', player.weapon === 'knife');
+    $('tbW1').textContent = player.prim ? WP[player.prim].s : '—'; $('tbW2').textContent = player.prim2 ? WP[player.prim2].s : '—'; $('tbW3').textContent = player.sec ? '권총' : '—';
+    $('tbW1').classList.toggle('on', !!player.prim && player.weapon === player.prim); $('tbW2').classList.toggle('on', !!player.prim2 && player.weapon === player.prim2); $('tbW3').classList.toggle('on', player.weapon === 'pi'); $('tbW4').classList.toggle('on', player.weapon === 'knife');
   }, 150);
 })();
 
