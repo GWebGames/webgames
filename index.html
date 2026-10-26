@@ -201,6 +201,63 @@ const GAMES=[
       <g stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M160 66l0-8M150 70l-6-5M170 70l6-5"/></g>
       <rect x="20" y="12" width="90" height="8" rx="2" fill="#ff5d4a"/><rect x="210" y="12" width="90" height="8" rx="2" fill="#3cc4ff"/>
     </svg>`
+  },
+  {
+    id:'korea38',
+    title:'38°선', hanja:'三八線',
+    desc:'6·25 전쟁 전략 시뮬레이션. 월 단위 턴제 전략 지도에서 24개 지역을 다투고, 교전 지역은 실시간 워게임식 세부 전투로 직접 지휘. 남침·인천상륙·중공군 참전 등 실제 전황이 사건으로 발생해요.',
+    keys:'마우스 지휘 · Enter/Space 턴 종료 · N/Tab 다음 부대',
+    src:'games/korea38.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#05090e"/>
+      <g stroke="#2a3a4e" stroke-width="1" opacity=".7"><path d="M0 45H320M0 90H320M0 135H320M80 0V180M160 0V180M240 0V180"/></g>
+      <path d="M120 10L168 22 196 14 214 40 190 62 204 84 184 112 196 140 170 168 132 160 120 128 104 100 118 70 100 44Z" fill="#14202e" stroke="#3a5068" stroke-width="2"/>
+      <path d="M98 92L228 84" stroke="#e8c35a" stroke-width="2.5" stroke-dasharray="7 5"/>
+      <g fill="#ff5a52"><rect x="136" y="46" width="16" height="12" rx="2"/><rect x="170" y="62" width="16" height="12" rx="2"/><rect x="150" y="30" width="16" height="12" rx="2"/></g>
+      <g fill="#4b8bff"><rect x="128" y="112" width="16" height="12" rx="2"/><rect x="160" y="126" width="16" height="12" rx="2"/><rect x="148" y="146" width="16" height="12" rx="2"/></g>
+      <g stroke="#e8c35a" stroke-width="2" fill="none"><path d="M152 100L150 80M150 80l-5 6M150 80l5 6"/></g>
+      <text x="262" y="96" text-anchor="middle" font-size="40" font-weight="700" fill="#e8c35a" font-family="serif">38°</text>
+    </svg>`
+  },
+  {
+    id:'zerozone',
+    title:'감염 제로 구역', hanja:'',
+    desc:'관악중학교를 거점으로 살아남아라. 낙성대·행운동 실제 지도 위에서 분대를 편성해 보급품을 수색하고, 안개 속 건물을 탐색하며 구조대가 올 때까지 기지를 지키는 좀비 서바이벌 전략.',
+    keys:'마우스 지휘 · Space 정지/재생 · 1·2 배속 · Esc 선택 해제',
+    src:'games/zerozone.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#0d1210"/>
+      <g stroke="#1d2a24" stroke-width="10" stroke-linecap="round"><path d="M0 70H320M0 130H320M90 0V180M220 0V180"/></g>
+      <g stroke="#26372f" stroke-width="2"><path d="M0 70H320M0 130H320M90 0V180M220 0V180" stroke-dasharray="8 8"/></g>
+      <g fill="#16221c" stroke="#2a3d33" stroke-width="2"><rect x="20" y="16" width="52" height="40"/><rect x="108" y="18" width="94" height="38"/><rect x="238" y="14" width="64" height="44"/><rect x="20" y="146" width="56" height="28"/><rect x="238" y="146" width="62" height="28"/></g>
+      <rect x="112" y="82" width="90" height="36" fill="#1c2f25" stroke="#5dff8f" stroke-width="2.5"/>
+      <text x="157" y="105" text-anchor="middle" font-size="12" fill="#5dff8f" font-family="sans-serif" font-weight="700">BASE</text>
+      <g fill="#5dff8f"><circle cx="100" cy="70" r="5"/><circle cx="108" cy="64" r="4"/><circle cx="214" cy="130" r="5"/></g>
+      <g fill="#ff6b5e" opacity=".9"><circle cx="40" cy="100" r="5"/><circle cx="50" cy="112" r="5"/><circle cx="262" cy="80" r="5"/><circle cx="276" cy="92" r="5"/><circle cx="268" cy="100" r="5"/><circle cx="160" cy="150" r="5"/></g>
+      <circle cx="157" cy="100" r="64" fill="none" stroke="#5dff8f" stroke-opacity=".35" stroke-dasharray="5 6"/>
+    </svg>`
+  },
+  {
+    id:'baseball',
+    title:'고교야구 챔피언십', hanja:'',
+    desc:'전국대회 결승전. 초에는 타자로, 말에는 투수와 야수로 직접 승부하세요. 투수 교체·대타 등 선수 기용까지 가능한 고교야구 게임.',
+    keys:'마우스/터치로 조준 · 투구·스윙 · V·B 시점 전환',
+    src:'games/baseball.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="bbsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#06101f"/><stop offset="1" stop-color="#16345c"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#bbsky)"/>
+      <g fill="#ffe9a8"><circle cx="30" cy="22" r="3"/><circle cx="290" cy="22" r="3"/><circle cx="60" cy="14" r="2"/><circle cx="260" cy="14" r="2"/></g>
+      <path d="M0 96Q160 60 320 96V180H0Z" fill="#1f5a34"/>
+      <path d="M160 168L60 108 160 62 260 108Z" fill="#b87a47"/>
+      <path d="M160 150L88 108 160 78 232 108Z" fill="#2a6e3f"/>
+      <g fill="#f3efe4"><rect x="153" y="156" width="14" height="10" transform="rotate(0)"/><rect x="62" y="102" width="10" height="10"/><rect x="155" y="58" width="10" height="10"/><rect x="248" y="102" width="10" height="10"/></g>
+      <circle cx="160" cy="112" r="6" fill="#b87a47"/>
+      <circle cx="184" cy="80" r="7" fill="#f3efe4" stroke="#c8402b" stroke-width="1.5"/>
+      <path d="M160 112Q172 96 184 80" stroke="#f3efe4" stroke-width="1.5" fill="none" stroke-dasharray="3 3" opacity=".7"/>
+    </svg>`
   }
 ];
 
