@@ -329,24 +329,25 @@ const WP = {
   sg: { n: '산탄총', s: '산탄', slot: 0, am: 'sh', mag: 6, cd: 0.85, dmg: 9, head: 18, pel: 8, pspread: 0.045, fo: 45, fmin: 0.2, reload: 3.2, spread: 0, rcl: 0.09, kick: 0.02, kA: 2.4, zoom: 18, ads: 0.6, ideal: 7, fs: 1.9, ft: 0.07, sm: 3, noEject: 1, snd: 'sr' },
   dm: { n: '지정사수총', s: '지정', slot: 0, am: 'sr', mag: 10, cd: 0.36, dmg: 42, head: 105, reload: 2.7, spread: 0.001, rcl: 0.06, kick: 0.008, kA: 1.8, zoom: 44, ads: 0.3, hip: 0.012, ideal: 55, fs: 1.3, ft: 0.055, snd: 'sr' },
   lm: { n: '경기관총', s: '경기관', slot: 0, am: 'ar', mag: 75, cd: 0.085, dmg: 17, head: 38, reload: 4.6, spread: 0.003, rcl: 0.016, kick: 0.003, kA: 0.9, zoom: 24, ads: 0.5, ideal: 30, fs: 1.3 },
+  rpg: { n: '바주카포', s: '바주카', slot: 0, am: 'rk', mag: 1, rocket: 1, cd: 1.0, dmg: 0, head: 0, reload: 3.4, spread: 0.004, rcl: 0.1, kick: 0.035, kA: 3.4, zoom: 20, ads: 0.35, ideal: 40, fs: 2.4, ft: 0.1, sm: 4, noEject: 1, snd: 'sr' },
   tu: { n: '거치포', slot: 2, mag: 0, cd: 0.11, dmg: 24, head: 48, heat: 0.05, reload: 0, spread: 0.007, rcl: 0.012, kick: 0.002, kA: 0.6 },
   hu: { n: '험비 기관총', slot: 2, mag: 0, cd: 0.1, dmg: 14, head: 28, heat: 0.045, reload: 0, spread: 0.006, rcl: 0.012, kick: 0.002, kA: 0.6 },
   pi: { n: '권총', s: '권총', slot: 1, am: 'pi', mag: 12, cd: 0.26, dmg: 16, head: 34, reload: 1.5, spread: 0.003, rcl: 0.035, kick: 0.006, kA: 0.7, zoom: 27, ads: 0.4, ideal: 10, fs: 0.8 }
 };
-const WL = ['knife', 'ar', 'sr', 'pi', 'tu', 'smg', 'sg', 'dm', 'lm'], WC = {};
+const WL = ['knife', 'ar', 'sr', 'pi', 'tu', 'smg', 'sg', 'dm', 'lm', 'rpg'], WC = {};
 WL.forEach((k, i) => { WC[k] = i; });   // 네트워크 인덱스: 뒤에 추가만 한다 (기존 번호 유지)
-const AMMO_PACK = { ar: 30, sr: 10, pi: 30, sh: 8 };
-const AM_TYPES = ['ar', 'sr', 'pi', 'sh'], AM_NAME = { ar: '소총탄', sr: '저격탄', pi: '권총탄', sh: '산탄' };
-const newMags = () => ({ ar: 0, sr: 0, pi: 0, smg: 0, sg: 0, dm: 0, lm: 0 }), newRes = () => ({ ar: 0, sr: 0, pi: 0, sh: 0 });
-const ITEM_WP = { gun: 'ar', snipe: 'sr', pistol: 'pi', smg: 'smg', shotgun: 'sg', dmr: 'dm', lmg: 'lm' }, WPN_ITEM = { ar: 'gun', sr: 'snipe', pi: 'pistol', smg: 'smg', sg: 'shotgun', dm: 'dmr', lm: 'lmg' };
-const ITEM_AM = { ammo: 'ar', ammoS: 'sr', ammoP: 'pi', ammoG: 'sh' }, AM_ITEM = { ar: 'ammo', sr: 'ammoS', pi: 'ammoP', sh: 'ammoG' };
+const AMMO_PACK = { ar: 30, sr: 10, pi: 30, sh: 8, rk: 4 };
+const AM_TYPES = ['ar', 'sr', 'pi', 'sh'], AM_NAME = { ar: '소총탄', sr: '저격탄', pi: '권총탄', sh: '산탄', rk: '로켓탄' };
+const newMags = () => ({ ar: 0, sr: 0, pi: 0, smg: 0, sg: 0, dm: 0, lm: 0, rpg: 0 }), newRes = () => ({ ar: 0, sr: 0, pi: 0, sh: 0, rk: 0 });
+const ITEM_WP = { gun: 'ar', snipe: 'sr', pistol: 'pi', smg: 'smg', shotgun: 'sg', dmr: 'dm', lmg: 'lm', rpg: 'rpg' }, WPN_ITEM = { rpg: 'rpg', ar: 'gun', sr: 'snipe', pi: 'pistol', smg: 'smg', sg: 'shotgun', dm: 'dmr', lm: 'lmg' };
+const ITEM_AM = { ammo: 'ar', ammoS: 'sr', ammoP: 'pi', ammoG: 'sh', ammoR: 'rk' }, AM_ITEM = { ar: 'ammo', sr: 'ammoS', pi: 'ammoP', sh: 'ammoG', rk: 'ammoR' };
 const ATT_NAME = { supp: '소음기', xmag: '확장탄창' };
-const magMax = w => Math.ceil(WP[w].mag * (player.xmag ? 1.5 : 1));
+const magMax = w => WP[w].rocket ? WP[w].mag : Math.ceil(WP[w].mag * (player.xmag ? 1.5 : 1));
 const hasW = (h, w) => !!w && (w === h.prim || w === h.prim2 || (w === 'pi' && !!h.sec));
 const MED_MAX = 2, MED_HEAL = 40;   // 구급상자: 최대 2개 보유, 체력이 40 이상 깎이면 자동 사용
 const GR_MAX = 4, GR_KEYS = ['frag', 'smoke', 'flash'], GR_NAME = { frag: '수류탄', smoke: '연막탄', flash: '섬광탄' };
-const ITEM_NAME = { frag: '수류탄', smoke: '연막탄', flash: '섬광탄', gun: '소총', snipe: '저격총', pistol: '권총', smg: '기관단총', shotgun: '산탄총', dmr: '지정사수총', lmg: '경기관총', ammo: '소총탄 +30', ammoS: '저격탄 +10', ammoP: '권총탄 +30', ammoG: '산탄 +8', supp: '소음기', xmag: '확장탄창', med: '구급상자', helm: '헬멧', vest: '조끼' };
-const ITEM_CSS = { frag: '#8cff5a', smoke: '#cfd6dc', flash: '#fff3a0', med: '#3dff6a', ammo: '#ffe04a', ammoS: '#ff9a30', ammoP: '#6ab0ff', ammoG: '#ff7a5a', supp: '#9fd0ff', xmag: '#ffd36a', gun: '#ff5a4a', snipe: '#c47dff', pistol: '#4adfff', smg: '#ffb13a', shotgun: '#ff6aa8', dmr: '#7dffb0', lmg: '#9aa6ff' };
+const ITEM_NAME = { rpg: '바주카포 (RPG)', ammoR: '로켓탄 +4', frag: '수류탄', smoke: '연막탄', flash: '섬광탄', gun: '소총', snipe: '저격총', pistol: '권총', smg: '기관단총', shotgun: '산탄총', dmr: '지정사수총', lmg: '경기관총', ammo: '소총탄 +30', ammoS: '저격탄 +10', ammoP: '권총탄 +30', ammoG: '산탄 +8', supp: '소음기', xmag: '확장탄창', med: '구급상자', helm: '헬멧', vest: '조끼' };
+const ITEM_CSS = { rpg: '#ff6a3a', ammoR: '#ff8a5a', frag: '#8cff5a', smoke: '#cfd6dc', flash: '#fff3a0', med: '#3dff6a', ammo: '#ffe04a', ammoS: '#ff9a30', ammoP: '#6ab0ff', ammoG: '#ff7a5a', supp: '#9fd0ff', xmag: '#ffd36a', gun: '#ff5a4a', snipe: '#c47dff', pistol: '#4adfff', smg: '#ffb13a', shotgun: '#ff6aa8', dmr: '#7dffb0', lmg: '#9aa6ff' };
 // 산탄 등 다중 탄환: 거리에 따른 피해 감소, 방향 흩뿌리기
 const pelletMul = (W, t) => W.fo ? Math.max(W.fmin || 0.2, 1 - t / W.fo) : 1;
 function jitterDir(d, sp) { const v = d.clone(); v.x += (Math.random() - 0.5) * 2 * sp; v.y += (Math.random() - 0.5) * 2 * sp; v.z += (Math.random() - 0.5) * 2 * sp; return v.normalize(); }
@@ -1747,6 +1748,17 @@ let VMMAT = null;
       add(B(0.06, 0.12, 0.3), poly, 0, -0.025, 0.38); add(B(0.064, 0.13, 0.026), dark, 0, -0.025, 0.54);
       vm.handL = mkHand(0, -0.07, -0.45, -0.3, true); vm.handR = mkHand(0, -0.11, 0.2, 0.15, true); vm.handHome = [0, -0.07, -0.45];
       vm.flashPos = [0, 0.012, -1.02]; vm.eject = [0.045, 0.03, 0.0]; vm.sightY = 0.088;
+    } else if (kind === 'rpg') {
+      const olive = L(0x56603a);
+      cylZ(0.05, 0.95, olive, 0, 0.04, -0.43); cylZ(0.056, 0.1, dark, 0, 0.04, 0.0);
+      cylZ(0.07, 0.18, dark, 0, 0.04, -0.82); cylZ(0.05, 0.16, tan, 0, 0.04, -0.98);
+      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.052, 0.2, 10), red); nose.rotation.x = -Math.PI / 2; nose.position.set(0, 0.04, -1.15); root.add(nose);
+      add(B(0.04, 0.07, 0.2), dark, 0, 0.115, -0.1); add(B(0.025, 0.02, 0.025), lens, 0, 0.125, -0.19); add(B(0.01, 0.04, 0.01), steel, 0, 0.135, 0.06);
+      add(B(0.045, 0.11, 0.05), poly, 0, -0.03, -0.45).rotation.x = 0.15; add(B(0.045, 0.12, 0.06), poly, 0, -0.04, 0.0).rotation.x = -0.25;
+      mag(0.06, 0.1, 0.1, -0.12, 0.05);
+      vm.charge = add(B(0.02, 0.02, 0.03), mid, 0.06, 0.05, 0.0);
+      vm.handL = mkHand(0, -0.07, -0.45, -0.3, true); vm.handR = mkHand(0, -0.1, 0.02, 0.15, true); vm.handHome = [0, -0.07, -0.45];
+      vm.flashPos = [0, 0.04, -1.3]; vm.eject = [0.04, 0.03, 0.0]; vm.sightY = 0.12;
     } else {
       vm.slide = new THREE.Group(); root.add(vm.slide);
       add(B(0.04, 0.04, 0.2), steel, 0, 0.034, -0.01, vm.slide); add(B(0.036, 0.014, 0.2), dark, 0, 0.058, -0.01, vm.slide);
@@ -1778,7 +1790,7 @@ let VMMAT = null;
     cylZ(0.036, 0.02, mid, vm.flashPos[0], vm.flashPos[1], vm.flashPos[2] - 0.15, vm.supp); cylZ(0.036, 0.02, mid, vm.flashPos[0], vm.flashPos[1], vm.flashPos[2] - 0.03, vm.supp);
     return vm;
   }
-  ['ar', 'sr', 'pi', 'smg', 'sg', 'dm', 'lm'].forEach(k => { VMS[k] = build(k); });
+  ['ar', 'sr', 'pi', 'smg', 'sg', 'dm', 'lm', 'rpg'].forEach(k => { VMS[k] = build(k); });
 })();
 function setVM(kind) {
   for (const k in VMS) VMS[k].root.visible = k === kind;
@@ -1786,6 +1798,35 @@ function setVM(kind) {
   curVM = kind; magMesh = v.mag; newMag = v.newMag; handL = v.handL; handR = v.handR; chargeH = v.charge; gunFlash = v.flash;
 }
 setVM('ar'); VMS.ar.root.visible = false;
+
+/* ===== 고품질 총기 모델: 1인칭 모델을 한 덩어리로 병합 → 바닥 아이템/3인칭에서 재사용 ===== */
+const GUNVC = new THREE.MeshLambertMaterial({ vertexColors: true });
+const GUNDET = {}, GUN_RIG_FZ = { ar: -1.18, sr: -1.5, pi: -0.78, smg: -0.92, sg: -1.28, dm: -1.36, lm: -1.26, rpg: -1.5 }, GUN_TP_S = 1.7, GUN_IT_S = { ar: 1.5, sr: 1.25, pi: 2.8, smg: 1.7, sg: 1.4, dm: 1.35, lm: 1.2, rpg: 1.2 };
+function gunModel(k) {
+  if (GUNDET[k] !== undefined) return GUNDET[k];
+  const vm = VMS[k]; if (!vm) return (GUNDET[k] = null);
+  const skip = new Set([vm.handL, vm.handR, vm.flash, vm.newMag, vm.supp]);
+  const P = [], N = [], C = [], col = new THREE.Color(), rel = new THREE.Matrix4(), tmp = new THREE.Matrix4();
+  const walk = o => {
+    if (skip.has(o)) return;
+    if (o.isMesh && o.visible !== false) {
+      rel.identity(); for (let q = o; q && q !== vm.root; q = q.parent) { q.updateMatrix(); tmp.multiplyMatrices(q.matrix, rel); rel.copy(tmp); }
+      const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone(); g.applyMatrix4(rel); col.copy(o.material.color);
+      const pa = g.attributes.position.array, na = g.attributes.normal.array;
+      for (let i = 0; i < pa.length; i++) { P.push(pa[i]); N.push(na[i]); }
+      for (let i = 0; i < pa.length; i += 3) C.push(col.r, col.g, col.b);
+      g.dispose();
+    }
+    o.children.forEach(walk);
+  };
+  vm.root.children.forEach(walk);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); geo.setAttribute('color', new THREE.Float32BufferAttribute(C, 3));
+  geo.computeBoundingBox(); const bb = geo.boundingBox, ctr = bb.getCenter(new THREE.Vector3());
+  const item = geo.clone().translate(-ctr.x, -ctr.y, -ctr.z);
+  const fz = k === 'rpg' ? -0.2 : GUN_RIG_FZ[k] - GUN_TP_S * vm.flashPos[2];
+  return (GUNDET[k] = { geo, item, oz: k === 'rpg' ? -0.2 : fz });
+}
 gunVM.position.set(0.22, -0.22, -0.45);
 camera.add(gunVM);
 const muzzleLight = new THREE.PointLight(0xffb060, 0, 22, 2); muzzleLight.position.set(0.05, -0.05, -1.2); camera.add(muzzleLight);
@@ -2056,6 +2097,106 @@ const carMat = {
 };
 const _cl = { x: 0, z: 0 }, _co = { x: 0, y: 0, z: 0 }, _cd = { x: 0, y: 0, z: 0 }, _carTmp = { x: 0, y: 0, z: 0 };
 function carLocal(c, x, z, out) { const s = Math.sin(c.yaw), co = Math.cos(c.yaw), dx = x - c.x, dz = z - c.z; out.x = dx * co - dz * s; out.z = dx * s + dz * co; return out; }
+/* ===== 고품질 차량 모델: 병합 지오메트리 + 휠 회전/조향 + 브레이크등 + 야간 전조등 ===== */
+const VCMAT = new THREE.MeshLambertMaterial({ vertexColors: true });
+const _mgV = new THREE.Vector3(), _mgS = new THREE.Vector3(1, 1, 1), _mgQ = new THREE.Quaternion(), _mgE = new THREE.Euler(), _mgM = new THREE.Matrix4();
+function mgeo(parts) {
+  const P = [], N = [], C = [], col = new THREE.Color();
+  for (let k = 0; k < parts.length; k++) {
+    const p = parts[k], g = p[0].index ? p[0].toNonIndexed() : p[0].clone();
+    _mgE.set(p[4] || 0, p[5] || 0, p[6] || 0); _mgQ.setFromEuler(_mgE); _mgM.compose(_mgV.set(p[1], p[2], p[3]), _mgQ, _mgS); g.applyMatrix4(_mgM);
+    col.setHex(p[7] === undefined ? 0xffffff : p[7]);
+    const pa = g.attributes.position.array, na = g.attributes.normal.array;
+    for (let i = 0; i < pa.length; i++) { P.push(pa[i]); N.push(na[i]); }
+    for (let i = 0; i < pa.length; i += 3) C.push(col.r, col.g, col.b);
+    g.dispose();
+  }
+  const o = new THREE.BufferGeometry();
+  o.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); o.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); o.setAttribute('color', new THREE.Float32BufferAttribute(C, 3));
+  return o;
+}
+const bxp = (w, h, d, x, y, z, col, rx, ry, rz) => [new THREE.BoxGeometry(w, h, d), x, y, z, rx, ry, rz, col];
+const cxp = (r, h, x, y, z, col, r2) => [new THREE.CylinderGeometry(r, r2 === undefined ? r : r2, h, 12).rotateZ(Math.PI / 2), x, y, z, 0, 0, 0, col];
+const czp = (r, h, x, y, z, col, rx) => [new THREE.CylinderGeometry(r, r, h, 12).rotateX(Math.PI / 2), x, y, z, rx || 0, 0, 0, col];
+const cyp = (r, h, x, y, z, col, rx, rz) => [new THREE.CylinderGeometry(r, r, h, 8), x, y, z, rx || 0, 0, rz || 0, col];
+// 측면 윤곽(z,y) → x방향으로 압출한 차체
+function profGeo(pts, w, b) {
+  const s = new THREE.Shape(); pts.forEach((p, i) => i ? s.lineTo(p[0], p[1]) : s.moveTo(p[0], p[1])); s.closePath();
+  b = b || 0; const dp = w - 2 * b;
+  const g = new THREE.ExtrudeGeometry(s, { depth: dp, bevelEnabled: b > 0, bevelThickness: b, bevelSize: b, bevelSegments: 1, steps: 1 });
+  g.translate(0, 0, -dp / 2); g.rotateY(-Math.PI / 2); return g;
+}
+function edgeBox(a, b, x, t, col) {
+  const dz = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dz, dy), phi = Math.atan2(dy, dz);
+  return [new THREE.BoxGeometry(t, 0.07, L + 0.04), x, (a[1] + b[1]) / 2, (a[0] + b[0]) / 2, -phi, 0, 0, col];
+}
+const WHEELGEO = {};
+function wheelGeo(r, w, kind) {
+  const key = r + '_' + w + kind; if (WHEELGEO[key]) return WHEELGEO[key];
+  const P = [[new THREE.CylinderGeometry(r, r, w, 20).rotateZ(Math.PI / 2), 0, 0, 0, 0, 0, 0, 0x151517]];
+  if (kind === 'm') for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6; P.push([new THREE.BoxGeometry(w + 0.02, r * 0.12, r * 0.2), 0, Math.sin(a) * r, Math.cos(a) * r, -a, 0, 0, 0x242529]); }
+  for (const sg of [-1, 1]) {
+    const x = sg * (w / 2 + 0.004);
+    P.push([new THREE.CylinderGeometry(r * 0.66, r * 0.66, 0.012, 18).rotateZ(Math.PI / 2), x, 0, 0, 0, 0, 0, kind === 'm' ? 0x6d7260 : 0xa7adb5]);
+    for (let k = 0; k < 5; k++) P.push([new THREE.BoxGeometry(0.012, r * 0.17, r * 0.46).translate(0, 0, r * 0.4), x + sg * 0.004, 0, 0, k * Math.PI * 2 / 5, 0, 0, 0x2b2e33]);
+    P.push([new THREE.CylinderGeometry(r * 0.2, r * 0.2, 0.03, 10).rotateZ(Math.PI / 2), x + sg * 0.01, 0, 0, 0, 0, 0, 0x45484e]);
+  }
+  return (WHEELGEO[key] = mgeo(P));
+}
+function wheelNode(geo) { const pv = new THREE.Group(), sp = new THREE.Mesh(geo, VCMAT); pv.add(sp); pv.spin = sp; return pv; }
+let _beamGeo = null;
+function beamGeo() {
+  if (_beamGeo) return _beamGeo;
+  const P = [-0.6, 0.62, -2.25, 0.6, 0.62, -2.25, -3.4, 0.08, -17, 3.4, 0.08, -17], C = [0.2, 0.19, 0.11, 0.2, 0.19, 0.11, 0, 0, 0, 0, 0, 0];
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); g.setIndex([0, 2, 1, 1, 2, 3]); return (_beamGeo = g);
+}
+const beamMat = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+const CARMODELS = {};
+function carModel(v) {
+  if (CARMODELS[v]) return CARMODELS[v];
+  const V = [
+    { low: [[-2.15, .3], [-2.15, .7], [-1.55, .82], [-0.8, .9], [1.0, .92], [1.9, .88], [2.15, .8], [2.15, .3]], gh: [[-0.8, .9], [-0.2, 1.4], [1.0, 1.4], [1.55, .9]], hy: .62, ty: .72, rf: [-0.2, 1.0] },
+    { low: [[-2.15, .3], [-2.15, .68], [-1.5, .8], [-0.75, .88], [1.8, .95], [2.15, .88], [2.15, .3]], gh: [[-0.75, .88], [-0.25, 1.42], [1.45, 1.44], [2.0, .94]], hy: .6, ty: .76, rf: [-0.25, 1.45] },
+    { low: [[-2.15, .3], [-2.15, .78], [-1.6, .94], [-0.9, 1.0], [2.0, 1.0], [2.15, .9], [2.15, .3]], gh: [[-0.85, 1.0], [-0.5, 1.44], [1.8, 1.44], [2.0, 1.0]], hy: .72, ty: .78, rf: [-0.5, 1.8] },
+    { low: [[-2.15, .3], [-2.15, .72], [-1.4, .86], [-0.9, .95], [0.55, .95], [0.55, .78], [2.15, .78], [2.15, .3]], gh: [[-0.85, .95], [-0.45, 1.42], [0.3, 1.42], [0.55, .95]], hy: .72, ty: .66, rf: [-0.45, 0.3] }
+  ][v];
+  const B = [[profGeo(V.low, 1.9, 0.03), 0, 0, 0, 0, 0, 0, 0xffffff]], gh = V.gh, ytop = gh[1][1];
+  // 필러
+  for (const sx of [-1, 1]) {
+    B.push(edgeBox(gh[0], gh[1], sx * 0.81, 0.08, 0xffffff)); B.push(edgeBox(gh[2], gh[3], sx * 0.81, 0.08, 0xffffff));
+    const bz = (gh[1][0] + gh[2][0]) / 2 + 0.1; B.push(bxp(0.08, ytop - gh[0][1], 0.08, sx * 0.81, (ytop + gh[0][1]) / 2, bz));
+  }
+  if (v === 3) { for (const sx of [-1, 1]) B.push(bxp(0.1, 0.26, 1.6, sx * 0.9, 0.9, 1.35)); B.push(bxp(1.84, 0.3, 0.08, 0, 0.93, 2.14)); B.push(bxp(1.84, 0.26, 0.08, 0, 0.91, 0.58)); }
+  const rz0 = V.rf[0], rz1 = V.rf[1];
+  const CAB = [bxp(1.72, 0.06, rz1 - rz0 + 0.12, 0, ytop + 0.02, (rz0 + rz1) / 2)];
+  const D = [
+    bxp(1.8, 0.1, 4.2, 0, 0.3, 0, 0x101012),
+    bxp(1.98, 0.2, 0.16, 0, 0.38, -2.18, 0x2a2a2e), bxp(1.98, 0.2, 0.16, 0, 0.38, 2.18, 0x2a2a2e),
+    bxp(0.95, 0.15, 0.05, 0, V.hy, -2.17, 0x0b0b0c), bxp(0.95, 0.025, 0.06, 0, V.hy + 0.02, -2.175, 0x9a9ea5), bxp(0.95, 0.025, 0.06, 0, V.hy - 0.04, -2.175, 0x9a9ea5),
+    bxp(0.36, 0.1, 0.02, 0, 0.4, -2.275, 0xe8e8e8), bxp(0.36, 0.1, 0.02, 0, 0.4, 2.275, 0xe8e8e8),
+    bxp(0.14, 0.09, 0.14, 1.03, gh[0][1] + 0.1, gh[0][0] + 0.1, 0x1b1b1e), bxp(0.14, 0.09, 0.14, -1.03, gh[0][1] + 0.1, gh[0][0] + 0.1, 0x1b1b1e),
+    cxp(0.04, 0.12, 0.5, 0.3, 2.22, 0x777a80), cxp(0.04, 0.12, -0.5, 0.3, 2.22, 0x777a80)
+  ];
+  for (const sx of [-1, 1]) {
+    D.push(bxp(0.04, 0.1, 2.1, sx * 0.97, 0.38, 0, 0x16171a));
+    for (const z of [-0.8, 0.35, 1.5]) D.push(bxp(0.012, 0.4, 0.014, sx * 0.953, 0.62, z, 0x0e0e10));
+    for (const z of [-0.1, 0.75]) D.push(bxp(0.03, 0.03, 0.17, sx * 0.96, 0.82, z, 0xc9ccd1));
+    for (const sz of [-1, 1]) D.push(cxp(0.5, 0.03, sx * 0.945, 0.4, sz * 1.4, 0x0c0c0e));
+  }
+  if (v === 0) D.push(cyp(0.012, 0.5, -0.5, 1.7, 1.0, 0x222222, 0.1));
+  if (v === 1) { D.push(bxp(1.5, 0.05, 0.3, 0, 1.46, 2.05, 0x1d1d20)); D.push(bxp(0.06, 0.1, 0.2, 0.7, 1.4, 2.05, 0x1d1d20)); D.push(bxp(0.06, 0.1, 0.2, -0.7, 1.4, 2.05, 0x1d1d20)); }
+  if (v === 2) { for (const sx of [-1, 1]) D.push(bxp(0.04, 0.04, 2.0, sx * 0.72, 1.5, 0.45, 0x1d1d20)); D.push(bxp(1.4, 0.04, 0.05, 0, 1.5, -0.2, 0x1d1d20), bxp(1.4, 0.04, 0.05, 0, 1.5, 1.2, 0x1d1d20)); D.push(bxp(1.4, 0.12, 0.05, 0, 0.95, 2.17, 0x1d1d20)); }
+  if (v === 3) { D.push(bxp(1.64, 0.03, 1.55, 0, 0.8, 1.35, 0x1a1a1c)); D.push(bxp(0.04, 0.5, 0.04, 0.8, 1.2, 0.62, 0x222), bxp(0.04, 0.5, 0.04, -0.8, 1.2, 0.62, 0x222), bxp(1.64, 0.04, 0.04, 0, 1.45, 0.62, 0x222)); }
+  const H = [], T = [];
+  for (const sx of [-1, 1]) { H.push(bxp(0.34, 0.11, 0.06, sx * 0.68, V.hy, -2.2)); T.push(bxp(0.4, 0.11, 0.06, sx * 0.68, V.ty, 2.2)); D.push(bxp(0.4, 0.15, 0.04, sx * 0.68, V.hy, -2.17, 0xcfd3d8)); D.push(bxp(0.44, 0.15, 0.04, sx * 0.68, V.ty, 2.17, 0x3a1a1a)); }
+  return (CARMODELS[v] = { body: mgeo(B), cab: mgeo(CAB), glass: profGeo(gh, 1.6, 0), det: mgeo(D), head: mgeo(H), tail: mgeo(T) });
+}
+function carAddCommon(c, g, parts, wheelFn) {
+  const mk = (geo, mat, sh) => { const o = new THREE.Mesh(geo, mat); o.castShadow = !!sh; g.add(o); return o; };
+  mk(parts.body, c.bodyMat, true); mk(parts.cab, c.cabMat, true); c.glass = mk(parts.glass, carMat.glass, false); mk(parts.det, VCMAT, false);
+  c.tailMat = new THREE.MeshBasicMaterial({ color: 0x8a1a1a }); c.brkOn = false;
+  c.lamps = [mk(parts.head, carMat.head, false), mk(parts.tail, c.tailMat, false)];
+}
 function buildCarObj(d) {
   const c = {
     id: d.id, x0: d.x, z0: d.z, yaw0: d.yaw, color: d.color, x: d.x, z: d.z, yaw: d.yaw, v: 0, hp: CAR_HP, maxHp: CAR_HP, tires: [1, 1, 1, 1], wreck: false,
@@ -2063,22 +2204,46 @@ function buildCarObj(d) {
   };
   c.bodyMat = new THREE.MeshLambertMaterial({ color: d.color });
   c.cabMat = new THREE.MeshLambertMaterial({ color: shade(d.color, 0.9) });
-  const g = new THREE.Group();
-  const add = (geo, m, x, y, z, sh) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = !!sh; g.add(o); return o; };
-  add(carGeo.body, c.bodyMat, 0, 0.56, 0, true);
-  c.glass = add(carGeo.cab, carMat.glass, 0, 1.15, 0.25, false);
-  add(carGeo.roof, c.cabMat, 0, 1.44, 0.25, true);
-  add(carGeo.bump, carMat.trim, 0, 0.32, -2.2); add(carGeo.bump, carMat.trim, 0, 0.32, 2.2);
-  c.lamps = [add(carGeo.lamp, carMat.head, -0.65, 0.66, -2.16), add(carGeo.lamp, carMat.head, 0.65, 0.66, -2.16), add(carGeo.lamp, carMat.tail, -0.65, 0.66, 2.16), add(carGeo.lamp, carMat.tail, 0.65, 0.66, 2.16)];
-  for (let i = 0; i < 4; i++) c.wheels.push(add(carGeo.wheel, carMat.dark, (i & 1 ? 1 : -1) * 0.97, 0.4, (i & 2 ? 1 : -1) * 1.4));
+  const g = new THREE.Group(), m = carModel(((d.id % 4) + 4) % 4);
+  carAddCommon(c, g, m);
+  const wg = wheelGeo(0.4, 0.32, 'c'); c.wr = 0.4;
+  for (let i = 0; i < 4; i++) { const w = wheelNode(wg); w.position.set((i & 1 ? 1 : -1) * 0.97, 0.4, (i & 2 ? 1 : -1) * 1.4); g.add(w); c.wheels.push(w); }
+  c.beam = new THREE.Mesh(beamGeo(), beamMat); c.beam.visible = false; c.beam.frustumCulled = false; g.add(c.beam);
   c.mesh = g; scene.add(g); return c;
 }
 const HUM_HP = Math.round(CAR_HP * 1.6), HUM_VMAX = 23, GUN_Y = 0.85;
-const humGeo = {
-  body: new THREE.BoxGeometry(1.92, 0.62, 4.3), hood: new THREE.BoxGeometry(1.72, 0.34, 1.5), cab: new THREE.BoxGeometry(1.8, 0.66, 2.0), roof: new THREE.BoxGeometry(1.86, 0.12, 2.1),
-  bed: new THREE.BoxGeometry(1.84, 0.34, 1.05), flare: new THREE.BoxGeometry(0.3, 0.1, 1.05), wheel: new THREE.CylinderGeometry(0.46, 0.46, 0.34, 14).rotateZ(Math.PI / 2),
-  ring: new THREE.CylinderGeometry(0.55, 0.6, 0.22, 14, 1, true), snorkel: new THREE.BoxGeometry(0.08, 0.9, 0.08)
-};
+const humGeo = { ring: new THREE.CylinderGeometry(0.55, 0.6, 0.22, 14, 1, true) };
+let _humM = null;
+function humModel() {
+  if (_humM) return _humM;
+  const hull = [[-2.15, .3], [-2.15, .92], [-1.75, 1.0], [-0.5, 1.2], [2.2, 1.2], [2.2, .3]], gh = [[-0.5, 1.2], [-0.35, 1.6], [1.5, 1.6], [1.6, 1.2]];
+  const B = [[profGeo(hull, 1.92, 0.03), 0, 0, 0, 0, 0, 0, 0xffffff]];
+  for (const sx of [-1, 1]) {
+    B.push(edgeBox(gh[0], gh[1], sx * 0.86, 0.09, 0xffffff)); B.push(edgeBox(gh[2], gh[3], sx * 0.86, 0.09, 0xffffff));
+    B.push(bxp(0.09, 0.4, 0.09, sx * 0.86, 1.4, 0.55)); B.push(bxp(0.1, 0.22, 1.1, sx * 0.94, 1.3, 1.7));
+    for (const z of [-1.4, 1.4]) B.push(bxp(0.36, 0.1, 1.0, sx * 0.98, 1.0, z));
+  }
+  B.push(bxp(1.86, 0.22, 0.09, 0, 1.3, 2.18)); B.push(bxp(1.2, 0.07, 1.1, 0, 1.0 + 0.1, -1.2));
+  const CAB = [bxp(1.88, 0.1, 2.1, 0, 1.63, 0.55)];
+  const D = [bxp(1.8, 0.1, 4.2, 0, 0.3, 0, 0x101012),
+    bxp(2.0, 0.24, 0.2, 0, 0.4, -2.24, 0x2a2c2e), bxp(2.0, 0.24, 0.2, 0, 0.4, 2.26, 0x2a2c2e),
+    bxp(1.1, 0.36, 0.05, 0, 0.8, -2.15, 0x0b0b0c), bxp(0.06, 0.06, 1.4, 0.95, 1.12, -1.1, 0x1d1d20),
+    bxp(0.05, 0.55, 0.05, -0.5, 0.75, -2.3, 0x1d1d20), bxp(0.05, 0.55, 0.05, 0.5, 0.75, -2.3, 0x1d1d20), bxp(1.1, 0.05, 0.05, 0, 1.03, -2.3, 0x1d1d20),
+    cyp(0.03, 0.95, 0.98, 1.4, -0.45, 0x1a1a1c), czp(0.42, 0.24, 0, 0.98, 2.38, 0x151517), czp(0.2, 0.26, 0, 0.98, 2.38, 0x7a7e70),
+    cyp(0.012, 1.5, -0.88, 2.35, 1.95, 0x222222, 0.12), cyp(0.015, 0.5, -0.88, 1.55, 1.75, 0x222222, 0.0),
+    bxp(0.22, 0.38, 0.14, -0.6, 1.5, 1.95, 0x4a5a2a), bxp(0.22, 0.38, 0.14, -0.34, 1.5, 1.95, 0x7a2a22), bxp(0.45, 0.3, 0.35, 0.5, 1.45, 1.75, 0x3d4232),
+    bxp(0.36, 0.1, 0.02, 0, 0.45, -2.35, 0xe8e8e8), bxp(0.14, 0.12, 0.1, 1.07, 1.45, -0.35, 0x1b1b1e), bxp(0.14, 0.12, 0.1, -1.07, 1.45, -0.35, 0x1b1b1e)];
+  for (const sx of [-1, 1]) {
+    D.push(bxp(0.12, 0.06, 1.8, sx * 1.0, 0.45, 0, 0x2a2c2e));
+    for (const z of [-0.2, 0.9, 1.5]) D.push(bxp(0.012, 0.6, 0.014, sx * 0.965, 0.92, z, 0x0e0e10));
+    for (const z of [0.1, 1.05]) D.push(bxp(0.03, 0.03, 0.17, sx * 0.97, 1.1, z, 0xaeb2b8));
+    for (const sz of [-1, 1]) D.push(cxp(0.54, 0.03, sx * 0.955, 0.46, sz * 1.4, 0x0c0c0e));
+    D.push(cxp(0.14, 0.05, sx * 0.8, 0.85, -2.17, 0xcfd3d8), bxp(0.16, 0.1, 0.05, sx * 0.96, 0.62, -2.17, 0xd9902a));
+  }
+  const H = [], T = [];
+  for (const sx of [-1, 1]) { H.push([new THREE.CylinderGeometry(0.1, 0.1, 0.06, 12).rotateX(Math.PI / 2), sx * 0.8, 0.85, -2.2, 0, 0, 0, 0xffffff]); T.push(bxp(0.24, 0.14, 0.06, sx * 0.82, 0.95, 2.28)); }
+  return (_humM = { body: mgeo(B), cab: mgeo(CAB), glass: profGeo(gh, 1.74, 0), det: mgeo(D), head: mgeo(H), tail: mgeo(T) });
+}
 function buildHumveeObj(d) {
   const c = {
     id: d.id, x0: d.x, z0: d.z, yaw0: d.yaw, color: d.color, x: d.x, z: d.z, yaw: d.yaw, v: 0, hp: HUM_HP, maxHp: HUM_HP, tires: [1, 1, 1, 1], wreck: false, hum: true,
@@ -2086,22 +2251,11 @@ function buildHumveeObj(d) {
   };
   c.bodyMat = new THREE.MeshLambertMaterial({ color: d.color });
   c.cabMat = new THREE.MeshLambertMaterial({ color: shade(d.color, 0.9) });
-  const g = new THREE.Group();
-  const add = (geo, m, x, y, z, sh) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = !!sh; g.add(o); return o; };
-  add(humGeo.body, c.bodyMat, 0, 0.62, 0, true);
-  add(humGeo.hood, c.bodyMat, 0, 1.1, -1.35, true);
-  c.glass = add(humGeo.cab, carMat.glass, 0, 1.26, 0.55, false);
-  add(humGeo.roof, c.cabMat, 0, 1.62, 0.55, true);
-  add(humGeo.bed, c.bodyMat, 0, 1.1, 1.75, true);
-  add(humGeo.snorkel, carMat.dark, 0.95, 1.2, -0.2);
-  add(carGeo.bump, carMat.trim, 0, 0.32, -2.2); add(carGeo.bump, carMat.trim, 0, 0.32, 2.2);
-  c.lamps = [add(carGeo.lamp, carMat.head, -0.65, 0.78, -2.16), add(carGeo.lamp, carMat.head, 0.65, 0.78, -2.16), add(carGeo.lamp, carMat.tail, -0.65, 0.78, 2.16), add(carGeo.lamp, carMat.tail, 0.65, 0.78, 2.16)];
-  for (let i = 0; i < 4; i++) {
-    const sx = i & 1 ? 1 : -1, sz = i & 2 ? 1 : -1;
-    c.wheels.push(add(humGeo.wheel, carMat.dark, sx * 0.97, 0.46, sz * 1.4));
-    add(humGeo.flare, carMat.trim, sx * 0.98, 0.98, sz * 1.4);
-  }
-  add(humGeo.ring, carMat.dark, 0, 1.78, 0.35);
+  const g = new THREE.Group(); carAddCommon(c, g, humModel());
+  const wg = wheelGeo(0.46, 0.34, 'm'); c.wr = 0.46;
+  for (let i = 0; i < 4; i++) { const w = wheelNode(wg); w.position.set((i & 1 ? 1 : -1) * 0.97, 0.46, (i & 2 ? 1 : -1) * 1.4); g.add(w); c.wheels.push(w); }
+  const ring = new THREE.Mesh(humGeo.ring, carMat.dark); ring.position.set(0, 1.78, 0.35); g.add(ring);
+  c.beam = new THREE.Mesh(beamGeo(), beamMat); c.beam.visible = false; c.beam.frustumCulled = false; g.add(c.beam);
   c.mesh = g; scene.add(g); return c;
 }
 (function () { const defs = carList.slice(); carList.length = 0; defs.forEach(d => cars.push(d.hum ? buildHumveeObj(d) : buildCarObj(d))); })();
@@ -2114,6 +2268,38 @@ const bikeGeo = {
   arm: new THREE.BoxGeometry(0.1, 0.1, 0.56), leg: new THREE.BoxGeometry(0.15, 0.17, 0.6)
 };
 const BIKE_HP = CAR_HP / 2, BIKE_VMAX = 31;
+let _bikeM = null, _bikeW = null;
+function bikeModel() {
+  if (_bikeM) return _bikeM;
+  const sph = (rx, ry, rz) => new THREE.SphereGeometry(1, 12, 10).scale(rx, ry, rz);
+  const B = [[sph(0.16, 0.13, 0.3), 0, 0.9, -0.2, 0, 0, 0, 0xffffff], [sph(0.2, 0.2, 0.27), 0, 0.96, -0.68, -0.25, 0, 0, 0xffffff], [sph(0.14, 0.1, 0.4), 0, 0.88, 0.62, 0.1, 0, 0, 0xffffff],
+    bxp(0.1, 0.03, 0.6, 0, 0.78, -0.86), bxp(0.1, 0.03, 0.5, 0, 0.7, 0.9, 0xffffff, 0.2)];
+  const CAB = [];
+  const D = [
+    bxp(0.3, 0.3, 0.44, 0, 0.45, 0.0, 0x303338), cxp(0.07, 0.12, 0.17, 0.5, -0.05, 0x8a8f96), cxp(0.07, 0.12, -0.17, 0.5, -0.05, 0x8a8f96),
+    bxp(0.26, 0.08, 0.6, 0, 0.8, 0.38, 0x16171a),
+    bxp(0.05, 0.05, 0.9, 0.1, 0.62, -0.1, 0x2a2d33, 0.12), bxp(0.05, 0.05, 0.9, -0.1, 0.62, -0.1, 0x2a2d33, 0.12),
+    bxp(0.04, 0.06, 0.95, 0.11, 0.42, 0.38, 0x2a2d33), bxp(0.04, 0.06, 0.95, -0.11, 0.42, 0.38, 0x2a2d33),
+    cyp(0.03, 0.4, 0.1, 0.6, 0.62, 0x9a9ea5, 0.1), cyp(0.03, 0.4, -0.1, 0.6, 0.62, 0x9a9ea5, 0.1),
+    cyp(0.045, 0.72, 0.08, 0.62, -0.74, 0xb5b9c0, 0.3), cyp(0.045, 0.72, -0.08, 0.62, -0.74, 0xb5b9c0, 0.3), bxp(0.24, 0.05, 0.08, 0, 0.98, -0.63, 0x2a2d33),
+    bxp(0.74, 0.03, 0.03, 0, 1.0, -0.6, 0x1d1d20), cxp(0.04, 0.12, 0.4, 1.0, -0.6, 0x111111), cxp(0.04, 0.12, -0.4, 1.0, -0.6, 0x111111),
+    bxp(0.07, 0.08, 0.04, 0.36, 1.12, -0.6, 0x1b1b1e), bxp(0.07, 0.08, 0.04, -0.36, 1.12, -0.6, 0x1b1b1e),
+    cxp(0.07, 0.04, 0.2, 0.18, 0.04, 0x9a9ea5), bxp(0.04, 0.04, 0.2, 0.2, 0.34, 0.45, 0x2a2d33),
+    cyp(0.045, 0.85, 0.2, 0.34, 0.55, 0xa0a4ab, 0), bxp(0.1, 0.07, 0.02, 0, 0.74, 1.04, 0xe8e8e8),
+    cxp(0.12, 0.03, 0.33, 0.62, 0.0, 0x555a60)
+  ];
+  D[D.length - 3][0] = new THREE.CylinderGeometry(0.045, 0.045, 0.85, 8).rotateX(Math.PI / 2);
+  const H = [[sph(0.1, 0.1, 0.06), 0, 0.93, -0.92, 0, 0, 0, 0xffffff]], T = [bxp(0.16, 0.06, 0.06, 0, 0.8, 1.06)];
+  D.push([sph(0.13, 0.13, 0.1), 0, 0.93, -0.84, 0, 0, 0, 0x9a9ea5]);
+  return (_bikeM = { body: mgeo(B), det: mgeo(D), head: mgeo(H), tail: mgeo(T) });
+}
+function bikeWheel() {
+  if (_bikeW) return _bikeW;
+  const P = [[new THREE.TorusGeometry(0.285, 0.075, 8, 20).rotateY(Math.PI / 2), 0, 0, 0, 0, 0, 0, 0x151517], [new THREE.TorusGeometry(0.21, 0.012, 6, 20).rotateY(Math.PI / 2), 0, 0, 0, 0, 0, 0, 0xa7adb5],
+    cxp(0.06, 0.13, 0, 0, 0, 0x555a60), cxp(0.15, 0.015, 0.06, 0, 0, 0x6a6e75)];
+  for (let k = 0; k < 4; k++) P.push([new THREE.BoxGeometry(0.01, 0.01, 0.42), 0, 0, 0, k * Math.PI / 4, 0, 0, 0xaeb2b8]);
+  return (_bikeW = mgeo(P));
+}
 function buildBikeObj(d) {
   const c = {
     id: d.id, x0: d.x, z0: d.z, yaw0: d.yaw, color: d.color, x: d.x, z: d.z, yaw: d.yaw, v: 0, hp: BIKE_HP, maxHp: BIKE_HP, tires: [1, 1, 1, 1], wreck: false, bike: true,
@@ -2124,11 +2310,12 @@ function buildBikeObj(d) {
   c.cabMat = new THREE.MeshLambertMaterial({ color: shade(d.color, 0.9) });
   const g = new THREE.Group(), lean = new THREE.Group(); g.add(lean);
   const add = (geo, m, x, y, z, par, sh) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = !!sh; (par || lean).add(o); return o; };
-  add(bikeGeo.frame, c.bodyMat, 0, 0.62, 0.05, null, true); add(bikeGeo.tank, c.bodyMat, 0, 0.86, -0.18, null, true); add(bikeGeo.seat, carMat.dark, 0, 0.8, 0.42);
-  add(bikeGeo.eng, carMat.dark, 0, 0.45, 0.0); add(bikeGeo.exh, carMat.trim, 0.2, 0.34, 0.5);
-  add(bikeGeo.fork, carMat.trim, 0, 0.62, -0.74).rotation.x = 0.3; add(bikeGeo.bars, carMat.trim, 0, 0.98, -0.62);
-  c.lamps = [add(bikeGeo.lamp, carMat.head, 0, 0.92, -0.86), add(bikeGeo.lamp, carMat.tail, 0, 0.78, 0.8)];
-  c.wheels.push(add(bikeGeo.wheel, carMat.dark, 0, 0.36, -0.82, null, true), add(bikeGeo.wheel, carMat.dark, 0, 0.36, 0.82, null, true));
+  const m = bikeModel();
+  add(m.body, c.bodyMat, 0, 0, 0, null, true); add(m.det, VCMAT, 0, 0, 0);
+  c.tailMat = new THREE.MeshBasicMaterial({ color: 0x8a1a1a }); c.brkOn = false;
+  c.lamps = [add(m.head, carMat.head, 0, 0, 0), add(m.tail, c.tailMat, 0, 0, 0)];
+  const wg = bikeWheel(); c.wr = 0.36;
+  for (const z of [-0.82, 0.82]) { const w = wheelNode(wg); w.position.set(0, 0.36, z); lean.add(w); c.wheels.push(w); }
   c.glass = { visible: true };
   const rider = new THREE.Group(); lean.add(rider);
   const dk = new THREE.MeshLambertMaterial({ color: 0x2d3340 }), skin = new THREE.MeshLambertMaterial({ color: 0xe2b48c });
@@ -2136,6 +2323,7 @@ function buildBikeObj(d) {
   add(bikeGeo.arm, dk, -0.26, 1.06, -0.2, rider).rotation.x = -0.25; add(bikeGeo.arm, dk, 0.26, 1.06, -0.2, rider).rotation.x = -0.25;
   add(bikeGeo.leg, dk, -0.22, 0.66, 0.14, rider).rotation.x = 0.35; add(bikeGeo.leg, dk, 0.22, 0.66, 0.14, rider).rotation.x = 0.35;
   rider.visible = false; c.rider = rider; c.lean = lean;
+  c.beam = new THREE.Mesh(beamGeo(), beamMat); c.beam.visible = false; c.beam.frustumCulled = false; c.beam.position.set(0, 0.2, 0.9); lean.add(c.beam);
   c.mesh = g; scene.add(g); return c;
 }
 (function () {
@@ -2357,6 +2545,21 @@ function simCar(c, dt) {
     }
   }
 }
+function carWheelFx(c, dt, d2) {
+  const s = Math.sin(c.yaw), co = Math.cos(c.yaw);
+  if (c.px === undefined) { c.px = c.x; c.pz = c.z; c.fv = 0; c.lyw = c.yaw; c.st = 0; }
+  const idt = 1 / Math.max(dt, 1e-3), pf = c.fv;
+  let fv = ((c.x - c.px) * -s + (c.z - c.pz) * -co) * idt; if (Math.abs(fv) > 60) fv = 0;
+  const yr = angDiff(c.yaw, c.lyw) * idt; c.px = c.x; c.pz = c.z; c.lyw = c.yaw;
+  c.fv = pf + (fv - pf) * Math.min(1, dt * 10);
+  const acc = (c.fv - pf) * idt, brk = !c.wreck && ((c.in.br > 0.3 && Math.abs(c.fv) > 0.5) || (c.fv > 1.5 && acc < -4));
+  if (brk !== c.brkOn) { c.brkOn = brk; c.tailMat.color.setHex(brk ? 0xff3434 : 0x8a1a1a); }
+  const tg = (!c.bike && Math.abs(c.fv) > 1.2) ? clamp(Math.atan(yr * 2.8 / c.fv), -0.5, 0.5) : 0;
+  c.st += (tg - c.st) * Math.min(1, dt * 10);
+  const dr = c.fv * dt / c.wr;
+  for (let i = 0; i < c.wheels.length; i++) { const w = c.wheels[i]; w.spin.rotation.x -= dr * (c.tires[i] ? 1 : 0.5); if (!c.bike && i < 2) w.rotation.y = c.st; }
+  if (c.beam) c.beam.visible = ENV.night && !c.wreck && d2 < 250 * 250 && (c.drvId >= 0 || c.occId[0] >= 0 || !!c.driver);
+}
 function updateCars(dt) {
   const cam = camera.position, isClient = NET.mode === 'client';
   for (let i = 0; i < cars.length; i++) {
@@ -2386,6 +2589,7 @@ function updateCars(dt) {
     }
     const dx = c.x - cam.x, dz = c.z - cam.z, d2 = dx * dx + dz * dz;
     c.mesh.visible = d2 < 380 * 380;
+    if (c.wr && d2 < 220 * 220) carWheelFx(c, dt, d2);
     if (d2 < 130 * 130) {
       c.smokeT -= dt;
       if (c.smokeT <= 0) {
@@ -2600,6 +2804,7 @@ function kill(t, attacker, head) {
 function setArmedVisual(g, kind) {
   const u = g.userData, k = kind === true ? 'ar' : kind, on = !!k && k !== 'knife';
   u.gunParts.forEach(m => { m.visible = on; }); u.knife.visible = !on; u.scope.visible = on && (k === 'sr' || k === 'dm');
+  if (u.gunDet) for (const kk in u.gunDet) u.gunDet[kk].visible = false;
   if (!on) return;
   const [body, barrel, , stock, grip, hguard, sight, muz] = u.gunParts;
   // 기본(소총) 모양으로 모두 되돌린 뒤 무기별로 덮어쓴다 (이전 무기 형태가 남지 않게)
@@ -2627,6 +2832,15 @@ function setArmedVisual(g, kind) {
   } else if (k === 'lm') {
     body.scale.set(1.25, 1.35, 1.2); body.position.z = -0.52; barrel.scale.set(1.3, 1, 1.05); barrel.position.z = -1.0; u.flash.position.z = -1.26;
     stock.scale.set(1.2, 1.2, 1.1); hguard.scale.set(1.6, 1.5, 1.25); hguard.position.z = -0.8; sight.position.set(0, 0.15, -0.9); muz.position.z = -1.14;
+  } else if (k === 'rpg') {
+    body.scale.set(1.1, 1.1, 0.8); body.position.z = -0.3; barrel.scale.set(2.6, 1.25, 2.6); barrel.position.z = -0.75; u.flash.position.z = -1.5;
+    stock.visible = false; hguard.visible = false; muz.visible = false; sight.position.set(0, 0.17, -0.55); grip.position.set(0, -0.12, -0.45);
+  }
+  const dm = gunModel(k);
+  if (dm) {
+    u.gunDet = u.gunDet || {}; let o = u.gunDet[k];
+    if (!o) { o = new THREE.Mesh(dm.geo, GUNVC); o.scale.setScalar(k === 'rpg' ? 1.35 : GUN_TP_S); u.rig.add(o); u.gunDet[k] = o; }
+    o.position.set(0, 0.01, dm.oz); o.visible = true; u.gunParts.forEach(m => { m.visible = false; }); u.scope.visible = false;
   }
 }
 function setGunVisual(kind) { setArmedVisual(playerMesh, kind); }
@@ -2670,6 +2884,18 @@ function playerShoot() {
   const start = new THREE.Vector3();
   if (!tps) { gunFlash.visible = true; gunFlash.getWorldPosition(start); gunFlash.updateMatrixWorld(true); }
   else { playerMesh.userData.flash.visible = true; playerMesh.userData.flashT = 0.04; playerMesh.userData.flash.getWorldPosition(start); }
+  if (W.rocket) {
+    const rst = o.clone().addScaledVector(dir, minT + 1.3);
+    launchRocket(player, rst, dir, undefined, NET.mode === 'client');
+    if (NET.mode === 'client') netSend(NET.hostConn, { t: 'f', o: [o.x, o.y, o.z], d: [dir.x, dir.y, dir.z], mt: minT });
+    gunFlashT = 0.1; muzzleT = 0.14;
+    if (!tps) { gunFlash.rotation.z = Math.random() * 6.28; gunFlash.scale.setScalar(2.2); gunFlash.getWorldPosition(_sm); }
+    else _sm.copy(start);
+    for (let i = 0; i < 4; i++) spawnPart('smoke', _sm.x, _sm.y, _sm.z, rand(-1.2, 1.2), rand(-0.3, 0.8), rand(-1.2, 1.2), 0.12, 0.8, -0.05, 1.8);
+    player.recoil = Math.min(player.recoil + W.rcl, 0.25); player.pitch += W.kick; gunKick = W.kA;
+    if (player.ammo <= 0 && player.reserve > 0) startReload();
+    return;
+  }
   const pel = W.pel || 1, hits = new Map(), sup = !!player.supp;
   for (let i = 0; i < pel; i++) {
     const dd = pel > 1 ? jitterDir(dir, W.pspread * (aiming ? 0.7 : 1)) : dir;
@@ -3167,7 +3393,7 @@ function findItem(b) {
   return best;
 }
 // 봇 무기 관리: 주무기 2 + 권총 1. 사거리에 맞는 무기로 자동 교체한다.
-function botWantsW(b, w) { if (hasW(b, w)) return false; return WP[w].slot === 0 ? !(b.prim && b.prim2) : !b.sec; }
+function botWantsW(b, w) { if (w === 'rpg' || hasW(b, w)) return false; return WP[w].slot === 0 ? !(b.prim && b.prim2) : !b.sec; }
 function botOwned(b) { const a = []; if (b.prim) a.push(b.prim); if (b.prim2) a.push(b.prim2); if (b.sec) a.push('pi'); return a; }
 function botSetWp(b, w) { if (b.wp === w) return false; b.wp = w; b.gun = !!w; setArmedVisual(b.mesh, w || false); return true; }
 function botPickWeapon(b, dist) {
@@ -3431,7 +3657,8 @@ const itemMat = {
   crate: new THREE.MeshLambertMaterial({ color: 0x6b5a3a }), crateLid: new THREE.MeshLambertMaterial({ color: 0x4f432a }), crateStrap: new THREE.MeshLambertMaterial({ color: 0x2a2a2a })
 };
 itemMat.beamCrate.opacity = 0.2;
-itemMat.beamFrag = beamM(0x8cff5a); itemMat.beamSmoke = beamM(0xdfe6ec); itemMat.beamFlash = beamM(0xfff3a0);
+itemMat.beamFrag = beamM(0x8cff5a); itemMat.beamSmoke = beamM(0xdfe6ec); itemMat.beamFlash = beamM(0xfff3a0); itemMat.beamRpg = beamM(0xff5a2a); itemMat.beamAmmoR = beamM(0xff5a2a); itemMat.ammoR = new THREE.MeshLambertMaterial({ color: 0x7a8a3a, emissive: 0x1a2008 });
+itemGeo.rpgT = new THREE.CylinderGeometry(0.1, 0.1, 1.4, 10).rotateX(Math.PI / 2); itemGeo.rpgN = new THREE.ConeGeometry(0.12, 0.34, 10).rotateX(Math.PI / 2); itemGeo.rpgF = new THREE.CylinderGeometry(0.15, 0.1, 0.22, 10).rotateX(Math.PI / 2);
 const armorMats = {}, armorBeams = {};
 function aMat(l) { return armorMats[l] || (armorMats[l] = new THREE.MeshLambertMaterial({ color: LVL_COLOR[l], emissive: new THREE.Color(LVL_COLOR[l]).multiplyScalar(0.28) })); }
 function aBeam(l) { return armorBeams[l] || (armorBeams[l] = new THREE.MeshBasicMaterial({ color: LVL_COLOR[l], transparent: true, opacity: 0.26, depthWrite: false, side: THREE.DoubleSide })); }
@@ -3455,7 +3682,7 @@ function makeItem(type, x, z, lvl, dur, y0, fixedId) {
   if (type === 'med') {
     addM(itemGeo.med, itemMat.med).castShadow = true; addM(itemGeo.c1, itemMat.white, 0.22); addM(itemGeo.c2, itemMat.white, 0.22); beamMat = itemMat.beamMed;
   } else if (ITEM_AM[type]) {
-    addM(itemGeo.ammo, itemMat[type]).castShadow = true; addM(itemGeo.strip, itemMat.strip); beamMat = itemMat[{ ammo: 'beamAmmo', ammoS: 'beamAmmoS', ammoP: 'beamAmmoP', ammoG: 'beamAmmoG' }[type]];
+    addM(itemGeo.ammo, itemMat[type]).castShadow = true; addM(itemGeo.strip, itemMat.strip); beamMat = itemMat[{ ammo: 'beamAmmo', ammoS: 'beamAmmoS', ammoP: 'beamAmmoP', ammoG: 'beamAmmoG', ammoR: 'beamAmmoR' }[type]];
     if (type === 'ammoS') g.scale.set(0.8, 1.3, 0.8);
   } else if (type === 'gun') {
     const a = addM(itemGeo.gunB, itemMat.dark); a.castShadow = true; a.rotation.y = 0.5;
@@ -3501,6 +3728,12 @@ function makeItem(type, x, z, lvl, dur, y0, fixedId) {
     const st = addM(itemGeo.gunS, itemMat.dark, 0.0); st.position.set(0.3, 0, 0.5); st.rotation.y = 0.5; st.scale.set(1.2, 1.2, 1.3);
     const bp = addM(itemGeo.gunS, itemMat.dark, -0.12); bp.position.set(-0.26, 0, -0.45); bp.rotation.y = 0.5; bp.scale.set(0.3, 0.3, 1.2);
     beamMat = itemMat.beamLmg;
+  } else if (type === 'rpg') {
+    const a = addM(itemGeo.rpgT, itemMat.gunTan, 0.1); a.castShadow = true; a.rotation.y = 0.5;
+    const n = addM(itemGeo.rpgN, itemMat.ammoR, 0.1); n.position.set(-0.4, 0, -0.62); n.rotation.y = 0.5;
+    const f = addM(itemGeo.rpgF, itemMat.dark, 0.1); f.position.set(0.37, 0, 0.64); f.rotation.y = 0.5;
+    const g = addM(itemGeo.gunM, itemMat.dark, -0.02); g.position.set(0.05, 0, 0.05); g.rotation.y = 0.5;
+    beamMat = itemMat.beamRpg;
   } else if (type === 'pistol') {
     const a = addM(itemGeo.pisB, itemMat.dark, 0.1); a.castShadow = true;
     const gp = addM(itemGeo.pisG, itemMat.gunTan, -0.06); gp.position.z = 0.12; gp.rotation.x = -0.2;
@@ -3517,6 +3750,8 @@ function makeItem(type, x, z, lvl, dur, y0, fixedId) {
     addM(itemGeo.vest, aMat(lvl)).castShadow = true;
     const pl = addM(itemGeo.vestPlate, itemMat.dark, 0.04); pl.position.z = 0.13; beamMat = aBeam(lvl);
   }
+  const gk = ITEM_WP[type], gdm = gk && gunModel(gk);
+  if (gdm) { while (g.children.length) g.remove(g.children[0]); const gm = new THREE.Mesh(gdm.item, GUNVC); gm.scale.setScalar(GUN_IT_S[gk] || 1.4); gm.castShadow = true; g.add(gm); }
   addM(itemGeo.beam, beamMat, 3);
   g.position.set(x, y0 + 0.6, z);
   scene.add(g);
@@ -4301,6 +4536,90 @@ function updateBlind(dt) {
   blind.ring -= dt; if (blind.ring <= 0) { blind.ring = 0.28; sfxTone(3300, 0.32, 0.012 + 0.03 * op, 'sine'); }
 }
 
+/* ================= 바주카포 (로켓) ================= */
+const rockets = [];
+let nextRkId = 1;
+const RK_SPEED = 62, RK_G = 2.5, RK_R = 10.5, RK_DMG = 230;
+const rkGeo = { body: new THREE.CylinderGeometry(0.07, 0.07, 0.6, 8).rotateX(Math.PI / 2), nose: new THREE.ConeGeometry(0.07, 0.22, 8).rotateX(Math.PI / 2).translate(0, 0, 0.4), fin: new THREE.BoxGeometry(0.2, 0.012, 0.12), glow: new THREE.SphereGeometry(0.09, 8, 6) };
+const rkMat = { body: new THREE.MeshLambertMaterial({ color: 0x6a7242 }), nose: new THREE.MeshLambertMaterial({ color: 0xc0392b, emissive: 0x3a0e0a }), glow: new THREE.MeshBasicMaterial({ color: 0xffa040 }) };
+function launchRocket(owner, pos, dir, id, local) {
+  const mesh = new THREE.Group();
+  mesh.add(new THREE.Mesh(rkGeo.body, rkMat.body), new THREE.Mesh(rkGeo.nose, rkMat.nose));
+  const f1 = new THREE.Mesh(rkGeo.fin, rkMat.body); f1.position.z = -0.25; const f2 = f1.clone(); f2.rotation.z = Math.PI / 2; mesh.add(f1, f2);
+  const gl = new THREE.Mesh(rkGeo.glow, rkMat.glow); gl.position.z = -0.38; gl.scale.set(1, 1, 1.8); mesh.add(gl);
+  scene.add(mesh); mesh.position.copy(pos);
+  const r = { id: id === undefined ? nextRkId++ : id, pos: pos.clone(), vel: dir.clone().normalize().multiplyScalar(RK_SPEED), owner, mesh, age: 0, local: !!local, stopped: false };
+  rockets.push(r);
+  if (!local && NET.mode === 'host' && NET.live) NET.evq.push(['rk', r.id, r1(pos.x), r1(pos.y), r1(pos.z), r2(dir.x), r2(dir.y), r2(dir.z), grOwnerId(owner)]);
+  const d = Math.hypot(pos.x - camera.position.x, pos.z - camera.position.z), v = clamp(1 - d / 220, 0, 1);
+  if (v > 0.02) { sfxTone(180, 0.5, 0.35 * v, 'sawtooth'); sfxClick(500, 0.4, 0.8 * v); sfxTone(90, 0.7, 0.3 * v, 'triangle'); }
+  return r;
+}
+const r2 = v => Math.round(v * 100) / 100;
+function removeRocket(i) { const r = rockets[i]; if (!r) return; scene.remove(r.mesh); rockets.splice(i, 1); }
+function rocketFx(x, y, z) {
+  explodeFx(x, y, z);
+  for (let k = 0; k < 14; k++) spawnPart('spark', x + rand(-0.6, 0.6), y + rand(0.2, 1.2), z + rand(-0.6, 0.6), rand(-13, 13), rand(4, 15), rand(-13, 13), 0.15, 1.0, 12, 0);
+  for (let k = 0; k < 10; k++) spawnPart('smoke', x + rand(-1.5, 1.5), y + rand(0.2, 1.6), z + rand(-1.5, 1.5), rand(-3, 3), rand(1.5, 4.5), rand(-3, 3), 1.2, 2.8, 0, 3.5);
+  for (let k = 0; k < 10; k++) { const a = k * 0.628; spawnPart('dust', x, 0.3, z, Math.cos(a) * 8, 0.8, Math.sin(a) * 8, 0.6, 1.1, 0, 3); }
+  spawnPart('spark', x, y + 0.8, z, 0, 0.3, 0, 4.2, 0.4, 0, 2.2);
+  const d = Math.hypot(x - camera.position.x, z - camera.position.z), v = clamp(1 - d / 240, 0, 1) * 0.8;
+  if (v > 0.01) { sfxTone(45, 0.95, v, 'sawtooth'); sfxTone(95, 0.45, v * 0.8, 'square'); sfxClick(700, 0.5, v * 0.9); }
+  if (d < 22 && player.alive) hitFlash = Math.max(hitFlash, 0.55 * (1 - d / 22));
+}
+function rocketBlast(p, owner) {
+  const ex = p.x, ey = p.y + 0.35, ez = p.z;
+  for (let i = 0; i < entities.length; i++) {
+    const e = entities[i]; if (!e.alive || e.air || e.drv && e.drv.wreck) continue;
+    const cy = e.pos.y + (e.h || 1.85) * 0.5, dx = e.pos.x - ex, dy = cy - ey, dz = e.pos.z - ez, d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    if (d > RK_R) continue;
+    let k = 1 - d / RK_R;
+    if (d > 1.5 && !los(ex, ey, ez, e.pos.x, cy, e.pos.z)) k = 0;
+    const dmg = RK_DMG * k; if (dmg < 3) continue;
+    e.grDeath = !owner || e === owner;
+    damage(e, dmg, owner || null, false);
+  }
+  for (let i = 0; i < cars.length; i++) {
+    const c = cars[i]; if (c.wreck) continue;
+    const d = Math.hypot(c.x - ex, c.z - ez); if (d > RK_R + 3) continue;
+    carDamage(c, 450 * (1 - d / (RK_R + 3)), owner || null);
+  }
+}
+function explodeRocket(i, p) {
+  const r = rockets[i]; if (!r) return;
+  const pp = p || r.pos;
+  if (NET.mode === 'host' && NET.live) NET.evq.push(['rx', r.id, r1(pp.x), r1(pp.y), r1(pp.z), grOwnerId(r.owner)]);
+  const owner = r.owner, x = pp.x, y = pp.y, z = pp.z;
+  removeRocket(i);
+  rocketFx(x, y, z);
+  if (NET.mode !== 'client') rocketBlast({ x, y, z }, owner);
+}
+const _rd = new THREE.Vector3(), _rt = new THREE.Vector3();
+function updateRockets(dt) {
+  for (let i = rockets.length - 1; i >= 0; i--) {
+    const r = rockets[i]; r.age += dt;
+    if (r.stopped) { if (r.age > 4) removeRocket(i); continue; }
+    const n = Math.max(1, Math.ceil(dt / 0.03)), h = dt / n; let hit = null;
+    for (let s2 = 0; s2 < n && !hit; s2++) {
+      r.vel.y -= RK_G * h;
+      const sp = r.vel.length(), len = sp * h; _rd.copy(r.vel).multiplyScalar(1 / sp);
+      const res = castRay(r.pos, _rd, len + 0.2, r.owner, 0);
+      if (res.type !== 'none' && res.t <= len + 0.2) { _rt.copy(r.pos).addScaledVector(_rd, Math.max(0, res.t - 0.05)); hit = _rt; }
+      else r.pos.addScaledVector(_rd, len);
+    }
+    if (hit) {
+      if (r.local) { r.pos.copy(hit); r.stopped = true; r.mesh.visible = false; r.age = 0; }
+      else explodeRocket(i, hit.clone());
+      continue;
+    }
+    if (r.age > 7 || r.pos.y < -5) { if (r.local) removeRocket(i); else explodeRocket(i); continue; }
+    r.mesh.position.copy(r.pos); _rt.copy(r.pos).add(r.vel); r.mesh.lookAt(_rt);
+    if (r.age > 0.25) spawnPart('smoke', r.pos.x - _rd.x * 0.5, r.pos.y - _rd.y * 0.5, r.pos.z - _rd.z * 0.5, rand(-0.2, 0.2), rand(0.1, 0.4), rand(-0.2, 0.2), 0.22, 0.9, 0, 1.6);
+    if (Math.random() < 0.7) spawnPart('spark', r.pos.x - _rd.x * 0.4, r.pos.y - _rd.y * 0.4, r.pos.z - _rd.z * 0.4, rand(-0.5, 0.5), rand(-0.5, 0.5), rand(-0.5, 0.5), 0.12, 0.25, 0, 0);
+  }
+}
+function resetRockets() { while (rockets.length) removeRocket(rockets.length - 1); nextRkId = 1; }
+
 /* ================= 맵 이벤트: 폭격 / 독가스 / 짙은 안개 ================= */
 const EV_KINDS = ['strike', 'gas', 'fog'];
 const hazards = [];
@@ -4343,7 +4662,7 @@ function makeHazard(id, kind, x, z, R, warn, life) {
 function removeHazard(i) { const h = hazards[i]; scene.remove(h.grp); h.grp.traverse(o => { if (o.material) o.material.dispose(); }); hazards.splice(i, 1); }
 function announceHazard(kind, x, z, warn) {
   const d = Math.round(Math.hypot(x - player.pos.x, z - player.pos.z)), dir = compass(x - player.pos.x, z - player.pos.z);
-  const txt = kind === 'strike' ? '🚨 폭격 경보! ' + dir + ' ' + d + 'm — ' + Math.round(warn) + '초 후 포격' : '☣ 독가스 살포! ' + dir + ' ' + d + 'm';
+  const txt = kind === 'strike' ? '🚨 폭격 경보! ' + dir + ' ' + d + 'm — ' + Math.round(warn) + '초 후 포격' : '☣ 독가스 경보! ' + dir + ' ' + d + 'm — ' + Math.round(warn) + '초 후 확산';
   toast(txt, 4200); feedLocal(txt); sfxTone(520, 0.25, 0.1, 'sawtooth'); setTimeout(() => sfxTone(760, 0.25, 0.1, 'sawtooth'), 260);
 }
 function launchEvent(kind, x, z, R, warn, life) {
@@ -4356,13 +4675,13 @@ function launchEvent(kind, x, z, R, warn, life) {
 function spawnEvent() {
   const r = Math.random(), kind = r < 0.4 ? 'strike' : r < 0.7 ? 'gas' : 'fog';
   if (kind === 'fog') { if (fogEv) return false; launchEvent('fog', 0, 0, 0, 0, rand(55, 80)); return true; }
-  if (hazards.length >= 2) return false;
+  if (hazards.length >= 3) return false;
   const cand = entities.filter(e => e.alive && !e.air && !e.gone);
   if (!cand.length) return false;
   const e = cand[Math.floor(Math.random() * cand.length)], R = kind === 'strike' ? 36 : 42;
   let x = e.pos.x + rand(-22, 22), z = e.pos.z + rand(-22, 22);
   const lim = Math.max(zSafe() - R * 0.5, 40), d = Math.hypot(x, z); if (d > lim) { x *= lim / d; z *= lim / d; }
-  launchEvent(kind, x, z, R, kind === 'strike' ? 9 : 7, kind === 'strike' ? 16 : 40);
+  launchEvent(kind, x, z, R, kind === 'strike' ? 9 : 10, kind === 'strike' ? 16 : 40);
   return true;
 }
 function bombBlast(x, z) {
@@ -4382,7 +4701,7 @@ function bombBlast(x, z) {
 function updateEvents(dt) {
   // 주최(호스트/솔로)
   if (NET.mode !== 'client' && state === 'playing' && !drop.planeActive && !player.air) {
-    evT -= dt; if (evT <= 0) evT = spawnEvent() ? rand(85, 140) : 15;
+    evT -= dt; if (evT <= 0) evT = spawnEvent() ? rand(40, 70) : 10;
   }
   let inGas = false;
   for (let i = hazards.length - 1; i >= 0; i--) {
@@ -4393,6 +4712,8 @@ function updateEvents(dt) {
     h.disc.material.opacity = (act ? 0.2 : 0.1) * fadeOut; h.wall.material.opacity = (act ? 0.16 : 0.08) * fadeOut;
     h.blobs.forEach(m => { m.userData.ph += dt; m.position.y = 2.5 + Math.sin(m.userData.ph) * 1.4; m.material.opacity = (act ? 0.17 : 0.07) * fadeOut; });
     const dp = Math.hypot(player.pos.x - h.x, player.pos.z - h.z);
+    if (act && !h.on) { h.on = true; if (h.kind === 'gas') { if (dp < 400) { toast('☣ 독가스 확산 시작!', 2200); sfxTone(200, 0.6, 0.12, 'sawtooth'); } } }
+    if (player.alive && !player.air && dp < h.R + 2 && h.t < h.warn + h.life) { h.wT = (h.wT || 0) - dt; if (h.wT <= 0) { h.wT = 2; toast(act ? (h.kind === 'gas' ? '☣ 독가스 안! 벗어나세요' : '💥 폭격 구역! 벗어나세요') : '⚠ 위험 구역 안! ' + Math.ceil(h.warn - h.t) + '초 후 ' + (h.kind === 'gas' ? '독가스' : '폭격'), 1800); } }
     if (!act) { h.sirenT -= dt; if (h.sirenT <= 0 && dp < 320) { h.sirenT = 1.0; sfxTone(h.kind === 'strike' ? 640 : 300, 0.4, 0.05 * clamp(1 - dp / 320, 0.15, 1), 'sawtooth'); } }
     if (act && h.kind === 'strike' && h.t < h.warn + h.life && NET.mode !== 'client') {
       h.shellT -= dt;
@@ -4435,14 +4756,14 @@ function addShell(x, z) {
 function resetEvents() {
   while (hazards.length) removeHazard(hazards.length - 1);
   while (bombs.length) { scene.remove(bombs[bombs.length - 1].m); bombs.pop(); }
-  evT = rand(100, 140); nextHzId = 1; fogVisK = 1;
+  evT = rand(50, 80); nextHzId = 1; fogVisK = 1;
   if (fogEv) { fogEv = null; if (!fogAir) { scene.fog.near = ENV.fogN; scene.fog.far = ENV.fogF; } }
   blind.t = 0; blindOv.style.display = 'none'; blindOv._o = 0; gasOv.style.display = 'none'; gasOv._o = 0;
 }
 
 /* ================= 보급 투하 ================= */
 const airdrops = [];
-let adT = 150, nextAdId = 1;
+let adT = 75, nextAdId = 1;
 const adMat = {
   chute: new THREE.MeshLambertMaterial({ color: 0xe8552b, emissive: 0x3a1208, side: THREE.DoubleSide }),
   rope: new THREE.LineBasicMaterial({ color: 0xe0e0e0 }),
@@ -4452,7 +4773,7 @@ const adGeo = { chute: new THREE.SphereGeometry(2.4, 14, 7, 0, Math.PI * 2, 0, M
 function airdropEntries() {
   return [
     { type: 'helm', lvl: 3, dur: armorMax('helm', 3) }, { type: 'vest', lvl: 3, dur: armorMax('vest', 3) },
-    { type: 'snipe' }, { type: 'lmg' }, { type: 'ammoS' }, { type: 'ammo' }, { type: 'med' }, { type: 'med' }, { type: 'frag' }
+    { type: 'snipe' }, { type: 'lmg' }, { type: 'rpg' }, { type: 'ammoR' }, { type: 'ammoS' }, { type: 'med' }, { type: 'frag' }
   ];
 }
 function startAirdrop(id, x, z) {
@@ -4491,7 +4812,7 @@ function autoMed(h, dt) {
 }
 function updateAirdrops(dt) {
   if (NET.mode !== 'client' && state === 'playing' && !drop.planeActive) {
-    adT -= dt; if (adT <= 0) { adT = rand(120, 180); spawnAirdrop(); }
+    adT -= dt; if (adT <= 0) { adT = rand(60, 90); spawnAirdrop(); }
   }
   for (let i = airdrops.length - 1; i >= 0; i--) {
     const a = airdrops[i]; a.t += dt;
@@ -4514,7 +4835,7 @@ function updateAirdrops(dt) {
 }
 function resetAirdrops() {
   for (const a of airdrops) { if (a.g) scene.remove(a.g); scene.remove(a.beam); }
-  airdrops.length = 0; nextAdId = 1; adT = rand(120, 180);
+  airdrops.length = 0; nextAdId = 1; adT = rand(65, 90);
 }
 
 /* ================= 플레이어 업데이트 ================= */
@@ -5325,7 +5646,7 @@ function onClientMsg(conn, m) {
       if (!rp || !rp.alive) return;
       if (!isFinite(m.x + m.y + m.z + m.yaw)) return;
       Object.assign(rp.net, { x: clamp(m.x, -MAP_HALF, MAP_HALF), y: clamp(m.y, -5, 900), z: clamp(m.z, -MAP_HALF, MAP_HALF), yaw: m.yaw, pt: clamp(+m.pt || 0, -1.5, 1.5), st: clamp(m.st | 0, 0, 3), ds: clamp(m.ds | 0, 0, 3), w: clamp(m.w | 0, 0, WL.length - 1) });
-      if (Array.isArray(m.rs) && m.rs.length >= 3) { rp.res.ar = clamp(m.rs[0] | 0, 0, 999); rp.res.sr = clamp(m.rs[1] | 0, 0, 999); rp.res.pi = clamp(m.rs[2] | 0, 0, 999); rp.res.sh = clamp(m.rs[3] | 0, 0, 999); }
+      if (Array.isArray(m.rs) && m.rs.length >= 3) { rp.res.ar = clamp(m.rs[0] | 0, 0, 999); rp.res.sr = clamp(m.rs[1] | 0, 0, 999); rp.res.pi = clamp(m.rs[2] | 0, 0, 999); rp.res.sh = clamp(m.rs[3] | 0, 0, 999); rp.res.rk = clamp(m.rs[4] | 0, 0, 99); }
       if (rp.drv) {
         const c = rp.drv;
         if (rp.seat === 0 && Array.isArray(m.ci)) { c.in.th = clamp(+m.ci[0] || 0, -1, 1); c.in.sr = clamp(+m.ci[1] || 0, -1, 1); c.in.br = m.ci[2] ? 1 : 0; c.inT = performance.now(); }
@@ -5447,6 +5768,7 @@ function hostFire(rp, m, stab) {
     if (r2.type === 'ent') damage(r2.ent, 34, rp, false);
     return;
   }
+  if (W.rocket) { launchRocket(rp, o.clone().addScaledVector(d, mt + 1.3), d, undefined, false); return; }
   const pel = W.pel || 1, hits = new Map(), st = o.clone().addScaledVector(d, mt + 0.9);
   for (let i = 0; i < pel; i++) {
     const dd = pel > 1 ? jitterDir(d, W.pspread) : d;
@@ -5626,7 +5948,7 @@ function clientStart(m) {
 }
 function sendState() {
   const ds = player.air ? (drop.state === 'plane' ? 0 : drop.state === 'fall' ? 1 : 2) : 3, q = v => Math.round(v * 100) / 100;
-  netSend(NET.hostConn, { t: 'st', x: q(player.pos.x), y: q(player.pos.y), z: q(player.pos.z), yaw: q(player.yaw), st: player.slideT > 0 ? 3 : player.stance, ds, pt: Math.round(player.pitch * 100) / 100, w: player.thr || player.tur ? 0 : WC[player.weapon], rs: [player.res.ar, player.res.sr, player.res.pi, player.res.sh], ci: player.drv && player.seat === 0 ? [driveIn.th, driveIn.sr, driveIn.br] : undefined });
+  netSend(NET.hostConn, { t: 'st', x: q(player.pos.x), y: q(player.pos.y), z: q(player.pos.z), yaw: q(player.yaw), st: player.slideT > 0 ? 3 : player.stance, ds, pt: Math.round(player.pitch * 100) / 100, w: player.thr || player.tur ? 0 : WC[player.weapon], rs: [player.res.ar, player.res.sr, player.res.pi, player.res.sh, player.res.rk], ci: player.drv && player.seat === 0 ? [driveIn.th, driveIn.sr, driveIn.br] : undefined });
 }
 function applyGot(m) { applyGotLocal(m); }
 function makeGhost(id, x, y, z, yaw) {
@@ -5725,6 +6047,12 @@ function applyEvent(ev) {
     case 'cd': { const cr = crateById[ev[1]]; if (cr) removeCrate(cr); break; }
     case 'ad': if (!airdrops.some(q => q.id === ev[1])) startAirdrop(ev[1], ev[2], ev[3]); break;
     case 'g': { if (ev[9] === NET.myId || grens.some(q => q.id === ev[1])) break; launchGren(ev[2], ev[3], ev[4], ev[5], ev[6], ev[7], ev[8], ghosts[ev[9]], ev[1]); break; }
+    case 'rk': { if (ev[8] === NET.myId || rockets.some(q => q.id === ev[1] && !q.local)) break; const _o = new THREE.Vector3(ev[2], ev[3], ev[4]), _d = new THREE.Vector3(ev[5], ev[6], ev[7]); launchRocket(ghosts[ev[8]] || null, _o, _d, ev[1], true); break; }
+    case 'rx': {
+      let gi = ev[5] === NET.myId ? rockets.findIndex(q => q.local && q.owner === player) : rockets.findIndex(q => q.id === ev[1]);
+      if (gi >= 0) removeRocket(gi);
+      rocketFx(ev[2], ev[3], ev[4]); break;
+    }
     case 'hz': if (!hazards.some(q => q.id === ev[1])) { makeHazard(ev[1], ev[2] === 0 ? 'strike' : 'gas', ev[3], ev[4], ev[5], ev[6], ev[7]); announceHazard(ev[2] === 0 ? 'strike' : 'gas', ev[3], ev[4], ev[6]); } break;
     case 'bm': addShell(ev[1], ev[2]); break;
     case 'fg': fogEv = { t: 0, life: ev[1] }; toast('🌫 짙은 안개가 몰려옵니다 — 시야가 크게 줄어듭니다', 4200); feedLocal('🌫 짙은 안개'); break;
@@ -5772,7 +6100,7 @@ function resetGame(m) {
   clearPing(); clearTeamPings(); mapCur.x = 320; mapCur.y = 320;
   setArmorVisual(playerMesh, 0, 0);
   player.supp = false; player.xmag = false; player.prim = null; player.prim2 = null; player.sec = false; player.weapon = 'knife'; player.mags = newMags(); player.res = newRes();
-  player.gr = { frag: 0, smoke: 0, flash: 0 }; player.med = 0; player.medCd = 0; player.tur = null; player.thr = null; player.throwWind = 0; player.thrDraw = 0; player.thrCd = 0; resetGrens(); resetAirdrops(); resetTurrets(); resetEvents();
+  player.gr = { frag: 0, smoke: 0, flash: 0 }; player.med = 0; player.medCd = 0; player.tur = null; player.thr = null; player.throwWind = 0; player.thrDraw = 0; player.thrCd = 0; resetGrens(); resetRockets(); resetAirdrops(); resetTurrets(); resetEvents();
   setVM('ar'); VMS.ar.root.visible = false; scoped = false; $('scope').style.display = 'none';
   setGunVisual(false);
   viewMode = 'fps'; aiming = false; mouseDown = false; adsK = 0; hitFlash = 0; gameTime = 0;
@@ -6274,7 +6602,7 @@ function loop(now) {
     }
     updateItems(dt, now / 1000);
     updateEffects(dt);
-    updateGrens(dt); updateSmokes(dt); updateAirdrops(dt); updateTurrets(dt); updateEvents(dt);
+    updateGrens(dt); updateRockets(dt); updateSmokes(dt); updateAirdrops(dt); updateTurrets(dt); updateEvents(dt);
     if (NET.mode !== 'client' && state === 'playing') { autoMed(player, dt); for (let i = 0; i < bots.length; i++) if (bots[i].remote) autoMed(bots[i], dt); }
     if (NET.mode !== 'client' && state === 'playing' && (player.alive || spec.on) && onlyTeamAlive(player.team)) endGame(true);
     if (NET.mode === 'host' && NET.live) {
