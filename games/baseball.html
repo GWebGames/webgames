@@ -1,14 +1,9 @@
-<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
 <title>고교야구 챔피언십</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-html,body{margin:0;min-height:100%;background:#06101f}
-
 /* Layout: 16:9 broadcast stage on top, thumb-reach control tray below. Night game, school-color blue vs red, chalk + clay accents. */
 :root{--night:#06101f;--panel:#0d2340;--panel2:#16345c;--chalk:#f3efe4;--gold:#ffc83d;--blue:#3b82ff;--red:#ff5442;--line:rgba(255,255,255,.16);--muted:#9fb3d1;color-scheme:dark}
 *{box-sizing:border-box}
@@ -17,7 +12,7 @@ body{background:var(--night);color:var(--chalk);font:14px/1.4 'Noto Sans KR',sys
 #wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 #stage{position:relative;aspect-ratio:16/9;width:100%;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.5);touch-action:none}
 canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
-.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:radial-gradient(ellipse at 50% 25%,rgba(22,56,110,.9),rgba(4,10,22,.97));text-align:center;padding:16px;overflow:auto}
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;background:radial-gradient(ellipse at 50% 25%,rgba(22,56,110,.9),rgba(4,10,22,.97));text-align:center;padding:16px;overflow:auto}
 h1{font-family:'Black Han Sans','Noto Sans KR',sans-serif;font-weight:400;font-size:clamp(30px,7vw,66px);margin:0;line-height:1.05;text-wrap:balance}
 h1 em{font-style:normal;color:var(--gold)}
 .sub{color:var(--muted);margin:0;max-width:56ch;text-wrap:balance}
@@ -60,21 +55,71 @@ button{font:inherit;color:var(--chalk);cursor:pointer}
 .br i{display:block;height:7px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
 .br u{display:block;height:100%;background:var(--blue);text-decoration:none}
 .empty{color:var(--muted);padding:20px}
+.ov>:first-child{margin-top:auto}.ov>:last-child{margin-bottom:auto}
+#mtools{display:none;position:absolute;top:68px;right:8px;flex-direction:column;align-items:flex-end;display:flex;gap:6px;z-index:5}
+#mtools .chip{padding:3px 10px;font-size:12px;background:rgba(6,16,31,.7)}
+#rot{position:absolute;left:0;right:0;bottom:0;background:rgba(255,200,61,.95);color:#1a1200;font-weight:900;text-align:center;padding:5px;font-size:13px;z-index:6}
+#btnSlide{background:#7dff9b;box-shadow:0 4px 0 #2e8f47;color:#06210e}
+#btnSlide small{margin-left:6px;opacity:.6}
+#ptypes{display:contents}
+body{-webkit-tap-highlight-color:transparent}
+body.mob{user-select:none;-webkit-user-select:none;touch-action:manipulation;padding:0;overscroll-behavior:none}
+body.mob #mtools{display:flex}
+body.mob.land #menu~#x{}
+body.mob .pt,body.mob .bs,body.mob .go,body.mob .chip{touch-action:manipulation}
+body.mob .help{font-size:11px}
+body.mob #ctl{padding:8px}
+body.mob .pt{padding:12px 6px;font-size:15px}
+body.mob .bs{padding:18px 6px;font-size:20px}
+body.mob #btnThrow,body.mob #btnSwing,body.mob #btnSlide{padding:20px 28px;font-size:22px}
+body.mob #stage{border-radius:0}
+body.mob.land,body.mob.land #wrap{height:100dvh;overflow:hidden}
+body.mob.land #wrap{position:fixed;inset:0;max-width:none;margin:0;gap:0;align-items:center;justify-content:center;background:#000}
+body.mob.land #stage{flex:none;width:auto;border-radius:0;box-shadow:none}
+body.mob.land #vb,body.mob.land #tip{display:none}
+body.mob.land #ctl{position:fixed;inset:0;background:none;border:0;padding:0;min-height:0;pointer-events:none;display:block;z-index:4}
+body.mob.land #ctl .grp{position:absolute;pointer-events:none}
+body.mob.land #ctl button{pointer-events:auto;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+body.mob.land #gPitch,body.mob.land #gBat,body.mob.land #gRun,body.mob.land #gField,body.mob.land #gSub{inset:0}
+body.mob.land #ptypes{display:flex;position:absolute;left:max(8px,env(safe-area-inset-left));top:50%;transform:translateY(-50%);flex-direction:column;gap:5px;width:84px}
+body.mob.land .pt{flex:none;max-width:none;padding:6px 4px;font-size:13px;background:rgba(6,16,31,.72);pointer-events:auto}
+body.mob.land .pt.on{background:var(--c)}
+body.mob.land #btnThrow,body.mob.land #btnSwing,body.mob.land #btnSlide{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;width:104px;height:104px;border-radius:50%;padding:0;font-size:20px;max-width:none;flex:none}
+body.mob.land #btnSlide small{display:none}
+body.mob.land #gField{display:flex;inset:auto 0 12px 0;justify-content:center;gap:10px}
+body.mob.land #gField .bs{flex:none;width:84px;padding:14px 4px;background:rgba(13,35,64,.85)}
+body.mob.land #fT{position:absolute;bottom:62px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:0 10px;border-radius:6px}
+body.mob.land #gSub{display:flex;inset:auto auto 10px max(10px,env(safe-area-inset-left));flex-direction:column;gap:6px}
+body.mob.land #gSub .chip{background:rgba(6,16,31,.75);padding:6px 10px;font-size:12px}
+body.mob.land #gPitch ~ #gSub{left:max(104px,env(safe-area-inset-left))}
+body.mob.land .ov{padding:8px;gap:6px}
+body.mob.land h1{font-size:26px}
+body.mob.land .ov .sub{display:none}
+body.mob.land #menu .chip{padding:4px 12px;font-size:13px}
+body.mob.land .vs{font-size:15px}
+body.mob.land .help{display:none}
+body.mob.land .sub{font-size:12px}
+body.mob.land .go{padding:8px 22px;font-size:16px}
+body.mob.land #rot{display:none}
 </style>
 <div id="wrap">
  <div id="stage">
   <canvas id="c" width="960" height="540"></canvas>
+  <div id="mtools"><button class="chip" id="btnFs" hidden>⛶ 전체화면</button><button class="chip" id="btnVw">시점 ⟳</button></div>
+  <div id="rot" hidden>📱 화면을 가로로 돌리면 더 크게 플레이할 수 있어요</div>
   <div id="menu" class="ov">
    <div class="vs"><b class="a">한빛고</b><span>VS</span><b class="h">청룡고</b></div>
    <h1>고교야구 <em>챔피언십</em></h1>
    <p class="sub">전국대회 결승전. 초에는 타자로, 말에는 투수와 야수로 직접 승부하세요.</p>
    <div class="row" id="inns"><button class="chip on" data-n="3">3이닝</button><button class="chip" data-n="5">5이닝</button><button class="chip" data-n="9">9이닝</button></div>
+   <div class="row" id="modes"><button class="chip on" data-m="auto">자동</button><button class="chip" data-m="mob">📱 모바일</button><button class="chip" data-m="pc">🖥 PC</button></div>
    <button class="go" id="btnStart">경기 시작</button>
    <div class="help">
     <span><b>타격</b> 마우스로 방망이 위치를 맞추고, 공이 홈플레이트에 닿을 때 클릭 또는 Space. 빠르면 당겨치고 늦으면 밀어칩니다.</span>
     <span><b>투구</b> 구종 선택(1~5), 마우스로 코스 조준, 원이 작아질 때 클릭 또는 Space.</span>
     <span><b>수비</b> 타구가 잡히면 아웃시킬 베이스를 눌러 송구(1~4키). 베이스 아래 '수비 ✓'는 받아줄 야수가 제때 도착한다는 뜻이고 '✕'면 송구 실책이 나옵니다. 실책이면 백업 수비수가 공을 주워요.</span>
-    <span>모바일은 화면을 드래그해 조준하고 아래 버튼으로 투구·스윙합니다.</span>
+    <span><b>주루</b> 공격 중 주자가 베이스에 닿기 직전 S키/Space/슬라이딩 버튼. 타이밍이 맞으면 굿 슬라이딩! 수비 중 다이빙·점프 호수비도 나옵니다.</span>
+    <span><b>모바일</b> 화면을 드래그해 조준하고 버튼으로 투구·스윙·슬라이딩. 가로 화면을 권장합니다.</span>
    </div>
   </div>
   <div id="end" class="ov" hidden>
@@ -86,11 +131,13 @@ button{font:inherit;color:var(--chalk);cursor:pointer}
  <div id="vb"><span>시점</span><div class="seg" id="pvs"></div><span>타구</span><div class="seg" id="fvs"></div><span>(V·B키로 전환)</span></div>
  <div id="ctl">
   <div id="gPitch" class="grp" hidden>
+   <div id="ptypes" class="grp">
    <button class="pt" data-i="0" style="--c:#ff6b57">직구<small>1</small></button>
    <button class="pt" data-i="1" style="--c:#ffd23f">슬라이더<small>2</small></button>
    <button class="pt" data-i="2" style="--c:#5ec8ff">커브<small>3</small></button>
    <button class="pt" data-i="3" style="--c:#8fe36a">체인지업<small>4</small></button>
    <button class="pt" data-i="4" style="--c:#c58bff">포크볼<small>5</small></button>
+   </div>
    <button class="go" id="btnThrow">투구</button>
   </div>
   <div id="gBat" class="grp" hidden><button class="go" id="btnSwing">스윙!</button></div>
@@ -101,6 +148,7 @@ button{font:inherit;color:var(--chalk);cursor:pointer}
    <button class="bs" data-b="3">3루 <small>3</small></button>
    <button class="bs" data-b="4">홈 <small>4</small></button>
   </div>
+  <div id="gRun" class="grp" hidden><button class="go" id="btnSlide">슬라이딩!<small>S</small></button></div>
   <div id="gSub" class="grp" hidden>
    <button class="chip" id="btnPit">투수 교체<small id="penN"></small></button>
    <button class="chip" id="btnPh">대타<small id="benN"></small></button>
@@ -191,10 +239,22 @@ function ballXYZ(m,t){
 // ---------- plan a ball in play ----------
 function buildPlay(bb,bases,outs,batter){
   const m=ballModel(bb);
-  const P={m,bb,hr:m.hr,plan:[],ev:[],t:0,phase:'run',outs0:outs,bases:bases.slice(),batter,thrTo:null,res:null};
+  let forced=null,special=null,forceCatch=false,missD=null;
+  // an outfielder leaps at the wall and takes a home run away
+  if(m.hr&&m.D-m.fence<3.2&&bb.th>=14&&Math.random()<0.34){
+    let tw=null;for(let t=m.tL*0.4;t<=m.tL;t+=0.02){if(ballXYZ(m,t).d>=m.fence-0.4){tw=t;break}}
+    if(tw!=null){
+      const b=ballXYZ(m,tw);
+      if(b.z<=4.6){
+        let bi=7,bd=1e9;for(const i of [6,7,8]){const q=Math.hypot(FD0[i].x-b.x,FD0[i].y-b.y);if(q<bd){bd=q;bi=i}}
+        m.hr=false;m.maxD=m.fence-0.4;forced={t:tw,f:{...FD0[bi],i:bi},b};special={type:'wall'};forceCatch=true;
+      }
+    }
+  }
+  const P={m,bb,hr:m.hr,plan:[],ev:[],t:0,phase:'run',outs0:outs,bases:bases.slice(),batter,thrTo:null,res:null,special:null,miss:null};
   if(m.hr){P.tf=m.tL+1.3;P.fp=ballXYZ(m,m.tL);P.f=null;return P}
   const FL=FD0.map((f,i)=>({...f,i}));
-  let hit=null;
+  let hit=forced;
   for(let t=0.1;t<=12&&!hit;t+=0.05){
     const b=ballXYZ(m,t);if(b.z>2.9)continue;
     let best=null;
@@ -208,12 +268,32 @@ function buildPlay(bb,bases,outs,batter){
     for(const q of FL){if(q.i===1)continue;const rc=dist(q,b)/q.s+q.r;if(rc<bt){bt=rc;f=q}}
     hit={t:Math.max(12,bt),f,b};
   }
+  // diving / leaping attempts: the fielder can reach farther than normal but may miss
+  if(!forced){
+    const tl=m.tL>0?m.tL:9;let dv=null;
+    for(let t=0.2;t<=Math.min(hit.t-0.3,tl)&&!dv;t+=0.05){
+      const b=ballXYZ(m,t),ar=m.tL>0&&t<=m.tL;
+      if(b.z>(ar?2.6:0.6))continue;
+      let best=null;
+      for(const f of FL){if(f.i===1)continue;
+        const rc=Math.max(0,Math.hypot(f.x-b.x,f.y-b.y)-3.6)/f.s+f.r+0.12;
+        if(rc<=t&&(!best||rc<best.rc))best={f,rc}}
+      if(best)dv={t,f:best.f,b};
+    }
+    if(dv){
+      const air0=m.tL>0&&dv.t<=m.tL;
+      if(Math.random()>0.75){/* plays it safe */}
+      else if(Math.random()<(air0?0.55:0.6)){hit=dv;special={type:'dive',air:air0,knees:!air0};forceCatch=air0}
+      else{missD={i:dv.f.i,t:dv.t,b:{x:dv.b.x,y:dv.b.y}};if(dv.f.i===hit.f.i)hit={...hit,t:hit.t+0.9}}
+    }
+  }
   const air=m.tL>0&&hit.t<=m.tL;
   let caught=false,err=false;
-  if(air){caught=Math.random()<((bb.th<25?0.8:0.94)-(bb.v>38?0.07:0));err=!caught}
-  else err=Math.random()<(0.035+(bb.v>32?0.02:0));
+  if(air){caught=forceCatch||Math.random()<((bb.th<25?0.8:0.94)-(bb.v>38?0.07:0));err=!caught}
+  else err=!(special&&special.type==='dive')&&Math.random()<(0.035+(bb.v>32?0.02:0));
+  P.special=special;P.miss=missD;
   P.caughtAir=caught;P.error=err;P.f=hit.f;P.hitT=hit.t;
-  P.tf=hit.t+(err?0.9:0);
+  P.tf=hit.t+(err?0.9:0)+(special&&special.knees?0.55:0);
   P.fp={x:hit.b.x,y:hit.b.y};
   P.inf=hit.b.d<50;
   const thr=b=>P.tf+0.45+dist(P.fp,BASE[b])/30;
@@ -244,6 +324,7 @@ function buildPlay(bb,bases,outs,batter){
       P.plan.push({r:rn,from:b,to,tS,vr,tArr:tS+(to-b)*27.4/vr});
     }
   }
+  for(const e of P.plan)if(e.to-e.from>=1&&e.to<4&&Math.random()<0.3)e.vis=true;
   P.need=new Set(P.plan.map(e=>e.to));
   computeCover(P);
   return P;
@@ -273,6 +354,13 @@ function coverOK(P,k,tp){
 // where fielder i is at time t, covering a base, backing up a throw, or chasing the ball
 function fielderPos(P,i,t){
   const f=FD0[i],lp=(a,b,m)=>({x:a.x+(b.x-a.x)*m,y:a.y+(b.y-a.y)*m});
+  if(P.miss&&P.miss.i===i){
+    const ms=P.miss,mp=ms.b;
+    if(t<ms.t)return lp(f,mp,CL(t/ms.t,0,1));
+    if(!(P.f&&P.f.i===i))return {x:mp.x,y:mp.y};
+    if(t<ms.t+0.9)return {x:mp.x,y:mp.y};
+    return lp(mp,P.fp,CL((t-ms.t-0.9)/Math.max(0.1,P.hitT-ms.t-0.9),0,1));
+  }
   if(P.f&&P.f.i===i){
     const r=P.res;
     if(r&&r.self&&t>r.tR){const B=BASE[r.k];return lp(P.fp,B,CL((t-r.tR)/Math.max(0.05,r.tB-r.tR),0,1))}
@@ -287,6 +375,35 @@ function fielderPos(P,i,t){
     if(bk.i===i||(r.wild&&r.retr&&r.retr.i===i))return lp(f,bk,CL((t-r.tR-0.2)*f.s*1.1/Math.max(1,dist(f,bk)),0,1));
   }
   return {x:f.x,y:f.y};
+}
+// body pose for a fielder at time t: diving, leaping at the wall, or null
+function fielderPose(P,i,t){
+  const f=FD0[i];
+  if(P.special&&P.f&&P.f.i===i){
+    const th=P.hitT;
+    if(P.special.type==='wall'){if(t>=th-0.3&&t<=th+0.45)return {kind:'jump',ph:CL((t-(th-0.3))/0.75,0,1),ang:0}}
+    else if(t>=th-0.3&&t<=th+1.0)return {kind:'dive',ph:CL((t-(th-0.3))/0.3,0,1),ang:Math.atan2(P.fp.x-f.x,P.fp.y-f.y)};
+  }
+  if(P.miss&&P.miss.i===i){
+    const th=P.miss.t;
+    if(t>=th-0.3&&t<=th+0.9)return {kind:'dive',ph:CL((t-(th-0.3))/0.3,0,1),ang:Math.atan2(P.miss.b.x-f.x,P.miss.b.y-f.y)};
+  }
+  return null;
+}
+// runner sliding into the base he is heading for
+function slidePose(e,t){
+  if(!e.vis||e.to<1||e.to>4)return null;
+  const a=e.tArr-0.5,b=e.tArr+0.55;if(t<a||t>b)return null;
+  const A=BASE[e.to-1],B=BASE[e.to],l=Math.hypot(B.x-A.x,B.y-A.y);
+  return {dx:(B.x-A.x)/l,dy:(B.y-A.y)/l,ph:(t-a)/(b-a)};
+}
+// dust kicked up at the base: returns [{x,y,r,a}] in field coords
+function dustAt(e,t){
+  if(!e.vis||e.to<1||e.to>4)return [];
+  const t0=e.tArr-0.15,ph=(t-t0)/0.75;if(ph<0||ph>1)return [];
+  const B=BASE[e.to],o=[];
+  for(let i=0;i<7;i++){const a=i*0.9+e.to,r=0.3+ph*(1.2+(i%3)*0.5);o.push({x:B.x+Math.cos(a)*r,y:B.y+Math.sin(a)*r,r:0.5+ph*0.9,a:(1-ph)*0.55})}
+  return o;
 }
 // AI fielding decision: returns base 1..4 or 0 for no throw
 function aiPick(P){
@@ -307,8 +424,8 @@ function resolveThrow(P,k,tp){
     else tC=Math.max(flight,cv.tA);
     if(!wild&&Math.random()<0.02+(dB>38?0.05:0))wild=true;
   }
-  const res={k,tR,tB,tC,outs:[],safe:[],dp:null,t2:null,self,wild,end:null,retr:null,tPick:0};
-  const c=P.plan.filter(e=>e.to===k&&!e.out&&e.tArr>tp);
+  const res={k,tR,tB,tC,outs:[],safe:[],dp:null,t2:null,self,wild,end:null,retr:null,tPick:0,tp};
+  res.cand=P.plan.filter(e=>e.to===k&&!e.out&&e.tArr>tp);
   if(wild){
     // nobody takes the throw: the ball runs to the backup spot and runners may take an extra base
     const end=BACKUP[k];res.end=end;let best=1e9;
@@ -321,18 +438,31 @@ function resolveThrow(P,k,tp){
       const nx=e.to+1,tN=e.tArr+27.4/e.vr,tThr=res.tPick+0.35+dist(end,BASE[nx])/30;
       if(tN<tThr&&(nx===4||!occ.has(nx))){occ.delete(e.to);if(nx<4)occ.add(nx);e.to=nx;e.tArr=tN}
     }
-    res.safe=c;
+    res.safe=res.cand;
     return res;
   }
-  for(const e of c){if(e.tArr-tC+RN()*0.13>0){e.out=true;e.tOut=tC;res.outs.push(e)}}
-  res.safe=c.filter(e=>!e.out);
+  return res;
+}
+// the ball reaches the covering fielder: decide who is out (slides change the margin)
+function settleThrow(P,res){
+  const k=res.k;
+  for(const e of res.cand){
+    if(e.out)continue;
+    const b=e.slide?e.slide.b:0;
+    if(e.tArr-b-res.tC+RN()*0.13>0){e.out=true;e.tOut=res.tC;res.outs.push(e)}
+  }
+  res.safe=res.cand.filter(e=>!e.out);
+  for(const e of res.cand)if(Math.abs(e.tArr-res.tC)<0.45||e.slide)e.vis=true;
   if(res.outs.length&&k===2&&res.outs[0].from===1&&!P.caughtAir&&P.outs0+1<3&&P.cov&&P.cov[1]){
     const bt=P.plan.find(e=>e.from===0&&!e.out&&e.to===1);
-    const t2=tC+0.5+dist(BASE[2],BASE[1])/30;
-    if(bt&&P.cov[1].tA<=t2+0.25){res.t2=Math.max(t2,P.cov[1].tA);
-      if(bt.tArr-res.t2+RN()*0.13>0){bt.out=true;bt.tOut=res.t2;res.dp=bt}}
+    const t2=res.tC+0.5+dist(BASE[2],BASE[1])/30;
+    if(bt&&P.cov[1].tA<=t2+0.25){
+      res.t2=Math.max(t2,P.cov[1].tA);
+      const b=bt.slide?bt.slide.b:0;
+      if(bt.tArr-b-res.t2+RN()*0.13>0){bt.out=true;bt.tOut=res.t2;res.dp=bt}
+      if(Math.abs(bt.tArr-res.t2)<0.45||bt.slide)bt.vis=true;
+    }
   }
-  return res;
 }
 // ---------- pitching ----------
 function mkPitch(idx,F){
@@ -686,9 +816,7 @@ function drawField(){
   FD0.forEach((f,i)=>{
     const q=fielderPos(P,i,t),x=q.x,y=q.y;
     const p=fs(x,y);
-    c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(p.x,p.y+5,8,3,0,0,7);c.fill();
-    c.fillStyle=def.c;c.beginPath();c.arc(p.x,p.y,8,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=1.5;c.stroke();
-    tx(c,f.p,p.x,p.y+4,10,'#fff','center',FONT_B,'900');
+    fielderTop(c,p,def,f.p,fielderPose(P,i,t));
   });
   // runners
   const mv=new Set(P.plan.map(e=>e.from));
@@ -697,8 +825,9 @@ function drawField(){
   for(const e of P.plan){
     if(e.out&&t>e.tOut+0.9)continue;
     const d=CL((t-e.tS)*e.vr,0,(e.to-e.from)*27.4),q=pathXY(e.from,d),p=fs(q.x,q.y);
-    runner(p,off,e.r,e.out&&t>=e.tOut);
+    runner(p,off,e.r,e.out&&t>=e.tOut,slidePose(e,t));
   }
+  for(const e of P.plan)for(const d of dustAt(e,t)){const q=fs(d.x,d.y);c.fillStyle=`rgba(214,170,120,${d.a})`;c.beginPath();c.arc(q.x,q.y,d.r*5,0,7);c.fill()}
   // ball
   const bl=ballField(P),bp=fs(bl.x,bl.y);
   if(!(P.hr&&bl.d>P.m.fence+30)){
@@ -717,12 +846,40 @@ function drawField(){
   c.restore();
   drawHUD();popups();
 }
-function runner(p,team,r,isOut){
+function runner(p,team,r,isOut,sl){
   const c=ctx;c.globalAlpha=isOut?0.45:1;
-  c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(p.x,p.y+5,7,3,0,0,7);c.fill();
-  c.fillStyle='#fff';c.beginPath();c.arc(p.x,p.y,8.5,0,7);c.fill();
-  c.fillStyle=team.d;c.beginPath();c.arc(p.x,p.y,6.5,0,7);c.fill();
-  tx(c,String(r&&r.num||''),p.x,p.y+3.5,9,'#fff','center',FONT_B,'900');c.globalAlpha=1;
+  c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(p.x,p.y+5,sl?12:7,3,0,0,7);c.fill();
+  if(sl){
+    // sliding feet-first along the base path
+    const a=Math.atan2(-sl.dy*4.0,sl.dx*4.2);
+    c.save();c.translate(p.x,p.y);c.rotate(a);
+    c.fillStyle='#fff';c.beginPath();c.ellipse(0,0,13,7,0,0,7);c.fill();
+    c.fillStyle=team.d;c.beginPath();c.ellipse(-1,0,10.5,5.2,0,0,7);c.fill();
+    c.fillStyle='#e8b98f';c.beginPath();c.arc(-9,0,3.2,0,7);c.fill();
+    c.restore();
+  }else{
+    c.fillStyle='#fff';c.beginPath();c.arc(p.x,p.y,8.5,0,7);c.fill();
+    c.fillStyle=team.d;c.beginPath();c.arc(p.x,p.y,6.5,0,7);c.fill();
+  }
+  tx(c,String(r&&r.num||''),p.x,p.y+(sl?-9:3.5),9,'#fff','center',FONT_B,'900');c.globalAlpha=1;
+}
+// top-down fielder, with dive / leap poses
+function fielderTop(c,p,def,label,ps){
+  c.strokeStyle='#fff';c.lineWidth=1.5;
+  if(ps&&ps.kind==='dive'){
+    const ux=Math.sin(ps.ang)*4.2,uy=-Math.cos(ps.ang)*4.0,l=Math.hypot(ux,uy)||1,fly=(1-ps.ph)*7;
+    c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(p.x+ux/l*5,p.y+5,14,4,0,0,7);c.fill();
+    c.save();c.translate(p.x+ux/l*6,p.y+uy/l*6-fly);c.rotate(Math.atan2(uy,ux));
+    c.fillStyle=def.c;c.beginPath();c.ellipse(0,0,14,7,0,0,7);c.fill();c.stroke();
+    c.fillStyle='#7a4f27';c.beginPath();c.arc(14,0,4.2,0,7);c.fill();
+    c.restore();
+    tx(c,label,p.x+ux/l*6,p.y+uy/l*6-fly+3.5,9,'#fff','center',FONT_B,'900');
+    return;
+  }
+  const h=ps&&ps.kind==='jump'?14*Math.sin(ps.ph*PI):0;
+  c.fillStyle='rgba(0,0,0,.3)';c.beginPath();c.ellipse(p.x,p.y+5,8,3,0,0,7);c.fill();
+  c.fillStyle=def.c;c.beginPath();c.arc(p.x,p.y-h,8,0,7);c.fill();c.stroke();
+  tx(c,label,p.x,p.y-h+4,10,'#fff','center',FONT_B,'900');
 }
 function draw(){
   if(!G){ctx.fillStyle='#0b1a35';ctx.fillRect(0,0,W,H);if(BGM)ctx.drawImage(BGM,0,0);return}
@@ -1031,16 +1188,36 @@ function fp(x,y,z){
   if(FV==='3d'&&FCAM){const r=P3(FCAM,x,z,y);return r?{x:r.x,y:r.y,s:r.s}:{x:-99,y:-99,s:1}}
   return {x:480+4.2*x,y:508-4.0*y-z*4,s:1};
 }
-function chibi(c,cam,x,z,col,dk,lab,alpha){
-  const hm=2.4,g=P3(cam,x,0,z);if(!g)return;
-  const sh=P3(cam,x,hm*0.5,z),hd=P3(cam,x,hm*0.86,z);if(!sh||!hd)return;
-  const s=g.s;c.globalAlpha=alpha==null?1:alpha;
-  c.fillStyle='rgba(0,0,0,.32)';c.beginPath();c.ellipse(g.x,g.y,0.65*s,0.22*s,0,0,7);c.fill();
+function chibi(c,cam,x,z,col,dk,lab,alpha,pose){
+  const hm=2.4,g0=P3(cam,x,0,z);if(!g0)return;
+  const s=g0.s;c.globalAlpha=alpha==null?1:alpha;
+  if(pose&&(pose.kind==='dive'||pose.kind==='slide')){
+    // lying body along (dx,dz): head first for a dive, feet first for a slide
+    const dx=pose.kind==='dive'?Math.sin(pose.ang):pose.dx,dz=pose.kind==='dive'?Math.cos(pose.ang):pose.dy;
+    const fly=pose.kind==='dive'?(1-pose.ph)*0.9:0,sg=pose.kind==='dive'?1:-1;
+    const hy=pose.kind==='dive'?0.45+fly:0.8,fy=0.3+(pose.kind==='dive'?fly*0.6:0);
+    const hp=P3(cam,x+dx*0.85*sg,hy,z+dz*0.85*sg),fp_=P3(cam,x-dx*0.95*sg,fy,z-dz*0.95*sg),mp=P3(cam,x-dx*0.1*sg,(hy+fy)/2,z-dz*0.1*sg);
+    if(!hp||!fp_||!mp){c.globalAlpha=1;return}
+    c.fillStyle='rgba(0,0,0,.32)';c.beginPath();c.ellipse(g0.x,g0.y,1.3*s,0.3*s,0,0,7);c.fill();
+    c.lineCap='round';
+    c.strokeStyle='#f3efe4';c.lineWidth=Math.max(3,0.5*s);c.beginPath();c.moveTo(fp_.x,fp_.y);c.lineTo(mp.x,mp.y);c.stroke();
+    c.strokeStyle=col;c.lineWidth=Math.max(5,0.85*s);c.beginPath();c.moveTo(mp.x,mp.y);c.lineTo(hp.x,hp.y);c.stroke();
+    const hr=Math.max(3,0.34*s);
+    c.fillStyle='#e8b98f';c.beginPath();c.arc(hp.x,hp.y,hr,0,7);c.fill();c.fillStyle=dk;c.beginPath();c.arc(hp.x,hp.y-hr*0.1,hr*1.05,PI,0);c.fill();
+    if(pose.kind==='dive'){c.fillStyle='#7a4f27';c.beginPath();c.arc(hp.x+dx*0.1*s,hp.y,Math.max(2.5,0.3*s),0,7);c.fill()}
+    if(lab&&s>4)tx(c,lab,hp.x,hp.y-hr-3,Math.max(9,0.6*s),'#fff','center',FONT_B,'900');
+    c.globalAlpha=1;return;
+  }
+  const lift=pose&&pose.kind==='jump'?1.15*Math.sin(pose.ph*PI):0;
+  const g=P3(cam,x,lift,z),sh=P3(cam,x,lift+hm*0.5,z),hd=P3(cam,x,lift+hm*0.86,z);
+  if(!g||!sh||!hd){c.globalAlpha=1;return}
+  c.fillStyle='rgba(0,0,0,.32)';c.beginPath();c.ellipse(g0.x,g0.y,0.65*s,0.22*s,0,0,7);c.fill();
   c.lineCap='round';
   c.strokeStyle='#f3efe4';c.lineWidth=Math.max(3,0.5*s);c.beginPath();c.moveTo(g.x,g.y);c.lineTo(g.x,(g.y+sh.y)/2);c.stroke();
   c.strokeStyle=col;c.lineWidth=Math.max(5,0.85*s);c.beginPath();c.moveTo(g.x,(g.y+sh.y)/2);c.lineTo(sh.x,sh.y);c.stroke();
   const hr=Math.max(3,0.34*s);
   c.fillStyle='#e8b98f';c.beginPath();c.arc(hd.x,hd.y,hr,0,7);c.fill();c.fillStyle=dk;c.beginPath();c.arc(hd.x,hd.y-hr*0.1,hr*1.05,PI,0);c.fill();
+  if(pose&&pose.kind==='jump'){c.fillStyle='#7a4f27';c.beginPath();c.arc(hd.x+hr*1.6,hd.y-hr*0.6,Math.max(2.5,0.3*s),0,7);c.fill()}
   if(lab&&s>4)tx(c,lab,hd.x,hd.y-hr-3,Math.max(9,0.6*s),'#fff','center',FONT_B,'900');
   c.globalAlpha=1;
 }
@@ -1052,7 +1229,7 @@ function drawField3D(){
   const it=[];
   FD0.forEach((f,i)=>{
     const q=fielderPos(P,i,t),x=q.x,y=q.y;
-    it.push({x,y,col:def.c,dk:def.d,lab:f.p});
+    it.push({x,y,col:def.c,dk:def.d,lab:f.p,pose:fielderPose(P,i,t)});
   });
   const mv=new Set(P.plan.map(e=>e.from));
   for(let b=1;b<=3;b++)if(G.bases[b]&&!mv.has(b))it.push({x:BASE[b].x,y:BASE[b].y,col:off.c,dk:off.d,lab:String(G.bases[b].num)});
@@ -1060,14 +1237,16 @@ function drawField3D(){
   for(const e of P.plan){
     if(e.out&&t>e.tOut+0.9)continue;
     const d=CL((t-e.tS)*e.vr,0,(e.to-e.from)*27.4),q=pathXY(e.from,d);
-    it.push({x:q.x,y:q.y,col:off.c,dk:off.d,lab:String(e.r.num),a:e.out&&t>=e.tOut?0.45:1});
+    const sl=slidePose(e,t);
+    it.push({x:q.x,y:q.y,col:off.c,dk:off.d,lab:String(e.r.num),a:e.out&&t>=e.tOut?0.45:1,pose:sl?{kind:'slide',dx:sl.dx,dy:sl.dy,ph:sl.ph}:null});
   }
   it.forEach(o=>{const g=P3(cam,o.x,0,o.y);o.d=g?g.d:0});
   it.sort((a,b)=>b.d-a.d);
   const bl=ballField(P);
   const showBall=!(P.hr&&bl.d>P.m.fence+30);
   if(showBall){const gs=P3(cam,bl.x,0,bl.y);if(gs){c.fillStyle='rgba(0,0,0,.4)';c.beginPath();c.ellipse(gs.x,gs.y,Math.max(2.5,0.35*gs.s),Math.max(1.2,0.14*gs.s),0,0,7);c.fill()}}
-  it.forEach(o=>chibi(c,cam,o.x,o.y,o.col,o.dk,o.lab,o.a));
+  it.forEach(o=>chibi(c,cam,o.x,o.y,o.col,o.dk,o.lab,o.a,o.pose));
+  for(const e of P.plan)for(const d of dustAt(e,t)){const g=P3(cam,d.x,0.2,d.y);if(g){c.fillStyle=`rgba(214,170,120,${d.a})`;c.beginPath();c.arc(g.x,g.y,Math.max(3,d.r*g.s*0.8),0,7);c.fill()}}
   if(showBall){const b=P3(cam,bl.x,bl.z,bl.y);if(b){c.fillStyle='#fff';c.beginPath();c.arc(b.x,b.y,Math.max(3,0.28*b.s),0,7);c.fill();c.strokeStyle='#d13a30';c.lineWidth=1;c.stroke()}}
   if(P.phase==='decide'&&G.half===1){
     for(let k=1;k<=4;k++){
@@ -1090,18 +1269,20 @@ function drawField3D(){
 let G=null,AC=null;
 const defT=()=>1-G.half,userBat=()=>G.half===0;
 const batter=()=>G.lineup[G.half][G.order[G.half]];
+// ---------- haptics ----------
+function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
 // ---------- audio ----------
 function tone(f,d,ty,v,sl){const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type=ty||'sine';o.frequency.setValueAtTime(f,t);if(sl)o.frequency.exponentialRampToValueAtTime(sl,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d)}
 function noise(d,v,hp){const t=AC.currentTime,n=AC.sampleRate*d,b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();f.type='highpass';f.frequency.value=hp||800;s.buffer=b;g.gain.value=v;s.connect(f).connect(g).connect(AC.destination);s.start(t)}
 function sfx(k){try{
   if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();
-  if(k==='hit'){noise(0.12,0.7,1500);tone(220,0.12,'square',0.25,90)}
+  if(k==='hit'){noise(0.12,0.7,1500);tone(220,0.12,'square',0.25,90);buzz(22)}
   else if(k==='mitt'){noise(0.07,0.5,400);tone(110,0.09,'sine',0.4,60)}
   else if(k==='swing'){noise(0.18,0.18,2500)}
   else if(k==='whoosh'){noise(0.25,0.08,3000)}
   else if(k==='catch'){noise(0.06,0.4,600)}
   else if(k==='cheer'){noise(1.2,0.22,1200);tone(520,0.4,'triangle',0.1,780)}
-  else if(k==='out'){tone(300,0.25,'sawtooth',0.12,150)}
+  else if(k==='out'){tone(300,0.25,'sawtooth',0.12,150);buzz(35)}
 }catch(e){}}
 // ---------- helpers ----------
 function say(text,col,sub,dur,sz){G.banner={text,col,sub,dur:dur||1.3,sz,t:0}}
@@ -1111,7 +1292,7 @@ function addRuns(n){if(!n)return;G.score[G.half]+=n;G.inns[G.half][G.inn-1]=(G.i
 function ringR(){const s=G.stam[defT()]/100,ph=0.5+0.5*Math.sin(G.ringT*3.2);return (0.1+(1-s)*0.22+PT[G.sel].diff*0.45+ph*(0.5+(1-s)*0.3))*(1+(0.8-G.pit[defT()].ctl)*1.2)}
 // ---------- game flow ----------
 function newGame(max){
-  G={paused:false,lineup:[TEAMS[0].L.slice(),TEAMS[1].L.slice()],bench:[TEAMS[0].bench.slice(),TEAMS[1].bench.slice()],pen:[TEAMS[0].pen.slice(),TEAMS[1].pen.slice()],pit:[{...TEAMS[0].pit},{...TEAMS[1].pit}],max,inn:1,half:0,outs:0,balls:0,strikes:0,score:[0,0],hits:[0,0],err:[0,0],inns:[[],[]],bases:[null,null,null,null],order:[0,0],stam:[100,100],pc:[0,0],
+  G={great:[0,0],paused:false,lineup:[TEAMS[0].L.slice(),TEAMS[1].L.slice()],bench:[TEAMS[0].bench.slice(),TEAMS[1].bench.slice()],pen:[TEAMS[0].pen.slice(),TEAMS[1].pen.slice()],pit:[{...TEAMS[0].pit},{...TEAMS[1].pit}],max,inn:1,half:0,outs:0,balls:0,strikes:0,score:[0,0],hits:[0,0],err:[0,0],inns:[[],[]],bases:[null,null,null,null],order:[0,0],stam:[100,100],pc:[0,0],
     mode:'ready',view:'main',timer:1,fn:null,sel:0,aim:{x:0,y:0},cur:{x:0,y:0.1},ringT:0,pitch:null,play:null,popups:[],banner:null,lastSp:135,fx:null,over:false,shake:0,flash:0,fade:0.8,tAll:0};
   say('1회초','#ffc83d','공격: 타격 시작 · 한빛고 VS 청룡고',1.6,56);
   beginPA();G.timer=1.7;
@@ -1215,7 +1396,8 @@ function doHit(bb,label,res){
 }
 // ---------- ball in play ----------
 function startField(bb){
-  G.play=buildPlay(bb,G.bases,G.outs,batter());G.view='field';G.mode='field';G.fade=0.7;G.fx=null;
+  G.play=buildPlay(bb,G.bases,G.outs,batter());
+  const mp=G.play.miss;if(mp)G.play.ev.push({t:mp.t,fn:()=>{const q=fp(mp.b.x,mp.b.y,1);pop('아쉽게 놓쳤다!','#ffd9a0',q.x,q.y-24,24);buzz(15)}});G.view='field';G.mode='field';G.fade=0.7;G.fx=null;
 }
 function maxArr(P){let m=P.t;for(const e of P.plan)if(!e.out)m=Math.max(m,e.tArr);return m}
 function pickBase(k){
@@ -1223,16 +1405,40 @@ function pickBase(k){
   if(!k){P.phase='settle';P.endT=maxArr(P)+0.5;return}
   const res=resolveThrow(P,k,P.t);P.res=res;P.phase='settle';
   const bp=fp(BASE[k].x,BASE[k].y,1);
-  P.ev.push({t:res.wild?res.tB:res.tC,fn:()=>{
-    if(res.wild){sfx('out');pop('송구 실책!','#ff9d8f',bp.x,bp.y-20,28)}
-    else if(res.outs.length){sfx('out');pop('OUT!','#ff5442',bp.x,bp.y-20,30)}
-    else if(res.safe.length){pop('SAFE','#ffffff',bp.x,bp.y-20,26)}
-    sfx('catch')}});
-  if(res.t2)P.ev.push({t:res.t2,fn:()=>{const q=fp(BASE[1].x,BASE[1].y,1);if(res.dp){sfx('out');pop('병살!','#ffc83d',q.x,q.y-20,30)}else pop('SAFE','#fff',q.x,q.y-20,26)}});
-  P.endT=Math.max(maxArr(P)+0.3,Math.max(res.tC,res.t2||0)+0.9,res.tPick?res.tPick+0.6:0);
+  if(res.wild){
+    P.ev.push({t:res.tB,fn:()=>{sfx('out');pop('송구 실책!','#ff9d8f',bp.x,bp.y-20,28);sfx('catch')}});
+  }else{
+    P.ev.push({t:res.tC,fn:()=>{
+      settleThrow(P,res);
+      if(res.outs.length){sfx('out');pop('OUT!','#ff5442',bp.x,bp.y-20,30)}
+      else if(res.safe.length){pop('SAFE','#ffffff',bp.x,bp.y-20,26)}
+      sfx('catch');
+      if(res.t2)P.ev.push({t:res.t2,fn:()=>{const q=fp(BASE[1].x,BASE[1].y,1);if(res.dp){sfx('out');pop('병살!','#ffc83d',q.x,q.y-20,30)}else pop('SAFE','#fff',q.x,q.y-20,26)}});
+    }});
+  }
+  P.endT=Math.max(maxArr(P)+0.3,res.tC+0.9+(k===2?0.9:0),res.tPick?res.tPick+0.6:0);
+}
+// offense: slide into the base. Best timing is 0.2-0.6s before arrival; too early slows the runner.
+function userSlide(){
+  if(!G||G.over||G.half!==0||G.mode!=='field'||!G.play||G.paused)return;
+  const P=G.play;let n=0;
+  for(const e of P.plan){
+    if(e.out||e.slide||e.to>4)continue;
+    const d=e.tArr-P.t;if(d<=0||d>1.4)continue;
+    const b=d>1.0?-0.08:d>0.6?0.05:d>0.2?0.12:0.02;
+    e.slide={b,t:P.t};e.vis=true;n++;
+    const q=fp(BASE[e.to].x,BASE[e.to].y,1);
+    pop(b>=0.12?'굿 슬라이딩!':b>0.03?'슬라이딩':b<0?'너무 일러요':'늦었어요',b>=0.12?'#7dff9b':b>0?'#ffffff':'#ff9d8f',q.x,q.y-34,b>=0.12?28:22);
+  }
+  if(n){sfx('swing');buzz(18)}
 }
 function onFielded(){
   const P=G.play,fq=fp(P.fp.x,P.fp.y,1);
+  if(P.special){
+    const sp=P.special,nm=sp.type==='wall'?'홈런 강탈!!':sp.air?'다이빙 캐치!':'다이빙 포구!';
+    G.great[1-G.half]++;sfx('cheer');buzz([30,40,30]);G.flash=0.3;G.shake=0.4;
+    say('호수비!',sp.type==='wall'?'#ff9d3d':'#7dff9b',nm,1.7,64);
+  }
   if(P.caughtAir){sfx('catch');pop('아웃!','#ff5442',fq.x,fq.y-24,28)}
   else if(P.error){pop('실책!','#ff9d8f',fq.x,fq.y-24,28)}
   else sfx('catch');
@@ -1298,7 +1504,7 @@ function update(dt){
 <script>
 'use strict';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const gP=$('#gPitch'),gB=$('#gBat'),gF=$('#gField'),tip=$('#tip'),fT=$('#fT');
+const gR=$('#gRun'),gP=$('#gPitch'),gB=$('#gBat'),gF=$('#gField'),tip=$('#tip'),fT=$('#fT');
 let inns=3,mouse=true;
 initBG();
 if(document.fonts&&document.fonts.load){
@@ -1312,8 +1518,37 @@ $('#btnStart').onclick=start;$('#btnAgain').onclick=start;
 window.showEnd=function(){
   const a=G.score[0],b=G.score[1],win=a>b,draw=a===b;
   $('#endT').textContent=draw?'무승부':win?'우승! 한빛고':'아쉬운 준우승';
-  $('#endS').textContent=`한빛고 ${a} : ${b} 청룡고  ·  안타 ${G.hits[0]} : ${G.hits[1]}  ·  ${G.inn}회 종료`;
+  $('#endS').textContent=`한빛고 ${a} : ${b} 청룡고  ·  안타 ${G.hits[0]} : ${G.hits[1]}  ·  ${G.inn}회 종료  ·  호수비 ${G.great[0]} : ${G.great[1]}`;
   $('#end').hidden=false;
+};
+// ---- mobile mode ----
+let modePref='auto';try{modePref=localStorage.getItem('hb_mode')||'auto'}catch(e){}
+const stg=$('#stage');
+function isMob(){return modePref==='mob'||(modePref==='auto'&&(matchMedia('(pointer:coarse)').matches||innerWidth<760))}
+function fit(){
+  const mob=isMob(),land=innerWidth>innerHeight;
+  document.body.classList.toggle('mob',mob);document.body.classList.toggle('land',mob&&land);
+  if(mob&&land){const vh=window.visualViewport?visualViewport.height:innerHeight,w=Math.floor(Math.min(innerWidth,vh*16/9));stg.style.width=w+'px';stg.style.height=Math.round(w*9/16)+'px'}
+  else{stg.style.width='';stg.style.height=''}
+  $('#rot').hidden=!(mob&&!land);
+  const fsOK=!!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen);
+  $('#btnFs').hidden=!fsOK;
+}
+function paintModes(){$$('#modes .chip').forEach(b=>b.classList.toggle('on',b.dataset.m===modePref))}
+$$('#modes .chip').forEach(b=>b.onclick=()=>{modePref=b.dataset.m;try{localStorage.setItem('hb_mode',modePref)}catch(e){}paintModes();fit()});
+paintModes();fit();
+addEventListener('resize',fit);addEventListener('orientationchange',()=>setTimeout(fit,200));
+if(window.visualViewport)visualViewport.addEventListener('resize',fit);
+$('#btnFs').onclick=async()=>{
+  try{
+    const d=document,el=d.documentElement;
+    if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d)}
+    else{await (el.requestFullscreen||el.webkitRequestFullscreen).call(el);try{await screen.orientation.lock('landscape')}catch(e){}}
+  }catch(e){}
+};
+$('#btnVw').onclick=()=>{
+  if(!G)return;
+  if(G.mode==='field'||G.mode==='hitfx')setFV(cyc(FVS,FV));else setPV(cyc(PVS,PV));
 };
 // ---- camera views ----
 try{const a=localStorage.getItem('hb_pv'),b=localStorage.getItem('hb_fv');if(PVS.some(x=>x[0]===a))PV=a;if(FVS.some(x=>x[0]===b))FV=b}catch(e){}
@@ -1374,6 +1609,7 @@ function setPos(e){
     if(drag){const z={x:CL(drag.zx+(p.x-drag.x)/PNL.ux,-1.7,1.7),y:CL(drag.zy+(p.y-drag.y)/PNL.uy,-1.7,1.7)};if(G.mode==='aim')G.aim=z;else if(G.half===0&&G.view==='main')G.cur=z}
     return;
   }
+  if(e.pointerType==='touch'&&isMob()){const r=cv.getBoundingClientRect();p.y-=48*H/r.height}
   if(G.mode==='aim')G.aim=toZone(p);
   else if(G.half===0&&G.view==='main')G.cur=toZone(p);
 }
@@ -1386,8 +1622,9 @@ cv.addEventListener('pointerdown',e=>{
     for(let k=1;k<=4;k++){const q=fp(BASE[k].x,BASE[k].y,0),d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=k}}
     if(best)pickBase(best);return;
   }
-  if(mouse){if(G.mode==='aim')doThrow();else if(G.mode==='pitch')doSwing()}
+  if(mouse){if(G.mode==='aim')doThrow();else if(G.mode==='pitch')doSwing();else if(G.mode==='field'&&G.half===0)userSlide()}
 });
+$('#btnSlide').addEventListener('pointerdown',e=>{e.preventDefault();userSlide()});
 $('#btnThrow').onclick=()=>doThrow();
 const sw=$('#btnSwing');sw.addEventListener('pointerdown',e=>{e.preventDefault();doSwing()});
 $$('.pt').forEach(b=>b.onclick=()=>{if(G)G.sel=+b.dataset.i});
@@ -1396,7 +1633,7 @@ addEventListener('keydown',e=>{
   if(!G||G.over)return;
   if(G.paused){if(e.key==='Escape')closeRoster();return}
   const k=e.key;
-  if(k===' '){e.preventDefault();if(G.mode==='aim')doThrow();else if(G.mode==='pitch')doSwing();return}
+  if(k===' '||k==='s'||k==='S'){e.preventDefault();if(G.mode==='aim')doThrow();else if(G.mode==='pitch')doSwing();else if(G.mode==='field')userSlide();return}
   if(/^[1-5]$/.test(k)){
     if(G.mode==='field'&&G.play&&G.play.phase==='decide'&&G.half===1){if(+k<=4)pickBase(+k)}
     else if(G.mode==='aim')G.sel=+k-1;
@@ -1416,14 +1653,15 @@ function sync(){
   bPit.disabled=!cs||!G.pen[0].length;bPh.disabled=!cs||!G.bench[0].length;
   $('#penN').textContent=` ${G.pen[0].length}`;$('#benN').textContent=` ${G.bench[0].length}`;
   bPit.classList.toggle('alert',G.half===1&&G.stam[0]<35&&G.pen[0].length>0);
-  gP.hidden=!showP;gB.hidden=!showB;gF.hidden=!decide;
+  const P0=G.play,canSl=G.half===0&&G.mode==='field'&&P0&&P0.plan&&P0.plan.some(e=>!e.out&&!e.slide&&e.to<=4&&e.tArr-P0.t>0&&e.tArr-P0.t<1.4);
+  gR.hidden=!canSl;gP.hidden=!showP;gB.hidden=!showB;gF.hidden=!decide;
   $$('.pt').forEach(b=>b.classList.toggle('on',+b.dataset.i===G.sel));
   if(decide)fT.textContent=Math.max(0,G.play.dl-G.play.t).toFixed(1)+'초';
   let t;
   if(G.mode==='aim')t=(PV==='back'?'구종을 고르고(1~5) 마우스로 코스를 조준하세요.':'구종을 고르고(1~5) 오른쪽 아래 조준 패드 위에서 마우스로 조준하세요.')+' 원이 가장 작을 때 클릭 또는 Space.'+(G.stam[0]<35?' 체력이 떨어졌어요. 투수 교체를 고려해 보세요.':'');
   else if(decide)t='주자가 먼저 닿는 베이스로 송구하세요. 노란 원이 주자가 향하는 베이스입니다.';
   else if(G.half===0&&(G.mode==='bwait'||G.mode==='pitch'))t=PV==='back'?'방망이 위치를 공 코스에 맞추고, 공이 홈플레이트에 가장 가까울 때 클릭 또는 Space. 빠르면 당겨치고 늦으면 밀어칩니다.':'오른쪽 아래 타격 패드 위에 마우스를 올려 공 위치(흰 점)에 노란 원을 맞추고, 타이밍에 클릭 또는 Space. 터치는 패드를 드래그하듯 화면을 끌어요.';
-  else if(G.mode==='field')t=G.half===0?'타구를 따라가는 중... 주자는 자동으로 달립니다.':'타구 처리 중...';
+  else if(G.mode==='field')t=G.half===0?(canSl?'베이스에 닿기 직전! 슬라이딩 (S / Space / 클릭)':'타구를 따라가는 중... 주자는 자동으로 달립니다.'):'타구 처리 중...';
   else t='한빛고 '+G.score[0]+' : '+G.score[1]+' 청룡고';
   if(t!==tip.textContent)tip.textContent=t;
 }
@@ -1437,4 +1675,5 @@ function loop(now){
 requestAnimationFrame(loop);
 
 </script>
-</html>
+
+</body></html>
