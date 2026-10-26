@@ -91,6 +91,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
   <div class="c" id="hNext" title="다음 해질녘/아침까지 남은 시간"></div>
   <label class="c tg" title="사망·붕괴·습격 같은 경고가 뜨면 자동으로 일시정지"><input type="checkbox" id="apause">⏸ 경고 시 정지</label>
   <button id="btnAB" title="자원이 되는 대로 방벽·텃밭·감시탑·주거지를 알아서 건설">🔨 자동 건설 OFF</button>
+  <div class="c" title="소리"><button id="btnSnd" style="padding:2px 6px">🔊</button><input type="range" id="vol" min="0" max="100" value="60" style="width:64px"></div>
   <div class="spd"><button data-sp="0">⏸</button><button data-sp="1" class="on">▶</button><button data-sp="2">⏩</button><button data-sp="4">⏭</button></div>
 </div>
 
@@ -294,11 +295,11 @@ const cv=$('cv'),ctx=cv.getContext('2d');let vw=0,vh=0,dpr=1;
 const cam={x:755,y:480,z:0.8};
 const fxText=[],tracers=[];
 const fogCv=document.createElement('canvas');fogCv.width=FW;fogCv.height=FH;const fogCtx=fogCv.getContext('2d');
-let logDirty=true;
+let logDirty=true;let sfxLog=()=>{};
 
 function tNow(){return (G.time%DAY)/DAY}
 function log(msg,kind='info'){const t=tNow(),h=(6+t*24)%24;const hh=String(Math.floor(h)).padStart(2,'0'),mm=String(Math.floor((h%1)*60)).padStart(2,'0');
- G.logs.unshift({t:`D${G.day} ${hh}:${mm}`,m:msg,k:kind});if(G.logs.length>70)G.logs.pop();logDirty=true;if(kind==='bad'&&G.alertPause&&started&&speed>0){setSpeed(0);toast('⏸ 경고로 일시정지: '+msg.replace(/<[^>]+>/g,'').slice(0,40))}}
+ G.logs.unshift({t:`D${G.day} ${hh}:${mm}`,m:msg,k:kind});if(G.logs.length>70)G.logs.pop();logDirty=true;sfxLog(kind,msg);if(kind==='bad'&&G.alertPause&&started&&speed>0){setSpeed(0);toast('⏸ 경고로 일시정지: '+msg.replace(/<[^>]+>/g,'').slice(0,40))}}
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2000)}
 function floatText(x,y,txt,color='#fff'){fxText.push({x,y,txt,color,life:1.1})}
 
@@ -601,7 +602,7 @@ function fighterTick(s,dt,tb){
  if(!ne.e||ne.d>range||s.cd>0)return ne;
  const e=ne.e;const dmg=w.dmg*effK(s,w.key)*tb;
  s.cd=w.cd;e.hp-=dmg;e.flash=0.12;if(w.ammo)G.res.ammo=Math.max(0,G.res.ammo-w.ammo);
- tracers.push({x1:s.x,y1:s.y,x2:e.x,y2:e.y,life:w.range>60?0.12:0.08,melee:w.range<=60});
+ tracers.push({x1:s.x,y1:s.y,x2:e.x,y2:e.y,life:w.range>60?0.12:0.08,melee:w.range<=60,wk:s.weapon});
  gainXp(s,w.key,1.4);
  if(e.hp<=0){if(e.isR)killRaider(e);else{e.dead=true;G.kills++}gainXp(s,w.key,2)}
  return ne}
@@ -1224,6 +1225,7 @@ cv.addEventListener('wheel',e=>{e.preventDefault();const b=s2w(e.clientX,e.clien
 function clampCam(){cam.x=clamp(cam.x,0,W);cam.y=clamp(cam.y,0,H)}
 
 function clickWorld(sx,sy){
+ sfx('tick');
  const w=s2w(sx,sy);const R=1/Math.max(cam.z,0.5);
  if(G.moveSq){const sq=G.squads.find(q=>q.id===G.moveSq);setMoveMode(null);
   if(sq){if(G.night||tNow()>=0.40){toast('지금은 이동시킬 수 없습니다 (낮 시간에만)')}
@@ -1314,10 +1316,107 @@ addEventListener('keyup',e=>{delete keys[e.key.toLowerCase()]});
 function keyPan(dt){const sp=520/cam.z*dt;let mx=0,my=0;if(keys['a']||keys['arrowleft'])mx-=1;if(keys['d']||keys['arrowright'])mx+=1;if(keys['w']||keys['arrowup'])my-=1;if(keys['s']||keys['arrowdown'])my+=1;if(mx||my){cam.x+=mx*sp;cam.y+=my*sp;clampCam()}}
 let phaseDay=0,phaseFlag=0;
 function phaseAlerts(){const t=tNow();if(G.day!==phaseDay){phaseDay=G.day;phaseFlag=0}
- if(!phaseFlag&&t>=0.40&&!G.night){phaseFlag=1;toast('🌆 곧 해가 집니다! 밖의 분대를 복귀시키세요');}
+ if(!phaseFlag&&t>=0.40&&!G.night){phaseFlag=1;sfx('dusk');toast('🌆 곧 해가 집니다! 밖의 분대를 복귀시키세요');}
  const left=t<0.40?(0.40-t)*DAY:(t<0.97?(0.97-t)*DAY:(1-t)*DAY);}
 function hNext(){const t=tNow();let lab,left;if(t<0.40){lab='🌆 해질녘까지';left=(0.40-t)*DAY}else if(t<0.58){lab='🌙 밤까지';left=(0.58-t)*DAY}else if(t<0.97){lab='☀️ 아침까지';left=(0.97-t)*DAY}else{lab='☀️ 아침까지';left=(1.05-t)*DAY}
  const el=$('hNext');el.innerHTML=`${lab} <b>${Math.max(0,Math.ceil(left))}초</b>`}
+
+
+/* =================== 사운드 (WebAudio 합성 · 외부 파일 없음) =================== */
+const AU={ctx:null,on:true,vol:0.6,last:{}};
+try{const sv=JSON.parse(localStorage.getItem('gwk_snd')||'null');if(sv){AU.on=sv.on!==false;AU.vol=typeof sv.vol==='number'?sv.vol:0.6}}catch(e){}
+function auSave(){try{localStorage.setItem('gwk_snd',JSON.stringify({on:AU.on,vol:AU.vol}))}catch(e){}}
+function auInit(){
+ if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();return}
+ try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;const c=new AC();AU.ctx=c;
+  AU.master=c.createGain();const comp=c.createDynamicsCompressor();AU.master.connect(comp);comp.connect(c.destination);
+  AU.mus=c.createGain();AU.sfx=c.createGain();AU.mus.connect(AU.master);AU.sfx.connect(AU.master);
+  AU.dayBus=c.createGain();AU.nightBus=c.createGain();AU.tenBus=c.createGain();
+  for(const b of [AU.dayBus,AU.nightBus,AU.tenBus]){b.gain.value=0;b.connect(AU.mus)}
+  // 리버브 비슷한 딜레이
+  const dl=c.createDelay(1);dl.delayTime.value=0.37;const fb=c.createGain();fb.gain.value=0.38;const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=1800;
+  dl.connect(lp);lp.connect(fb);fb.connect(dl);AU.dly=dl;dl.connect(AU.mus);
+  const n=c.createBuffer(1,c.sampleRate*1.5,c.sampleRate),dd=n.getChannelData(0);for(let i=0;i<dd.length;i++)dd[i]=Math.random()*2-1;AU.noise=n;
+  AU.mus.gain.value=0.5;AU.sfx.gain.value=0.9;auVol();
+  setInterval(musTick,100);
+ }catch(e){AU.ctx=null}}
+function auVol(){if(!AU.ctx)return;AU.master.gain.setTargetAtTime(AU.on?AU.vol:0,AU.ctx.currentTime,0.05)}
+function NOTE(n){return 440*Math.pow(2,(n-69)/12)}
+function tone(f,t,dur,type,vol,dest,f2,att){const c=AU.ctx,o=c.createOscillator(),g=c.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(Math.max(20,f2),t+dur);
+ const a=att||0.005;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(dest||AU.sfx);o.start(t);o.stop(t+dur+0.05);return g}
+function nz(t,dur,vol,ff,type,dest,ff2){const c=AU.ctx,s=c.createBufferSource(),g=c.createGain(),f=c.createBiquadFilter();s.buffer=AU.noise;f.type=type||'lowpass';f.frequency.setValueAtTime(ff,t);if(ff2)f.frequency.exponentialRampToValueAtTime(ff2,t+dur);
+ g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest||AU.sfx);s.start(t,Math.random());s.stop(t+dur+0.05)}
+function sfx(k,x){
+ if(!AU.ctx||!AU.on||AU.vol<=0)return;const c=AU.ctx,t=c.currentTime,now=performance.now();
+ const th={shot:45,rifle:60,bow:60,hit:50,zdie:70,tick:40,click:30,raid:70,tower:80}[k]||0;if(th&&AU.last[k]&&now-AU.last[k]<th)return;AU.last[k]=now;
+ switch(k){
+  case 'shot':nz(t,0.09,0.5,3200,'lowpass',null,500);tone(210,t,0.1,'sawtooth',0.18,null,60);break;
+  case 'rifle':nz(t,0.16,0.8,2400,'lowpass',null,300);tone(130,t,0.16,'sawtooth',0.28,null,40);break;
+  case 'bow':tone(520,t,0.12,'triangle',0.2,null,180);nz(t,0.06,0.15,4000,'highpass');break;
+  case 'melee':nz(t,0.1,0.35,1800,'bandpass',null,600);tone(140,t,0.08,'square',0.12,null,70);break;
+  case 'tower':nz(t,0.12,0.45,2600,'lowpass',null,400);tone(160,t,0.12,'sawtooth',0.2,null,50);break;
+  case 'raid':nz(t,0.12,0.5,3500,'lowpass',null,600);tone(240,t,0.1,'sawtooth',0.2,null,80);break;
+  case 'zdie':tone(150+Math.random()*40,t,0.28,'sawtooth',0.14,null,45);nz(t,0.15,0.2,900,'lowpass');break;
+  case 'click':tone(720,t,0.05,'square',0.05);break;
+  case 'tick':tone(520,t,0.04,'triangle',0.05);break;
+  case 'good':[0,4,7].forEach((n,i)=>tone(NOTE(72+n),t+i*0.09,0.35,'triangle',0.13,AU.dly&&null));break;
+  case 'warn':tone(NOTE(67),t,0.22,'square',0.08);tone(NOTE(67),t+0.16,0.22,'square',0.08);break;
+  case 'bad':tone(NOTE(55),t,0.5,'sawtooth',0.17,null,NOTE(52));tone(NOTE(54),t+0.02,0.5,'sawtooth',0.14,null,NOTE(51));nz(t,0.3,0.2,500,'lowpass');break;
+  case 'dawn':[0,4,7,12].forEach((n,i)=>tone(NOTE(69+n),t+i*0.18,1.4,'sine',0.14,null,null,0.05));break;
+  case 'dusk':tone(NOTE(48),t,1.6,'sawtooth',0.14,null,NOTE(46),0.3);break;
+  case 'night':tone(NOTE(36),t,2.6,'sawtooth',0.2,null,NOTE(34),0.6);tone(NOTE(43),t,2.6,'sawtooth',0.1,null,NOTE(41),0.6);nz(t,2.2,0.12,300,'lowpass',null,80);break;
+  case 'radio':for(let i=0;i<3;i++){tone(1180,t+i*0.14,0.07,'square',0.05)}nz(t,0.5,0.06,3000,'bandpass');break;
+  case 'build':tone(NOTE(60),t,0.12,'triangle',0.14);tone(NOTE(67),t+0.1,0.25,'triangle',0.14);nz(t,0.05,0.2,1500,'bandpass');break;
+  case 'win':[0,4,7,12,16].forEach((n,i)=>tone(NOTE(60+n),t+i*0.2,1.6,'triangle',0.15));break;
+  case 'lose':[0,-3,-7,-12].forEach((n,i)=>tone(NOTE(57+n),t+i*0.5,2.2,'sawtooth',0.12,null,null,0.1));break;
+ }}
+sfxLog=(kind,msg)=>{if(!AU.ctx||!started)return;
+ if(msg.startsWith('☀️'))sfx('dawn');
+ else if(msg.includes('📻'))sfx(kind==='bad'?'bad':'radio');
+ else if(msg.startsWith('💀')||kind==='bad')sfx('bad');
+ else if(kind==='good')sfx('good');
+ else if(kind==='warn')sfx('warn')};
+const _tp=tracers.push.bind(tracers);
+tracers.push=function(t){if(t.raid)sfx('raid');else if(t.melee)sfx('melee');else if(t.wk==='rifle')sfx('rifle');else if(t.wk==='bow')sfx('bow');else if(t.wk)sfx('shot');else sfx('tower');return _tp(t)};
+// 배경음악
+const CH_DAY=[[57,60,64],[53,57,60],[48,52,55],[55,59,62]],CH_NIGHT=[[45,48,52],[46,50,53],[50,53,57],[44,47,52]];
+const mu={t:0,step:0,kills:0,nightP:false,over:false,ten:0};
+function pad(f,t,dur,bus,vol,type,lpf){const c=AU.ctx;for(const dt of [-6,6]){const o=c.createOscillator(),g=c.createGain(),fl=c.createBiquadFilter();o.type=type||'triangle';o.frequency.value=f;o.detune.value=dt;fl.type='lowpass';fl.frequency.value=lpf||1400;
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+1.2);g.gain.setValueAtTime(vol,t+dur-1.2);g.gain.linearRampToValueAtTime(0.0001,t+dur);o.connect(fl);fl.connect(g);g.connect(bus);o.start(t);o.stop(t+dur+0.1)}}
+function pluck(f,t,bus,vol){const g=tone(f,t,1.1,'sine',vol,bus);try{g.connect(AU.dly)}catch(e){}}
+function kick(t,bus,v){tone(95,t,0.22,'sine',v,bus,38)}
+function musStep(t){const s=mu.step,bar=Math.floor(s/8)%4;
+ if(s%8===0){const cd=CH_DAY[bar],cn=CH_NIGHT[bar];
+  for(const n of cd)pad(NOTE(n),t,4.3,AU.dayBus,0.05);pad(NOTE(cd[0]-12),t,4.3,AU.dayBus,0.07,'sine');
+  for(const n of cn)pad(NOTE(n),t,4.3,AU.nightBus,0.05,'sawtooth',500);pad(NOTE(cn[0]-12),t,4.3,AU.nightBus,0.12,'sine')}
+ if(Math.random()<0.55){const cd=CH_DAY[bar];pluck(NOTE(cd[Math.floor(Math.random()*3)]+12),t,AU.dayBus,0.08)}
+ if(s%8===3&&Math.random()<0.5)pluck(NOTE(CH_NIGHT[bar][2]+24),t,AU.nightBus,0.035);
+ if(s%2===0){kick(t,AU.nightBus,0.22);kick(t+0.2,AU.nightBus,0.12)}
+ // 긴장감 타악
+ kick(t,AU.tenBus,0.5);if(s%2===1)nz(t,0.12,0.18,6000,'highpass',AU.tenBus);nz(t+0.25,0.06,0.1,7000,'highpass',AU.tenBus);
+ if(s%4===2)tone(NOTE(40+(bar%2)*2),t,0.45,'sawtooth',0.1,AU.tenBus)}
+function musTick(){
+ if(!AU.ctx||!G)return;const c=AU.ctx;
+ if(!AU.on||!started){AU.dayBus.gain.setTargetAtTime(0,c.currentTime,0.3);AU.nightBus.gain.setTargetAtTime(0,c.currentTime,0.3);AU.tenBus.gain.setTargetAtTime(0,c.currentTime,0.3);return}
+ const dk=darkness(tNow());
+ let n=0;for(const z of G.zs)if(isVis(z.x,z.y))n++;for(const r of G.raiders)if(isVis(r.x,r.y))n+=2;
+ const ten=clamp((n-4)/22,0,1);mu.ten+=(ten-mu.ten)*0.3;
+ const lowM=speed===0?0.45:1,end=G.over?0.15:1;
+ AU.dayBus.gain.setTargetAtTime((1-dk)*0.9*lowM*end,c.currentTime,0.8);
+ AU.nightBus.gain.setTargetAtTime(dk*1.0*lowM*end,c.currentTime,0.8);
+ AU.tenBus.gain.setTargetAtTime(mu.ten*0.55*lowM*end*(speed===0?0:1),c.currentTime,0.5);
+ if(mu.t<c.currentTime)mu.t=c.currentTime+0.05;
+ const stp=0.5/(speed>=4?1.5:speed>=2?1.2:1);
+ while(mu.t<c.currentTime+0.6){musStep(mu.t);mu.t+=stp;mu.step++}
+ const dk2=G.kills-mu.kills;if(dk2>0&&dk2<40){for(let i=0;i<Math.min(3,dk2);i++)setTimeout(()=>sfx('zdie'),i*60)}mu.kills=G.kills;
+ if(G.night&&!mu.nightP){mu.nightP=true;sfx('night')}else if(!G.night)mu.nightP=false;
+ if(G.over&&!mu.over){mu.over=true;sfx(G.won?'win':'lose')}}
+function syncSndUI(){$('btnSnd').textContent=!AU.on||AU.vol<=0?'🔇':AU.vol<0.4?'🔈':'🔊';$('vol').value=Math.round(AU.vol*100)}
+$('btnSnd').onclick=()=>{auInit();AU.on=!AU.on;auVol();auSave();syncSndUI()};
+$('vol').oninput=e=>{auInit();AU.vol=+e.target.value/100;if(AU.vol>0)AU.on=true;auVol();auSave();syncSndUI()};
+syncSndUI();
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button,.sqc,.row');if(b&&!b.id.startsWith('btnSnd'))sfx('click')},true);
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{if(started||ev)auInit()},{once:false,passive:true}));
 
 /* =================== 메인 루프 =================== */
 let last=performance.now(),uiT=0,abT=0;
@@ -1334,7 +1433,7 @@ function frame(now){
 addEventListener('resize',resize);
 resize();buildMap();newGame();
 cam.z=clamp(Math.min((innerHeight-60)/860,(innerWidth-620)/760),0.45,1.2);cam.x=C.x;cam.y=C.y+20;
-$('btnStart').onclick=()=>{$('ov').classList.add('hide');started=true;setSpeed(1)};
+$('btnStart').onclick=()=>{auInit();$('ov').classList.add('hide');started=true;setSpeed(1)};
 requestAnimationFrame(frame);
 })();
 </script>
