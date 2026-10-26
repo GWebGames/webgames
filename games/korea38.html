@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>38°선 — 6·25 전쟁 전략 시뮬레이션</title>
 <style>
 :root{--un:#4b8bff;--com:#ff5a52;--bg:#05090e;--panel:rgba(9,15,23,.88);--line:#2a3a4e;--txt:#d9e4f0;--dim:#7f92a7;--gold:#e8c35a;--grn:#5ad08a}
@@ -79,6 +79,34 @@ button.blue:hover:not(:disabled){background:#27519a}
 #mbox .two>div{background:#09111a;border:1px solid #1d2c3d;padding:8px 10px;font-size:12.5px}
 #mbox .two b.un{color:var(--un)}#mbox .two b.com{color:var(--com)}
 #mbox ul{margin-left:18px;font-size:13px}
+html,body{touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+.mobonly{display:none}
+body.mob .mobonly{display:inline-block}
+body.mob button{min-height:38px}
+body.mob #hudL{left:6px;top:6px;padding:5px 8px;min-width:0;max-width:56vw}
+body.mob #hudL .title{font-size:15px}body.mob #hudL .title small,body.mob #objs{display:none}
+body.mob #vp{margin-top:4px;font-size:11px}body.mob #vp>div:nth-child(n+3){display:none}
+body.mob .hbtns{margin-top:4px;gap:4px}body.mob .hbtns button{padding:3px 7px;font-size:11px;min-height:30px}
+body.mob #banner{left:auto;right:6px;transform:none;font-size:11px;padding:4px 8px;letter-spacing:0;white-space:normal;max-width:42vw;text-align:right}
+body.mob #banner span+span{margin-left:0;display:block}
+body.mob #log,body.mob #tLog{display:none}
+body.mob #tip{display:none!important}
+body.mob.portrait #panel{left:0;right:0;top:auto;bottom:0;width:100%;height:40vh;border-left:0;border-top:1px solid var(--line)}
+body.mob:not(.portrait) #panel{width:min(260px,34vw)}
+body.mob #pBtns{flex-wrap:wrap}body.mob #pBtns button{flex:1 1 22%;min-height:36px;font-size:12px}
+body.mob #endBtn{margin:0 8px 8px;padding:10px;font-size:15px}
+body.mob #pBody{padding:6px 8px}body.mob .u{padding:8px 6px}body.mob #pHead{padding:8px 10px}
+body.mob #tTop{left:0;transform:none;padding:4px 10px;gap:8px;font-size:11px;white-space:normal;max-width:calc(100vw - 142px);flex-wrap:wrap;justify-content:flex-start}
+body.mob #tTitle{display:none}
+body.mob #tSide{display:none;width:min(78vw,320px);padding-bottom:16px;z-index:6}
+body.mob.tside #tSide{display:block}
+body.mob #tMini{width:128px;height:80px;right:6px;top:50px;bottom:auto}
+body.mob #tBtns{left:50%;bottom:6px;width:98vw;flex-wrap:wrap;justify-content:center;gap:5px}
+body.mob #tBtns button{padding:7px 9px;font-size:12px;min-height:38px}
+body.mob #tBtns button.on{background:#7a5a10;border-color:#e8c35a}
+body.mob:not(.portrait) #tBtns{left:4px;top:42px;bottom:auto;transform:none;width:auto;display:grid;grid-template-columns:repeat(2,66px);gap:4px}
+body.mob:not(.portrait) #tBtns button{min-height:30px;padding:3px 2px;font-size:10.5px}
+body.mob #mbox{padding:14px 14px;font-size:13px}body.mob #mbox h2{font-size:18px}body.mob #mbox .two{grid-template-columns:1fr}
 @media(max-width:900px){#panel{width:250px}#banner{left:calc((100% - 250px)/2);font-size:12px;padding:5px 12px}#log{width:240px;font-size:11px}#hudL{min-width:0;padding:6px 9px}#tSide{width:230px}}
 </style>
 </head>
@@ -107,7 +135,7 @@ button.blue:hover:not(:disabled){background:#27519a}
   <canvas id="tMini" width="300" height="188"></canvas>
   <div id="tLog"></div>
   <div id="tBtns">
-    <button id="tView">3D 보기</button>
+    <button id="tView">3D 보기</button><button id="tInfoB" class="mobonly">ⓘ 정보</button><button id="tMulti" class="mobonly">＋다중</button><button id="tBox" class="mobonly">▭ 박스</button><button id="tAllB" class="mobonly">전체</button><button id="tNoneB" class="mobonly">해제</button>
     <button id="tSnd">🔊</button>
     <button id="tFM" class="blue">포격 지시 (G)</button>
     <button id="tSmk" class="blue">연막 (X)</button>
@@ -244,12 +272,21 @@ function hash(i,j){let h=Math.imul(i,374761393)^Math.imul(j,668265263);h=Math.im
 function vnoise(x,y){const xi=Math.floor(x),yi=Math.floor(y),xf=x-xi,yf=y-yi;const s=t=>t*t*(3-2*t);const a=hash(xi,yi),b=hash(xi+1,yi),c=hash(xi,yi+1),d=hash(xi+1,yi+1);return a+(b-a)*s(xf)+(c-a)*s(yf)+(a-b-c+d)*s(xf)*s(yf);}
 for(let j=0;j<NY;j++)for(let i=0;i<NX;i++)SHADE[j*NX+i]=.72+.55*(.6*vnoise(i/16,j/16)+.4*vnoise(i/5.5+40,j/5.5));
 let VW=800,VH=600,DPR=1,V={S:70,cx:400,cy:300};
+let MOB=false;
+function detectMob(){const mm=q=>typeof matchMedia!=='undefined'&&matchMedia(q).matches;const nv=typeof navigator!=='undefined'?navigator:{};const ua=nv.userAgent||'';
+  const was=MOB;
+  MOB=mm('(pointer:coarse)')||(mm('(hover:none)')&&(nv.maxTouchPoints||0)>0)||/Android|iPhone|iPad|iPod|Mobile|Tablet|Silk/i.test(ua)||(/Macintosh/.test(ua)&&(nv.maxTouchPoints||0)>1)||Math.min(window.innerWidth,window.innerHeight)<640||(typeof location!=='undefined'&&/[?&]m=1/.test(location.search||''));
+  if(typeof location!=='undefined'&&/[?&]m=0/.test(location.search||''))MOB=false;
+  if(MOB&&!was&&!detectMob.shown&&typeof document!=='undefined'&&document.body){detectMob.shown=1;setTimeout(()=>{const d=document.createElement('div');d.textContent='📱 모바일 모드 자동 적용 — 터치 조작 안내는 ? 도움말 참고';d.style.cssText='position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(20,24,18,.92);color:#e8e2c8;border:1px solid #8a8f5a;padding:8px 14px;border-radius:8px;font-size:13px;z-index:99;max-width:90vw;text-align:center;pointer-events:none;transition:opacity .6s';document.body.appendChild(d);setTimeout(()=>d.style.opacity=0,4000);setTimeout(()=>d.remove(),4800);},300);}}
+function panelM(){if(!MOB)return{pw:VW<=900?250:330,sh:0};return VH>VW?{pw:0,sh:Math.round(VH*.4)}:{pw:Math.min(260,Math.round(VW*.34)),sh:0};}
+const tacPW=()=>MOB?0:(VW<=900?230:320);
 function resize(){
-  DPR=window.devicePixelRatio||1;VW=window.innerWidth;VH=window.innerHeight;
+  DPR=window.devicePixelRatio||1;VW=window.innerWidth;VH=window.innerHeight;detectMob();
+  if(typeof document!=='undefined'&&document.body&&document.body.classList){document.body.classList.toggle('mob',MOB);document.body.classList.toggle('portrait',VH>VW);}
   cv.width=VW*DPR;cv.height=VH*DPR;
-  const pw=VW<=900?250:330;const free=VW-pw;
-  const S=Math.max(30,Math.min(VH*1.06/9.2,free*1.1/(7.2*COS)));
-  V.fit={S,cx:free/2,cy:VH/2+10};
+  const {pw,sh}=panelM();const free=VW-pw,fh=VH-sh-(MOB?40:0);
+  const S=Math.max(30,Math.min(fh*(MOB?.97:1.06)/9.2,free*1.1/(7.2*COS)));
+  V.fit={S,cx:free/2,cy:fh/2+10+(MOB?40:0)};
   if(!V.user){V.S=S;V.cx=V.fit.cx;V.cy=V.fit.cy;}
   const t=$('tcv');t.width=VW*DPR;t.height=VH*DPR;
 
@@ -563,6 +600,24 @@ window.addEventListener('mouseup',e=>{if(pan){
   if(pan.b===2&&!pan.m&&G&&!T&&G.phase==='orders'&&G.sel.size){const p=pickProv(e.clientX,e.clientY);if(p>=0&&G.targets.has(p))execMove(p);}
   pan=null;setTimeout(()=>{V.panned=false;},0);}});
 cv.addEventListener('wheel',e=>{if(!G||T)return;e.preventDefault();if(PREF.map){camZoom(G.cam,e.deltaY,5,32);return;}const f=e.deltaY<0?1.18:1/1.18;const S2=clamp(V.S*f,V.fit.S*.8,V.fit.S*6);const k=S2/V.S;V.cx=e.clientX-(e.clientX-V.cx)*k;V.cy=e.clientY-(e.clientY-V.cy)*k;V.S=S2;V.user=true;},{passive:false});
+// ---- 터치 (전략 지도)
+const SCH={n:0,last:null,moved:false};
+cv.addEventListener('touchstart',e=>{if(!G||T)return;const ts=e.touches;
+  if(ts.length===1){SCH.last={x:ts[0].clientX,y:ts[0].clientY};SCH.s0={x:ts[0].clientX,y:ts[0].clientY};SCH.moved=false;}
+  else if(ts.length===2){SCH.d=tdist(ts);SCH.c=tctr(ts);SCH.moved=true;V.panned=true;}
+},{passive:true});
+cv.addEventListener('touchmove',e=>{if(!G||T)return;e.preventDefault();const ts=e.touches;
+  if(ts.length===2){const d=tdist(ts),c=tctr(ts),ratio=d/(SCH.d||d);
+    if(PREF.map){camZoom(G.cam,ratio>1?-1:1,5,32);G.cam.dist=clamp(G.cam.dist/ratio,5,32);camDrag(G.cam,c[0]-SCH.c[0],c[1]-SCH.c[1],VH);}
+    else{const S2=clamp(V.S*ratio,V.fit.S*.8,V.fit.S*6),k=S2/V.S;V.cx=c[0]-(c[0]-V.cx)*k+(c[0]-SCH.c[0]);V.cy=c[1]-(c[1]-V.cy)*k+(c[1]-SCH.c[1]);V.S=S2;V.user=true;}
+    SCH.d=d;SCH.c=c;V.panned=true;return;}
+  if(ts.length===1&&SCH.last){const x=ts[0].clientX,y=ts[0].clientY;
+    if(!SCH.moved&&Math.hypot(x-SCH.s0.x,y-SCH.s0.y)>10)SCH.moved=true;
+    if(SCH.moved){V.panned=true;const dx=x-SCH.last.x,dy=y-SCH.last.y;
+      if(PREF.map)camOrbit(G.cam,dx,dy);else{V.cx+=dx;V.cy+=dy;V.user=true;}}
+    SCH.last={x,y};}
+},{passive:false});
+cv.addEventListener('touchend',e=>{if(e.touches.length===0)setTimeout(()=>{V.panned=false;},60);},{passive:true});
 cv.addEventListener('dblclick',()=>{if(!G||T)return;if(PREF.map){G.cam=newCamMap();return;}V.user=false;V.S=V.fit.S;V.cx=V.fit.cx;V.cy=V.fit.cy;});
 cv.addEventListener('mouseleave',()=>{$('tip').style.display='none';if(G){G.hover=-1;G.dirtyHi=true;}});
 cv.addEventListener('click',e=>{if(!G||T||G.phase==='init'||V.panned)return;const p=pickProv(e.clientX,e.clientY);
@@ -598,6 +653,7 @@ function help(){return modal(`<h2>조작법 · 규칙</h2>
 <h4>사건 · 목표 · 보급 · 계급</h4><ul><li>실제 전쟁의 흐름(남침, 인천상륙, 중공군 참전, 장진호, 흥남철수, 1·4후퇴, 고지전…)이 <b>사건</b>으로 발생하며 전투력·병력에 영향을 줍니다. 왼쪽 위 <b>목표</b>를 기간 안에 달성하면 승점 보너스를 받습니다.</li><li><b>보급</b>: 유엔군은 부산·인천, 공산군은 압록강·두만강 접경(평북·량강·함북)에서 이어진 아군 지역만 보급됩니다. 끊기면(주황 ! 표시) 병력이 줄고 회복되지 않으며 전투력 −10%, 세부 전투에서 탄약 절반·제압 상태로 시작합니다.</li><li><b>계급</b>: 전투에서 승리·격파하면 경험치가 쌓여 ★ 승급하고 전투력이 오릅니다.</li><li>세부 전투: 측면·후방 공격 보너스, 제압·패주, 포병 탄약 제한이 있습니다.</li></ul>
 <h4>3D 보기 (전략 지도 · 세부 전투 공통)</h4><ul><li>‘3D 보기’ 버튼으로 전환. <b>드래그</b>=회전·기울기(전략 지도) / 세부 전투는 <b>휠 클릭 드래그</b> 또는 <b>Alt+드래그</b>, 우클릭 드래그(전략)·Shift+드래그=이동, 휠=확대/축소.</li><li>키보드: Q/E 회전, R/F 기울기, +/- 확대, 방향키 이동, 더블클릭(전략)=시점 초기화.</li></ul>
 <h4>세부 전투 (워게임 방식 · 실시간 · 일시정지 가능)</h4><ul><li><b>배치 단계</b>: 전투 시작 전, 유닛을 선택하고 초록색 아군 구역에 우클릭해 재배치합니다. 적은 보이지 않습니다. 준비되면 ‘전투 개시’.</li><li><b>자유 이동 전장</b>: 육각 칸이 아니라 연속 지형 위를 자유롭게 움직입니다. 보병은 숲·시가지에서, 전차·차량은 <b>도로</b>에서 빠르고 숲·논·여울에서는 느립니다. 강은 <b>다리·여울</b>로만 건넙니다.</li><li><b>시야와 은폐</b>: 적은 시선(LOS)이 통하고 시야 안에 있을 때만 보입니다. 언덕·숲·건물·연막이 시선을 막고, 숲·건물 속 정지 부대는 가까이 가야 발견됩니다. 사격하면 위치가 드러납니다.</li><li><b>장갑 방향</b>: 전차는 전면이 가장 두껍고 측면·후면이 약합니다. 관통력이 장갑을 넘어야 피해가 들어가며 (튕김/관통 표시), 보병용 총기는 장갑차를 거의 못 뚫습니다. 측면·후방으로 우회하세요.</li><li><b>제압</b>: 총알이 스치기만 해도 보병은 제압되어 느려지고 명중이 떨어지며, 한계를 넘으면 패주합니다. 기관총·박격포가 제압에 강합니다.</li><li><b>거점 점령전</b>: 거점(A~E) 반경 안에 홀로 머물면 점령되고, 가진 거점당 3초마다 1점. 먼저 400점이거나 시간 종료(15분) 때 점수가 높은 쪽 승리. 병력이 20% 이하로 무너지면 붕괴합니다. 증원은 100초·220초에 후방 도로로 도착.</li><li><b>간접 화력</b>: 곡사포·박격포·로켓은 시야 밖도 포격 가능(<b>G</b> 키 후 지점 클릭). <b>X</b>=연막탄. 최소 사거리가 있고 탄약이 한정됩니다. 공습·함포는 요청 후 9~11초 뒤 탄착.</li><li>조작: 좌클릭/드래그 선택 · 더블클릭 같은 병종 · <b>우클릭</b> 지면=이동(여러 부대는 대형), 우클릭 적=공격 이동 · Shift+4~9 그룹 지정 · WASD/방향키 화면 이동 · 휠 확대 · 미니맵 클릭 이동(우클릭=명령) · Space 일시정지 · 1/2/3 배속.</li><li><b>3D 보기</b>: 같은 전장을 기울여 입체 모델로 봅니다(Q/E 회전, R/F 기울기, 휠 클릭 드래그 회전).</li></ul>
+<h4>모바일 · 태블릿 (터치)</h4><ul><li>자동으로 터치 화면을 감지해 레이아웃이 바뀝니다 (세로: 아래쪽 패널 / 가로: 오른쪽 패널). 폰·태블릿(iPad 포함)을 자동 인식하며, 화면을 돌리거나 창 크기를 바꾸면 즉시 다시 맞춰집니다. 주소 뒤에 <b>?m=1</b>=강제 모바일, <b>?m=0</b>=강제 PC 모드.</li><li><b>전략 지도</b>: 탭=지역 선택(이동 가능한 부대 자동 선택) → 초록/빨강 지역 탭=이동 · 한 손가락 드래그=이동(3D는 회전) · 두 손가락=확대/축소.</li><li><b>세부 전투</b>: 유닛 탭=선택, 두 번 탭=같은 병종 전체, 선택 후 땅 탭=이동, 적 탭=공격. ＋다중 / ▭박스 / 전체 / 해제 버튼, ⓘ=정보 패널, 우상단 미니맵 터치로 이동. 포격·연막·공습·함포는 버튼 후 목표 지점을 탭.</li></ul>
 <h4>승리 조건</h4><ul><li>24개 지역 중 22개를 장악하면 즉시 승리.</li><li>1953년 7월(38턴)까지 <b>승점</b>(서울·평양 5, 부산 4, 대구·대전·광주·울산·함흥·인천 2, 그 외 1)이 더 높은 쪽이 승리.</li></ul>
 <p style="color:var(--dim);font-size:12px;margin-top:8px">단축키: Enter/Space 턴 종료 · N/Tab 다음 이동 부대 · 이동 가능 지역 우클릭=선택 부대 즉시 이동 · ‘추천 이동’=AI 참모에게 일임 · Esc 선택 해제 (세부 전투: Space 일시정지, 1/2/3 배속, S 정지, Ctrl+A 전체 선택)</p>`,[{t:'닫기',v:1,cls:'blue'}]);}
 
@@ -1552,7 +1608,7 @@ async function runTactical(pid,att,A,D){
   T.deploy=!(typeof HEADLESS!=='undefined'&&HEADLESS);
   // 카메라
   const mySide=G.player,cyStart=mySide==='COM'?GH*.28:GH*.72;
-  T.cam={x:GW/2,y:cyStart,s:Math.max(9,(VW-(VW<=900?230:320))/58)};
+  T.cam={x:GW/2,y:cyStart,s:Math.max(MOB?7:9,(VW-tacPW()-tacLeft())/(MOB?44:58))};
   T.c3=Object.assign(newCamTac(),{tx:GW/2,ty:cyStart,dist:34,pitch:.82});
   $('tac').classList.remove('hidden');TAC.on=true;SFX.resume();SFX.ambOn(true);SFX.horn();
   $('tTitle').textContent=`전투: ${p.n}`;
@@ -1590,7 +1646,7 @@ function tacRefresh(){
   $('tAuto').textContent=T.auto?'수동 지휘로':'자동 지휘';
   $('tRet').disabled=!act;
   $('tView').textContent=PREF.tac?'2D 보기':'3D 보기';
-  renderTSide();
+  mobBtnState();renderTSide();
 }
 const selUnits=()=>[...T.selSet].map(id=>T.units.find(u=>u.id===id)).filter(u=>u&&u.alive);
 function renderTSide(){
@@ -1614,6 +1670,7 @@ function renderTSide(){
   if(sel.length===1)h+=info(sel[0]);
   else if(sel.length>1){const cnt={};let hp=0,mh=0;for(const u of sel){cnt[TT[u.key].n]=(cnt[TT[u.key].n]||0)+1;hp+=u.hp;mh+=u.mhp;}
     h+=`<h3>${sel.length}개 부대 선택</h3><div class="hp"><i style="width:${hp/mh*100}%;background:#5ad08a"></i></div>`+Object.entries(cnt).map(([k,v])=>`<div class="row"><span>${k}</span><span>×${v}</span></div>`).join('');}
+  else if(MOB)h+=`<h3>지휘 안내 (터치)</h3><div class="box">• <b>유닛 탭</b>: 선택 (＋다중 켜면 여러 개) · <b>두 번 탭</b>: 같은 병종 전체<br>• 유닛 선택 후 <b>땅 탭</b>=이동 · <b>적 탭</b>=공격<br>• 한 손가락 드래그=화면 이동 · <b>두 손가락</b>=확대/축소(3D는 회전)<br>• ▭박스: 드래그로 영역 선택 · 해제 · 전체<br>• 포격/연막/공습/함포 버튼 → 목표 지점 탭<br>• 우상단 미니맵 터치=이동 · ⓘ 정보 패널 열기/닫기</div>`;
   else h+=`<h3>지휘 안내</h3><div class="box">• 좌클릭/드래그: 선택 · 더블클릭: 같은 병종 선택<br>• <b style="color:#58a6ff">우클릭</b> 지면: 이동 (여러 부대는 대형 유지)<br>• <b style="color:#ff6a60">우클릭</b> 적: 공격 이동 — 사거리·시야 확보 후 사격<br>• <b>장갑 방향</b>: 전면은 두껍고 측·후면은 얇습니다. 우회하세요.<br>• 숲·시가지·언덕 뒤에 숨으면 적이 보지 못합니다.<br>• 보병은 <b>숲/건물</b> 안에서, 전차는 <b>도로</b>에서 빠릅니다.<br>• <b>G</b> 포격 지시 · <b>X</b> 연막 · <b>S</b> 정지 · WASD 이동 · 휠 확대 · Space 일시정지<br>• Shift+숫자 그룹 지정 / 숫자 호출</div>`;
   if(T.hover){const hv=T.units.find(u=>u.alive&&Math.hypot(u.x-T.hover.x,u.y-T.hover.y)<TT[u.key].r*1.1&&(u.side===G.player||isSeen(G.player,u)));
     if(hv&&!sel.includes(hv))h+=`<div class="box">${info(hv)}</div>`;
@@ -1623,7 +1680,8 @@ function renderTSide(){
   s.innerHTML=h;
 }
 // ---------------- 좌표 변환 ----------------
-function tacCenter(){const pw=VW<=900?230:320;return[(VW-pw)/2,VH*.48];}
+const tacLeft=()=>MOB&&VW>VH?140:0;
+function tacCenter(){const pw=tacPW(),L=tacLeft();return[L+(VW-pw-L)/2,VH*(MOB?.5:.48)];}
 let CAMT=null;
 function tacCam(){const [cx,cy]=tacCenter();CAMT=camMat(T.c3,cx,cy,VH*1.15);return CAMT;}
 function w2s(x,y,z){ // 월드(셀,높이) → 화면
@@ -1640,7 +1698,7 @@ function unitAt(px,py,mine){
   for(const u of T.units){if(!u.alive)continue;
     if(mine?u.side!==G.player:(u.side===G.player||!isSeen(G.player,u)))continue;
     const q=w2s(u.x,u.y,PREF.tac?.5:0);if(!q)continue;
-    const r=Math.max(12,Math.min(30,q[2]*TT[u.key].r*(PREF.tac?1.1:1.0)));const d=Math.hypot(q[0]-px,q[1]-py);
+    const r=Math.max(MOB?24:12,Math.min(34,q[2]*TT[u.key].r*(PREF.tac?1.1:1.0)));const d=Math.hypot(q[0]-px,q[1]-py);
     if(d<r&&d<bd){bd=d;best=u;}}
   return best;
 }
@@ -1663,50 +1721,122 @@ function cmdMove(sel,tx,ty){
     s2.forEach((u,i)=>orderMove(u,clamp(p2[i][0],1,GW-1),clamp(p2[i][1],1,GH-1)));}
   T.rings.push({x:tx,y:ty,t0:performance.now(),col:'#58a6ff'});
 }
+function tacCommand(px,py){ // 우클릭 / 탭 명령
+  const sel=selUnits().filter(u=>u.side===G.player);if(!sel.length)return false;
+  const g=s2w(px,py);if(!g)return false;
+  if(T.deploy){
+    if(!inDeploy(G.player,g[1]))return false;
+    const pos=formation(sel.length,g[0],g[1],G.player==='COM'?0:3.1416);
+    sel.forEach((u,i)=>{const [nx,ny]=pos[i];if(!inDeploy(G.player,ny)||!moveCost(clsOf(u),gc(nx,ny)))return;u.x=clamp(nx,1,GW-1);u.y=ny;u.path=[];u.order=null;});
+    SFX.hit();return true;}
+  const en=unitAt(px,py,false);
+  if(en){for(const u of sel){if(TT[u.key].ind)orderFire(u,en.x,en.y);else orderAttack(u,en);}T.rings.push({x:en.x,y:en.y,t0:performance.now(),col:'#ff4a3d'});return true;}
+  cmdMove(sel,g[0],g[1]);return true;
+}
+function tacModeClick(px,py){
+  const g=s2w(px,py);const k=T.mode;T.mode='idle';
+  if(g){
+    if(k==='air'||k==='nav'){requestStrike(G.player,k,g[0],g[1]);}
+    else{const arty=selUnits().filter(u=>TT[u.key].ind&&u.ammo>0);let n=0;
+      for(const u of arty)if(orderFire(u,g[0]+rnd(-1,1),g[1]+rnd(-1,1),k==='smoke'?'smoke':'he'))n++;
+      if(n)T.rings.push({x:g[0],y:g[1],t0:performance.now(),col:k==='smoke'?'#d8d8d0':'#ffc84a'});else tlog('사거리 밖이거나 사용 가능한 포병이 없습니다.','');}}
+  tacRefresh();
+}
+function tacSelectAt(px,py,add){
+  const u=unitAt(px,py,true);
+  if(u){if(add){if(T.selSet.has(u.id))T.selSet.delete(u.id);else T.selSet.add(u.id);}else{T.selSet.clear();T.selSet.add(u.id);}}
+  else if(!add)T.selSet.clear();
+  tacRefresh();return u;
+}
+function tacBoxSel(x0,y0,x1,y1,add){
+  const a=Math.min(x0,x1),b=Math.max(x0,x1),c0=Math.min(y0,y1),d=Math.max(y0,y1);
+  if(!add)T.selSet.clear();
+  for(const u of tUnits(G.player)){const q=w2s(u.x,u.y,PREF.tac?.5:0);if(q&&q[0]>=a&&q[0]<=b&&q[1]>=c0&&q[1]<=d)T.selSet.add(u.id);}
+  tacRefresh();
+}
+function tacSelType(u){T.selSet.clear();
+  for(const o of tUnits(G.player))if(o.key===u.key){const q=w2s(o.x,o.y);if(q&&q[0]>=0&&q[0]<=VW&&q[1]>=0&&q[1]<=VH)T.selSet.add(o.id);}tacRefresh();}
 tcvEl.addEventListener('mousedown',e=>{if(!T||T.done)return;
   if(!T.rings)T.rings=[];
   if(e.button===1||(e.button===0&&e.altKey)){e.preventDefault();T.orb={lx:e.clientX,ly:e.clientY,pan:!PREF.tac||e.shiftKey};return;}
   if(e.button===0){T.drag={x0:e.clientX,y0:e.clientY,x1:e.clientX,y1:e.clientY};return;}
   if(e.button!==2)return;
-  e.preventDefault();
-  const sel=selUnits().filter(u=>u.side===G.player);if(!sel.length)return;
-  const g=s2w(e.clientX,e.clientY);if(!g)return;
-  if(T.deploy){
-    const ok=inDeploy(G.player,g[1]);if(!ok)return;
-    const pos=formation(sel.length,g[0],g[1],G.player==='COM'?0:3.1416);
-    sel.forEach((u,i)=>{const [nx,ny]=pos[i];if(!inDeploy(G.player,ny)||!moveCost(clsOf(u),gc(nx,ny)))return;u.x=clamp(nx,1,GW-1);u.y=ny;u.path=[];u.order=null;});
-    SFX.hit();return;}
-  const en=unitAt(e.clientX,e.clientY,false);
-  if(en){for(const u of sel){if(TT[u.key].ind)orderFire(u,en.x,en.y);else orderAttack(u,en);}T.rings.push({x:en.x,y:en.y,t0:performance.now(),col:'#ff4a3d'});return;}
-  cmdMove(sel,g[0],g[1]);
+  e.preventDefault();tacCommand(e.clientX,e.clientY);
 });
 tcvEl.addEventListener('mousemove',e=>{if(!T)return;const g=s2w(e.clientX,e.clientY);if(g)T.hover={x:g[0],y:g[1]};if(T.drag){T.drag.x1=e.clientX;T.drag.y1=e.clientY;}});
 tcvEl.addEventListener('mouseup',e=>{
   if(!T||e.button!==0||!T.drag)return;
   const d=T.drag;T.drag=null;
   const moved=Math.hypot(d.x1-d.x0,d.y1-d.y0)>6;
-  if(T.mode!=='idle'&&!moved){
-    const g=s2w(e.clientX,e.clientY);const k=T.mode;T.mode='idle';
-    if(g){
-      if(k==='air'||k==='nav'){requestStrike(G.player,k,g[0],g[1]);}
-      else{const arty=selUnits().filter(u=>TT[u.key].ind&&u.ammo>0);let n=0;
-        for(const u of arty)if(orderFire(u,g[0]+rnd(-1,1),g[1]+rnd(-1,1),k==='smoke'?'smoke':'he'))n++;
-        if(n)T.rings.push({x:g[0],y:g[1],t0:performance.now(),col:k==='smoke'?'#d8d8d0':'#ffc84a'});else tlog('사거리 밖이거나 사용 가능한 포병이 없습니다.','');}}
-    tacRefresh();return;}
-  if(moved){const x0=Math.min(d.x0,d.x1),x1=Math.max(d.x0,d.x1),y0=Math.min(d.y0,d.y1),y1=Math.max(d.y0,d.y1);
-    if(!e.shiftKey)T.selSet.clear();
-    for(const u of tUnits(G.player)){const q=w2s(u.x,u.y,PREF.tac?.5:0);if(q&&q[0]>=x0&&q[0]<=x1&&q[1]>=y0&&q[1]<=y1)T.selSet.add(u.id);}}
-  else{const u=unitAt(e.clientX,e.clientY,true);
-    if(u){if(e.shiftKey){if(T.selSet.has(u.id))T.selSet.delete(u.id);else T.selSet.add(u.id);}else{T.selSet.clear();T.selSet.add(u.id);}}
-    else if(!e.shiftKey)T.selSet.clear();}
-  tacRefresh();
+  if(T.mode!=='idle'&&!moved){tacModeClick(e.clientX,e.clientY);return;}
+  if(moved)tacBoxSel(d.x0,d.y0,d.x1,d.y1,e.shiftKey);
+  else tacSelectAt(e.clientX,e.clientY,e.shiftKey);
 });
-tcvEl.addEventListener('dblclick',e=>{if(!T||T.done)return;const u=unitAt(e.clientX,e.clientY,true);if(!u)return;T.selSet.clear();
-  for(const o of tUnits(G.player))if(o.key===u.key){const q=w2s(o.x,o.y);if(q&&q[0]>=0&&q[0]<=VW&&q[1]>=0&&q[1]<=VH)T.selSet.add(o.id);}tacRefresh();});
+// ---- 터치 (전술)
+const TCH={n:0,last:null,start:null,moved:false,lastTap:null};
+const tdist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
+const tang=t=>Math.atan2(t[1].clientY-t[0].clientY,t[1].clientX-t[0].clientX);
+const tctr=t=>[(t[0].clientX+t[1].clientX)/2,(t[0].clientY+t[1].clientY)/2];
+tcvEl.addEventListener('touchstart',e=>{if(!T||T.done)return;
+  const ts=e.touches;TCH.n=Math.max(ts.length===1?0:TCH.n,ts.length);
+  if(ts.length===1){TCH.start={x:ts[0].clientX,y:ts[0].clientY,t:Date.now()};TCH.last={x:ts[0].clientX,y:ts[0].clientY};TCH.moved=false;
+    if(T.boxMode)T.drag={x0:ts[0].clientX,y0:ts[0].clientY,x1:ts[0].clientX,y1:ts[0].clientY};}
+  else if(ts.length===2){TCH.d=tdist(ts);TCH.a=tang(ts);TCH.c=tctr(ts);TCH.moved=true;T.drag=null;}
+},{passive:true});
+tcvEl.addEventListener('touchmove',e=>{if(!T||T.done)return;e.preventDefault();
+  const ts=e.touches;
+  if(ts.length===2){const d=tdist(ts),a=tang(ts),c=tctr(ts);
+    const ratio=d/(TCH.d||d);
+    if(PREF.tac){camZoom(T.c3,ratio>1?-1:1,8,90);if(Math.abs(ratio-1)>.001)T.c3.dist=clamp(T.c3.dist/ratio,8,90);
+      T.c3.yaw-=angN(a-TCH.a)*1;camDrag(T.c3,c[0]-TCH.c[0],c[1]-TCH.c[1],VH*1.15);}
+    else{const g=s2w(c[0],c[1]);T.cam.s=clamp(T.cam.s*ratio,4,48);const g2=s2w(c[0],c[1]);if(g&&g2){T.cam.x+=g[0]-g2[0];T.cam.y+=g[1]-g2[1];}
+      T.cam.x-=(c[0]-TCH.c[0])/T.cam.s;T.cam.y-=(c[1]-TCH.c[1])/T.cam.s;}
+    TCH.d=d;TCH.a=a;TCH.c=c;clampCam();return;}
+  if(ts.length===1&&TCH.last){const x=ts[0].clientX,y=ts[0].clientY;
+    if(!TCH.moved&&Math.hypot(x-TCH.start.x,y-TCH.start.y)>10)TCH.moved=true;
+    if(TCH.moved){
+      if(T.boxMode&&T.drag){T.drag.x1=x;T.drag.y1=y;}
+      else{const dx=x-TCH.last.x,dy=y-TCH.last.y;if(PREF.tac)camDrag(T.c3,dx,dy,VH*1.15);else{T.cam.x-=dx/T.cam.s;T.cam.y-=dy/T.cam.s;}clampCam();}}
+    TCH.last={x,y};}
+},{passive:false});
+tcvEl.addEventListener('touchend',e=>{if(!T||T.done)return;e.preventDefault();
+  if(e.touches.length>0)return;
+  const cn=TCH.n;TCH.n=0;
+  if(cn>=2){T.drag=null;return;}
+  const st=TCH.start;if(!st)return;
+  if(T.boxMode&&T.drag&&TCH.moved){const d=T.drag;T.drag=null;tacBoxSel(d.x0,d.y0,d.x1,d.y1,T.multi);return;}
+  T.drag=null;
+  if(TCH.moved||Date.now()-st.t>600)return;
+  tacTap(st.x,st.y);
+},{passive:false});
+function tacTap(px,py){
+  const g=s2w(px,py);if(g)T.hover={x:g[0],y:g[1]};
+  if(T.mode!=='idle'){tacModeClick(px,py);return;}
+  const now=Date.now();
+  const mine=unitAt(px,py,true);
+  if(mine){
+    if(TCH.lastTap&&now-TCH.lastTap.t<380&&TCH.lastTap.id===mine.id){tacSelType(mine);TCH.lastTap=null;return;}
+    TCH.lastTap={t:now,id:mine.id};
+    if(T.multi){if(T.selSet.has(mine.id))T.selSet.delete(mine.id);else T.selSet.add(mine.id);}else{T.selSet.clear();T.selSet.add(mine.id);}
+    tacRefresh();return;}
+  if(selUnits().length&&tacCommand(px,py))return;
+  tacRefresh();
+}
+function mobBtnState(){if(!T)return;$('tMulti').classList.toggle('on',!!T.multi);$('tBox').classList.toggle('on',!!T.boxMode);document.body.classList.toggle('tside',!!T.sideOpen);}
+$('tMulti').onclick=()=>{if(T){T.multi=!T.multi;mobBtnState();}};
+$('tBox').onclick=()=>{if(T){T.boxMode=!T.boxMode;mobBtnState();}};
+$('tAllB').onclick=()=>{if(T){for(const u of tUnits(G.player))T.selSet.add(u.id);tacRefresh();}};
+$('tNoneB').onclick=()=>{if(T){T.selSet.clear();T.mode='idle';tacRefresh();}};
+$('tInfoB').onclick=()=>{if(T){T.sideOpen=!T.sideOpen;mobBtnState();}};
+tcvEl.addEventListener('dblclick',e=>{if(!T||T.done)return;const u=unitAt(e.clientX,e.clientY,true);if(u)tacSelType(u);});
 window.addEventListener('mousemove',e=>{if(!T||!T.orb)return;const dx=e.clientX-T.orb.lx,dy=e.clientY-T.orb.ly;T.orb.lx=e.clientX;T.orb.ly=e.clientY;
   if(T.orb.pan){if(PREF.tac)camDrag(T.c3,dx,dy,VH*1.15);else{T.cam.x-=dx/T.cam.s;T.cam.y-=dy/T.cam.s;}}else camOrbit(T.c3,dx,dy);clampCam();});
 window.addEventListener('mouseup',e=>{if(T&&T.orb)T.orb=null;});
-function clampCam(){if(!T)return;T.cam.x=clamp(T.cam.x,0,GW);T.cam.y=clamp(T.cam.y,0,GH);T.c3.tx=clamp(T.c3.tx,0,GW);T.c3.ty=clamp(T.c3.ty,0,GH);}
+function clampCam(){if(!T)return;
+  if(!PREF.tac){const [cx,cy]=tacCenter(),s=T.cam.s;const lx=cx/s,rx=(VW-cx)/s,ty=cy/s,by=(VH-cy)/s;
+    T.cam.x=lx+rx>=GW?GW/2:clamp(T.cam.x,lx,GW-rx);T.cam.y=ty+by>=GH?GH/2:clamp(T.cam.y,ty,GH-by);}
+  else{T.cam.x=clamp(T.cam.x,0,GW);T.cam.y=clamp(T.cam.y,0,GH);}
+  T.c3.tx=clamp(T.c3.tx,0,GW);T.c3.ty=clamp(T.c3.ty,0,GH);}
 tcvEl.addEventListener('wheel',e=>{if(!T)return;e.preventDefault();
   if(PREF.tac){camZoom(T.c3,e.deltaY,8,90);return;}
   const f=e.deltaY<0?1.14:1/1.14;const g=s2w(e.clientX,e.clientY);const ns=clamp(T.cam.s*f,5,48);
@@ -1769,6 +1899,8 @@ let miniDrag=false;
 miniEl.addEventListener('mousedown',e=>{if(!T)return;miniDrag=true;const [x,y]=miniXY(e);T.cam.x=x;T.cam.y=y;T.c3.tx=x;T.c3.ty=y;});
 window.addEventListener('mousemove',e=>{if(!T||!miniDrag)return;const [x,y]=miniXY(e);T.cam.x=clamp(x,0,GW);T.cam.y=clamp(y,0,GH);T.c3.tx=T.cam.x;T.c3.ty=T.cam.y;});
 window.addEventListener('mouseup',()=>{miniDrag=false;});
+miniEl.addEventListener('touchstart',e=>{if(!T)return;e.preventDefault();const t=e.touches[0],[x,y]=miniXY(t);T.cam.x=clamp(x,0,GW);T.cam.y=clamp(y,0,GH);T.c3.tx=T.cam.x;T.c3.ty=T.cam.y;},{passive:false});
+miniEl.addEventListener('touchmove',e=>{if(!T)return;e.preventDefault();const t=e.touches[0],[x,y]=miniXY(t);T.cam.x=clamp(x,0,GW);T.cam.y=clamp(y,0,GH);T.c3.tx=T.cam.x;T.c3.ty=T.cam.y;},{passive:false});
 miniEl.addEventListener('contextmenu',e=>{e.preventDefault();if(!T)return;const sel=selUnits();if(!sel.length||T.deploy)return;const [x,y]=miniXY(e);cmdMove(sel,x,y);});
 function drawMini(){
   const W=miniEl.width,H=miniEl.height,c=mctx;c.clearRect(0,0,W,H);
@@ -1900,14 +2032,14 @@ function drawCommon(c,mode3){
   if(T.mode!=='idle'&&T.hover){ringW(c,T.hover.x,T.hover.y,T.mode==='air'||T.mode==='nav'?7:T.mode==='smoke'?3:3.2,'rgba(255,200,80,.1)','rgba(255,200,80,.8)',1.6,[5,4]);}
 }
 function tacOverlay2(c){
-  const pw=VW<=900?230:320;
+  const pw=tacPW();
   if(T.paused&&!T.done){c.save();c.fillStyle='rgba(0,0,0,.26)';c.fillRect(0,0,VW-pw,VH);c.fillStyle='#ffe9a3';c.font='800 28px "Noto Sans KR",sans-serif';c.textAlign='center';
-    c.fillText(T.deploy?'배치 단계':'일시정지',(VW-pw)/2,VH*.2);c.font='600 14px "Noto Sans KR",sans-serif';c.fillStyle='#cfd8e3';
-    c.fillText(T.deploy?'유닛을 선택해 초록 구역 안에서 재배치 — 우클릭으로 이동 · [전투 개시]로 시작':'Space 로 재개 — 일시정지 중에도 명령을 내릴 수 있습니다',(VW-pw)/2,VH*.2+26);c.restore();}
+    c.fillText(T.deploy?'배치 단계':'일시정지',(VW-pw)/2,VH*.2);c.font='600 '+(MOB?12:14)+'px "Noto Sans KR",sans-serif';c.fillStyle='#cfd8e3';
+    c.fillText(T.deploy?(MOB?'유닛을 탭해 선택 → 초록 구역을 탭해 재배치 · [전투 개시]':'유닛을 선택해 초록 구역 안에서 재배치 — 우클릭으로 이동 · [전투 개시]로 시작'):(MOB?'▶ 재개 버튼을 누르세요 — 정지 중에도 명령 가능':'Space 로 재개 — 일시정지 중에도 명령을 내릴 수 있습니다'),(VW-pw)/2,VH*.2+26);c.restore();}
 }
 function drawTac(time){
   const c=ctc;c.setTransform(DPR,0,0,DPR,0,0);c.fillStyle='#070a0c';c.fillRect(0,0,VW,VH);
-  const dt=Math.min(.05,(time-(T.lastDraw||time))/1000);T.lastDraw=time;camKeys(dt);
+  const dt=Math.min(.05,(time-(T.lastDraw||time))/1000);T.lastDraw=time;camKeys(dt);clampCam();
   const s=T.cam.s,[cx,cy]=tacCenter();
   const X=x=>cx+(x-T.cam.x)*s,Y=y=>cy+(y-T.cam.y)*s;
   c.save();const [shx,shy]=getShake();c.translate(shx,shy);
@@ -2325,7 +2457,7 @@ function drawTri(c,img,s0,s1,s2,t0,t1,t2){
   c.drawImage(img,sx,sy,ex2-sx,ey2-sy,sx,sy,ex2-sx,ey2-sy);
   c.restore();
 }
-function mapCam(){const pw=VW<=900?250:330;CAMM=camMat(G.cam,(VW-pw)/2,VH*.52,VH*1.0);return CAMM;}
+function mapCam(){const {pw,sh}=panelM();const fh=VH-sh;CAMM=camMat(G.cam,(VW-pw)/2,MOB?fh*.55:VH*.52,MOB?Math.min(fh,(VW-pw)*1.5):VH*1.0);return CAMM;}
 function sceneLL(lon,lat,z){const p=mw(lon,lat,z);return p;}
 function groundH(lon,lat){const i=(lon-LON0)/(NX*DX)*MW,j=(LAT1-lat)/(NY*DY)*MH;if(!MESH||i<0||j<0||i>=MW||j>=MH)return 0;
   const i0=Math.floor(i),j0=Math.floor(j),fi=i-i0,fj=j-j0,H=MESH.H,w=MW+1;
