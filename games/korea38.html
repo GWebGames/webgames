@@ -927,6 +927,93 @@ const angD=(a,b)=>Math.abs(angN(a-b));
 let T_TEX=null;   // 지형 텍스처 캔버스
 
 // ---------------- 지형 생성 ----------------
+
+// ---------- 지역별 특색 지형 (좌표는 전투맵 비율, y=0 북쪽) ----------
+const TERF={
+ se:[{t:'ridge',pts:[[0,.03],[.3,.09],[.65,.05],[1,.1]],w:5.5,h:10,n:'북한산·북악산',lx:.3,ly:.08},
+     {t:'hill',x:.21,y:.27,r:5,h:5.5,n:'인왕산'},{t:'hill',x:.41,y:.42,r:6,h:7.5,n:'남산'},{t:'hill',x:.78,y:.87,r:7,h:7,n:'관악산'},
+     {t:'river',pts:[[0,.6],[.25,.65],[.5,.62],[.75,.67],[1,.62]],w:3.8,n:'한강',lx:.12,ly:.64},
+     {t:'urban',x:.46,y:.4,rx:22,ry:10},{t:'urban',x:.42,y:.8,rx:18,ry:6},{t:'urban',x:.78,y:.44,rx:9,ry:6}],
+ gg:[{t:'ridge',pts:[[.5,.05],[.78,.16],[1,.1]],w:5,h:7.5,n:'감악산',lx:.75,ly:.14},
+     {t:'river',pts:[[0,.34],[.3,.4],[.6,.33],[1,.38]],w:2.2,n:'임진강',lx:.12,ly:.36},{t:'paddy',x:.3,y:.72,rx:22,ry:8},{t:'urban',x:.55,y:.55,rx:7,ry:4}],
+ ic:[{t:'hill',x:.62,y:.38,r:5,h:5,n:'월미산'},{t:'hill',x:.34,y:.55,r:4,h:4.2,n:'자유공원'},
+     {t:'river',pts:[[0,.86],[.5,.9],[1,.85]],w:3.8,n:'갯벌·수로',lx:.2,ly:.88},{t:'urban',x:.5,y:.5,rx:24,ry:10}],
+ gw:[{t:'ridge',pts:[[.74,0],[.62,.35],[.72,.7],[.62,1]],w:7.5,h:14,n:'태백산맥',lx:.7,ly:.3},
+     {t:'ridge',pts:[[.2,0],[.3,.4],[.22,1]],w:5.5,h:9,n:'오대산맥',lx:.24,ly:.5},
+     {t:'river',pts:[[.42,0],[.4,.3],[.44,.6],[.4,1]],w:1.5,n:'계곡',lx:.43,ly:.12},{t:'forest',x:.5,y:.5,rx:30,ry:20}],
+ cb:[{t:'ridge',pts:[[.92,0],[.62,.5],[.2,1]],w:6,h:10,n:'소백산맥',lx:.65,ly:.45},{t:'river',pts:[[0,.3],[.5,.42],[1,.35]],w:2.2,n:'남한강',lx:.15,ly:.3}],
+ cn:[{t:'hill',x:.72,y:.3,r:6,h:6.5,n:'계룡산'},{t:'river',pts:[[0,.72],[.5,.62],[1,.7]],w:3,n:'금강',lx:.15,ly:.7},{t:'paddy',x:.3,y:.35,rx:20,ry:9}],
+ jb:[{t:'ridge',pts:[[0,.32],[.5,.4],[1,.28]],w:5,h:7.5,n:'노령산맥',lx:.2,ly:.34},{t:'paddy',x:.35,y:.75,rx:28,ry:10},{t:'river',pts:[[0,.8],[.5,.75],[1,.82]],w:2.4,n:'만경강',lx:.15,ly:.8}],
+ jn:[{t:'hill',x:.88,y:.2,r:8,h:10,n:'지리산'},{t:'ridge',pts:[[.1,.1],[.4,.2]],w:4,h:6},{t:'paddy',x:.4,y:.7,rx:28,ry:10}],
+ gb:[{t:'ridge',pts:[[.88,0],[.78,.5],[.9,1]],w:6.5,h:13,n:'태백산맥',lx:.82,ly:.3},{t:'river',pts:[[.18,0],[.3,.5],[.14,1]],w:2.6,n:'낙동강',lx:.2,ly:.12},{t:'hill',x:.55,y:.3,r:6,h:7,n:'팔공산'}],
+ gn:[{t:'hill',x:.18,y:.25,r:8,h:10,n:'지리산'},{t:'river',pts:[[0,.46],[.5,.52],[1,.42]],w:3.2,n:'낙동강',lx:.12,ly:.5},{t:'paddy',x:.6,y:.7,rx:22,ry:9}],
+ bs:[{t:'ridge',pts:[[.05,.14],[.5,.08],[.95,.16]],w:6,h:9,n:'금정산',lx:.3,ly:.1},{t:'hill',x:.72,y:.8,r:4.5,h:5,n:'영도 봉래산'},
+     {t:'urban',x:.5,y:.55,rx:28,ry:11},{t:'river',pts:[[0,.9],[1,.87]],w:2.6,n:'낙동강 하구',lx:.15,ly:.9}],
+ dg:[{t:'ridge',pts:[[0,.09],[1,.07]],w:5.5,h:9.5,n:'팔공산',lx:.2,ly:.08},{t:'ridge',pts:[[0,.93],[1,.9]],w:5,h:8.5,n:'비슬산',lx:.2,ly:.92},
+     {t:'river',pts:[[0,.62],[.5,.58],[1,.64]],w:2.2,n:'신천',lx:.12,ly:.6},{t:'urban',x:.5,y:.5,rx:26,ry:12}],
+ dj:[{t:'hill',x:.12,y:.4,r:8,h:8.5,n:'계룡산'},{t:'hill',x:.58,y:.78,r:4.5,h:5,n:'보문산'},{t:'river',pts:[[0,.34],[.5,.4],[1,.3]],w:2.5,n:'갑천',lx:.15,ly:.36},{t:'urban',x:.5,y:.5,rx:22,ry:11}],
+ gj:[{t:'hill',x:.84,y:.35,r:9,h:10.5,n:'무등산'},{t:'river',pts:[[0,.72],[.5,.68],[1,.62]],w:1.8,n:'광주천',lx:.15,ly:.7},{t:'urban',x:.45,y:.5,rx:20,ry:10},{t:'paddy',x:.25,y:.2,rx:22,ry:8}],
+ us:[{t:'ridge',pts:[[.05,.06],[.5,.1],[.95,.05]],w:5.5,h:8,n:'영남알프스',lx:.3,ly:.08},{t:'river',pts:[[0,.5],[.5,.52],[1,.6]],w:2.8,n:'태화강',lx:.12,ly:.5},{t:'urban',x:.6,y:.62,rx:22,ry:8}],
+ py:[{t:'hill',x:.46,y:.28,r:5,h:5.5,n:'모란봉'},{t:'river',pts:[[0,.56],[.4,.5],[1,.6]],w:3.6,n:'대동강',lx:.12,ly:.58},{t:'urban',x:.46,y:.42,rx:22,ry:11}],
+ hh:[{t:'ridge',pts:[[0,.06],[1,.1]],w:5,h:8.5,n:'마천령 산줄기',lx:.2,ly:.07},{t:'river',pts:[[0,.55],[.5,.6],[1,.52]],w:2.4,n:'성천강',lx:.15,ly:.58},{t:'paddy',x:.5,y:.4,rx:30,ry:10},{t:'urban',x:.5,y:.45,rx:12,ry:6}],
+ hb:[{t:'ridge',pts:[[.15,0],[.6,.5],[.3,1]],w:6.5,h:11,n:'함경산맥',lx:.5,ly:.4}],
+ hn:[{t:'ridge',pts:[[.05,.3],[.5,.25],[.95,.18]],w:6,h:10,n:'부전·장진',lx:.3,ly:.27},{t:'ridge',pts:[[.1,.78],[.9,.74]],w:4,h:6}],
+ ry:[{t:'ridge',pts:[[0,.2],[.5,.3],[1,.15]],w:7,h:15,n:'개마고원',lx:.5,ly:.28},{t:'ridge',pts:[[.1,.85],[.6,.7],[1,.8]],w:6,h:12},{t:'forest',x:.5,y:.5,rx:32,ry:22}],
+ pb:[{t:'ridge',pts:[[.1,.05],[.5,.2],[.9,.05]],w:6,h:9.5,n:'낭림산맥',lx:.5,ly:.17}],
+ pn:[{t:'ridge',pts:[[.72,0],[.5,.5],[.62,1]],w:5,h:6.5,n:'언진산맥',lx:.6,ly:.3}],
+ hbk:[{t:'ridge',pts:[[0,.1],[.5,.2],[1,.12]],w:4.5,h:6.5,n:'멸악산맥',lx:.3,ly:.14}],
+};
+function applyTerF(k,ctx){
+  const ops=TERF[k];if(!ops)return null;
+  const {HV,ter,rng,fb,o3,ox}=ctx;const W1=GW+1;
+  const frx=v=>v*GW,fry=v=>v*GH;
+  const infl=new Float32Array(W1*(GH+1));const labels=[];let hasRiver=false;
+  const dseg=(x,y,a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1];const l2=dx*dx+dy*dy||1;let t=((x-a[0])*dx+(y-a[1])*dy)/l2;t=Math.max(0,Math.min(1,t));return Math.hypot(x-(a[0]+dx*t),y-(a[1]+dy*t));};
+  for(const o of ops){
+    if(o.t==='ridge'||o.t==='hill'){
+      const pts=o.t==='ridge'?o.pts.map(q=>[frx(q[0]),fry(q[1])]):null;const w=o.t==='ridge'?o.w:o.r*.62;
+      for(let j=0;j<=GH;j++){const edge=Math.min(j,GH-j);const ef=.3+.7*clamp(edge/10,0,1);
+        for(let i=0;i<=GW;i++){
+          let d;if(pts){d=1e9;for(let q=0;q<pts.length-1;q++)d=Math.min(d,dseg(i,j,pts[q],pts[q+1]));}else d=Math.hypot(i-frx(o.x),j-fry(o.y));
+          const g=Math.exp(-(d/w)*(d/w));if(g<.01)continue;
+          const nz=.72+.56*fb(i,j,o3+11);const add=o.h*g*nz*ef;
+          HV[j*W1+i]+=add;infl[j*W1+i]=Math.max(infl[j*W1+i],g*ef);}}
+      const lx=o.t==='ridge'?(o.lx!=null?frx(o.lx):null):frx(o.x),ly=o.t==='ridge'?(o.ly!=null?fry(o.ly):null):fry(o.y);
+      if(o.n&&lx!=null)labels.push({x:lx,y:ly,n:o.n,k:'m'});
+    }
+  }
+  // 산지 사면은 숲으로 (능선·정상부 일부는 민둥)
+  for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const k2=j*W1+i;const g=(infl[k2]+infl[k2+1]+infl[k2+W1]+infl[k2+W1+1])/4;
+    if(g>.26&&ter[j*GW+i]<3&&(fb(i,j,o3+5)>.3||g>.55))ter[j*GW+i]=2;
+    else if(g>.82&&fb(i,j,o3+7)<.45)ter[j*GW+i]=0;}
+  for(const o of ops){
+    if(o.t==='forest'){for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const d=Math.hypot((i-frx(o.x))/o.rx,(j-fry(o.y))/o.ry);if(d<.9+.3*vnoise(i/4+ox,j/4)&&fb(i,j,o3+3)>.38&&ter[j*GW+i]<3)ter[j*GW+i]=2;}}
+    else if(o.t==='paddy'){for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const d=Math.hypot((i-frx(o.x))/o.rx,(j-fry(o.y))/o.ry);if(d<.9+.25*vnoise(i/4+ox,j/4)&&ter[j*GW+i]<=2&&infl[j*W1+i]<.2)ter[j*GW+i]=1;}}
+    else if(o.t==='river'){hasRiver=true;
+      const pts=o.pts.map(q=>[frx(q[0]),fry(q[1])]);const ph=rng()*6;
+      const yAt=x=>{// 선분 보간
+        for(let q=0;q<pts.length-1;q++){if(x>=pts[q][0]&&x<=pts[q+1][0]){const f=(x-pts[q][0])/((pts[q+1][0]-pts[q][0])||1);return pts[q][1]+(pts[q+1][1]-pts[q][1])*f;}}return x<pts[0][0]?pts[0][1]:pts[pts.length-1][1];};
+      const vert=Math.abs(pts[pts.length-1][1]-pts[0][1])>Math.abs(pts[pts.length-1][0]-pts[0][0])*1.2;
+      const wd=o.w;
+      const cl=(a,b)=>{ // 중심선까지 거리
+        let d=1e9;for(let q=0;q<pts.length-1;q++)d=Math.min(d,dseg(a,b,pts[q],pts[q+1]));return d;};
+      for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){
+        const wob=Math.sin((vert?j:i)/9+ph)*1.4+Math.sin((vert?j:i)/4+ph*2)*.5;
+        const d=cl(i+.5,j+.5)-wob*.35;
+        const dd=Math.abs(d);
+        if(dd<wd)ter[j*GW+i]=4;else if(dd<wd+1.1&&ter[j*GW+i]!==4)ter[j*GW+i]=5;}
+      for(let j=0;j<=GH;j++)for(let i=0;i<=GW;i++){const d=cl(i,j);if(d<wd+2.6){HV[j*W1+i]=Math.min(HV[j*W1+i],-.25+Math.max(0,d-wd)*.3);}}
+      if(o.n)labels.push({x:frx(o.lx!=null?o.lx:.5),y:fry(o.ly!=null?o.ly:.5),n:o.n,k:'w'});
+    }
+  }
+  for(const o of ops){
+    if(o.t==='urban'){const cx=frx(o.x),cy=fry(o.y);
+      for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const d=Math.hypot((i-cx)/o.rx,(j-cy)/o.ry);
+        if(d<.78+.38*vnoise(i/3+ox,j/3+ox*.5)&&ter[j*GW+i]<4&&infl[j*W1+i]<.62)ter[j*GW+i]=3;}}
+    if(o.t==='hill'&&o.n==='남산')labels.push({x:frx(o.x),y:fry(o.y)-2.2,n:'N서울타워',k:'p'});
+  }
+  return{labels,hasRiver};
+}
 function genTerrain(p,rng){
   const t=p.ter,N=GW*GH,ter=new Uint8Array(N),road=new Uint8Array(N),HV=new Float32Array((GW+1)*(GH+1));
   const ox=rng()*500,o2=rng()*500,o3=rng()*500;
@@ -951,9 +1038,11 @@ function genTerrain(p,rng){
     if(fb(i,j,o3)>pth&&h<(t.paddy?3:1.6))c=1;
     if(fq(i,j)>fth||(h>3.5&&fq(i,j)>fth-.12))c=2;
     ter[k]=c;}
+  // 지역 특색 지형
+  const tf=applyTerF(p.k,{HV,ter,rng,fb,o3,ox});
   // 강
   const rivers=[];
-  if(t.r){const ph=rng()*6,yb=GH*(.4+.2*rng()),wd=2.2+rng()*1.2;
+  if(t.r&&!(tf&&tf.hasRiver)){const ph=rng()*6,yb=GH*(.4+.2*rng()),wd=2.2+rng()*1.2;
     for(let i=0;i<GW;i++){const yr=yb+Math.sin(i/12+ph)*5+Math.sin(i/5+ph*2)*1.2;rivers.push([i,yr]);
       for(let j=0;j<GH;j++){const d=Math.abs(j+.5-yr);if(d<wd){ter[j*GW+i]=4;}else if(d<wd+1.1&&ter[j*GW+i]!==4){ter[j*GW+i]=5;}}}
     for(let j=0;j<=GH;j++)for(let i=0;i<=GW;i++){const yr=rivers[Math.min(GW-1,i)][1];const d=Math.abs(j-yr);if(d<wd+2.5){HV[j*(GW+1)+i]=Math.min(HV[j*(GW+1)+i],-.25+Math.max(0,d-wd)*.25);}}}
@@ -981,16 +1070,19 @@ function genTerrain(p,rng){
     for(let s=0;s<=L;s++){const f=s/L,x=a[0]+(b[0]-a[0])*f,y=a[1]+(b[1]-a[1])*f;
       for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){if(Math.hypot(di,dj)>1.1)continue;const i=Math.floor(x)+di,j=Math.floor(y)+dj;if(i<0||j<0||i>=GW||j>=GH)continue;const kk=j*GW+i;
         if(Math.hypot(i+.5-x,j+.5-y)>1.05)continue;road[kk]=1;if(ter[kk]===2||ter[kk]===1)ter[kk]=0;if(ter[kk]===4)ter[kk]=5;}}}
+  // 도로는 산지를 깎아 완만하게, 거점 주변은 평탄하게
+  {const W1=GW+1;for(let k=0;k<N;k++){if(!road[k])continue;const i=k%GW,j=(k/GW)|0;for(const q of [j*W1+i,j*W1+i+1,(j+1)*W1+i,(j+1)*W1+i+1]){if(HV[q]>2)HV[q]=2+(HV[q]-2)*.55;}}
+   for(const z of zones)for(let j=Math.max(0,Math.floor(z.y-6));j<=Math.min(GH,z.y+6);j++)for(let i=Math.max(0,Math.floor(z.x-6));i<=Math.min(GW,z.x+6);i++){const d=Math.hypot(i-z.x,j-z.y);const f=clamp((d-3)/3,0,1);if(HV[j*W1+i]>1.5)HV[j*W1+i]=1.5+(HV[j*W1+i]-1.5)*f;}}
   // 구역·전개 지대 보정
   for(const z of zones)for(let j=Math.floor(z.y-3);j<=z.y+3;j++)for(let i=Math.floor(z.x-3);i<=z.x+3;i++){if(i<0||j<0||i>=GW||j>=GH)continue;if(Math.hypot(i-z.x,j-z.y)<3&&(ter[j*GW+i]===4))ter[j*GW+i]=5;}
   for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){if((j<3||j>GH-4)&&(ter[j*GW+i]===4||ter[j*GW+i]===5))ter[j*GW+i]=0;}
   // 건물 · 나무
-  for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const k=j*GW+i;if(ter[k]===3&&!road[k]){const nh=(hashN(i,j,3)<.6)?1:0;
-      for(let q=0;q<nh;q++)houses.push({x:i+.2+hashN(i,j,4+q)*.6,y:j+.2+hashN(i,j,7+q)*.6,w:.55+hashN(i,j,9)*.35,d:.5+hashN(i,j,11)*.3,h:.5+hashN(i,j,13)*.6,a:(hashN(i,j,15)<.5?0:1.5708)+(hashN(i,j,17)-.5)*.3,roof:hashN(i,j,19)});}}
+  for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){const k=j*GW+i;if(ter[k]===3&&!road[k]){const nh=(hashN(i,j,3)<.6+(t.u||0)*.5)?1:0;
+      for(let q=0;q<nh;q++)houses.push({x:i+.2+hashN(i,j,4+q)*.6,y:j+.2+hashN(i,j,7+q)*.6,w:.55+hashN(i,j,9)*.35,d:.5+hashN(i,j,11)*.3,h:(.5+hashN(i,j,13)*.6)*(1+(t.u>=.4?(t.u-.2)*(hashN(i,j,23)<.35?3.2:1.2):0)),a:(hashN(i,j,15)<.5?0:1.5708)+(hashN(i,j,17)-.5)*.3,roof:hashN(i,j,19)});}}
   const trees=[];
   for(let j=0;j<GH;j++)for(let i=0;i<GW;i++){if(ter[j*GW+i]!==2)continue;const n=2+(hashN(i,j,21)<.5?1:0);
     for(let q=0;q<n;q++)trees.push([i+.1+hashN(i,j,22+q)*.8,j+.1+hashN(i,j,25+q)*.8,.8+hashN(i,j,28+q)*.7,hashN(i,j,31+q)]);}
-  return{ter,road,HV,zones,roads,rivers,houses,trees};
+  return{ter,road,HV,zones,roads,rivers,houses,trees,labels:(tf&&tf.labels)||[]};
 }
 function hashN(i,j,k){let h=Math.imul(i*73856093^j*19349663^k*83492791,2654435761);h=(h^(h>>>15))>>>0;return h/4294967296;}
 
@@ -1613,6 +1705,7 @@ async function runTactical(pid,att,A,D){
   $('tac').classList.remove('hidden');TAC.on=true;SFX.resume();SFX.ambOn(true);SFX.horn();
   $('tTitle').textContent=`전투: ${p.n}`;
   tlog(`${p.n} 전투 — ${SIDE_N[att]} 공격 / ${SIDE_N[def]} 방어 (거점 점령으로 ${T.target}점 선취 또는 시간 종료 시 우세)`,'');
+  if(T.labels&&T.labels.length)tlog('지형: '+T.labels.map(l=>l.n).join(' · '),'');
   tlog(T.deploy?'배치 단계 — 유닛을 선택하고 아군 구역에 우클릭해 재배치한 뒤 [전투 개시]':'스페이스바: 시작·일시정지 / 우클릭: 이동·공격','');
   tacRefresh();
   T.endP=new Promise(r=>T.endRes=r);
@@ -1972,6 +2065,13 @@ function drawBars(c,u,q,sz){
 }
 function drawCommon(c,mode3){
   const now=performance.now();
+  // 지명 표시 (산·강·랜드마크)
+  if(T.labels&&T.labels.length){c.save();c.textAlign='center';c.textBaseline='middle';
+    for(const L of T.labels){const q=w2s(L.x,L.y,L.k==='w'?0:2.2);if(!q||q[0]<-60||q[0]>VW+60||q[1]<-20||q[1]>VH+20)continue;
+      const fs=Math.round(clamp(q[2]*1.5,11,17));c.font='700 '+fs+'px "Noto Sans KR",sans-serif';
+      const txt=(L.k==='m'?'▲ ':L.k==='w'?'〰 ':'◆ ')+L.n;c.lineWidth=3.5;c.strokeStyle='rgba(0,0,0,.65)';c.strokeText(txt,q[0],q[1]);
+      c.fillStyle=L.k==='w'?'rgba(150,205,245,.95)':L.k==='p'?'rgba(255,225,140,.95)':'rgba(235,225,190,.92)';c.fillText(txt,q[0],q[1]);}
+    c.restore();}
   // 거점
   for(const z of T.zones){
     const col=z.owner==='UN'?'75,139,255':z.owner==='COM'?'255,90,82':'200,205,212';
@@ -2139,11 +2239,21 @@ function drawTac3D(time){
       const M=mkM(t[0],t[1],gH(t[0],t[1]),0,1);const k=t[2];
       prism(F,M,0,0,0,.4*k,.07,.06,4,[84,60,38],0);prism(F,M,0,0,.25*k,1.5*k,.6*k,.05,6,t[3]<.5?[40,84,46]:[52,100,56],0);}}
   for(const w of T.wrecks){const M=mkM(w.x,w.y,gH(w.x,w.y),w.face,1.4);if(w.veh)box(F,M,0,0,.18,.52,.3,.14,[32,30,28]);else box(F,M,0,0,.03,.3,.2,.03,[56,40,34]);}
+  const FU=[],halos=[];
   for(const u of T.units){if(!u.alive)continue;if(u.side!==G.player&&!isSeen(G.player,u))continue;
     const bob=u.moving&&TT[u.key].cls==='inf'?Math.abs(Math.sin(time/90+u.id))*.05:0;
     const sc=TT[u.key].cls==='inf'?1.3:TT[u.key].cls==='veh'?1.5:1.4;
-    const M=mkM(u.x,u.y,gH(u.x,u.y)+bob,u.face,sc);tacModel2(F,M,u);}
+    const M=mkM(u.x,u.y,gH(u.x,u.y)+bob,u.face,sc);const n0=FU.length;tacModel2(FU,M,u);
+    if(TT[u.key].cls==='inf')for(let k=n0;k<FU.length;k++){const f=FU[k];f.col=[Math.min(255,f.col[0]*1.3+18),Math.min(255,f.col[1]*1.3+18),Math.min(255,f.col[2]*1.3+14)];}
+    const hq=w2s(u.x,u.y,gH(u.x,u.y)+.05);if(hq)halos.push([hq,u]);}
   renderFaces(c,C,F);
+  // 유닛은 나무·지형 뒤에 가려지지 않도록 위에 그리고, 진영색 발광 링으로 숲 속에서도 식별
+  for(const [q,u] of halos){const inf=TT[u.key].cls==='inf';const r=Math.max(5,q[2]*(inf?.8:1.1));const col=u.side==='UN'?'64,128,245':'236,72,62';
+    c.save();c.translate(q[0],q[1]);c.scale(1,.45);
+    const gr=c.createRadialGradient(0,0,r*.2,0,0,r);gr.addColorStop(0,'rgba('+col+',.38)');gr.addColorStop(.7,'rgba('+col+',.22)');gr.addColorStop(1,'rgba('+col+',0)');
+    c.fillStyle=gr;c.beginPath();c.arc(0,0,r,0,6.283);c.fill();
+    c.strokeStyle='rgba('+col+',.85)';c.lineWidth=1.6;c.beginPath();c.arc(0,0,r*.62,0,6.283);c.stroke();c.restore();}
+  renderFaces(c,C,FU);
   drawCommon(c,true);
   drawParts(c,(x,y,z)=>{const q=w2s(x,y,z*1.6);return q?[q[0],q[1],Math.min(q[2],26)*1.35]:null;});
   c.restore();
