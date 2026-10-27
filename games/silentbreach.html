@@ -71,9 +71,9 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .stats dt{color:var(--muted);font-size:max(9px,1.1cqw);letter-spacing:.1em;text-transform:uppercase}
 .stats dd{margin:0;font-weight:700;font-size:max(14px,2.4cqw)}
 .rank{font-size:max(34px,8cqw);font-weight:700;color:var(--accent);line-height:1}
-.missions{display:grid;grid-template-columns:repeat(auto-fit,minmax(13cqw,1fr));gap:.8cqw}
-.mbtn{font:inherit;text-align:left;color:var(--text);background:#131b1e;border:1px solid var(--line);padding:.8cqw 1cqw;cursor:pointer;display:grid;gap:.2cqw;font-size:max(10px,1.3cqw)}
-.mbtn b{font-size:max(11px,1.5cqw);letter-spacing:.06em}
+.missions{display:grid;grid-template-columns:repeat(auto-fit,minmax(11cqw,1fr));gap:.6cqw}
+.mbtn{font:inherit;text-align:left;color:var(--text);background:#131b1e;border:1px solid var(--line);padding:.55cqw .8cqw;cursor:pointer;display:grid;gap:.1cqw;font-size:max(10px,1.15cqw)}
+.mbtn b{font-size:max(10px,1.3cqw);letter-spacing:.04em}
 .mbtn span{color:var(--muted)}
 .mbtn:hover:not([disabled]){border-color:#4a6066}
 .mbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -275,7 +275,42 @@ const MISSIONS = [
    doors:[[2,6],[7,6],[15,6],[20,6],[2,9],[7,9],[15,9],[20,9],[10,3],[13,3],[10,12],[13,12],[5,3],[18,3],[5,12],[18,12]],
    rooms:[{r:[1,1,4,5],theme:'conc'},{r:[6,1,9,5],theme:'dark'},{r:[14,1,17,5],theme:'conc'},{r:[19,1,22,5],theme:'dark'},{r:[1,10,4,14],theme:'dark'},{r:[6,10,9,14],theme:'conc'},{r:[14,10,17,14],theme:'dark'},{r:[19,10,22,14],theme:'conc'}],
    enemies:[{x:3,y:2,a:.6,room:0},{x:8,y:4,a:.3,room:1},{x:16,y:3,a:2.8,room:2},{x:21,y:3,a:2.4,room:3},{x:2,y:12,a:.4,room:4},{x:8,y:12,a:4.0,room:5},{x:15,y:12,a:3.5,room:6},{x:21,y:12,a:3.3,room:7},{x:9,y:2,a:.8,room:1},{x:17,y:4,a:3.2,room:2}],
-   hostages:[[3,5],[22,4],[16,13]] }
+   hostages:[[3,5],[22,4],[16,13]] },
+ { name:'TRAIN', sub:'열차 습격', par:440, exec0:70, execN:42, start:[1.5,12.5],
+   brief:'정차한 열차를 객차 다섯 칸이 일렬로 잇고 있다. 객차끼리는 연결문으로, 승강장과는 옆문으로 이어진다. 열차 밖 승강장에도 적이 있고 반대편 끝에서 저격수가 노린다. 적 9명, 인질 3명.',
+   pillars:[[8,3],[15,3],[10,12],[18,12]],
+   props:[[5,2],[6,2],[13,4],[18,2],[19,3],[3,13],[4,13],[9,13],[10,13],[14,12],[20,13],[1,6],[1,9],[8,6],[5,9],[10,9],[13,6],[15,6],[18,9],[22,9],[22,6]],
+   carve:[[1,2,22,4],[1,11,22,13]],
+   doors:[[2,5],[12,5],[21,5],[6,10],[16,10],[21,10],[4,7],[9,8],[14,7],[19,8]],
+   rooms:[{r:[1,6,3,9],theme:'dark'},{r:[5,6,8,9],theme:'wood'},{r:[10,6,13,9],theme:'carpet'},{r:[15,6,18,9],theme:'wood'},{r:[20,6,22,9],theme:'dark'},{r:[1,2,22,4],theme:'conc'},{r:[1,11,22,13],theme:'conc'}],
+   enemies:[{x:2,y:8,a:0,room:0},{x:7,y:7,a:.3,room:1},{x:11,y:7,a:.2,room:2},{x:12,y:9,a:4.7,room:2},{x:17,y:8,a:3.2,room:3},{x:21,y:8,a:3.14,room:4},{x:20,y:3,a:3.14,room:5},{x:3,y:3,a:.4,room:5},{x:13,y:12,a:3.14,room:6}],
+   hostages:[[1,8],[22,7],[10,8]] },
+ { name:'CATACOMBS', sub:'지하 묘지', par:460, exec0:70, execN:40, start:[11.5,13.5],
+   brief:'한 칸 폭의 좁은 통로가 석실 여덟 개를 잇는 지하 묘지. 통로에서는 섬광탄을 벽에 튕겨 돌려 넣어야 한다. 석실 사이는 문 두 개와 짧은 통로로 이어져 있다. 적 9명, 인질 3명.',
+   pillars:[[10,8],[13,7]],
+   props:[[1,1],[2,1],[5,4],[8,1],[9,4],[16,1],[21,1],[22,4],[1,6],[1,9],[4,9],[22,6],[22,9],[19,9],[9,9],[14,6],[1,13],[1,14],[21,14]],
+   carve:[[7,13,15,13],[11,11,11,12],[3,11,3,11],[7,7,7,7],[16,7,16,7],[20,11,20,11]],
+   doors:[[6,13],[16,13],[11,10],[3,10],[3,12],[20,10],[20,12],[6,7],[8,7],[15,7],[17,7],[11,5],[6,2],[14,2],[3,5],[20,5]],
+   rooms:[{r:[1,1,5,4],theme:'dark'},{r:[7,1,13,4],theme:'dark'},{r:[15,1,22,4],theme:'dark'},{r:[1,6,5,9],theme:'dark'},{r:[9,6,14,9],theme:'dark'},{r:[18,6,22,9],theme:'dark'},{r:[1,13,5,14],theme:'dark'},{r:[17,13,22,14],theme:'dark'}],
+   enemies:[{x:3,y:2,a:.8,room:0},{x:9,y:3,a:1.4,room:1},{x:12,y:2,a:2.0,room:1},{x:18,y:3,a:2.5,room:2},{x:3,y:8,a:.3,room:3},{x:12,y:7,a:1.57,room:4},{x:20,y:8,a:3.2,room:5},{x:3,y:14,a:.4,room:6},{x:19,y:14,a:3.1,room:7}],
+   hostages:[[1,8],[21,2],[13,2]] },
+ { name:'HANGAR', sub:'격납고', par:480, exec0:65, execN:40, start:[12.5,13.5],
+   brief:'지붕이 높은 격납고는 엄폐물뿐인 탁 트인 공간이다. 한쪽 끝에서 저격수가 지켜보고 있어 정면으로 걸어 들어가면 죽는다. 아래쪽 창고 네 칸에 적이 숨어 있다. 적 9명, 인질 3명.',
+   pillars:[[7,4],[16,5],[10,7],[13,7],[3,7]],
+   props:[[4,3],[5,3],[4,4],[8,6],[9,6],[14,3],[15,3],[16,3],[18,6],[19,6],[11,4],[12,4],[2,6],[21,6],[6,8],[7,8],[2,14],[1,11],[7,14],[17,14],[22,11]],
+   carve:[[12,11,12,14]],
+   doors:[[12,10],[11,13],[13,13],[3,10],[8,10],[15,10],[20,10],[6,12],[18,12]],
+   rooms:[{r:[1,1,22,9],theme:'conc'},{r:[1,11,5,14],theme:'wood'},{r:[7,11,10,14],theme:'wood'},{r:[14,11,17,14],theme:'wood'},{r:[19,11,22,14],theme:'wood'},{r:[12,11,12,14],theme:'conc'}],
+   enemies:[{x:6,y:5,a:0,room:0},{x:13,y:5,a:3.0,room:0},{x:20,y:4,a:3.14,room:0},{x:17,y:8,a:3.3,room:0},{x:3,y:13,a:.4,room:1},{x:8,y:13,a:.2,room:2},{x:15,y:13,a:3.0,room:3},{x:21,y:12,a:3.3,room:4},{x:20,y:14,a:3.1,room:4}],
+   hostages:[[2,13],[9,13],[22,2]] },
+ { name:'MANOR', sub:'저택', par:520, exec0:60, execN:38, start:[11.5,13.5],
+   brief:'현관홀에서 올라가면 기둥이 선 대연회장, 양옆에 서재와 침실 별채, 위에는 식당이 있다. 별채 문 안쪽에서 매복이 기다린다. 연회장 끝에서 저격수가 노리고 있다. 마지막 작전. 적 9명, 인질 3명.',
+   pillars:[[9,7],[14,7]],
+   props:[[7,5],[16,9],[11,6],[7,14],[8,14],[15,14],[16,14],[10,12],[1,1],[2,1],[1,3],[3,5],[1,10],[1,13],[3,14],[4,10],[22,1],[21,1],[22,5],[22,10],[22,13],[20,14],[10,1],[11,1],[12,1],[7,3],[16,3]],
+   doors:[[11,10],[5,6],[5,8],[18,6],[18,8],[8,4],[14,4],[5,12],[18,12],[5,2],[18,2],[2,7],[20,7]],
+   rooms:[{r:[6,11,17,14],theme:'wood'},{r:[6,5,17,9],theme:'carpet'},{r:[1,1,4,6],theme:'wood'},{r:[1,8,4,14],theme:'carpet'},{r:[19,1,22,6],theme:'wood'},{r:[19,8,22,14],theme:'carpet'},{r:[6,1,17,3],theme:'dark'}],
+   enemies:[{x:7,y:8,a:0,room:1},{x:16,y:6,a:3.14,room:1},{x:2,y:3,a:.8,room:2},{x:2,y:12,a:.4,room:3},{x:21,y:3,a:2.4,room:4},{x:21,y:12,a:3.3,room:5},{x:9,y:2,a:.3,room:6},{x:15,y:2,a:1.6,room:6},{x:12,y:6,a:1.5,room:1}],
+   hostages:[[1,2],[22,12],[12,3]] }
 ];
 /* Enemy kinds per mission. i = index in that mission's enemies list; x,y,a override position and facing. */
 const KINDS = { rifle:{hp:100,tag:''}, shield:{hp:130,tag:'방패'}, sniper:{hp:70,tag:'저격'}, ambush:{hp:70,tag:'매복'} };
@@ -290,6 +325,10 @@ const PATCH = {
   METRO:[{i:0,k:'shield'},{i:1,k:'sniper',x:21,y:8,a:3.14},{i:4,k:'ambush',x:11,y:3,a:1.57},{i:6,k:'ambush',x:4,y:12,a:4.71},{i:8,k:'shield'}],
   LAB:[{i:1,k:'ambush',x:7,y:4,a:4.71},{i:2,k:'shield'},{i:5,k:'ambush',x:3,y:11,a:1.57},{i:6,k:'shield'},{i:8,k:'sniper',x:18,y:9,a:3.14}],
   CASINO:[{i:0,k:'shield'},{i:2,k:'sniper',x:16,y:9,a:3.14},{i:5,k:'ambush',x:19,y:5,a:3.14},{i:6,k:'shield'},{i:7,k:'ambush',x:8,y:2,a:1.57},{i:8,k:'ambush',x:14,y:2,a:1.57}],
+  TRAIN:[{i:1,k:'shield'},{i:3,k:'ambush',x:12,y:6,a:4.71},{i:4,k:'shield'},{i:5,k:'ambush',x:21,y:6,a:4.71},{i:6,k:'sniper',x:22,y:3,a:3.14}],
+  CATACOMBS:[{i:1,k:'ambush',x:7,y:2,a:3.14},{i:3,k:'shield'},{i:4,k:'ambush',x:3,y:6,a:4.71},{i:5,k:'shield'},{i:6,k:'sniper',x:22,y:7,a:3.14},{i:8,k:'ambush',x:17,y:13,a:3.14},{i:7,k:'ambush',x:5,y:13,a:0}],
+  HANGAR:[{i:1,k:'shield'},{i:3,k:'shield'},{i:2,k:'sniper',x:22,y:5,a:3.14},{i:4,k:'ambush',x:3,y:11,a:4.71},{i:5,k:'ambush',x:8,y:11,a:4.71},{i:6,k:'ambush',x:15,y:11,a:4.71}],
+  MANOR:[{i:0,k:'shield'},{i:1,k:'sniper',x:17,y:5,a:3.14},{i:2,k:'ambush',x:4,y:6,a:0},{i:3,k:'ambush',x:4,y:12,a:0},{i:5,k:'shield'},{i:6,k:'ambush',x:8,y:3,a:1.57}],
   'OIL RIG':[{i:0,k:'ambush',x:2,y:5,a:1.57},{i:1,k:'shield'},{i:2,k:'ambush',x:15,y:5,a:1.57},{i:4,k:'ambush',x:2,y:10,a:4.71},{i:5,k:'shield'},{i:6,k:'shield'},{i:7,k:'sniper',x:22,y:11,a:3.14}]
 };
 function enemyDefs(m){ const P=PATCH[m.name]||[]; return m.enemies.map((e,i)=>{ const p=P.find(q=>q.i===i); return p?{...e,...p}:{...e}; }); }
