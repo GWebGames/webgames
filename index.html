@@ -29,7 +29,11 @@ h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,5vw,2.6re
   background:var(--panel);border:2px solid var(--line);border-radius:6px;transition:transform .15s,border-color .15s}
 .card:hover:not(:disabled),.card:focus-visible{transform:translateY(-3px);border-color:var(--gold);outline:none}
 .card:disabled{cursor:not-allowed;background:#14252d;border-style:dashed}
-.thumb{aspect-ratio:16/9;width:100%;display:block;background:var(--sea)}
+.thumb{position:relative;overflow:hidden;aspect-ratio:16/9;width:100%;display:block;background:var(--sea)}
+.thumb svg{display:block;width:100%;height:100%}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.card:hover:not(:disabled) .thumb img{transform:scale(1.05)}
+.thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(13,27,36,.55));pointer-events:none}
 .info{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
 .name{font-family:var(--f-display);font-weight:800;font-size:1.25rem;letter-spacing:.06em}
 .name small{color:var(--gold);font-size:.7rem;letter-spacing:.2em;margin-left:6px}
@@ -79,7 +83,7 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
    게임 목록 — 새 게임은 여기에 객체 하나만 추가하면 됩니다.
    src   : 게임 HTML 파일 경로 (이 로비 파일 기준 상대경로)
    ready : false 면 "준비 중" 카드로 표시 (코드 받으면 true + src 채우기)
-   thumb : 카드 그림 (SVG 문자열). 비워두면 기본 그림 사용
+   thumb : 대체용 SVG 그림. 실제 대표 이미지는 thumbs/<id>.jpg (16:9, 800x450 권장)를 넣으면 자동으로 사용돼요
    ============================================================ */
 const GAMES=[
   {
@@ -258,6 +262,26 @@ const GAMES=[
       <circle cx="184" cy="80" r="7" fill="#f3efe4" stroke="#c8402b" stroke-width="1.5"/>
       <path d="M160 112Q172 96 184 80" stroke="#f3efe4" stroke-width="1.5" fill="none" stroke-dasharray="3 3" opacity=".7"/>
     </svg>`
+  },
+  {
+    id:'ilgito',
+    title:'자습서 일기토', hanja:'',
+    desc:'관악중학교 최강의 장수를 가려라! 말 대신 자습서를 타고 돌격해 충돌 순간에 공격 버튼을 누르는 타이밍 대결. 스토리 도장깨기, 한 기기 2인, AI 대전, 온라인 대전을 지원해요.',
+    keys:'충돌 순간에 타이밍 · P1: A 공격 S 필살 / P2: L 공격 K 필살',
+    src:'games/ilgito.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="ilsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1020"/><stop offset="1" stop-color="#3a2f5a"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#ilsky)"/>
+      <circle cx="160" cy="46" r="20" fill="#f4e3b0" opacity=".9"/>
+      <path d="M0 128Q80 108 160 124 240 108 320 128V180H0Z" fill="#161a33"/>
+      <rect y="136" width="320" height="44" fill="#221f3d"/><path d="M0 138H320" stroke="#e9d9a6" stroke-width="2" opacity=".6"/>
+      <g transform="translate(86 116)"><rect x="-26" y="2" width="52" height="14" rx="2" fill="#c8402b" stroke="#e9d9a6" stroke-width="2"/><text x="0" y="13" text-anchor="middle" font-size="9" fill="#e9d9a6" font-family="serif" font-weight="700">자습서</text>
+        <circle cx="0" cy="-26" r="7" fill="#e9d9a6"/><path d="M0 -19V-2M0 -12L16 -20" stroke="#e9d9a6" stroke-width="4" stroke-linecap="round"/><path d="M16 -20L38 -34" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+      <g transform="translate(234 116) scale(-1 1)"><rect x="-26" y="2" width="52" height="14" rx="2" fill="#3a63f0" stroke="#e9d9a6" stroke-width="2"/>
+        <circle cx="0" cy="-26" r="7" fill="#9fb4ff"/><path d="M0 -19V-2M0 -12L16 -20" stroke="#9fb4ff" stroke-width="4" stroke-linecap="round"/><path d="M16 -20L38 -34" stroke="#fff" stroke-width="3" stroke-linecap="round"/></g>
+      <g stroke="#ffd166" stroke-width="3" stroke-linecap="round"><path d="M160 96V78M148 100L138 88M172 100L182 88M142 108H128M178 108H192"/></g>
+    </svg>`
   }
 ];
 
@@ -278,7 +302,7 @@ GAMES.forEach(g=>{
   const b=document.createElement('button');
   b.className='card';b.type='button';b.disabled=!g.ready;
   b.innerHTML=
-    `<span class="thumb">${g.thumb||defaultThumb}</span>`+
+    `<span class="thumb">${g.thumb||defaultThumb}<img src="thumbs/${g.id}.jpg" alt="" loading="lazy" onerror="this.remove()"></span>`+
     `<span class="info">`+
       `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
       `<p class="desc">${esc(g.desc)}</p>`+
