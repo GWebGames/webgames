@@ -77,14 +77,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Se
 #lootPanel .lb{display:flex;gap:8px;margin-top:8px}
 #lootPanel .lb span{flex:1;text-align:center;padding:7px 4px;background:#ffd23a;color:#111;font-weight:800;border-radius:5px;cursor:pointer;font-size:15px}
 #lootPanel .lb span+span{background:#555;color:#fff}
-#modeSel,#teamSel{display:flex;gap:10px;margin-top:14px;pointer-events:auto;align-items:center;flex-wrap:wrap;justify-content:center}
+#gmSel,#modeSel,#teamSel{display:flex;gap:10px;margin-top:14px;pointer-events:auto;align-items:center;flex-wrap:wrap;justify-content:center}
 #teamSel span{font-weight:800;color:#ddd}
 #squad{left:14px;top:236px;width:176px;font-size:13px;display:none}
 #squad .sq{background:rgba(0,0,0,.5);margin-top:4px;padding:3px 7px;border-radius:4px;color:#fff;display:flex;flex-direction:column}
 #squad .sq.dead{opacity:.45}
 #squad .sq i{display:block;height:5px;background:#4ab0ff;margin-top:2px;border-radius:2px}
-#modeSel button,#teamSel button{padding:10px 20px;font-size:17px;font-weight:800;color:#fff;background:#333;border:2px solid #666;border-radius:8px;cursor:pointer;pointer-events:auto}
-#modeSel button.on,#teamSel button.on{background:#ffd23a;color:#111;border-color:#ffd23a}
+#gmSel button,#modeSel button,#teamSel button{padding:10px 20px;font-size:17px;font-weight:800;color:#fff;background:#333;border:2px solid #666;border-radius:8px;cursor:pointer;pointer-events:auto}
+#gmSel button.on,#modeSel button.on,#teamSel button.on{background:#ffd23a;color:#111;border-color:#ffd23a}
 #flashFx{inset:0;display:none;mix-blend-mode:screen;background:radial-gradient(ellipse 52% 58% at 50% 54%,rgba(255,236,190,.38) 0,rgba(255,236,190,.19) 42%,rgba(255,236,190,0) 100%)}
 #envBox{margin-top:12px;max-width:660px;pointer-events:auto;text-align:center}
 #envBox summary{cursor:pointer;font-weight:800;color:#ffd23a;font-size:15px;padding:7px 16px;border:2px solid #666;border-radius:8px;display:inline-block;background:#222;list-style:none}
@@ -171,6 +171,10 @@ body.mobile #lootPanel small{display:none}
 #nick{padding:9px 14px;font-size:16px;border-radius:6px;border:2px solid rgba(255,255,255,.35);background:rgba(0,0,0,.45);color:#fff;text-align:center;width:200px}
 .btn2{padding:10px 26px;font-size:17px;font-weight:700;color:#fff;background:#2a6fd6;border:none;border-radius:6px;cursor:pointer;box-shadow:0 3px 0 #17407e;pointer-events:auto}
 .btn2:hover{background:#3a82ef}.btn2:disabled{opacity:.45;cursor:default}
+#joinRow{margin:8px 0;display:flex;gap:8px;justify-content:center;align-items:center}
+#joinCode{padding:9px 10px;font-size:20px;font-weight:800;letter-spacing:5px;border-radius:6px;border:2px solid rgba(255,255,255,.35);background:rgba(0,0,0,.45);color:#ffd23a;text-align:center;width:150px;text-transform:uppercase}
+#joinCode::placeholder{font-size:13px;letter-spacing:0;font-weight:400;color:rgba(255,255,255,.55)}
+#mpInfo .code{cursor:pointer}
 #mpInfo{font-size:16px;line-height:1.7;min-height:24px;max-width:560px}
 #mpInfo .code{font-size:34px;font-weight:800;letter-spacing:6px;color:#ffd23a}
 #mpInfo .link{font-size:13px;opacity:.85;word-break:break-all}
@@ -244,6 +248,7 @@ body.mobile #lootPanel small{display:none}
   </div>
   <div class="tkeys">📱 <b>왼쪽 화면</b> 드래그 = 이동(끝까지 밀면 달리기) · <b>오른쪽 화면</b> 드래그 = 시점<br><b>발사</b> 버튼 누르고 있기 = 사격(누른 채 드래그로 조준 이동) · <b>조준</b> = 줌 켜기/끄기<br>점프 · 앉기 · 엎드리기 · 장전 · <b>E</b>(상자 열기/무기 교체) · 1~4 무기 · 지도(탭하면 핑) · 시점 · 핑<br>상자 목록은 <b>항목을 탭</b>하면 가져옵니다. 가로 화면으로 플레이하세요.</div>
   <div id="modeSel"><button data-m="pc">🖥 PC (키보드·마우스)</button><button data-m="mobile">📱 모바일 (터치)</button></div>
+  <div id="gmSel"><span style="font-weight:800;color:#ddd">게임 모드</span><button data-g="br">🎯 배틀로얄</button><button data-g="zm">🧟 좀비 생존 (10명)</button></div>
   <div id="teamSel"><span>팀 인원</span><button data-n="1">솔로</button><button data-n="2">듀오</button><button data-n="3">트리오</button><button data-n="4">스쿼드(4)</button></div>
   <details id="envBox"><summary id="envSum">🌍 환경 설정</summary>
     <div class="envRow" data-k="te"></div><div class="envRow" data-k="we"></div><div class="envRow" data-k="tm"></div>
@@ -254,6 +259,7 @@ body.mobile #lootPanel small{display:none}
   <div id="mpBox">
     <input id="nick" maxlength="10" placeholder="닉네임" autocomplete="off">
     <button class="btn2" id="hostBtn">👥 친구와 함께하기 (방 만들기)</button>
+    <div id="joinRow"><input id="joinCode" maxlength="5" placeholder="방 코드 5자리" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="btn2" id="joinBtn">코드로 참가</button></div>
     <div id="mpInfo"></div>
   </div>
 </div>
@@ -371,7 +377,8 @@ function genCode() { let c = ''; for (let i = 0; i < 5; i++) c += CODE_CH[Math.f
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const NET = { mode: 'solo', peer: null, conns: [], hostConn: null, code: '', seed: 0, nick: '', myId: -1, live: false, won: false, alive: 100, total: 100, evq: [], stT: 0, sendT: 0, names: {}, nextPid: 1, nextItem: 1, pendingJoin: false, tn: 1, teamN: 1, ranks: { 0: 0 }, nh: 1 };
-const teamOfId = id => Math.floor((id >= 1000 ? NET.nh + id - 1000 : (NET.ranks[id] || 0)) / (NET.tn || 1));
+const ZM = { on: false, sel: false, boot: true, T: 480, kills: 0, zc: 0, nextZ: 1, spawnT: 0, spawn: null, noiseT: 0, cleanT: 0, hordeT: 0, warned: false, done: false };
+const teamOfId = id => ZM.on ? (id >= 2000 ? 99 : 0) : Math.floor((id >= 1000 ? NET.nh + id - 1000 : (NET.ranks[id] || 0)) / (NET.tn || 1));
 let squadDrop = {}, teamMap = {};
 (function () {
   let h = ''; try { h = (location.hash || '').replace('#', '').toUpperCase().replace(/[^A-Z0-9]/g, ''); } catch (e) { }
@@ -1542,10 +1549,10 @@ function setArmorVisual(g, helm, vest) {
   u.vestMesh.visible = vest > 0;
   if (vest > 0) u.vestMesh.material = mat(LVL_COLOR[vest]);
 }
-function makeHuman(shirt, pants, helmet) {
+function makeHuman(shirt, pants, helmet, skinC) {
   const G = humanGeo();
   const g = new THREE.Group(); g.rotation.order = 'YXZ';
-  const skin = mat(0xe2b48c), sM = mat(shirt), pM = mat(pants), hM = mat(helmet, { side: THREE.DoubleSide }), gunM = mat(0x1c1c1c);
+  const skin = mat(skinC || 0xe2b48c), sM = mat(shirt), pM = mat(pants), hM = mat(helmet, { side: THREE.DoubleSide }), gunM = mat(0x1c1c1c);
   const add = (geo, m, x, y, z, parent) => { const me = new THREE.Mesh(geo, m); me.position.set(x, y, z); me.castShadow = true; (parent || g).add(me); return me; };
   add(G.torso, sM, 0, 1.14, 0);
   add(G.head, skin, 0, 1.68, 0);
@@ -1877,7 +1884,7 @@ const keys = {};
 const tpsPivot = new THREE.Vector3();
 
 const isTPS = () => viewMode === 'tps' || !player.alive;
-const countAlive = () => NET.mode === 'client' ? NET.alive : (player.alive ? 1 : 0) + bots.reduce((n, b) => n + (b.alive ? 1 : 0), 0);
+const countAlive = () => NET.mode === 'client' ? NET.alive : (player.alive ? 1 : 0) + bots.reduce((n, b) => n + (b.alive && !b.zom ? 1 : 0), 0);
 
 /* ================= 오디오 ================= */
 let actx = null, noiseBuf = null;
@@ -2783,6 +2790,7 @@ function wipeCheck(team) {
   }
 }
 function kill(t, attacker, head) {
+  if (t.zom) { zombieKilled(t, attacker, head); return; }
   if (t.drv) releaseDriver(t);
   if (t.tur) releaseTurret(t);
   t.alive = false; t.hp = 0; t.deathT = 0;
@@ -2904,6 +2912,7 @@ function playerShoot() {
     if (res.car && NET.mode !== 'client') hitCar(res, W.dmg * mul, player);
     const end = o.clone().addScaledVector(dd, Math.min(res.t, 260));
     if (i < 5) spawnTracer(start, end, 'p', wk);
+    if (i === 0) zomNoise(start.x, start.z, sup ? 16 : W.rocket ? 120 : 70);
     if (i < 3 && NET.mode === 'host' && NET.live) pushShot(0, start, end, res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0, WC[wk] | (sup ? 32 : 0));
     if (res.type === 'ent') {
       spawnSpark(end, 'e');
@@ -2949,6 +2958,7 @@ function botShoot(b, t, wk) {
     if (res.car) hitCar(res, B.db * mul, b);
     if (i === 0) {
       kind = res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0;
+      zomNoise(b.pos.x, b.pos.z, 55);
       const netNear = NET.live && NET.mode === 'host' && nearRemote(b.pos, 190);
       if (netNear && !nearP) {
         const e2 = _e.clone().addScaledVector(_bd, Math.min(res.t, B.ray)); _bs.copy(_e).addScaledVector(_bd, 0.9); _bs.y -= 0.2;
@@ -3282,13 +3292,13 @@ function spawnBot(i) {
   let tg, uj;
   if (squadDrop[tmId]) { tg = squadDrop[tmId].tg; uj = clamp(squadDrop[tmId].uj + rand(-0.01, 0.01), 0.02, 0.97); }
   else { tg = pickDropTarget(); uj = clamp(tg.u - rand(0, 0.1), 0.02, 0.97); squadDrop[tmId] = { tg, uj }; }
-  const mesh = makeHuman(0xd12a2a, 0x5a1414, 0x2a2a2a);
+  const mesh = makeHuman(ZM.on ? 0x3a7a4a : 0xd12a2a, ZM.on ? 0x2a3a2a : 0x5a1414, 0x2a2a2a);
   mesh.visible = false; scene.add(mesh);
   setArmorVisual(mesh, 0, 0); setArmedVisual(mesh, false);
   bots.push({
     id: 1000 + i, team: teamOfId(1000 + i), seat: 0, waitT: 0, helm: 0, helmDur: 0, vest: 0, vestDur: 0, gun: false, prim: null, prim2: null, sec: false, wp: null, wpCd: 0, itemT: null, swing: 0, meleeCd: 0,
     gr: { frag: Math.random() < 0.4 ? (Math.random() < 0.3 ? 2 : 1) : 0, smoke: 0, flash: Math.random() < 0.3 ? 1 : 0 }, grCd: rand(4, 14),
-    isPlayer: false, name: 'BOT-' + String(i + 1).padStart(2, '0'), pos: new THREE.Vector3(drop.sx, drop.alt, drop.sz), yaw: rand(0, Math.PI * 2),
+    isPlayer: false, name: (ZM.on ? 'ALLY-' : 'BOT-') + String(i + 1).padStart(2, '0'), pos: new THREE.Vector3(drop.sx, drop.alt, drop.sz), yaw: rand(0, Math.PI * 2),
     hp: 100, alive: true, mesh, goal: null, goalT: 0, fireCd: rand(0.5, 1.5), scanT: rand(0, 0.4), target: null, react: 0,
     strafe: 1, strafeT: 0, stuckT: 0, avoidT: 0, avoidAng: 0, walk: 0, kills: 0, deathT: 0, chaseT: 0, last: null, burst: 3, wasOut: false,
     acc: 0, gone: false, idleT: 0, carCd: rand(0, 20), drv: null, carT: null, avoidSide: 0, itemFail: 0, itemTime: 0, itemTr: null, itemBlock: null, dg: null, dgT: 0, drvT: 0, rev: 0, stuckC: 0, revN: 0,
@@ -3450,6 +3460,7 @@ function updateBot(b, dt, d2) {
   if (b.gone) return;
   if (b.ghost) { updateGhost(b, dt, d2); return; }
   if (b.remote) { updateRemote(b, dt, d2); return; }
+  if (b.zom) { updateZombie(b, dt, d2); return; }
   if (b.air) { updateBotAir(b, dt, d2); return; }
   if (!b.alive) {
     b.deathT += dt;
@@ -4700,7 +4711,7 @@ function bombBlast(x, z) {
 }
 function updateEvents(dt) {
   // 주최(호스트/솔로)
-  if (NET.mode !== 'client' && state === 'playing' && !drop.planeActive && !player.air) {
+  if (NET.mode !== 'client' && state === 'playing' && !drop.planeActive && !player.air && !ZM.on) {
     evT -= dt; if (evT <= 0) evT = spawnEvent() ? rand(40, 70) : 10;
   }
   let inGas = false;
@@ -5430,7 +5441,7 @@ function drawMapTo(ctx, S, cx, cz, range, detail) {
     }
     ctx.fillStyle = '#ff3a3a';
     for (const b of bots) {
-      if (!b.alive || b.air) continue;
+      if (!b.alive || b.air || b.zom) continue;
       if (Math.hypot(b.pos.x - player.pos.x, b.pos.z - player.pos.z) > 70) continue;
       ctx.beginPath(); ctx.arc(X(b.pos.x), Z(b.pos.z), 2.5, 0, Math.PI * 2); ctx.fill();
     }
@@ -5540,6 +5551,8 @@ function updateHUD(dt, now) {
   else if (zone.state === 'wait') { setText(el.zoneLabel, zoneOn() ? '자기장 축소까지' : '자기장 생성까지'); setText(el.zoneTimer, fmtTime(P.wait - zone.t)); }
   else { setText(el.zoneLabel, '자기장 축소 중...'); setText(el.zoneTimer, fmtTime(P.shrink - zone.t)); }
 
+  if (ZM.on) { setText(el.zoneLabel, '🧟 ' + ZM.zc + ' · 구조 헬기까지'); setText(el.zoneTimer, fmtTime(Math.max(0, ZM.T - gameTime))); }
+
   // 비네트 / 경고
   hitFlash = Math.max(0, hitFlash - dt * 2.2);
   const outside = zoneOn() && player.alive && Math.hypot(player.pos.x, player.pos.z) > zone.r;
@@ -5567,19 +5580,36 @@ function readNick() {
   try { localStorage.setItem('bg3d_nick', NET.nick); } catch (e) { }
 }
 function inviteLink() { return location.href.split('#')[0] + '#' + NET.code; }
+function copyText(txt, el, label) {
+  const done = ok => { const o = el.textContent; el.textContent = ok ? '복사됨!' : '직접 복사: ' + txt; setTimeout(() => { el.textContent = label; }, 1600); };
+  try { navigator.clipboard.writeText(txt).then(() => done(true), () => done(false)); } catch (e) { done(false); }
+}
+function goJoinCode() {
+  const c = ($('joinCode').value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (c.length !== 5) { mpMsg('방 코드는 5글자입니다. (예: AB3K7)'); return; }
+  readNick();
+  try { location.hash = c; } catch (e) { }
+  location.reload();
+}
+$('joinBtn').addEventListener('click', goJoinCode);
+$('joinCode').addEventListener('keydown', e => { if (e.key === 'Enter') goJoinCode(); });
+$('joinCode').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); });
 function mpMsg(t) { const b = $('mpInfo'); b.textContent = t; }
 function lobbyNames() { const o = { 0: NET.nick || '방장' }; for (const c of NET.conns) o[c.pid] = c.nick; return o; }
 function renderLobby(extra) {
   const box = $('mpInfo'); box.textContent = '';
   const add = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; e.textContent = text; box.appendChild(e); return e; };
   if (NET.mode === 'host') {
-    add('div', '', '방 코드'); add('div', 'code', NET.code); add('div', 'link', inviteLink());
-    const cb = document.createElement('button'); cb.className = 'btn2'; cb.textContent = '초대 링크 복사';
-    cb.onclick = () => { try { navigator.clipboard.writeText(inviteLink()); cb.textContent = '복사됨!'; } catch (e) { cb.textContent = '직접 복사하세요'; } };
-    box.appendChild(cb);
+    add('div', '', '친구에게 이 코드 5글자만 알려주세요 (눌러서 복사)');
+    const ce = add('div', 'code', NET.code); ce.onclick = () => copyText(NET.code, ce, NET.code);
+    const mkb = (label, fn) => { const b = document.createElement('button'); b.className = 'btn2'; b.style.margin = '4px'; b.textContent = label; b.onclick = () => fn(b, label); box.appendChild(b); return b; };
+    mkb('코드 복사', (b, l) => copyText(NET.code, b, l));
+    mkb('초대 링크 복사', (b, l) => copyText(inviteLink(), b, l));
+    if (navigator.share) mkb('공유하기', () => { try { navigator.share({ title: '배틀그라운드 3D', text: '같이 하자! 방 코드: ' + NET.code, url: inviteLink() }); } catch (e) { } });
+    add('div', 'link', '링크: ' + inviteLink());
     add('div', '', '참가자 (' + Object.keys(NET.names).length + '/' + MAX_PLAYERS + ') · 나머지 자리는 봇이 채웁니다');
   } else if (NET.mode === 'client') add('div', '', '방 ' + NET.code + ' 입장 완료 · 방장이 시작하면 자동으로 시작됩니다');
-  add('div', '', '팀 인원: ' + ['', '솔로', '듀오', '트리오', '스쿼드(4)'][NET.teamN || 1]);
+  if (ZM.sel) add('div', '', '모드: 🧟 좀비 생존 — 생존자 10명 (부족한 자리는 AI 동료)'); else add('div', '', '팀 인원: ' + ['', '솔로', '듀오', '트리오', '스쿼드(4)'][NET.teamN || 1]);
   if (extra) add('div', '', extra);
   const wrap = document.createElement('div');
   for (const id in NET.names) { const sp = document.createElement('span'); sp.className = 'pl'; sp.textContent = (id == 0 ? '👑 ' : '') + NET.names[id]; wrap.appendChild(sp); }
@@ -5616,7 +5646,7 @@ function startHosting() {
   NET.peer = peer;
   peer.on('open', () => {
     NET.mode = 'host'; NET.names = lobbyNames(); renderLobby();
-    $('hostBtn').style.display = 'none'; $('startBtn').textContent = '게임 시작 (친구 + 봇)';
+    $('hostBtn').style.display = 'none'; $('joinRow').style.display = 'none'; $('startBtn').textContent = '게임 시작 (친구 + 봇)';
   });
   peer.on('connection', hostAccept);
   peer.on('error', e => { mpMsg('방 만들기 오류: ' + (e && e.type ? e.type : e) + (e && e.type === 'unavailable-id' ? ' (같은 코드의 방이 이미 있습니다 — 새로고침 후 다시 시도)' : '')); $('hostBtn').disabled = false; });
@@ -5637,9 +5667,9 @@ function onClientMsg(conn, m) {
       conn.pid = NET.nextPid++; conn.nick = String(m.nick || 'PLAYER').slice(0, 10);
       NET.conns.push(conn);
       NET.names = lobbyNames();
-      netSend(conn, { t: 'welcome', id: conn.pid, names: NET.names, tn: NET.teamN });
+      netSend(conn, { t: 'welcome', id: conn.pid, names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0 });
       if (NET.live && (state === 'playing' || state === 'over')) netSend(conn, { t: 'busy' });
-      netAll({ t: 'lobby', names: NET.names, tn: NET.teamN }); renderLobby();
+      netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0 }); renderLobby();
       break;
     case 'pog': conn.rtt = Math.round(performance.now() - m.ts); conn.seen = performance.now(); break;
     case 'st':
@@ -5684,7 +5714,7 @@ function onClientLeave(conn) {
   if (rp && rp.drv) releaseDriver(rp);
   if (rp && rp.tur) releaseTurret(rp);
   if (rp && rp.alive) { rp.alive = false; rp.hp = 0; rp.deathT = 0; dropLoot(rp); feed(rp.name + ' — 연결 끊김'); }
-  NET.names = lobbyNames(); netAll({ t: 'lobby', names: NET.names }); renderLobby();
+  NET.names = lobbyNames(); netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0 }); renderLobby();
 }
 function spawnRemote(c) {
   const mesh = makeHuman(SHIRTS[c.pid % SHIRTS.length], 0x2a3a5a, 0x3b4a2a);
@@ -5721,7 +5751,8 @@ function updateRemote(b, dt, d2) {
   if (b.canopy) { b.canopy.visible = vis; b.canopy.position.set(b.pos.x, b.pos.y + 4.6, b.pos.z); b.canopy.rotation.y = b.yaw; }
   if (vis) {
     const sp = Math.hypot(b.pos.x - ox, b.pos.z - oz) / Math.max(dt, 1e-3);
-    b.walk += dt * sp * 1.6; const sw = (sp > 0.6 && !b.air ? Math.sin(b.walk) * 0.7 : 0) * (b.stance === 2 ? 0.25 : 1);
+    if (b.zom) { zombiePose(b, dt, sp); b.mesh.position.set(b.pos.x, b.pos.y, b.pos.z); b.mesh.rotation.y = b.yaw; if (b.f & 16 && d2 < 2500 && Math.random() < dt * 0.3) sfxGroan(b.zt, Math.sqrt(d2)); else if (sp > 2 && d2 < 1600 && Math.random() < dt * 0.15) sfxGroan(b.zt, Math.sqrt(d2)); return; }
+  b.walk += dt * sp * 1.6; const sw = (sp > 0.6 && !b.air ? Math.sin(b.walk) * 0.7 : 0) * (b.stance === 2 ? 0.25 : 1);
     ud.legL.rotation.x = sw; ud.legR.rotation.x = -sw;
     const st = b.stance;
     poseProne(b.mesh, st === 2 && !b.air);
@@ -5776,7 +5807,7 @@ function hostFire(rp, m, stab) {
     if (res.car) hitCar(res, W.dmg * mul, rp);
     const end = o.clone().addScaledVector(dd, Math.min(res.t, 220));
     const kind = res.type === 'ent' ? 1 : res.type === 'world' ? 2 : 0;
-    if (i === 0) { const wf = WC[wk] | (rp.supp ? 32 : 0); pushShot(rp.id, st, end, kind, wf); shotFx(st, end, kind, rp, wf); }
+    if (i === 0) { zomNoise(st.x, st.z, rp.supp ? 16 : 70); const wf = WC[wk] | (rp.supp ? 32 : 0); pushShot(rp.id, st, end, kind, wf); shotFx(st, end, kind, rp, wf); }
     else if (i < 3) { pushShot(rp.id, st, end, kind, 0); spawnTracer(st.clone(), end.clone(), 'b'); }
     if (res.type === 'ent') { const h = hits.get(res.ent) || { dmg: 0, head: false }; h.dmg += (res.head ? W.head : W.dmg) * mul; if (res.head) h.head = true; hits.set(res.ent, h); }
   }
@@ -5825,7 +5856,7 @@ function turretSnap() {
 }
 function hostSnapshot() {
   const ev = NET.evq; NET.evq = [];
-  const base = { t: 's', gt: r1(gameTime), dt: r1(drop.t), pa: drop.planeActive ? 1 : 0, z: [zone.phase, zone.state === 'wait' ? 0 : 1, r1(zone.t), r1(zone.r)], al: countAlive(), ev, tu: turretSnap() };
+  const base = { t: 's', gt: r1(gameTime), dt: r1(drop.t), pa: drop.planeActive ? 1 : 0, z: [zone.phase, zone.state === 'wait' ? 0 : 1, r1(zone.t), r1(zone.r)], al: countAlive(), zc: ZM.zc, ev, tu: turretSnap() };
   for (const c of NET.conns) {
     const rp = c.rp; if (!c.open || !rp) continue;
     const e = [], px = rp.pos.x, pz = rp.pos.z;
@@ -5833,7 +5864,7 @@ function hostSnapshot() {
       if (b === rp || b.gone) return;
       if (b !== player && b.air && ((b.remote && b.net.ds === 0) || (!b.remote && b.dropState === 'plane'))) return;
       if (b === player && player.air && drop.state === 'plane') return;
-      const dx = b.pos.x - px, dz = b.pos.z - pz, lim = b.air ? 700 : 330;
+      const dx = b.pos.x - px, dz = b.pos.z - pz, lim = b.air ? 700 : b.zom ? 170 : 330;
       if (dx * dx + dz * dz > lim * lim) return;
       encEnt(e, b);
     };
@@ -5850,6 +5881,7 @@ function hostSnapshot() {
   }
 }
 function hostWinCheck() {
+  if (ZM.on) return;
   const st = teamsAliveSet(); if (st.size !== 1) return;
   const wt = st.values().next().value;
   NET.won = true;
@@ -5858,7 +5890,7 @@ function hostWinCheck() {
 function hostStartBroadcast() {
   NET.live = true; NET.won = false; NET.names = lobbyNames();
   const msg = {
-    t: 'start', drop: { dx: drop.dx, dz: drop.dz, len: drop.len, sx: drop.sx, sz: drop.sz }, names: NET.names, total: NET.total, tn: NET.tn, ranks: NET.ranks, nh: NET.nh, env: NET.env,
+    t: 'start', drop: { dx: drop.dx, dz: drop.dz, len: drop.len, sx: drop.sx, sz: drop.sz }, names: NET.names, total: NET.total, tn: NET.tn, ranks: NET.ranks, nh: NET.nh, env: NET.env, zm: ZM.on ? 1 : 0, zs: ZM.on ? [ZM.spawn.x, ZM.spawn.z] : 0,
     ni: 0
   };
   const all = items.filter(i => !i.gone).map(i => [i.id, i.type, r1(i.x), r1(i.z), i.lvl, Math.round(i.dur), r1(i.y0)]);
@@ -5867,23 +5899,26 @@ function hostStartBroadcast() {
   for (const c of NET.conns) if (c.rp) {
     netSend(c, msg); NDB.sentStart++; ndbLog('start 전송 → ' + c.nick + ' (open=' + c.open + ')');
     for (let i = 0; i < all.length; i += 50) netSend(c, { t: 'items', a: all.slice(i, i + 50) });
+    if (ZM.on) { const res = invAccept(c.rp, { type: 'pistol' }, {}); if (res) hostApply(c.rp, res); }
   }
 }
 
 /* ---- 참가자 ---- */
-function setupJoinUI() {
-  $('startBtn').style.display = 'none'; $('hostBtn').style.display = 'none'; $('teamSel').style.display = 'none'; $('envBox').style.display = 'none';
+function setupJoinUI(noAuto) {
+  $('joinRow').style.display = 'none'; $('gmSel').style.display = 'none'; $('startBtn').style.display = 'none'; $('hostBtn').style.display = 'none'; $('teamSel').style.display = 'none'; $('envBox').style.display = 'none';
   const box = $('mpInfo'); box.textContent = '';
   const t = document.createElement('div'); t.textContent = '초대받은 방 코드: ' + NET.code; box.appendChild(t);
   if (typeof Peer === 'undefined') { mpMsg('멀티플레이 모듈(PeerJS)을 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); return; }
-  const b = document.createElement('button'); b.className = 'btn'; b.textContent = '방 입장'; b.onclick = joinRoom; box.appendChild(b);
   const s = document.createElement('button'); s.className = 'btn2'; s.style.marginLeft = '10px'; s.textContent = '혼자 하기';
-  s.onclick = () => { location.href = location.href.split('#')[0]; location.reload(); }; box.appendChild(s);
+  s.onclick = () => { location.href = location.href.split('#')[0]; location.reload(); };
+  if (noAuto === true) {
+    const b = document.createElement('button'); b.className = 'btn'; b.textContent = '다시 입장'; b.onclick = joinRoom; box.appendChild(b); box.appendChild(s);
+  } else { box.appendChild(s); joinRoom(); }
 }
 function joinRoom() {
   readNick(); initAudio(); mpMsg('방장에게 연결하는 중...');
   let done = false;
-  const fail = t => { if (done) return; done = true; mpMsg(t); setTimeout(setupJoinUI, 2500); };
+  const fail = t => { if (done) return; done = true; mpMsg(t); setTimeout(() => setupJoinUI(true), 2500); };
   setTimeout(() => { if (!NET.hostConn || !NET.hostConn.open) fail('연결 시간이 초과되었습니다. 방장이 방을 열었는지 확인하세요.'); }, 20000);
   let peer;
   try { peer = new Peer(undefined, peerOpts()); } catch (e) { fail('접속 실패: ' + e); return; }
@@ -5918,8 +5953,8 @@ function onHostMsg2(m) {
   if (!m || typeof m !== 'object') return;
   switch (m.t) {
     case 'items': (m.a || []).forEach(a => { if (!itemById[a[0]]) makeItem(a[1], a[2], a[3], a[4], a[5], a[6], a[0]); }); break;
-    case 'welcome': NET.myId = m.id; NET.teamN = m.tn || 1; NET.names = m.names || {}; renderLobby(); break;
-    case 'lobby': NET.teamN = m.tn || 1; NET.names = m.names || {}; if (state === 'menu') renderLobby(); break;
+    case 'welcome': ZM.sel = !!m.zm; refreshGm(); NET.myId = m.id; NET.teamN = m.tn || 1; NET.names = m.names || {}; renderLobby(); break;
+    case 'lobby': ZM.sel = !!m.zm; refreshGm(); NET.teamN = m.tn || 1; NET.names = m.names || {}; if (state === 'menu') renderLobby(); break;
     case 'full': mpMsg('방이 가득 찼습니다.'); break;
     case 'busy': renderLobby('게임이 진행 중입니다. 다음 판부터 참가합니다.'); break;
     case 'start': clientStart(m); break;
@@ -5952,11 +5987,11 @@ function sendState() {
 }
 function applyGot(m) { applyGotLocal(m); }
 function makeGhost(id, x, y, z, yaw) {
-  const human = id < 1000;
-  const mesh = human ? makeHuman(SHIRTS[id % SHIRTS.length], 0x2a3a5a, 0x3b4a2a) : makeHuman(0xd12a2a, 0x5a1414, 0x2a2a2a);
+  const human = id < 1000, zom = id >= 2000, zt = zom ? (id - 2000) % 3 : 0;
+  const mesh = zom ? makeZombieMesh(zt) : human ? makeHuman(SHIRTS[id % SHIRTS.length], 0x2a3a5a, 0x3b4a2a) : ZM.on ? makeHuman(0x3a7a4a, 0x2a3a2a, 0x2a2a2a) : makeHuman(0xd12a2a, 0x5a1414, 0x2a2a2a);
   setArmorVisual(mesh, 0, 0); setArmedVisual(mesh, false); mesh.visible = false; scene.add(mesh);
   const g = {
-    ghost: true, id, team: teamOfId(id), seat: 0, hpv: 100, isPlayer: false, name: human ? (NET.names[id] || 'P' + id) : 'BOT-' + (id - 999), pos: new THREE.Vector3(x, y, z), tp: { x, y, z, yaw },
+    ghost: true, id, team: teamOfId(id), seat: 0, hpv: 100, isPlayer: false, name: zom ? ZT[zt].n : human ? (NET.names[id] || 'P' + id) : (ZM.on ? 'ALLY-' : 'BOT-') + (id - 999), zom, zt, pos: new THREE.Vector3(x, y, z), tp: { x, y, z, yaw },
     yaw, alive: true, air: false, h: 1.85, mesh, helm: 0, vest: 0, gun: false, wp: null, wc: 0, stance: 0, canopy: null, deathT: 0, swing: 0, walk: 0,
     gone: false, acc: 0, f: 1, vh: -1, vv: -1, vg: false, fresh: true
   };
@@ -5984,7 +6019,7 @@ function updateGhost(b, dt, d2) {
   const chute = !!(f & 4), hidden = !!(f & 8) || !!(f & 64);
   if (chute && !b.canopy) { b.canopy = makeCanopy(canopyColors[b.id % canopyColors.length]); scene.add(b.canopy); }
   if (!chute && b.canopy) { scene.remove(b.canopy); b.canopy = null; }
-  const vis = !hidden && d2 < (b.air ? 650 * 650 : 300 * 300);
+  const vis = !hidden && d2 < (b.air ? 650 * 650 : b.zom ? ZVIS * ZVIS : 300 * 300);
   b.mesh.visible = vis;
   if (b.canopy) { b.canopy.visible = vis; b.canopy.position.set(b.pos.x, b.pos.y + 4.6, b.pos.z); b.canopy.rotation.y = b.yaw; }
   if (!vis) return;
@@ -6007,7 +6042,7 @@ function updateGhost(b, dt, d2) {
 }
 const _gv1 = new THREE.Vector3(), _gv2 = new THREE.Vector3();
 function applySnapshot(m) {
-  NET.alive = m.al; gameTime = m.gt;
+  NET.alive = m.al; gameTime = m.gt; ZM.zc = m.zc | 0;
   if (Math.abs(drop.t - m.dt) > 0.3) drop.t = m.dt;
   drop.planeActive = !!m.pa; if (!m.pa && drop.planeMesh) drop.planeMesh.visible = false;
   zone.phase = m.z[0]; zone.state = m.z[1] ? 'shrink' : 'wait'; zone.t = m.z[2]; zone.r = m.z[3];
@@ -6066,6 +6101,220 @@ function applyEvent(ev) {
   }
 }
 
+/* ================= 좀비 생존 모드 ================= */
+const ZT = [
+  { n: '좀비', hp: 100, spd: 1.3, run: 3.7, det: 34, dmg: 20, cd: 1.1, reach: 1.55, helm: 0, vest: 0, col: [0x5a4f3a, 0x2e3a4a, 0x2a2a2a, 0x7f9a6a] },
+  { n: '군인 좀비', hp: 230, spd: 1.2, run: 3.3, det: 44, dmg: 34, cd: 1.35, reach: 1.7, helm: 2, vest: 2, col: [0x3d4a2c, 0x2b3322, 0x3a4230, 0x6b8060] },
+  { n: '신속 좀비', hp: 70, spd: 2.4, run: 7.6, det: 58, dmg: 13, cd: 0.55, reach: 1.5, helm: 0, vest: 0, col: [0x7a2a2a, 0x3a3028, 0x2a2a2a, 0xa7a878] }
+];
+const ZM_BASE = 130, ZVIS = 150;
+function makeZombieMesh(zt) {
+  const T = ZT[zt], m = makeHuman(T.col[0], T.col[1], T.col[2], T.col[3]), u = m.userData;
+  setArmedVisual(m, false); u.knife.visible = false; u.zt = zt;
+  u.armL.rotation.set(1.45, 0, 0.1); u.armR.rotation.set(1.45, 0, -0.1);
+  if (zt === 2) { m.scale.x = 0.88; m.scale.z = 0.88; } else if (zt === 1) { m.scale.x = 1.1; m.scale.z = 1.1; }
+  if (zt === 0) { const w = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.26, 0.02), mat(0x5a0d0d)); w.position.set(Math.random() < 0.5 ? -0.14 : 0.14, 1.2, -0.175); m.add(w); }
+  setArmorVisual(m, T.helm, T.vest);
+  return m;
+}
+function zombiePose(b, dt, sp) {
+  const u = b.mesh.userData, run = sp > 4.6;
+  b.zw = (b.zw || 0) + dt * (2 + sp * 1.5);
+  const sw = sp > 0.3 ? Math.sin(b.zw) * Math.min(0.95, 0.35 + sp * 0.09) : 0;
+  u.legL.rotation.x = sw; u.legR.rotation.x = -sw;
+  let up = 0; if (b.swing > 0) up = b.swing >= 1 ? 0.5 + 0.5 * Math.sin(b.zw * 9) : Math.sin((1 - b.swing / 0.45) * Math.PI);
+  const a = 1.45 + up * 0.95 + (sp > 0.3 ? Math.sin(b.zw * 0.5) * 0.08 : Math.sin(b.zw * 0.3) * 0.05);
+  u.armL.rotation.x = a; u.armR.rotation.x = a + (run ? 0.1 : 0.0);
+  b.mesh.rotation.x = -(run ? 0.32 : sp > 0.3 ? 0.13 : 0.06);
+}
+function sfxGroan(zt, d) {
+  if (!actx || d > 55) return; const v = 0.07 * (1 - d / 55);
+  if (zt === 2) { sfxTone(300 + Math.random() * 120, 0.3, v, 'sawtooth'); sfxTone(170, 0.3, v * 0.7, 'square'); }
+  else sfxTone((zt ? 70 : 95) + Math.random() * 30, 0.55, v, 'sawtooth');
+}
+function zmSlotPos(idx) {
+  const sp = ZM.spawn || { x: 0, z: 0 };
+  for (let k = 0; k < 14; k++) { const a = idx * 0.64 + k * 0.5, r = 3 + (k >> 1), x = sp.x + Math.cos(a) * r, z = sp.z + Math.sin(a) * r; if (pointFree(x, z, 0.8)) return { x, z }; }
+  return { x: sp.x, z: sp.z };
+}
+function zmPickType() {
+  const mn = Math.min(gameTime / 60, 8), wn = Math.max(0.4, 0.62 - 0.02 * mn), ws = 0.14 + 0.015 * mn, wf = 0.24 + 0.005 * mn, r = Math.random() * (wn + ws + wf);
+  return r < wn ? 0 : r < wn + ws ? 1 : 2;
+}
+function spawnZombie(x, z, zt) {
+  const n = ZM.nextZ++, id = 2000 + n * 3 + zt, T = ZT[zt], mesh = makeZombieMesh(zt); mesh.visible = false; scene.add(mesh);
+  const b = {
+    id, zom: true, zt, team: 99, seat: 0, name: T.n, isPlayer: false, pos: new THREE.Vector3(x, 0, z), yaw: rand(0, Math.PI * 2), hp: T.hp, alive: true, mesh,
+    helm: T.helm, helmDur: T.helm ? armorMax('helm', T.helm) : 0, vest: T.vest, vestDur: T.vest ? armorMax('vest', T.vest) : 0, gun: false, wp: null, prim: null, prim2: null, sec: false,
+    gr: { frag: 0, smoke: 0, flash: 0 }, swing: 0, walk: 0, kills: 0, deathT: 0, acc: 0, gone: false, air: false, drv: null, tur: null, h: 1.85, stance: 0,
+    goal: null, goalT: 0, scanT: rand(0, 0.5), target: null, chaseT: 0, last: null, stuckT: 0, avoidT: 0, avoidAng: 0, avoidSide: 0, atkCd: 0, atkT: 0, idleT: rand(0, 5), nz: null, blind: 0, react: 0, hzId: 0
+  };
+  bots.push(b); entities.push(b); return b;
+}
+function zmMinSurvDist(x, z) {
+  let m = 1e9;
+  for (let i = 0; i < entities.length; i++) { const e = entities[i]; if (e.team !== 0 || !e.alive) continue; const d = Math.hypot(e.pos.x - x, e.pos.z - z); if (d < m) m = d; }
+  return m;
+}
+function zmSpawnAway(minD, zt) {
+  for (let i = 0; i < 16; i++) {
+    const x = rand(-ZONE_START + 10, ZONE_START - 10), z = rand(-ZONE_START + 10, ZONE_START - 10);
+    if (Math.hypot(x, z) > ZONE_START - 8 || !pointFree(x, z, 0.8)) continue;
+    if (zmMinSurvDist(x, z) < minD) continue;
+    return spawnZombie(x, z, zt === undefined ? zmPickType() : zt);
+  }
+  return null;
+}
+function zmSpawnInit() { ZM.kills = 0; ZM.zc = 0; ZM.spawnT = 2; ZM.hordeT = 55; ZM.cleanT = 2; ZM.warned = false; ZM.done = false; for (let i = 0; i < ZM_BASE; i++) zmSpawnAway(55); }
+function zmMakeAlly(b, i) {
+  const p = zmSlotPos(NET.nh + i);
+  b.air = false; b.dropState = 'landed'; b.pos.set(p.x, 0, p.z); b.canopy = null; b.fallT = 0; b.name = 'ALLY-' + String(i + 1).padStart(2, '0'); b.yaw = rand(0, Math.PI * 2);
+  botEquip(b, 'pi');
+}
+function zmPlaceRemote(rp) {
+  const p = zmSlotPos(rp.id); rp.air = false; rp.pos.set(p.x, 0, p.z); rp.net.x = p.x; rp.net.y = 0; rp.net.z = p.z; rp.net.ds = 3;
+}
+function zmStartPlayer() {
+  drop.planeActive = false; drop.state = 'landed'; if (drop.planeMesh) drop.planeMesh.visible = false;
+  const p = zmSlotPos(NET.mode === 'client' ? NET.myId : 0);
+  player.air = false; player.pos.set(p.x, 0, p.z); player.yaw = rand(0, Math.PI * 2);
+  equipLocal('pi', AMMO_PACK.pi, 1, null);
+}
+function zomFind(b, R) {
+  const gr = Math.ceil(R / EG), ci = clamp(Math.floor((b.pos.x + MAP_HALF) / EG), 0, EGN - 1), cj = clamp(Math.floor((b.pos.z + MAP_HALF) / EG), 0, EGN - 1);
+  let best = null, bd = R;
+  for (let j = Math.max(0, cj - gr); j <= Math.min(EGN - 1, cj + gr); j++) for (let i = Math.max(0, ci - gr); i <= Math.min(EGN - 1, ci + gr); i++) {
+    const arr = entGrid[j * EGN + i];
+    for (let k = 0; k < arr.length; k++) {
+      const e = arr[k]; if (e.team !== 0 || !e.alive) continue;
+      const d = Math.hypot(e.pos.x - b.pos.x, e.pos.z - b.pos.z), lim = (e.isPlayer || e.remote) ? R * (e.stance === 2 ? 0.5 : e.stance === 1 ? 0.75 : 1) : R;
+      if (d < bd && d < lim) { bd = d; best = e; }
+    }
+  }
+  return best;
+}
+function zomNoise(x, z, r) {
+  if (!ZM.on || NET.mode === 'client') return;
+  const now = performance.now(); if (now - ZM.noiseT < 120) return; ZM.noiseT = now;
+  const r2 = r * r;
+  for (let i = 0; i < bots.length; i++) { const b = bots[i]; if (!b.zom || !b.alive || b.target) continue; const dx = b.pos.x - x, dz = b.pos.z - z; if (dx * dx + dz * dz < r2) b.nz = { x, z, t: 9 }; }
+}
+function zomAlertNear(b, t) {
+  for (let i = 0; i < bots.length; i++) { const o = bots[i]; if (!o.zom || !o.alive || o === b || o.target) continue; const dx = o.pos.x - b.pos.x, dz = o.pos.z - b.pos.z; if (dx * dx + dz * dz < 18 * 18) o.nz = { x: t.pos.x, z: t.pos.z, t: 8 }; }
+}
+function zomHit(b, T) {
+  const t = b.target; if (!t || !t.alive) return;
+  const car = t.drv, reach = T.reach + 0.7 + (car ? 1.4 : 0);
+  if (Math.hypot(t.pos.x - b.pos.x, t.pos.z - b.pos.z) > reach) return;
+  if (car) carDamage(car, T.dmg * 0.9, b); else damage(t, T.dmg * (0.9 + Math.random() * 0.25), b, false);
+}
+function updateZombie(b, dt, d2) {
+  const T = ZT[b.zt];
+  if (!b.alive) {
+    b.deathT += dt; b.mesh.visible = d2 < ZVIS * ZVIS * 2; b.mesh.rotation.x = -Math.min(b.deathT * 3, 1) * Math.PI / 2;
+    if (b.deathT > 10) { scene.remove(b.mesh); b.gone = true; }
+    return;
+  }
+  if (b.swing > 0) b.swing -= dt;
+  if (b.atkCd > 0) b.atkCd -= dt;
+  b.scanT -= dt;
+  if (b.scanT <= 0) {
+    b.scanT = 0.3 + Math.random() * 0.25;
+    const R = T.det * (ENV.night ? 0.8 : 1) * Math.max(0.55, fogVisK), t = zomFind(b, R);
+    if (t) {
+      if (t !== b.target) { b.target = t; zomAlertNear(b, t); if (d2 < 55 * 55 && Math.random() < 0.6) sfxGroan(b.zt, Math.sqrt(d2)); }
+      b.chaseT = 7; b.last = { x: t.pos.x, z: t.pos.z };
+    } else if (b.target && (!b.target.alive || Math.hypot(b.target.pos.x - b.pos.x, b.target.pos.z - b.pos.z) > R * 2.2)) b.target = null;
+  }
+  if (b.target && !b.target.alive) b.target = null;
+  let gx = 0, gz = 0, spd = 0, want = false, dist = 99;
+  if (b.target) { gx = b.target.pos.x; gz = b.target.pos.z; spd = T.run; want = true; }
+  else if (b.nz && b.nz.t > 0) { b.nz.t -= dt; gx = b.nz.x; gz = b.nz.z; spd = T.run * 0.75; want = true; if (Math.hypot(gx - b.pos.x, gz - b.pos.z) < 3) b.nz = null; }
+  else if (b.chaseT > 0 && b.last) { b.chaseT -= dt; gx = b.last.x; gz = b.last.z; spd = T.run * 0.8; want = true; if (Math.hypot(gx - b.pos.x, gz - b.pos.z) < 2.5) b.chaseT = 0; }
+  else if (b.idleT > 0) b.idleT -= dt;
+  else {
+    b.goalT += dt;
+    if (!b.goal || b.goalT > 14) {
+      b.goalT = 0; b.goal = null;
+      for (let i = 0; i < 8; i++) { const x = b.pos.x + rand(-30, 30), z = b.pos.z + rand(-30, 30); if (Math.hypot(x, z) < ZONE_START - 10 && pointFree(x, z, 0.8)) { b.goal = { x, z }; break; } }
+      if (!b.goal) b.idleT = rand(2, 5);
+    }
+    if (b.goal) { gx = b.goal.x; gz = b.goal.z; spd = T.spd; want = true; if (Math.hypot(gx - b.pos.x, gz - b.pos.z) < 2) { b.goal = null; b.idleT = rand(2, 8); want = false; spd = 0; } }
+  }
+  if (want) {
+    dist = Math.hypot(gx - b.pos.x, gz - b.pos.z);
+    const car = b.target && b.target.drv, reach = T.reach + (car ? 1.4 : 0);
+    if (b.target && dist <= reach + 0.2 && Math.abs(b.target.pos.y - b.pos.y) < 2) {
+      spd = 0; b.yaw = turnToward(b.yaw, Math.atan2(-(gx - b.pos.x), -(gz - b.pos.z)), dt * 10);
+      if (b.atkCd <= 0 && b.atkT <= 0) { b.atkT = 0.3; b.swing = 0.45; b.atkCd = T.cd; }
+    } else {
+      let ang = b.target || b.nz || b.chaseT > 0 ? navAngle(b, gx, gz, dt) : Math.atan2(-(gx - b.pos.x), -(gz - b.pos.z));
+      ang = steerClear(b, ang, 3.5);
+      if (b.avoidT > 0) { ang += b.avoidAng; b.avoidT -= dt; }
+      b.yaw = turnToward(b.yaw, ang, dt * (b.zt === 2 ? 8 : 5));
+    }
+  }
+  if (b.atkT > 0) { b.atkT -= dt; if (b.atkT <= 0) zomHit(b, T); }
+  let moved = 0;
+  if (spd > 0) {
+    const fx = -Math.sin(b.yaw), fz = -Math.cos(b.yaw), bx = b.pos.x, bz = b.pos.z;
+    b.pos.y = getSupport(b.pos, 0.5);
+    moveEntity(b.pos, fx * spd * dt, fz * spd * dt, 0.42);
+    moved = Math.hypot(b.pos.x - bx, b.pos.z - bz);
+    if (moved < spd * dt * 0.4) { b.stuckT += dt; if (b.stuckT > 0.6) { b.stuckT = 0; b.avoidT = 0.9; b.avoidAng = (Math.random() < 0.5 ? -1 : 1) * rand(1, 2.2); b.goal = null; } }
+    else b.stuckT = Math.max(0, b.stuckT - dt);
+  }
+  if (b.target && d2 < 45 * 45 && Math.random() < dt * 0.22) sfxGroan(b.zt, Math.sqrt(d2));
+  const vis = d2 < ZVIS * ZVIS; b.mesh.visible = vis;
+  if (vis) zombiePose(b, dt, moved / Math.max(dt, 1e-3));
+  b.mesh.position.set(b.pos.x, b.pos.y, b.pos.z); b.mesh.rotation.y = b.yaw;
+}
+function zombieKilled(t, att, head) {
+  t.alive = false; t.hp = 0; t.deathT = 0; t.target = null; ZM.kills++;
+  if (att && att !== t) att.kills = (att.kills || 0) + 1;
+  const r = Math.random(), x = t.pos.x + 0.6, z = t.pos.z + 0.4;
+  if (NET.mode === 'client') return;
+  if (t.zt === 1) {
+    if (r < 0.5) makeItem(pick(['ammo', 'ammoP', 'ammoG', 'ammoS']), x, z, 0, 0, 0); else if (r < 0.72) makeItem('med', x, z, 0, 0, 0); else if (r < 0.82) makeItem('vest', x, z, 2, armorMax('vest', 2), 0);
+  } else if (t.zt === 0) { if (r < 0.06) makeItem('ammoP', x, z, 0, 0, 0); else if (r < 0.1) makeItem('med', x, z, 0, 0, 0); }
+  else if (r < 0.05) makeItem('med', x, z, 0, 0, 0);
+}
+function zmCompact() {
+  let j = 0; for (let i = 0; i < bots.length; i++) { const b = bots[i]; if (b.zom && b.gone) continue; bots[j++] = b; } bots.length = j;
+  entities.length = 0; entities.push(player, ...bots);
+}
+function zmHorde() {
+  let cx = 0, cz = 0, n = 0;
+  for (let i = 0; i < entities.length; i++) { const e = entities[i]; if (e.team !== 0 || !e.alive) continue; cx += e.pos.x; cz += e.pos.z; n++; }
+  if (!n) return; cx /= n; cz /= n;
+  const cnt = Math.min(34, 10 + Math.floor(gameTime / 60) * 3), a0 = rand(0, Math.PI * 2); let made = 0;
+  for (let i = 0; i < cnt * 3 && made < cnt; i++) {
+    const a = a0 + rand(-0.6, 0.6), r = rand(78, 105), x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r;
+    if (Math.hypot(x, z) > ZONE_START - 8 || !pointFree(x, z, 0.8)) continue;
+    const b = spawnZombie(x, z, zmPickType()); b.nz = { x: cx, z: cz, t: 40 }; made++;
+  }
+  if (made) feed('🧟 좀비 떼가 몰려옵니다!');
+}
+function zmTick(dt) {
+  ZM.cleanT -= dt; if (ZM.cleanT <= 0) { ZM.cleanT = 2; zmCompact(); }
+  ZM.spawnT -= dt;
+  if (ZM.spawnT <= 0) {
+    ZM.spawnT = 0.5; let alive = 0;
+    for (let i = 0; i < bots.length; i++) if (bots[i].zom && bots[i].alive) alive++;
+    ZM.zc = alive;
+    const cap = ZM_BASE + Math.floor(gameTime / 60) * 8;
+    for (let k = 0; k < Math.min(2, cap - alive); k++) zmSpawnAway(90);
+  }
+  ZM.hordeT -= dt; if (ZM.hordeT <= 0) { ZM.hordeT = 60; zmHorde(); }
+  if (!ZM.warned && gameTime >= ZM.T - 60) { ZM.warned = true; feed('🚁 구조 헬기가 1분 뒤 도착합니다 — 끝까지 버티세요!'); }
+  if (!ZM.done && gameTime >= ZM.T) zmWin();
+}
+function zmWin() {
+  ZM.done = true;
+  for (const c of NET.conns) { const rp = c.rp; if (rp && (rp.alive || rp.specOn)) netSend(c, { t: 'win', kills: rp.kills || 0, time: gameTime }); }
+  if (state === 'playing' && (player.alive || spec.on)) endGame(true);
+}
+
 /* ================= 게임 흐름 ================= */
 function randomPlayerSpawn() {
   for (let i = 0; i < 200; i++) {
@@ -6079,12 +6328,14 @@ function randomPlayerSpawn() {
 function resetGame(m) {
   statsDone = false; newAch = []; lastGain = null; kcAbort();
   const role = NET.mode;
+  ZM.on = !ZM.boot && (role === 'client' ? !!(m && m.zm) : ZM.sel); ZM.nextZ = 1; ZM.done = false; ZM.kills = 0; ZM.zc = 0;
+  if (ZM.on) ZM.spawn = role === 'client' ? { x: m.zs[0], z: m.zs[1] } : randomPlayerSpawn();
   bots.forEach(b => { scene.remove(b.mesh); if (b.canopy) scene.remove(b.canopy); }); bots.length = 0;
   for (const k in ghosts) delete ghosts[k];
   items.forEach(i => scene.remove(i.mesh)); items.length = 0; itemGrid.forEach(a => { a.length = 0; });
   crates.forEach(c => scene.remove(c.mesh)); crates.length = 0; for (const k in crateById) delete crateById[k]; nextCrate = 1; closeLoot(); nearCrate = null; nearSwap = null;
   for (const k in itemById) delete itemById[k];
-  squadDrop = {}; NET.tn = role === 'client' ? ((m && m.tn) || 1) : (NET.teamN || 1);
+  squadDrop = {}; NET.tn = role === 'client' ? ((m && m.tn) || 1) : (ZM.on ? 10 : (NET.teamN || 1));
   { const ev = role === 'client' ? ((m && m.env) || null) : resolveEnv(); if (ev) { NET.env = ev; applyEnv(ev); } }
   if (role === 'client') { NET.ranks = (m && m.ranks) || { 0: 0 }; NET.nh = (m && m.nh) || 1; }
   NET.nextItem = 1; NET.evq = []; NET.won = false; NET.conns.forEach(c => { c.rp = null; });
@@ -6118,17 +6369,27 @@ function resetGame(m) {
     initDrop();
     const rem = role === 'host' ? NET.conns.filter(c => c.open && c.pid) : [];
     NET.ranks = { 0: 0 }; rem.forEach((c, i) => { NET.ranks[c.pid] = i + 1; }); NET.nh = 1 + rem.length;
+    if (ZM.on) {
+      NET.total = 10; const nA = Math.max(0, 10 - NET.nh);
+      for (let i = 0; i < nA; i++) { spawnBot(i); zmMakeAlly(bots[bots.length - 1], i); }
+      rem.forEach(c => { zmPlaceRemote(spawnRemote(c)); });
+      spawnItems();
+    } else {
     NET.total = BOT_COUNT + 1;
     for (let i = 0; i < BOT_COUNT - rem.length; i++) spawnBot(i);
     rem.forEach(c => spawnRemote(c));
     spawnItems();
+    }
   }
   player.team = teamOfId(role === 'client' ? NET.myId : 0);
+  entities.length = 0; entities.push(player, ...bots);
+  if (ZM.on) { zmStartPlayer(); if (role !== 'client') zmSpawnInit(); }
   entities.length = 0; entities.push(player, ...bots);
   buildTeams();
   state = 'playing';
   $('endOverlay').style.display = 'none';
-  toast('수송기 탑승! M: 지도로 항로 확인 → F: 원하는 곳에서 낙하', 6000);
+  if (ZM.on) toast('🧟 좀비 생존 — 생존자 10명 · ' + fmtTime(ZM.T) + ' 동안 버티면 구조 헬기 도착! (총소리는 좀비를 부릅니다)', 8000);
+  else toast('수송기 탑승! M: 지도로 항로 확인 → F: 원하는 곳에서 낙하', 6000);
   feedLocal('🌍 오늘의 환경: ' + envLabel() + (ENV.night ? ' (L: 손전등)' : ''));
 }
 
@@ -6203,6 +6464,7 @@ function recordKill(head, dist, wkey) {
 }
 function recordGame(win) {
   if (statsDone) return; statsDone = true;
+  if (ZM.on) return;
   const rank = win ? 1 : overRank;
   const total = Math.ceil((NET.total || BOT_COUNT + 1) / (NET.tn || 1));
   const pct = total > 1 ? clamp((total - rank) / (total - 1), 0, 1) : 0;
@@ -6310,9 +6572,11 @@ function endGame(win) {
   const showEnd = () => {
     if (state !== 'over' || shown) return; shown = true;
     const title = $('endTitle');
-    if (win) { title.textContent = 'WINNER WINNER CHICKEN DINNER!'; title.style.color = '#ffd23a'; title.style.fontSize = '42px'; overRank = 1; }
+    if (ZM.on) { title.textContent = win ? '🚁 구조 성공 — 생존!' : '☠ 좀비에게 당했습니다'; title.style.color = win ? '#7dff9a' : '#ff4040'; title.style.fontSize = '44px'; }
+    else if (win) { title.textContent = 'WINNER WINNER CHICKEN DINNER!'; title.style.color = '#ffd23a'; title.style.fontSize = '42px'; overRank = 1; }
     else { title.textContent = 'YOU DIED'; title.style.color = '#ff4040'; title.style.fontSize = '56px'; }
-    $('endStats').innerHTML = '순위 <b style="color:#ffd23a">#' + overRank + '</b> / ' + Math.ceil((NET.total || BOT_COUNT + 1) / (NET.tn || 1)) + (NET.tn > 1 ? ' 팀' : '') + '<br>처치 수 <b style="color:#ff6a5a">' + player.kills + '</b> 킬<br>생존 시간 <b>' + fmtTime(gameTime) + '</b>';
+    if (ZM.on) $('endStats').innerHTML = '생존 시간 <b>' + fmtTime(gameTime) + '</b> / ' + fmtTime(ZM.T) + '<br>처치 수 <b style="color:#ff6a5a">' + player.kills + '</b><br>남은 좀비 <b>' + ZM.zc + '</b> · 전체 처치 <b>' + ZM.kills + '</b>';
+    else $('endStats').innerHTML = '순위 <b style="color:#ffd23a">#' + overRank + '</b> / ' + Math.ceil((NET.total || BOT_COUNT + 1) / (NET.tn || 1)) + (NET.tn > 1 ? ' 팀' : '') + '<br>처치 수 <b style="color:#ff6a5a">' + player.kills + '</b> 킬<br>생존 시간 <b>' + fmtTime(gameTime) + '</b>';
     if (lastGain) {
       const T = TIERS[tierIdx(STATS.rp)];
       $('endStats').innerHTML += '<br><br><span style="color:#7fd0ff">' + T.i + ' ' + T.n + '</span> <b style="color:#ffd23a">+' + lastGain.gain + ' RP</b> <small>(누적 ' + STATS.rp + ')</small>';
@@ -6325,7 +6589,7 @@ function endGame(win) {
     else { rb.style.display = ''; rb.textContent = '재시작'; rb.onclick = null; }
     $('endOverlay').style.display = 'flex';
   };
-  if (!win && kc.ready && gameTime - kc.gt < 20) setTimeout(() => { if (state === 'over' && !shown) kcStart(showEnd); }, 900);
+  if (!win && !ZM.on && kc.ready && gameTime - kc.gt < 20) setTimeout(() => { if (state === 'over' && !shown) kcStart(showEnd); }, 900);
   else setTimeout(showEnd, win ? 600 : 1400);
 }
 
@@ -6376,18 +6640,30 @@ function refreshEnvUI() {
   refreshEnvUI();
 })();
 
+function refreshGm() {
+  document.querySelectorAll('#gmSel button').forEach(b => b.classList.toggle('on', (b.dataset.g === 'zm') === ZM.sel));
+  $('teamSel').style.display = ZM.sel ? 'none' : '';
+  if (typeof renderLobby === 'function' && NET.mode !== 'solo' && state === 'menu') renderLobby();
+}
+document.querySelectorAll('#gmSel button').forEach(b => b.addEventListener('click', () => {
+  if (NET.mode === 'client' || NET.pendingJoin) return;
+  ZM.sel = b.dataset.g === 'zm'; try { localStorage.setItem('bg3d_gm', ZM.sel ? 'zm' : 'br'); } catch (e) { }
+  refreshGm(); if (NET.mode === 'host') netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0 });
+}));
+try { ZM.sel = localStorage.getItem('bg3d_gm') === 'zm'; } catch (e) { }
+refreshGm();
 function setTeamN(n) {
   NET.teamN = n;
   document.querySelectorAll('#teamSel button').forEach(b => b.classList.toggle('on', +b.dataset.n === n));
   try { localStorage.setItem('bg3d_team', String(n)); } catch (e) { }
-  if (NET.mode === 'host') { netAll({ t: 'lobby', names: NET.names, tn: n }); renderLobby(); }
+  if (NET.mode === 'host') { netAll({ t: 'lobby', names: NET.names, tn: n, zm: ZM.sel ? 1 : 0 }); renderLobby(); }
 }
 document.querySelectorAll('#teamSel button').forEach(b => b.addEventListener('click', () => { if (NET.mode === 'client' || NET.pendingJoin) return; setTeamN(+b.dataset.n); }));
 try { setTeamN(clamp(+(localStorage.getItem('bg3d_team') || 1) | 0, 1, 4)); } catch (e) { setTeamN(1); }
 $('startBtn').addEventListener('click', startGame);
 $('hostBtn').addEventListener('click', startHosting);
 try { $('nick').value = localStorage.getItem('bg3d_nick') || ''; } catch (e) { }
-if (NET.pendingJoin) setupJoinUI();
+if (NET.pendingJoin) { setupJoinUI(); const au = () => { initAudio(); }; addEventListener('pointerdown', au, { once: true }); addEventListener('keydown', au, { once: true }); }
 else if (typeof Peer === 'undefined') { $('hostBtn').disabled = true; $('hostBtn').title = '멀티플레이 모듈 로드 실패'; }
 $('restartBtn').addEventListener('click', startGame);
 $('pause').addEventListener('click', () => { initAudio(); requestLock(); });
@@ -6581,7 +6857,7 @@ function loop(now) {
     if (state === 'playing' && player.alive) updatePlayer(dt);
     if (state === 'playing') specUpdate(dt);
     updateCars(dt);
-    if (NET.mode !== 'client' && !drop.planeActive) updateZone(dt);
+    if (NET.mode !== 'client' && !drop.planeActive && !ZM.on) updateZone(dt);
     if (NET.mode !== 'client' && zoneOn() && player.alive && !player.air && Math.hypot(player.pos.x, player.pos.z) > zone.r) {
       player.hp -= zoneDmg() * dt;
       if (player.hp <= 0) kill(player, null, false);
@@ -6604,7 +6880,8 @@ function loop(now) {
     updateEffects(dt);
     updateGrens(dt); updateRockets(dt); updateSmokes(dt); updateAirdrops(dt); updateTurrets(dt); updateEvents(dt);
     if (NET.mode !== 'client' && state === 'playing') { autoMed(player, dt); for (let i = 0; i < bots.length; i++) if (bots[i].remote) autoMed(bots[i], dt); }
-    if (NET.mode !== 'client' && state === 'playing' && (player.alive || spec.on) && onlyTeamAlive(player.team)) endGame(true);
+    if (NET.mode !== 'client' && state === 'playing' && (player.alive || spec.on) && !ZM.on && onlyTeamAlive(player.team)) endGame(true);
+    if (ZM.on && NET.mode !== 'client' && state !== 'menu') zmTick(dt);
     if (NET.mode === 'host' && NET.live) {
       if (!NET.won && state !== 'menu') hostWinCheck();
       NET.sendT -= dt; if (NET.sendT <= 0) { NET.sendT = 0.1; hostSnapshot(); }
@@ -6620,7 +6897,7 @@ function loop(now) {
 }
 
 // 메뉴 배경용 초기 월드
-resetGame();
+resetGame(); ZM.boot = false;
 applyEnv(previewEnv());
 state = 'menu';
 requestAnimationFrame(loop);
