@@ -81,7 +81,7 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 <script>
 /* ============================================================
    게임 목록 — 새 게임은 여기에 객체 하나만 추가하면 됩니다.
-   src   : 게임 HTML 파일 경로 (이 로비 파일 기준 상대경로)
+   src    : 게임 HTML 파일 경로 (이 로비 파일 기준 상대경로)
    ready : false 면 "준비 중" 카드로 표시 (코드 받으면 true + src 채우기)
    thumb : 대체용 SVG 그림. 실제 대표 이미지는 thumbs/<id>.jpg (16:9, 800x450 권장)를 넣으면 자동으로 사용돼요
    ============================================================ */
@@ -285,6 +285,30 @@ const GAMES=[
   }
 ];
 
+/* ---------- 접속 횟수(조회수) 기반 정렬 로직 (GitHub Pages 호환) ---------- */
+function getPlayCounts() {
+  try {
+    const data = localStorage.getItem('lobby-play-counts');
+    return data ? JSON.parse(data) : {};
+  } catch(e) { return {}; }
+}
+
+function recordPlay(id) {
+  try {
+    const counts = getPlayCounts();
+    counts[id] = (counts[id] || 0) + 1;
+    localStorage.setItem('lobby-play-counts', JSON.stringify(counts));
+  } catch(e) {}
+}
+
+// 접속 횟수가 높은 순으로 GAMES 배열 정렬 (조회수가 같으면 원래 순서 유지)
+const counts = getPlayCounts();
+GAMES.sort((a, b) => {
+  const countA = counts[a.id] || 0;
+  const countB = counts[b.id] || 0;
+  return countB - countA;
+});
+
 /* ---------- 렌더링 ---------- */
 const $=id=>document.getElementById(id);
 const grid=$('grid'),stage=$('stage'),frame=$('frame');
@@ -298,10 +322,18 @@ const defaultThumb=`<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg
 
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-GAMES.forEach(g=>{
+GAMES.forEach((g, index)=>{
   const b=document.createElement('button');
   b.className='card';b.type='button';b.disabled=!g.ready;
+  
+  // 인기 Top 3 게임에 TOP 뱃지 부여
+  let topBadge = '';
+  if (g.ready && index < 3) {
+    topBadge = `<span class="badge" style="left:10px; right:auto; background:var(--gold); color:var(--ink);">🔥 TOP ${index + 1}</span>`;
+  }
+
   b.innerHTML=
+    topBadge +
     `<span class="thumb">${g.thumb||defaultThumb}<img src="thumbs/${g.id}.jpg" alt="" loading="lazy" onerror="this.remove()"></span>`+
     `<span class="info">`+
       `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
@@ -310,7 +342,11 @@ GAMES.forEach(g=>{
       `<span class="play">${g.ready?'플레이':'준비 중'}</span>`+
     `</span>`+
     (g.ready?'':'<span class="badge">COMING SOON</span>');
-  if(g.ready)b.addEventListener('click',()=>open(g));
+  
+  if(g.ready)b.addEventListener('click',()=>{
+    recordPlay(g.id);
+    open(g);
+  });
   grid.appendChild(b);
 });
 
