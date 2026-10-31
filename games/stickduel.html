@@ -62,6 +62,42 @@ details{text-align:left; background:rgba(255,255,255,.05); border:1px solid rgba
 summary{cursor:pointer; font-weight:700; color:var(--gold)}
 details ul{margin:8px 0 0; padding:0; list-style:none; display:grid; gap:5px; color:var(--mute); line-height:1.4}
 details b{color:var(--paper)}
+.card.wide{width:min(880px,100%)}
+#pick h2{font-family:var(--f-display); font-weight:400; font-size:clamp(26px,6vw,38px); margin:0}
+.pickgrid{display:grid; grid-template-columns:1fr 1fr; gap:12px; text-align:left}
+.pcol{--c:var(--p1); display:flex; flex-direction:column; gap:9px; min-width:0; padding:12px; border-radius:14px; border:2px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05)}
+.pcol.p2{--c:var(--p2)}
+.pcol.ready{border-color:var(--c)}
+.ph{margin:0; font-family:var(--f-display); font-weight:400; font-size:20px; color:var(--c)}
+.hint{margin:0; font-size:12px; color:var(--mute); min-height:15px}
+body.touch .hint{display:none}
+.wgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:6px}
+.wbtn{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:7px 2px; min-height:62px; font:700 12px/1.1 var(--f-body); color:var(--paper); background:rgba(255,255,255,.06); border:2px solid rgba(255,255,255,.15); border-radius:10px; cursor:pointer}
+.wbtn.sel{border-color:var(--c); background:rgba(255,255,255,.16); color:var(--c)}
+.wbtn:disabled{cursor:default; opacity:.55}
+.wbtn.sel:disabled{opacity:1}
+.winfo{display:grid; gap:3px; align-content:start; min-height:76px; font-size:12px; line-height:1.45; color:var(--mute)}
+.winfo b{color:var(--paper); font-size:14px}
+.winfo em{color:var(--gold); font-style:normal}
+.pp{color:var(--c); letter-spacing:.03em}
+.rdy{font:700 15px/1 var(--f-body); padding:13px; border-radius:12px; cursor:pointer; color:var(--paper); background:transparent; border:2px solid var(--c)}
+.rdy.on{background:var(--c); color:#0b0d24}
+.rdy:disabled{opacity:.7; cursor:default}
+.wbtn:focus-visible,.rdy:focus-visible{outline:3px solid var(--gold); outline-offset:2px}
+body.picking #pads{display:none!important}
+@media (max-width:640px){.pickgrid{grid-template-columns:1fr}}
+@media (max-height:460px) and (min-width:641px){
+  #pick .card{gap:6px}
+  #pick h2{font-size:22px}
+  #pickMap{display:none}
+  .pcol{padding:8px; gap:6px}
+  .ph{font-size:16px}
+  .wbtn{min-height:44px; padding:3px 2px; gap:1px}
+  .wbtn svg{width:24px; height:24px}
+  .winfo{min-height:0; font-size:11px; line-height:1.35}
+  .winfo b{font-size:13px}
+  .rdy{padding:9px; font-size:14px}
+}
 .note{margin:0; font-size:12px; color:var(--mute); line-height:1.5}
 #endTitle{font-family:var(--f-display); font-size:clamp(34px,9vw,54px); margin:0}
 #endScore{font-family:var(--f-display); font-size:30px; margin:0; letter-spacing:.08em}
@@ -75,7 +111,7 @@ body.touch #pads{display:flex}
 .pad.p2{--c:var(--p2); --bg:rgba(60,196,255,.14)}
 .btn{font:700 15px/1 var(--f-body); color:var(--c); background:var(--bg); border:2px solid var(--c); border-radius:14px; padding:0; touch-action:none; -webkit-user-select:none; user-select:none}
 .btn.on{background:var(--c); color:#0b0d24}
-.btn.sk{color:var(--mute); border-color:rgba(255,255,255,.3); background:rgba(255,255,255,.06); font-size:13px}
+.btn.sk{white-space:pre-line; line-height:1.25; color:var(--mute); border-color:rgba(255,255,255,.3); background:rgba(255,255,255,.06); font-size:13px}
 .btn.sk.rdy{color:#17142e; background:var(--gold); border-color:var(--gold); box-shadow:0 0 14px rgba(255,209,102,.7)}
 .btn.sk.on{filter:brightness(.8)}
 body.cpu .pad.p2{display:none}
@@ -106,7 +142,7 @@ body.cpu .pad.p1{width:min(70%,300px)}
     <section class="overlay" id="menu">
       <div class="card">
         <h1>스틱 <em>듀얼리스트</em></h1>
-        <p class="sub">한 화면, 한 기기에서 둘이서 붙는 막대기 결투. 라운드마다 무기가 무작위로 주어지고, 발판 밖으로 날아가면 낙사입니다.</p>
+        <p class="sub">한 화면, 한 기기에서 둘이서 붙는 막대기 결투. 무기는 라운드마다 무작위로 정해지거나 설정에서 직접 고를 수 있고, 발판 밖으로 날아가면 낙사입니다.</p>
         <div class="keys">
           <div class="k p1"><h3>P1 (빨강)</h3>
             <div>이동 <span><kbd>A</kbd> <kbd>D</kbd></span></div>
@@ -165,6 +201,13 @@ body.cpu .pad.p1{width:min(70%,300px)}
           </div>
         </div>
         <div class="row">
+          <span>무기</span>
+          <div class="seg" id="wpSeg">
+            <button type="button" data-x="rand" class="on">무작위</button>
+            <button type="button" data-x="pick">직접 선택</button>
+          </div>
+        </div>
+        <div class="row">
           <span>아이템 상자</span>
           <div class="seg" id="itemSeg">
             <button type="button" data-i="1" class="on">켜기</button>
@@ -173,6 +216,18 @@ body.cpu .pad.p1{width:min(70%,300px)}
         </div>
         <button class="go" id="bStart" type="button">대결 시작</button>
         <p class="note">모바일: 화면 아래 왼쪽 버튼은 P1, 오른쪽 버튼은 P2 전용입니다. 가로로 돌리면 버튼이 화면 위에 겹쳐 표시돼요. 일시정지는 Esc 또는 P.</p>
+      </div>
+    </section>
+
+    <section class="overlay" id="pick" hidden>
+      <div class="card wide">
+        <h2 id="pickRound">무기 선택</h2>
+        <p class="sub" id="pickMap"></p>
+        <div class="pickgrid">
+          <div class="pcol p1" id="pc0"></div>
+          <div class="pcol p2" id="pc1"></div>
+        </div>
+        <div class="btns"><button class="alt" id="bPickMenu" type="button">메뉴로</button></div>
       </div>
     </section>
 
@@ -341,6 +396,7 @@ function readInput(i){
   return{l:k.l||t.l||m.l,r:k.r||t.r||m.r,u:k.u||t.u||m.u,d:k.d||t.d||m.d,a:k.a||t.a||m.a,s:k.s||t.s||m.s}
 }
 window.addEventListener('keydown',e=>{
+  if(state==='pick'){if(!e.repeat)pickKey(e);return}
   if(e.code==='Escape'||e.code==='KeyP'){if(!e.repeat)togglePause();e.preventDefault();return}
   const m=KEYMAP[e.code]; if(!m)return;
   e.preventDefault(); kb[m[0]][m[1]]=1;
@@ -367,6 +423,7 @@ let state='menu',paused=false,target=3,round=1,score=[0,0],winner=-1,ringOut=fal
 let countT=0,koT=0,fightBan=0,hitstop=0,shake=0,acc=0,tAnim=0;
 let players=[],projs=[],parts=[];
 let items=[],hazards=[],itemT=6,boltT=4,flashT=0,itemsOn=true;
+let pickMode=false,pickSel=['sword','spear'],pickReady=[false,false];
 
 function mk(i){
   const wk=WKEYS[Math.floor(Math.random()*WKEYS.length)];
@@ -751,11 +808,13 @@ function startRound(){
   mapIdx=m;MAP=MAPS[m];PL=clonePL(MAP);G=1750*(MAP.grav||1);mapT=0;updatePlatforms(0,true);
   items=[];hazards=[];itemT=rnd(4.5,6.5);boltT=rnd(3.5,5);flashT=0;
   players=[mk(0),mk(1)];projs=[];parts=[];ringOut=false;winner=-1;
-  state='count';countT=3;koT=0;fightBan=0;acc=0;snd('beep');
+  koT=0;fightBan=0;acc=0;
+  if(pickMode){state='pick';enterPick()}
+  else{state='count';countT=3;snd('beep')}
 }
 function startMatch(){
   score=[0,0];round=1;paused=false;
-  $('menu').hidden=true;$('end').hidden=true;$('pause').hidden=true;
+  $('menu').hidden=true;$('end').hidden=true;$('pause').hidden=true;$('pick').hidden=true;
   ac();startRound();
 }
 function nextRound(){
@@ -771,7 +830,7 @@ function endMatch(){
   $('end').hidden=false;
 }
 function toMenu(){
-  paused=false;state='menu';
+  paused=false;state='menu';$('pick').hidden=true;document.body.classList.remove('picking');
   $('end').hidden=true;$('pause').hidden=true;$('menu').hidden=false;
   players=[mk(0),mk(1)];projs=[];parts=[];
   $('bPause').textContent='일시정지';
@@ -990,6 +1049,101 @@ function aiAir(p,A,L){
   if(p.jumps<2&&p.vy>-40&&A.jl<=0&&p.y>best.y-8)aiJump(A);
 }
 
+/* ===== 무기 직접 선택 =====
+   P1: A D 로 고르고 F 로 준비 / P2: ← → 로 고르고 / 로 준비. 컴퓨터 대결에서는 P1 이 두 키 세트를 모두 쓴다. */
+const WK_OPTS=[...WKEYS,'rand'];
+const ICON={
+  sword :'<g transform="rotate(-45 24 24)"><path d="M5 24h9M14 16v16M14 24h29"/></g>',
+  dagger:'<g transform="rotate(-45 24 24)"><path d="M9 24h7M16 18v12M16 24h18"/></g>',
+  spear :'<g transform="rotate(-45 24 24)"><path d="M4 24h31"/><path d="M33 18l11 6-11 6z" fill="currentColor"/></g>',
+  axe   :'<g transform="rotate(-45 24 24)"><path d="M5 24h37"/><path d="M30 24l3-13q13 13 0 26z" fill="currentColor"/></g>',
+  hammer:'<g transform="rotate(-45 24 24)"><path d="M5 24h30"/><rect x="33" y="13" width="11" height="22" rx="2" fill="currentColor"/></g>',
+  bow   :'<g transform="rotate(-45 24 24)"><path d="M17 5q20 19 0 38"/><path d="M17 5v38" stroke-width="1.5"/><path d="M8 24h32M36 19l6 5-6 5"/></g>',
+  pistol:'<path d="M9 17h30v9H22l-2 13h-9l2-13h-4z" fill="currentColor" stroke="none"/>',
+  rand  :'<path d="M14 15q0-9 10-9t10 9q0 6-10 10v5"/><circle cx="24" cy="39" r="2.2" fill="currentColor"/>'
+};
+const svgIcon=k=>'<svg viewBox="0 0 48 48" width="34" height="34" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+'</svg>';
+const TYPE_LABEL={m:'근접',t:'근접 · 찌르기',r:'원거리'};
+const pips=n=>'●'.repeat(n)+'○'.repeat(5-n);
+function wstat(k){
+  const d=WEAPONS[k],tot=d.wu+d.ac+d.rc;
+  return{pw:clamp(Math.round(d.dmg/6),1,5),sp:clamp(Math.round(5.5-tot*5),1,5),rg:d.type==='r'?5:clamp(Math.round(d.L/16),1,5)};
+}
+function infoHTML(k,hidden){
+  if(hidden)return'<b>비공개</b><span>컴퓨터는 무기를 숨기고 골랐어요. 카운트다운 때 공개됩니다.</span>';
+  if(k==='rand')return'<b>무작위</b><span>라운드가 시작될 때 무기가 정해져요.</span>';
+  const d=WEAPONS[k],s=wstat(k),sk=SKILLS[k];
+  return'<b>'+d.name+' · '+TYPE_LABEL[d.type]+'</b>'
+    +'<span class="pp">공격 '+pips(s.pw)+' &nbsp;속도 '+pips(s.sp)+' &nbsp;사거리 '+pips(s.rg)+'</span>'
+    +'<span>스킬 <em>'+sk.name+'</em> · '+sk.desc+'</span>';
+}
+
+function buildPick(){
+  for(const i of[0,1]){
+    const col=$('pc'+i);
+    col.innerHTML='<h3 class="ph"></h3><p class="hint"></p><div class="wgrid">'
+      +WK_OPTS.map(k=>'<button type="button" class="wbtn" data-w="'+k+'" aria-pressed="false">'+svgIcon(k)+'<span>'+(k==='rand'?'무작위':WEAPONS[k].name)+'</span></button>').join('')
+      +'</div><div class="winfo"></div><button type="button" class="rdy" data-ready="1">이 무기로 준비</button>';
+    col.addEventListener('click',e=>{
+      const wb=e.target.closest('[data-w]');
+      if(wb){pickSet(i,wb.dataset.w);return}
+      if(e.target.closest('[data-ready]'))pickToggle(i);
+    });
+  }
+}
+function renderPick(){
+  for(const i of[0,1]){
+    const col=$('pc'+i),isCpu=cpu&&i===1;
+    col.querySelector('.ph').textContent=(isCpu?'CPU·'+AI_NAMES[aiLevel]:'P'+(i+1))+(i?' (파랑)':' (빨강)');
+    col.querySelector('.hint').textContent=isCpu?'컴퓨터가 자동으로 고릅니다':
+      (i?(cpu?'':'← → 선택 · / 준비'):(cpu?'A D 또는 ← → 선택 · F 또는 / 준비':'A D 선택 · F 준비'));
+    col.classList.toggle('ready',!!pickReady[i]);
+    col.querySelectorAll('.wbtn').forEach(b=>{
+      const on=!isCpu&&b.dataset.w===pickSel[i];
+      b.classList.toggle('sel',on);b.setAttribute('aria-pressed',on?'true':'false');
+      b.disabled=isCpu||!!pickReady[i];
+    });
+    col.querySelector('.winfo').innerHTML=infoHTML(pickSel[i],isCpu);
+    const rb=col.querySelector('.rdy');
+    rb.textContent=isCpu?'선택 완료':(pickReady[i]?'준비 완료 · 눌러서 취소':'이 무기로 준비');
+    rb.disabled=isCpu;rb.classList.toggle('on',!!pickReady[i]);
+  }
+}
+function pickSet(i,k){
+  if((cpu&&i===1)||pickReady[i]||!WK_OPTS.includes(k))return;
+  pickSel[i]=k;tone(560,.05,'square',.04);renderPick();
+}
+function pickToggle(i){
+  if(cpu&&i===1)return;
+  pickReady[i]=!pickReady[i];tone(pickReady[i]?760:420,.07,'square',.05);
+  renderPick();
+  if(pickReady[0]&&pickReady[1])beginFromPick();
+}
+function enterPick(){
+  for(const k of kb)for(const x in k)k[x]=0;
+  for(const k of tch)for(const x in k)k[x]=0;
+  pickReady=[false,false];
+  if(cpu){pickSel[1]=WKEYS[Math.floor(Math.random()*WKEYS.length)];pickReady[1]=true}
+  $('pickRound').textContent='라운드 '+round+' · 무기 선택';
+  $('pickMap').textContent='이번 맵 · '+MAP.name+' ('+MAP.tip+')';
+  $('pick').hidden=false;document.body.classList.add('picking');
+  renderPick();
+}
+function beginFromPick(){
+  for(const i of[0,1])players[i].wk=pickSel[i]==='rand'?WKEYS[Math.floor(Math.random()*WKEYS.length)]:pickSel[i];
+  $('pick').hidden=true;document.body.classList.remove('picking');
+  state='count';countT=3;acc=0;snd('beep');
+}
+const PICK_KEYS={KeyA:[0,-1],KeyD:[0,1],KeyF:[0,0],ArrowLeft:[1,-1],ArrowRight:[1,1],Slash:[1,0]};
+function pickKey(e){
+  const m=PICK_KEYS[e.code];if(!m)return;
+  e.preventDefault();
+  const i=cpu?0:m[0],d=m[1];
+  if(d===0){pickToggle(i);return}
+  if(pickReady[i])return;
+  pickSet(i,WK_OPTS[(WK_OPTS.indexOf(pickSel[i])+d+WK_OPTS.length)%WK_OPTS.length]);
+}
+
 /* ===== 렌더링 ===== */
 const FONT="'Black Han Sans','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif";
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
@@ -1162,7 +1316,7 @@ function drawStick(p){
   ctx.beginPath();ctx.arc(q.sx+(p.stun>0?-2:0),q.sy-11,9.5,0,7);ctx.fill();
   ctx.fillStyle='#0b0d24';ctx.beginPath();ctx.arc(q.sx+4+(p.stun>0?-2:0),q.sy-12,p.dead?0:1.9,0,7);ctx.fill();
   if(p.dead){ctx.strokeStyle='#0b0d24';ctx.lineWidth=1.6;const ex=q.sx+4,ey=q.sy-12;line(ex-2,ey-2,ex+2,ey+2);line(ex-2,ey+2,ex+2,ey-2)}
-  drawWeapon(p,q);
+  if(state!=='pick')drawWeapon(p,q);
   ctx.restore();
 }
 function drawTrails(){
@@ -1243,6 +1397,7 @@ function bigText(s,x,y,size,fill){
   ctx.fillStyle=fill;ctx.fillText(s,x,y);
 }
 function drawHUD(){
+  if(state==='pick')return;
   bar(players[0],24,300,false);bar(players[1],476,300,true);
   skillGauge(players[0],24,300,false);skillGauge(players[1],476,300,true);
   ctx.font='13px '+FONT;ctx.textAlign='center';ctx.fillStyle='rgba(238,240,255,.75)';
@@ -1283,22 +1438,24 @@ $('bQuit').addEventListener('click',toMenu);
 $('bResume').addEventListener('click',togglePause);
 $('bPause').addEventListener('click',e=>{e.currentTarget.blur();togglePause()});
 $('bMute').addEventListener('click',e=>{muted=!muted;e.currentTarget.textContent=muted?'소리 켜기':'소리 끄기';e.currentTarget.blur();ac()});
-function saveCfg(){try{localStorage.setItem('sduel',JSON.stringify({cpu,aiLevel,target,itemsOn}))}catch(e){}}
+function saveCfg(){try{localStorage.setItem('sduel',JSON.stringify({cpu,aiLevel,target,itemsOn,pickMode}))}catch(e){}}
 function paintCfg(){
   document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',+x.dataset.w===target));
   document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.toggle('on',(x.dataset.m==='cpu')===cpu));
   document.querySelectorAll('#lvSeg button').forEach(x=>x.classList.toggle('on',+x.dataset.l===aiLevel));
+  document.querySelectorAll('#wpSeg button').forEach(x=>x.classList.toggle('on',(x.dataset.x==='pick')===pickMode));
   document.querySelectorAll('#itemSeg button').forEach(x=>x.classList.toggle('on',(x.dataset.i==='1')===itemsOn));
   $('lvRow').hidden=!cpu;$('cpuNote').hidden=!cpu;
   document.body.classList.toggle('cpu',cpu);
 }
 $('seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;target=+b.dataset.w;paintCfg();saveCfg()});
 $('modeSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;cpu=b.dataset.m==='cpu';paintCfg();saveCfg();players=[mk(0),mk(1)]});
+$('wpSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;pickMode=b.dataset.x==='pick';paintCfg();saveCfg()});
 $('itemSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;itemsOn=b.dataset.i==='1';paintCfg();saveCfg()});
 $('lvSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;aiLevel=+b.dataset.l;paintCfg();saveCfg();players=[mk(0),mk(1)]});
 try{
   const c=JSON.parse(localStorage.getItem('sduel')||'null');
-  if(c){cpu=!!c.cpu;if(c.aiLevel>=1&&c.aiLevel<=5)aiLevel=c.aiLevel|0;if([2,3,5].includes(c.target))target=c.target;if(typeof c.itemsOn==='boolean')itemsOn=c.itemsOn}
+  if(c){cpu=!!c.cpu;if(c.aiLevel>=1&&c.aiLevel<=5)aiLevel=c.aiLevel|0;if([2,3,5].includes(c.target))target=c.target;if(typeof c.itemsOn==='boolean')itemsOn=c.itemsOn;if(typeof c.pickMode==='boolean')pickMode=c.pickMode}
 }catch(e){}
 paintCfg();
 
@@ -1306,7 +1463,7 @@ const skBtns=Array.from(document.querySelectorAll('.btn.sk'));
 function syncSk(){
   for(const b of skBtns){
     const p=players[+b.dataset.p];if(!p)continue;
-    const rdy=p.skcd<=0,txt=rdy?SKILLS[p.wk].name:String(Math.ceil(p.skcd));
+    const rdy=p.skcd<=0,txt=rdy?'스킬':'스킬\n'+Math.ceil(p.skcd);
     if(b._t!==txt){b.textContent=txt;b._t=txt}
     if(b._r!==rdy){b.classList.toggle('rdy',rdy);b._r=rdy}
   }
@@ -1314,6 +1471,8 @@ function syncSk(){
 const skl=$('skList');
 if(skl)skl.innerHTML=WKEYS.map(k=>'<li><b>'+WEAPONS[k].name+' · '+SKILLS[k].name+'</b> '+SKILLS[k].desc+'</li>').join('');
 
+buildPick();
+$('bPickMenu').addEventListener('click',toMenu);
 updatePlatforms(0,true);
 players=[mk(0),mk(1)];
 resize();
