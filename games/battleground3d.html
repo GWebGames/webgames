@@ -77,14 +77,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Se
 #lootPanel .lb{display:flex;gap:8px;margin-top:8px}
 #lootPanel .lb span{flex:1;text-align:center;padding:7px 4px;background:#ffd23a;color:#111;font-weight:800;border-radius:5px;cursor:pointer;font-size:15px}
 #lootPanel .lb span+span{background:#555;color:#fff}
-#gmSel,#modeSel,#teamSel{display:flex;gap:10px;margin-top:14px;pointer-events:auto;align-items:center;flex-wrap:wrap;justify-content:center}
+#zlSel,#gmSel,#modeSel,#teamSel{display:flex;gap:10px;margin-top:14px;pointer-events:auto;align-items:center;flex-wrap:wrap;justify-content:center}
 #teamSel span{font-weight:800;color:#ddd}
 #squad{left:14px;top:236px;width:176px;font-size:13px;display:none}
 #squad .sq{background:rgba(0,0,0,.5);margin-top:4px;padding:3px 7px;border-radius:4px;color:#fff;display:flex;flex-direction:column}
 #squad .sq.dead{opacity:.45}
 #squad .sq i{display:block;height:5px;background:#4ab0ff;margin-top:2px;border-radius:2px}
-#gmSel button,#modeSel button,#teamSel button{padding:10px 20px;font-size:17px;font-weight:800;color:#fff;background:#333;border:2px solid #666;border-radius:8px;cursor:pointer;pointer-events:auto}
-#gmSel button.on,#modeSel button.on,#teamSel button.on{background:#ffd23a;color:#111;border-color:#ffd23a}
+#zlSel button,#gmSel button,#modeSel button,#teamSel button{padding:10px 20px;font-size:17px;font-weight:800;color:#fff;background:#333;border:2px solid #666;border-radius:8px;cursor:pointer;pointer-events:auto}
+#zlSel button.on,#gmSel button.on,#modeSel button.on,#teamSel button.on{background:#ffd23a;color:#111;border-color:#ffd23a}
 #flashFx{inset:0;display:none;mix-blend-mode:screen;background:radial-gradient(ellipse 52% 58% at 50% 54%,rgba(255,236,190,.38) 0,rgba(255,236,190,.19) 42%,rgba(255,236,190,0) 100%)}
 #envBox{margin-top:12px;max-width:660px;pointer-events:auto;text-align:center}
 #envBox summary{cursor:pointer;font-weight:800;color:#ffd23a;font-size:15px;padding:7px 16px;border:2px solid #666;border-radius:8px;display:inline-block;background:#222;list-style:none}
@@ -245,10 +245,12 @@ body.mobile #lootPanel small{display:none}
     <div><b>F</b>낙하 / 낙하산</div><div><b>시선 ↓</b>급강하(낙하 중)</div>
     <div><b>1 / 2</b>주무기 슬롯 1 / 2</div><div><b>3 / 4</b>권총 / 칼</div><div><b>5 / 6 / 7</b>수류탄 / 연막탄 / 섬광탄 (좌클릭 던지기 · 우클릭 가볍게)</div><div><b>E</b>상자 열기 · 무기 교체</div>
     <div><b>X</b>조준 지점에 핑</div><div><b>지도(M) 클릭</b>핑 / 우클릭 해제</div>
+    <div><b>🚤 보트 · 🚁 헬기</b>E 탑승 · 헬기는 <b>Space</b> 상승 / <b>C</b> 하강(착륙 후 하차)</div><div><b>🌊 강·호수</b>걸어서 건너면 느려져요 · 다리 이용 / 보트 탑승</div>
   </div>
-  <div class="tkeys">📱 <b>왼쪽 화면</b> 드래그 = 이동(끝까지 밀면 달리기) · <b>오른쪽 화면</b> 드래그 = 시점<br><b>발사</b> 버튼 누르고 있기 = 사격(누른 채 드래그로 조준 이동) · <b>조준</b> = 줌 켜기/끄기<br>점프 · 앉기 · 엎드리기 · 장전 · <b>E</b>(상자 열기/무기 교체) · 1~4 무기 · 지도(탭하면 핑) · 시점 · 핑<br>상자 목록은 <b>항목을 탭</b>하면 가져옵니다. 가로 화면으로 플레이하세요.</div>
+  <div class="tkeys">📱 <b>왼쪽 화면</b> 드래그 = 이동(끝까지 밀면 달리기) · <b>오른쪽 화면</b> 드래그 = 시점<br><b>발사</b> 버튼 누르고 있기 = 사격(누른 채 드래그로 조준 이동) · <b>조준</b> = 줌 켜기/끄기<br>헬기: <b>점프</b> = 상승, <b>앉기</b> = 하강 켜기/끄기 · 점프 · 앉기 · 엎드리기 · 장전 · <b>E</b>(상자 열기/무기 교체) · 1~4 무기 · 지도(탭하면 핑) · 시점 · 핑<br>상자 목록은 <b>항목을 탭</b>하면 가져옵니다. 가로 화면으로 플레이하세요.</div>
   <div id="modeSel"><button data-m="pc">🖥 PC (키보드·마우스)</button><button data-m="mobile">📱 모바일 (터치)</button></div>
   <div id="gmSel"><span style="font-weight:800;color:#ddd">게임 모드</span><button data-g="br">🎯 배틀로얄</button><button data-g="zm">🧟 좀비 생존 (10명)</button></div>
+  <div id="zlSel"><span style="font-weight:800;color:#ddd">좀비 난이도</span><button data-l="1">1단계 (100마리)</button><button data-l="2">2단계 (130마리)</button><button data-l="3">3단계 (200마리)</button></div>
   <div id="teamSel"><span>팀 인원</span><button data-n="1">솔로</button><button data-n="2">듀오</button><button data-n="3">트리오</button><button data-n="4">스쿼드(4)</button></div>
   <details id="envBox"><summary id="envSum">🌍 환경 설정</summary>
     <div class="envRow" data-k="te"></div><div class="envRow" data-k="we"></div><div class="envRow" data-k="tm"></div>
@@ -308,15 +310,16 @@ body.mobile #lootPanel small{display:none}
 if (typeof THREE === 'undefined') { document.body.innerHTML = '<div style="padding:40px;font-size:20px;color:#fff">Three.js를 불러오지 못했습니다. 인터넷 연결(cdnjs.cloudflare.com 접근)을 확인하세요.</div>'; return; }
 
 /* ================= 상수 ================= */
-const MAP_HALF = 500;           // 맵 반 크기 (1km x 1km)
-const ZONE_START = 450;         // 초기 자기장 반지름
+const MAP_HALF = 1000;          // 맵 반 크기 (2km x 2km)
+const ZONE_START = 900;         // 초기 자기장 반지름
+const MAP_K = MAP_HALF / 500;   // 1km 시절 대비 길이 배율 (개수는 MAP_K*MAP_K 근처)
 const PHASES = [
-  { wait: 75, shrink: 60, to: 320, dmg: 1 },
-  { wait: 60, shrink: 50, to: 200, dmg: 2 },
-  { wait: 50, shrink: 45, to: 110, dmg: 3 },
-  { wait: 40, shrink: 40, to: 55,  dmg: 5 },
-  { wait: 30, shrink: 35, to: 20,  dmg: 7 },
-  { wait: 25, shrink: 30, to: 6,   dmg: 10 }
+  { wait: 80, shrink: 80, to: 640, dmg: 1 },
+  { wait: 65, shrink: 70, to: 400, dmg: 2 },
+  { wait: 55, shrink: 60, to: 220, dmg: 3 },
+  { wait: 45, shrink: 50, to: 110, dmg: 5 },
+  { wait: 32, shrink: 40, to: 40,  dmg: 7 },
+  { wait: 25, shrink: 32, to: 6,   dmg: 10 }
 ];
 const BOT_COUNT = 99;           // 플레이어 포함 총 100명
 // 방어구(뚝배기=헬멧 / 조끼) 레벨별 설정
@@ -377,7 +380,8 @@ function genCode() { let c = ''; for (let i = 0; i < 5; i++) c += CODE_CH[Math.f
 function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const NET = { mode: 'solo', peer: null, conns: [], hostConn: null, code: '', seed: 0, nick: '', myId: -1, live: false, won: false, alive: 100, total: 100, evq: [], stT: 0, sendT: 0, names: {}, nextPid: 1, nextItem: 1, pendingJoin: false, tn: 1, teamN: 1, ranks: { 0: 0 }, nh: 1 };
-const ZM = { on: false, sel: false, boot: true, T: 480, kills: 0, zc: 0, nextZ: 1, spawnT: 0, spawn: null, noiseT: 0, cleanT: 0, hordeT: 0, warned: false, done: false };
+const ZM_LV = [100, 130, 200];
+const ZM = { on: false, sel: false, lv: 2, boot: true, T: 480, kills: 0, zc: 0, nextZ: 1, spawnT: 0, spawn: null, noiseT: 0, cleanT: 0, hordeT: 0, warned: false, done: false };
 const teamOfId = id => ZM.on ? (id >= 2000 ? 99 : 0) : Math.floor((id >= 1000 ? NET.nh + id - 1000 : (NET.ranks[id] || 0)) / (NET.tn || 1));
 let squadDrop = {}, teamMap = {};
 (function () {
@@ -484,6 +488,54 @@ const __realRandom = Math.random;
 Math.random = mulberry32(NET.seed);   // 같은 방 코드 = 같은 맵
 const colliders = [];
 const buildings = [];
+
+/* ---- 강 · 호수 (해석적 정의: 모든 참가자가 같은 시드로 같은 물을 만든다) ---- */
+const WATER = { rivers: [], lakes: [], bridges: [], outlines: [], y: 0.1 };
+(function () {
+  const sg = () => (Math.random() < 0.5 ? -1 : 1);
+  // 강 A: z = f(x)  (동서로 흐름) / 강 B: x = g(z)  (남북으로 흐름). 중앙(스폰)은 피한다
+  const mk = (axis, off, hw) => ({ axis, off, a1: rand(70, 110), k1: rand(220, 300), p1: rand(0, 6.28), a2: rand(12, 24), k2: rand(90, 130), p2: rand(0, 6.28), hw, hv: rand(3, 5), p3: rand(0, 6.28) });
+  WATER.rivers.push(mk('x', sg() * rand(240, 330), rand(17, 21)));
+  WATER.rivers.push(mk('z', sg() * rand(240, 330), rand(12, 15)));
+  const lk = [];
+  for (let g = 0; lk.length < 4 && g < 400; g++) {
+    const x = rand(-MAP_HALF + 160, MAP_HALF - 160), z = rand(-MAP_HALF + 160, MAP_HALF - 160), R = rand(55, 95);
+    if (Math.hypot(x, z) < 190 + R) continue;
+    if (lk.some(l => Math.hypot(l.x - x, l.z - z) < l.R + R + 120)) continue;
+    lk.push({ x, z, R, ax: rand(0.85, 1.25), az: rand(0.65, 1.0), rot: rand(0, 3.14), q1: rand(0, 6.28), q2: rand(0, 6.28), e1: rand(0.07, 0.13), e2: rand(0.03, 0.07) });
+  }
+  lk.forEach(l => WATER.lakes.push(l));
+})();
+function riverC(r, t) { return r.off + r.a1 * Math.sin(t / r.k1 + r.p1) + r.a2 * Math.sin(t / r.k2 + r.p2); }
+function riverS(r, t) { return r.a1 / r.k1 * Math.cos(t / r.k1 + r.p1) + r.a2 / r.k2 * Math.cos(t / r.k2 + r.p2); }
+function riverHW(r, t) { return r.hw + r.hv * Math.sin(t / 95 + r.p3); }
+function lakeR(l, ang) { return l.R * (1 + l.e1 * Math.sin(3 * ang + l.q1) + l.e2 * Math.sin(5 * ang + l.q2)); }
+// 물 위 판정(다리 위는 제외). m>0: 물가 여유 포함, m<0: 물 안쪽 깊숙한 곳만
+function waterRaw(x, z, m) {
+  for (let i = 0; i < 2; i++) {
+    const r = WATER.rivers[i], t = r.axis === 'x' ? x : z, u = r.axis === 'x' ? z : x;
+    if (t < -MAP_HALF - 80 || t > MAP_HALF + 80) continue;
+    const sl = riverS(r, t), d = Math.abs(u - riverC(r, t)) / Math.sqrt(1 + sl * sl);
+    if (d < riverHW(r, t) + m) return true;
+  }
+  for (let i = 0; i < WATER.lakes.length; i++) {
+    const l = WATER.lakes[i], dx = x - l.x, dz = z - l.z, mr = l.R * 1.5 * Math.max(l.ax, l.az) + m;
+    if (dx * dx + dz * dz > mr * mr) continue;
+    const c = Math.cos(l.rot), s = Math.sin(l.rot), lx = (dx * c + dz * s) / l.ax, lz = (-dx * s + dz * c) / l.az;
+    if (Math.hypot(lx, lz) < lakeR(l, Math.atan2(lz, lx)) + m) return true;
+  }
+  return false;
+}
+function onBridge(x, z) {
+  const B = WATER.bridges;
+  for (let i = 0; i < B.length; i++) { const b = B[i]; if (x > b.x0 && x < b.x1 && z > b.z0 && z < b.z1) return true; }
+  return false;
+}
+function waterAt(x, z, m) {
+  m = m || 0;
+  if (!waterRaw(x, z, m)) return false;
+  return m > 0 || !onBridge(x, z);
+}
 
 // 충돌체 공간 분할 그리드 (대규모 맵 성능용)
 const CELL = 16;
@@ -608,9 +660,9 @@ function addBoxY(cx, cz, w, d, y0, y1, color, noCol) {
 }
 function addBox(cx, cz, w, d, h, color) { addBoxY(cx, cz, w, d, 0, h, color); }
 // 지면 데칼(도로/해변): 충돌 없음, 그림자 없음, 항상 지면 위에 그려짐
-function addDecal(cx, cz, w, d, y1, color) {
-  const key = 'D' + color + '|' + Math.floor((cx + MAP_HALF) / 200) + '|' + Math.floor((cz + MAP_HALF) / 200);
-  const B = batches[key] || (batches[key] = { color, p: [], n: [], decal: true });
+function addDecal(cx, cz, w, d, y1, color, top) {
+  const key = 'D' + (top ? 'T' : '') + color + '|' + Math.floor((cx + MAP_HALF) / 200) + '|' + Math.floor((cz + MAP_HALF) / 200);
+  const B = batches[key] || (batches[key] = { color, p: [], n: [], decal: true, top: !!top });
   pushBox(B, cx - w / 2, 0, cz - d / 2, cx + w / 2, y1, cz + d / 2);
 }
 const shade = (c, f) => { const r = Math.min(255, ((c >> 16) & 255) * f) | 0, g = Math.min(255, ((c >> 8) & 255) * f) | 0, b = Math.min(255, (c & 255) * f) | 0; return (r << 16) | (g << 8) | b; };
@@ -627,13 +679,14 @@ function finalizeStatic() {
     g.setAttribute('position', new THREE.Float32BufferAttribute(B.p, 3));
     g.setAttribute('normal', new THREE.Float32BufferAttribute(B.n, 3));
     g.computeBoundingSphere();
-    const m = new THREE.Mesh(g, B.decal ? mat(B.color, { polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -8 }) : mat(B.color));
+    const m = new THREE.Mesh(g, B.decal ? mat(B.color, { polygonOffset: true, polygonOffsetFactor: B.top ? -14 : -4, polygonOffsetUnits: B.top ? -28 : -8 }) : mat(B.color));
     m.castShadow = !B.decal; m.receiveShadow = true; m.matrixAutoUpdate = false;
     scene.add(m);
   }
 }
 const carList = [];
 function pointFree(x, z, m) {
+  if (waterAt(x, z, m + 1.5)) return false;
   for (let i = 0; i < carList.length; i++) { const c = carList[i]; if (Math.abs(x - c.x) < 3.4 + m && Math.abs(z - c.z) < 3.4 + m) return false; }
   const near = collidersNear(x, z);
   for (let i = 0; i < near.length; i++) {
@@ -984,6 +1037,7 @@ function tryBuilding(cx, cz, spec, hint) {
   const w = spec.w, d = spec.d, m = (spec.type === 'bunker' || spec.type === 'tower') ? 12 : 7;
   if (Math.abs(cx) > MAP_HALF - 50 || Math.abs(cz) > MAP_HALF - 50) return false;
   if (Math.hypot(cx, cz) < 35) return false;
+  if (waterAt(cx, cz, Math.max(w, d) / 2 + 10)) return false;
   for (const b of buildings) if (cx + w / 2 + m > b.minX && cx - w / 2 - m < b.maxX && cz + d / 2 + m > b.minZ && cz - d / 2 - m < b.maxZ) return false;
   const any = hint || pick(['N', 'S', 'E', 'W']);
   const ns = (hint === 'N' || hint === 'S') ? hint : pick(['N', 'S']);
@@ -1006,9 +1060,9 @@ function tryBuilding(cx, cz, spec, hint) {
 }
 (function () {
   const towns = []; let g = 0;
-  while (towns.length < 9 && g++ < 600) {
+  while (towns.length < 30 && g++ < 3000) {
     const x = rand(-MAP_HALF + 120, MAP_HALF - 120), z = rand(-MAP_HALF + 120, MAP_HALF - 120);
-    if (Math.hypot(x, z) < 70 || towns.some(t => Math.hypot(t.x - x, t.z - z) < 200)) continue;
+    if (Math.hypot(x, z) < 70 || waterAt(x, z, 55) || towns.some(t => Math.hypot(t.x - x, t.z - z) < 190)) continue;
     towns.push({ x, z });
   }
   towns.forEach(t => townList.push(t));
@@ -1021,10 +1075,21 @@ function tryBuilding(cx, cz, spec, hint) {
     }
   });
   let n = 0; g = 0;
-  while (n < 24 && g++ < 900) if (tryBuilding(rand(-MAP_HALF + 60, MAP_HALF - 60), rand(-MAP_HALF + 60, MAP_HALF - 60), planBuilding(), null)) n++;
+  while (n < 90 && g++ < 3000) if (tryBuilding(rand(-MAP_HALF + 60, MAP_HALF - 60), rand(-MAP_HALF + 60, MAP_HALF - 60), planBuilding(), null)) n++;
   lootBuildings = buildings.filter(b => b.loot);
 })();
 
+
+// 다리 조각: 상판(데칼) + 양옆 난간(충돌체). WATER.bridges 범위 안은 물 판정에서 제외 → 걸어서 건널 수 있음
+function bridgePiece(cx, cz, w, d, horiz, mark) {
+  const x0 = cx - w / 2, x1 = cx + w / 2, z0 = cz - d / 2, z1 = cz + d / 2;
+  WATER.bridges.push({ x0, x1, z0, z1 });
+  addDecal(cx, cz, w, d, 0.15, 0x77736a, true);
+  addDecal(cx, cz, w - (horiz ? 0 : 1.2), d - (horiz ? 1.2 : 0), 0.165, 0x4a4b4e, true);
+  if (mark) addDecal(cx, cz, horiz ? w * 0.45 : 0.2, horiz ? 0.2 : d * 0.45, 0.175, 0xd8d0a0, true);
+  if (horiz) { addBox(cx, z0 + 0.2, w, 0.4, 1.0, 0x8a8780); addBox(cx, z1 - 0.2, w, 0.4, 1.0, 0x8a8780); }
+  else { addBox(x0 + 0.2, cz, 0.4, d, 1.0, 0x8a8780); addBox(x1 - 0.2, cz, 0.4, d, 1.0, 0x8a8780); }
+}
 // ---- 도로망: 마을끼리 연결 (건물과 겹치는 구간은 생략) ----
 const roadRects = [], polePts = [], carSpots = [];
 const onRoad = (x, z, m) => { for (let i = 0; i < roadRects.length; i++) { const r = roadRects[i]; if (x > r.x0 - m && x < r.x1 + m && z > r.z0 - m && z < r.z1 + m) return true; } return false; };
@@ -1043,6 +1108,11 @@ const onRoad = (x, z, m) => { for (let i = 0; i < roadRects.length; i++) { const
       const f = (k + 0.5) / n, cx = x0 + (x1 - x0) * f, cz = z0 + (z1 - z0) * f;
       if (insideBuilding(cx, cz, 3.5) || insideBuilding(cx + (horiz ? st / 2 : 0), cz + (horiz ? 0 : st / 2), 2.5) || insideBuilding(cx - (horiz ? st / 2 : 0), cz - (horiz ? 0 : st / 2), 2.5)) continue;
       const w = horiz ? st + 0.3 : RW, d = horiz ? RW : st + 0.3;
+      if (waterRaw(cx, cz, 1.5) || waterRaw(cx + (horiz ? st / 2 : 0), cz + (horiz ? 0 : st / 2), 1.5) || waterRaw(cx - (horiz ? st / 2 : 0), cz - (horiz ? 0 : st / 2), 1.5)) {
+        bridgePiece(cx, cz, horiz ? st + 0.3 : RW + 1.4, horiz ? RW + 1.4 : st + 0.3, horiz, k % 2 === 0);
+        roadRects.push({ x0: cx - (horiz ? st / 2 : RW / 2 + 1.3), x1: cx + (horiz ? st / 2 : RW / 2 + 1.3), z0: cz - (horiz ? RW / 2 + 1.3 : st / 2), z1: cz + (horiz ? RW / 2 + 1.3 : st / 2) });
+        continue;
+      }
       addDecal(cx, cz, horiz ? w : RW + 2.6, horiz ? RW + 2.6 : d, 0.02, 0x86775a);
       addDecal(cx, cz, w, d, 0.035, 0x4a4b4e);
       if (k % 2 === 0) addDecal(cx, cz, horiz ? st * 0.45 : 0.2, horiz ? 0.2 : st * 0.45, 0.045, 0xd8d0a0);
@@ -1052,10 +1122,14 @@ const onRoad = (x, z, m) => { for (let i = 0; i < roadRects.length; i++) { const
       if (segN % 6 === 2) carSpots.push({ x: cx + (horiz ? 0 : (segN % 4 < 2 ? 1 : -1) * (RW / 2 - 1.5)), z: cz + (horiz ? (segN % 4 < 2 ? 1 : -1) * (RW / 2 - 1.5) : 0), horiz });
     }
   };
+  const junc = (x, z) => {
+    if (waterRaw(x, z, 1.5)) { bridgePiece(x, z, RW + 1.4, RW + 1.4, true, false); return; }
+    addDecal(x, z, RW + 2.6, RW + 2.6, 0.02, 0x86775a); addDecal(x, z, RW, RW, 0.035, 0x4a4b4e);
+  };
   edges.forEach(e => {
     const a = e[0], b = e[1];
-    if (Math.random() < 0.5) { seg(a.x, a.z, b.x, a.z); seg(b.x, a.z, b.x, b.z); addDecal(b.x, a.z, RW + 2.6, RW + 2.6, 0.02, 0x86775a); addDecal(b.x, a.z, RW, RW, 0.035, 0x4a4b4e); }
-    else { seg(a.x, a.z, a.x, b.z); seg(a.x, b.z, b.x, b.z); addDecal(a.x, b.z, RW + 2.6, RW + 2.6, 0.02, 0x86775a); addDecal(a.x, b.z, RW, RW, 0.035, 0x4a4b4e); }
+    if (Math.random() < 0.5) { seg(a.x, a.z, b.x, a.z); seg(b.x, a.z, b.x, b.z); junc(b.x, a.z); }
+    else { seg(a.x, a.z, a.x, b.z); seg(a.x, b.z, b.x, b.z); junc(a.x, b.z); }
   });
 })();
 
@@ -1072,7 +1146,7 @@ const onRoad = (x, z, m) => { for (let i = 0; i < roadRects.length; i++) { const
 (function () {
   const cc = [0x8b6b3d, 0x6b4f2a, 0x5a6b3a, 0x7a7a6a, 0x6a5a4a];
   let n = 0, g = 0;
-  while (n < 180 && g++ < 3000) {
+  while (n < 650 && g++ < 9000) {
     const x = rand(-MAP_HALF + 10, MAP_HALF - 10), z = rand(-MAP_HALF + 10, MAP_HALF - 10);
     if (Math.hypot(x, z) < 14 || !pointFree(x, z, 3.5) || onRoad(x, z, 3)) continue;
     const big = Math.random() < 0.3, bw = rand(1.2, big ? 3.6 : 2.1), bd = rand(1.2, big ? 3.6 : 2.1), bh = rand(0.9, big ? 2.5 : 1.5), col = pick(cc);
@@ -1081,7 +1155,7 @@ const onRoad = (x, z, m) => { for (let i = 0; i < roadRects.length; i++) { const
     n++;
   }
   n = 0; g = 0;
-  while (n < 45 && g++ < 3000) {
+  while (n < 160 && g++ < 9000) {
     const x = rand(-MAP_HALF + 10, MAP_HALF - 10), z = rand(-MAP_HALF + 10, MAP_HALF - 10);
     if (Math.hypot(x, z) < 14 || !pointFree(x, z, 5) || onRoad(x, z, 4)) continue;
     const long = rand(6, 11), h = rand(1.3, 2.0);
@@ -1098,18 +1172,18 @@ function addCar(cx, cz, horiz, body, hum) {
   const cols = [0x9a2a2a, 0x2a4a8a, 0xc8c8c8, 0x2a2a2e, 0x3a6a3a, 0xb89a2a, 0x8a8a90, 0x7a3a5a];
   let n = 0;
   carSpots.slice().sort(() => Math.random() - 0.5).forEach(c => {
-    if (n >= 9 || !pointFree(c.x, c.z, 3)) return;
+    if (n >= 30 || !pointFree(c.x, c.z, 3)) return;
     addCar(c.x, c.z, c.horiz, pick(cols)); n++;
   });
   let g = 0;
-  while (n < 14 && g++ < 400) {
+  while (n < 46 && g++ < 1500) {
     const t = pick(townList), x = t.x + rand(-60, 60), z = t.z + rand(-60, 60);
     if (!pointFree(x, z, 4.5) || insideBuilding(x, z, 3) || onRoad(x, z, 2)) continue;
     addCar(x, z, Math.random() < 0.5, pick(cols)); n++;
   }
   // 험비 (지붕 360° 기관총 달림): 서로 멀리 떨어진 마을 주변에 5대
   const hv = []; g = 0;
-  while (hv.length < 5 && g++ < 900) {
+  while (hv.length < 14 && g++ < 3000) {
     const t = pick(townList), x = t.x + rand(-45, 45), z = t.z + rand(-45, 45);
     if (!pointFree(x, z, 5) || insideBuilding(x, z, 4) || onRoad(x, z, 2) || hv.some(u => Math.hypot(u.x - x, u.z - z) < 130)) continue;
     addCar(x, z, Math.random() < 0.5, pick([0x5b6444, 0x9c8a60, 0x4a5a3c]), true); hv.push({ x, z });
@@ -1119,7 +1193,7 @@ function addCar(cx, cz, horiz, body, hum) {
 // ---- 급수탑 (랜드마크) ----
 (function () {
   let n = 0, g = 0; const tm = mat(0x8e9aa5), rm = mat(0x6a4a3a);
-  while (n < 3 && g++ < 300) {
+  while (n < 8 && g++ < 900) {
     const t = pick(townList), x = t.x + rand(-80, 80), z = t.z + rand(-80, 80);
     if (!pointFree(x, z, 6) || insideBuilding(x, z, 5) || onRoad(x, z, 4)) continue;
     [[-1.6, -1.6], [1.6, -1.6], [-1.6, 1.6], [1.6, 1.6]].forEach(c => addBox(x + c[0], z + c[1], 0.5, 0.5, 9.5, 0x6a6e72));
@@ -1143,14 +1217,14 @@ function addCar(cx, cz, horiz, body, hum) {
   };
   const fin = ims => ims.forEach(im => { im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; });
   // 숲 중심
-  const forests = []; for (let i = 0; i < 16; i++) forests.push({ x: rand(-MAP_HALF + 60, MAP_HALF - 60), z: rand(-MAP_HALF + 60, MAP_HALF - 60), r: rand(35, 75) });
+  const forests = []; for (let i = 0; i < 56; i++) forests.push({ x: rand(-MAP_HALF + 60, MAP_HALF - 60), z: rand(-MAP_HALF + 60, MAP_HALF - 60), r: rand(35, 75) });
   const treePt = () => {
     if (Math.random() < 0.7) { const f = pick(forests), a = rand(0, Math.PI * 2), r = f.r * Math.sqrt(Math.random()); return [f.x + Math.cos(a) * r, f.z + Math.sin(a) * r]; }
     return [rand(-MAP_HALF + 8, MAP_HALF - 8), rand(-MAP_HALF + 8, MAP_HALF - 8)];
   };
   const okPt = (x, z, m) => Math.abs(x) < MAP_HALF - 6 && Math.abs(z) < MAP_HALF - 6 && Math.hypot(x, z) > 12 && pointFree(x, z, m) && !onRoad(x, z, 3.5) && !insideBuilding(x, z, 1.5);
   // 활엽수
-  const NB = 170, NP = 160;
+  const NB = 620, NP = 580;
   const tG = new THREE.CylinderGeometry(0.2, 0.32, 3.4, 8); tG.translate(0, 1.7, 0);
   const b1 = new THREE.SphereGeometry(1.9, 10, 8); b1.translate(0, 4.0, 0);
   const b2 = new THREE.SphereGeometry(1.35, 10, 8); b2.translate(0.7, 5.2, -0.3);
@@ -1163,7 +1237,7 @@ function addCar(cx, cz, horiz, body, hum) {
   const pc3 = mk(new THREE.CylinderGeometry(0, 1.0, 2.0, 9).translate(0, 5.9, 0), NP, false);
   let nb = 0, np = 0, g = 0;
   const greens = [0x2f6b2a, 0x3a7d30, 0x4a8a35, 0x2a6a3a], pines = [0x1f5a33, 0x246b3a, 0x2c7a42, 0x1a4f2e];
-  while ((nb < NB || np < NP) && g++ < 12000) {
+  while ((nb < NB || np < NP) && g++ < 40000) {
     const p = treePt(), x = p[0], z = p[1]; if (!okPt(x, z, 2.5)) continue;
     const sc = rand(0.85, 1.45), ry = rand(0, 6.28);
     const pineChance = Math.random() < 0.5;
@@ -1180,18 +1254,18 @@ function addCar(cx, cz, horiz, body, hum) {
   [bt, bl1, bl2, bl3, pt, pc1, pc2, pc3].forEach(im => { im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; });
   // 덤불
   const bushG = new THREE.SphereGeometry(0.85, 8, 6); bushG.translate(0, 0.5, 0);
-  const bush = mk(bushG, 180, false);
-  for (let n = 0, gg = 0; n < 180 && gg++ < 4000; ) {
+  const bush = mk(bushG, 640, false);
+  for (let n = 0, gg = 0; n < 640 && gg++ < 14000; ) {
     const p = Math.random() < 0.6 ? treePt() : [rand(-MAP_HALF + 8, MAP_HALF - 8), rand(-MAP_HALF + 8, MAP_HALF - 8)]; if (!okPt(p[0], p[1], 1.4)) continue;
     const s0 = rand(0.7, 1.5); put(bush, p[0], 0, p[1], s0 * 1.2, s0 * 0.8, s0 * 1.2, rand(0, 6), pick([0x3f7a32, 0x4a8a3a, 0x356b2e, 0x58853a]), true); n++;
   }
   // 바위
   const rockG = new THREE.SphereGeometry(1, 6, 5).toNonIndexed(); rockG.computeVertexNormals();
-  const rocks = mk(rockG, 260, false, true);
-  for (let n = 0, gg = 0; n < 150 && gg++ < 4000; ) {
+  const rocks = mk(rockG, 900, false, true);
+  for (let n = 0, gg = 0; n < 520 && gg++ < 14000; ) {
     const cx = rand(-MAP_HALF + 10, MAP_HALF - 10), cz = rand(-MAP_HALF + 10, MAP_HALF - 10); if (!okPt(cx, cz, 2.2)) continue;
     const cnt = 1 + Math.floor(Math.random() * 3);
-    for (let k = 0; k < cnt && rocks.count < 260; k++) {
+    for (let k = 0; k < cnt && rocks.count < 900; k++) {
       const x = cx + rand(-1.6, 1.6) * (k ? 1 : 0), z = cz + rand(-1.6, 1.6) * (k ? 1 : 0), s0 = rand(0.5, 1.9) * (k ? 0.7 : 1);
       put(rocks, x, s0 * 0.25, z, s0 * rand(1, 1.4), s0 * rand(0.65, 0.95), s0 * rand(1, 1.4), rand(0, 6), pick([0x7a7a76, 0x8a8a84, 0x6a6a68, 0x8a8478]), true);
       if (s0 > 1.1) registerCollider({ minX: x - s0 * 0.75, maxX: x + s0 * 0.75, minZ: z - s0 * 0.75, maxZ: z + s0 * 0.75, maxY: s0 * 0.85 });
@@ -1200,29 +1274,29 @@ function addCar(cx, cz, horiz, body, hum) {
   }
   // 풀
   const grassG = new THREE.CylinderGeometry(0, 0.1, 0.6, 4, 1); grassG.translate(0, 0.3, 0);
-  const grass = mk(grassG, 1300, false);
-  for (let n = 0, gg = 0; n < 1300 && gg++ < 9000; ) {
+  const grass = mk(grassG, 4800, false);
+  for (let n = 0, gg = 0; n < 4800 && gg++ < 30000; ) {
     const x = rand(-MAP_HALF, MAP_HALF), z = rand(-MAP_HALF, MAP_HALF);
-    if (onRoad(x, z, 1.5) || insideBuilding(x, z, 0.5)) continue;
+    if (onRoad(x, z, 1.5) || insideBuilding(x, z, 0.5) || waterAt(x, z, 2)) continue;
     const s0 = rand(0.7, 1.7), cl = Math.random() < 0.3 ? 0x8aa84a : pick([0x4a8f35, 0x5aa040, 0x3f7f2e, 0x6aa848]);
-    for (let k = 0; k < 2 && grass.count < 1300; k++) put(grass, x + k * 0.15, 0, z + k * 0.1, s0, s0 * rand(0.8, 1.5), s0, rand(0, 6), cl, true);
+    for (let k = 0; k < 2 && grass.count < 4800; k++) put(grass, x + k * 0.15, 0, z + k * 0.1, s0, s0 * rand(0.8, 1.5), s0, rand(0, 6), cl, true);
     n++;
   }
   // 드럼통
   const barrelG = new THREE.CylinderGeometry(0.4, 0.4, 1.1, 10); barrelG.translate(0, 0.55, 0);
-  const barrels = mk(barrelG, 90, false);
-  for (let n = 0, gg = 0; n < 70 && gg++ < 3000; ) {
+  const barrels = mk(barrelG, 260, false);
+  for (let n = 0, gg = 0; n < 220 && gg++ < 9000; ) {
     const b = pick(buildings); if (b.stair) continue;
     const side = Math.random() < 0.5, x = side ? pick([b.minX - 1.4, b.maxX + 1.4]) : rand(b.minX, b.maxX), z = side ? rand(b.minZ, b.maxZ) : pick([b.minZ - 1.4, b.maxZ + 1.4]);
     if (!pointFree(x, z, 0.9) || onRoad(x, z, 1)) continue;
     const bc = pick([0xb03a2e, 0x2e5fa0, 0x4a7a3a, 0x8a8a2e]);
     put(barrels, x, 0, z, 1, 1, 1, 0, bc, true); registerCollider({ minX: x - 0.42, maxX: x + 0.42, minZ: z - 0.42, maxZ: z + 0.42, maxY: 1.1 }); n++;
-    if (Math.random() < 0.5 && barrels.count < 90) { const x2 = x + rand(0.8, 1.0), z2 = z + rand(-0.3, 0.3); if (pointFree(x2, z2, 0.9)) { put(barrels, x2, 0, z2, 1, 1, 1, 0, pick([0xb03a2e, 0x2e5fa0, 0x4a7a3a]), true); registerCollider({ minX: x2 - 0.42, maxX: x2 + 0.42, minZ: z2 - 0.42, maxZ: z2 + 0.42, maxY: 1.1 }); } }
+    if (Math.random() < 0.5 && barrels.count < 260) { const x2 = x + rand(0.8, 1.0), z2 = z + rand(-0.3, 0.3); if (pointFree(x2, z2, 0.9)) { put(barrels, x2, 0, z2, 1, 1, 1, 0, pick([0xb03a2e, 0x2e5fa0, 0x4a7a3a]), true); registerCollider({ minX: x2 - 0.42, maxX: x2 + 0.42, minZ: z2 - 0.42, maxZ: z2 + 0.42, maxY: 1.1 }); } }
   }
   // 건초 더미
   const hayG = new THREE.CylinderGeometry(0.85, 0.85, 1.3, 14); hayG.rotateZ(Math.PI / 2); hayG.translate(0, 0.85, 0);
-  const hay = mk(hayG, 40, false);
-  for (let n = 0, gg = 0; n < 34 && gg++ < 3000; ) {
+  const hay = mk(hayG, 140, false);
+  for (let n = 0, gg = 0; n < 120 && gg++ < 9000; ) {
     const x = rand(-MAP_HALF + 20, MAP_HALF - 20), z = rand(-MAP_HALF + 20, MAP_HALF - 20); if (!okPt(x, z, 2.4)) continue;
     const ry = Math.random() < 0.5 ? 0 : Math.PI / 2; put(hay, x, 0, z, 1, 1, 1, ry, pick([0xc8a850, 0xb89a42, 0xd4b45a]), true);
     registerCollider({ minX: x - (ry ? 0.85 : 0.65), maxX: x + (ry ? 0.85 : 0.65), minZ: z - (ry ? 0.65 : 0.85), maxZ: z + (ry ? 0.65 : 0.85), maxY: 1.6 }); n++;
@@ -1231,7 +1305,7 @@ function addCar(cx, cz, horiz, body, hum) {
   const poleG = new THREE.CylinderGeometry(0.1, 0.13, 6.4, 8); poleG.translate(0, 3.2, 0);
   const armG = new THREE.BoxGeometry(1.3, 0.1, 0.1); armG.translate(0.55, 6.35, 0);
   const lampG = new THREE.SphereGeometry(0.24, 8, 6); lampG.translate(1.1, 6.22, 0);
-  const NPL = Math.min(polePts.length, 140);
+  const NPL = Math.min(polePts.length, 420);
   const pole = mk(poleG, NPL + 1, false), arm = mk(armG, NPL + 1, false);
   const lamp = new THREE.InstancedMesh(lampG, new THREE.MeshBasicMaterial({ color: 0xffe9a8 }), NPL + 1); lamp.count = 0; lamp.frustumCulled = false; scene.add(lamp);
   for (let i = 0; i < NPL; i++) {
@@ -1250,7 +1324,7 @@ function addCar(cx, cz, horiz, body, hum) {
 const turretDefs = [];
 (function () {
   const colSand = 0xb0a27a;
-  for (let t = 0, n = 0; t < 600 && n < 8; t++) {
+  for (let t = 0, n = 0; t < 2400 && n < 20; t++) {
     const x = rand(-ZONE_START + 70, ZONE_START - 70), z = rand(-ZONE_START + 70, ZONE_START - 70);
     if (!pointFree(x, z, 5) || insideBuilding(x, z, 7)) continue;
     if (turretDefs.some(d => Math.hypot(d.x - x, d.z - z) < 90)) continue;
@@ -1258,6 +1332,97 @@ const turretDefs = [];
     const wall = (lx, lz, w, d, h) => { const px = x + lx * cs + lz * sn, pz = z - lx * sn + lz * cs; if (horiz) addBox(px, pz, d, w, h, colSand); else addBox(px, pz, w, d, h, colSand); };
     wall(0, -1.4, 3.4, 0.7, 0.9); wall(-1.6, -0.1, 0.7, 2.2, 0.9); wall(1.6, -0.1, 0.7, 2.2, 0.9);
     turretDefs.push({ id: n, x, z, yaw }); n++;
+  }
+})();
+
+
+// ---- 물 표면 / 물가 메시 ----
+const waterTex = (function () {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 128; const c = cv.getContext('2d');
+  c.fillStyle = '#3a93b8'; c.fillRect(0, 0, 128, 128);
+  for (let i = 0; i < 90; i++) {
+    c.globalAlpha = 0.10 + Math.random() * 0.14; c.strokeStyle = Math.random() < 0.5 ? '#b9e6f5' : '#1f6c92'; c.lineWidth = 1 + Math.random() * 1.6;
+    const x = Math.random() * 128, y = Math.random() * 128, l = 6 + Math.random() * 16; c.beginPath(); c.moveTo(x, y); c.quadraticCurveTo(x + l / 2, y - 3, x + l, y); c.stroke();
+    if (x + l > 128) { c.beginPath(); c.moveTo(x - 128, y); c.quadraticCurveTo(x - 128 + l / 2, y - 3, x - 128 + l, y); c.stroke(); }
+  }
+  const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+})();
+const waterMat = new THREE.MeshLambertMaterial({ map: waterTex, color: 0xffffff, transparent: true, opacity: 0.92, polygonOffset: true, polygonOffsetFactor: -8, polygonOffsetUnits: -16 });
+const bankMat = new THREE.MeshLambertMaterial({ color: 0xb8a878, polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -5 });
+function addStrip(pts, widths, y, mat, uvS, flip) {
+  const P = [], U = [], I = [];
+  for (let i = 0; i < pts.length; i++) { const a = pts[i]; P.push(a[0] + a[2] * widths[i], y, a[1] + a[3] * widths[i], a[0] - a[2] * widths[i], y, a[1] - a[3] * widths[i]); }
+  for (let i = 0; i < P.length; i += 3) U.push(P[i] / uvS, P[i + 2] / uvS);
+  for (let i = 0; i < pts.length - 1; i++) { const k = i * 2; if (flip) I.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); else I.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2)); g.setIndex(I); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, mat); m.frustumCulled = false; m.receiveShadow = true; scene.add(m); return m;
+}
+function addPoly(pts, y, mat, uvS) {
+  const P = [], U = [], I = []; let cx = 0, cz = 0; pts.forEach(q => { cx += q[0]; cz += q[1]; }); cx /= pts.length; cz /= pts.length;
+  P.push(cx, y, cz); U.push(cx / uvS, cz / uvS); pts.forEach(q => { P.push(q[0], y, q[1]); U.push(q[0] / uvS, q[1] / uvS); });
+  for (let i = 0; i < pts.length; i++) I.push(0, 1 + (i + 1) % pts.length, 1 + i);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2)); g.setIndex(I); g.computeVertexNormals();
+  const m = new THREE.Mesh(g, mat); m.frustumCulled = false; m.receiveShadow = true; scene.add(m); return m;
+}
+(function () {
+  WATER.rivers.forEach(r => {
+    const pts = [], hw = [], hb = [];
+    for (let t = -MAP_HALF - 70; t <= MAP_HALF + 70; t += 10) {
+      const c = riverC(r, t), sl = riverS(r, t), n = Math.sqrt(1 + sl * sl), w = riverHW(r, t);
+      // (t,u) 좌표 → 월드(x,z). 법선은 (-sl,1)/n
+      const nx = r.axis === 'x' ? -sl / n : 1 / n, nz = r.axis === 'x' ? 1 / n : -sl / n;
+      pts.push(r.axis === 'x' ? [t, c, nx, nz] : [c, t, nx, nz]); hw.push(w); hb.push(w + 4.5);
+    }
+    addStrip(pts, hb, WATER.y - 0.07, bankMat, 20, r.axis === 'x'); addStrip(pts, hw, WATER.y, waterMat, 14, r.axis === 'x');
+    const L = [], R = []; pts.forEach((a, i) => { L.push([a[0] + a[2] * hw[i], a[1] + a[3] * hw[i]]); R.push([a[0] - a[2] * hw[i], a[1] - a[3] * hw[i]]); });
+    WATER.outlines.push(L.concat(R.reverse()));
+  });
+  WATER.lakes.forEach(l => {
+    const c = Math.cos(l.rot), s = Math.sin(l.rot), mk = pad => {
+      const o = []; for (let i = 0; i < 56; i++) { const a = i / 56 * Math.PI * 2, r = lakeR(l, a) + pad, lx = Math.cos(a) * r * l.ax, lz = Math.sin(a) * r * l.az; o.push([l.x + lx * c - lz * s, l.z + lx * s + lz * c]); }
+      return o;
+    };
+    addPoly(mk(5), WATER.y - 0.07, bankMat, 20); addPoly(mk(0), WATER.y, waterMat, 14); WATER.outlines.push(mk(0));
+  });
+})();
+function updateWater(dt) { waterTex.offset.x += dt * 0.012; waterTex.offset.y += dt * 0.006; }
+
+// ---- 보트 / 헬기 배치 정의 (같은 시드 = 같은 위치). 헬기장은 정적 지오메트리라 여기서 미리 그린다 ----
+const boatDefs = [], heliDefs = [];
+(function () {
+  const rng = mulberry32((NET.seed ^ 0x2f6e2b1) >>> 0);
+  const farBridge = (x, z) => WATER.bridges.every(b => Math.hypot((b.x0 + b.x1) / 2 - x, (b.z0 + b.z1) / 2 - z) > 30);
+  const bcols = [0xf2f2f0, 0xd03a2a, 0x2a6fd0, 0xe0a020, 0x3a8a5a];
+  const addB = (x, z, yaw) => { if (boatDefs.length < 16 && boatDefs.every(b => Math.hypot(b.x - x, b.z - z) < 1e9 && Math.hypot(b.x - x, b.z - z) > 40)) boatDefs.push({ x, z, yaw, color: bcols[Math.floor(rng() * bcols.length)] }); };
+  WATER.rivers.forEach(r => {
+    for (let t = -MAP_HALF + 120 + rng() * 150; t < MAP_HALF - 100; t += 260 + rng() * 170) {
+      const sl = riverS(r, t), n = Math.sqrt(1 + sl * sl), hw = riverHW(r, t), u = riverC(r, t) + (rng() - 0.5) * hw * 0.8;
+      const x = r.axis === 'x' ? t : u, z = r.axis === 'x' ? u : t;
+      if (!waterRaw(x, z, -7) || !farBridge(x, z)) continue;
+      const dx = r.axis === 'x' ? 1 / n : sl / n, dz = r.axis === 'x' ? sl / n : 1 / n, rev = rng() < 0.5 ? -1 : 1;
+      addB(x, z, Math.atan2(-dx * rev, -dz * rev));
+    }
+  });
+  WATER.lakes.forEach(l => {
+    for (let k = 0; k < 2; k++) {
+      const a = rng() * 6.28, rr = l.R * (0.25 + rng() * 0.35), x = l.x + Math.cos(a) * rr, z = l.z + Math.sin(a) * rr;
+      if (waterRaw(x, z, -10)) addB(x, z, rng() * 6.28);
+    }
+  });
+  // 헬기장: 서로 멀리 떨어진 마을 주변 6곳
+  const T = townList.slice().sort(() => rng() - 0.5);
+  for (let i = 0; i < T.length && heliDefs.length < 6; i++) {
+    const t = T[i];
+    for (let g = 0; g < 80; g++) {
+      const a = rng() * 6.28, rr = 45 + rng() * 55, x = t.x + Math.cos(a) * rr, z = t.z + Math.sin(a) * rr;
+      if (Math.hypot(x, z) < 90 || Math.abs(x) > ZONE_START - 60 || Math.abs(z) > ZONE_START - 60) continue;
+      if (!pointFree(x, z, 12) || insideBuilding(x, z, 14) || onRoad(x, z, 10) || heliDefs.some(h => Math.hypot(h.x - x, h.z - z) < 260)) continue;
+      heliDefs.push({ x, z, yaw: rng() * 6.28, color: pick([0x4a5a3c, 0x5b6444, 0xe8e8e8, 0x2a4a8a, 0xc03a2a]) });
+      addDecal(x, z, 15, 15, 0.025, 0x6b6e72); addDecal(x, z, 12.4, 12.4, 0.035, 0x56595d, false);
+      addDecal(x - 2.2, z, 0.9, 6.4, 0.05, 0xe8c84a); addDecal(x + 2.2, z, 0.9, 6.4, 0.05, 0xe8c84a); addDecal(x, z, 4.4, 0.9, 0.055, 0xe8c84a);
+      for (const q of [[-6.6, -6.6], [6.6, -6.6], [-6.6, 6.6], [6.6, 6.6]]) addDecal(x + q[0], z + q[1], 0.9, 0.9, 0.05, 0xe8e8e8);
+      break;
+    }
   }
 })();
 
@@ -2044,6 +2209,7 @@ function los(ax, ay, az, bx, by, bz) {
 }
 
 function moveEntity(p, dx, dz, r, noCar) {
+  if (p.y < 0.35 && (dx !== 0 || dz !== 0) && waterRaw(p.x, p.z, 0) && !onBridge(p.x, p.z)) { dx *= 0.5; dz *= 0.5; p.wet = 1; } else p.wet = 0;
   p.x += dx; p.z += dz;
   const near = collidersNear(p.x, p.z);
   for (let it = 0; it < 2; it++) {
@@ -2336,7 +2502,7 @@ function buildBikeObj(d) {
 (function () {
   const rng = mulberry32((NET.seed ^ 0x5bd1e995) >>> 0), base = cars.slice(), cols = [0xd03030, 0x2a6fd0, 0x26262a, 0xe0a020, 0x30a050];
   let n = 0;
-  for (let t = 0; t < 600 && n < 14 && base.length; t++) {
+  for (let t = 0; t < 2000 && n < 44 && base.length; t++) {
     const b = base[Math.floor(rng() * base.length)], a = rng() * Math.PI * 2, r = 5 + rng() * 7;
     const x = b.x0 + Math.cos(a) * r, z = b.z0 + Math.sin(a) * r, yaw = rng() * Math.PI * 2, col = cols[Math.floor(rng() * cols.length)];
     if (!pointFree(x, z, 1.8) || insideBuilding(x, z, 2) || Math.abs(x) > ZONE_START - 20 || Math.abs(z) > ZONE_START - 20) continue;
@@ -2345,16 +2511,180 @@ function buildBikeObj(d) {
   }
 })();
 
+/* ===== 보트 · 헬기 ===== */
+const BOAT_HP = Math.round(CAR_HP * 0.9), BOAT_VMAX = 21;
+const HELI_HP = Math.round(CAR_HP * 2.2), HELI_VMAX = 36, HELI_UP = 7.5, HELI_MAXY = 120;
+let _boatM = null, _heliM = null;
+function boatModel() {
+  if (_boatM) return _boatM;
+  const bow = new THREE.ConeGeometry(1, 3.0, 4).rotateY(Math.PI / 4).rotateX(-Math.PI / 2).scale(1.34, 0.56, 1);
+  const bowLo = new THREE.ConeGeometry(1, 3.0, 4).rotateY(Math.PI / 4).rotateX(-Math.PI / 2).scale(1.38, 0.3, 1);
+  const B = [[new THREE.BoxGeometry(1.9, 0.62, 3.6), 0, 0.42, 1.1, 0, 0, 0, 0xffffff], [bow, 0, 0.42, -2.2, 0, 0, 0, 0xffffff]];
+  const D = [
+    [new THREE.BoxGeometry(1.94, 0.22, 3.64), 0, 0.12, 1.1, 0, 0, 0, 0x23262b], [bowLo, 0, 0.12, -2.2, 0, 0, 0, 0x23262b],
+    [new THREE.BoxGeometry(1.7, 0.06, 3.3), 0, 0.76, 1.2, 0, 0, 0, 0xc9c3b4],
+    [new THREE.BoxGeometry(0.5, 0.5, 0.9), 0, 1.03, -0.05, 0, 0, 0, 0x2d3036],            // 콘솔
+    [new THREE.CylinderGeometry(0.2, 0.2, 0.05, 12).rotateX(0.9), 0, 1.36, -0.22, 0, 0, 0, 0x111111],   // 핸들
+    [new THREE.BoxGeometry(0.62, 0.24, 0.5), -0.5, 0.95, 1.0, 0, 0, 0, 0x2d3036], [new THREE.BoxGeometry(0.62, 0.24, 0.5), 0.5, 0.95, 1.0, 0, 0, 0, 0x2d3036],
+    [new THREE.BoxGeometry(1.5, 0.3, 0.5), 0, 0.98, 2.0, 0, 0, 0, 0x2d3036],                // 뒷 벤치
+    [new THREE.BoxGeometry(0.1, 0.55, 3.3), -0.97, 0.98, 1.1, 0, 0, 0, 0xd8d8d4], [new THREE.BoxGeometry(0.1, 0.55, 3.3), 0.97, 0.98, 1.1, 0, 0, 0, 0xd8d8d4],
+    [new THREE.BoxGeometry(1.9, 0.55, 0.1), 0, 0.98, 2.88, 0, 0, 0, 0xd8d8d4],
+    [new THREE.BoxGeometry(0.55, 0.85, 0.5), 0, 0.75, 3.15, 0, 0, 0, 0x1b1c1f],             // 선외기
+    [new THREE.CylinderGeometry(0.07, 0.07, 0.8, 8), 0, 0.28, 3.35, 0, 0, 0, 0x3a3d42],
+    [new THREE.CylinderGeometry(0.28, 0.28, 0.05, 12).rotateZ(Math.PI / 2), 0, -0.05, 3.42, 0, 0, 0, 0x8a8f96]
+  ];
+  const G = [[new THREE.BoxGeometry(1.5, 0.52, 0.06), 0, 1.3, -0.62, -0.5, 0, 0, 0xffffff]];
+  const H = [[new THREE.BoxGeometry(0.2, 0.14, 0.12), 0, 0.92, -3.0, 0, 0, 0, 0xffffff]];
+  return (_boatM = { body: mgeo(B), det: mgeo(D), glass: mgeo(G), head: mgeo(H) });
+}
+function buildBoatObj(d) {
+  const c = {
+    id: d.id, x0: d.x, z0: d.z, yaw0: d.yaw, color: d.color, x: d.x, z: d.z, yaw: d.yaw, v: 0, y: 0, hp: BOAT_HP, maxHp: BOAT_HP, tires: [1, 1, 1, 1], wreck: false, boat: true,
+    driver: null, drvId: -1, occ: [null, null, null, null], occId: [-1, -1, -1, -1], res: null, in: { th: 0, sr: 0, br: 0 }, inT: 0, smokeT: 0, engT: 0, net: { x: d.x, z: d.z, yaw: d.yaw, y: 0 }, wheels: [],
+    lastYaw: d.yaw, leanV: 0, wakeT: 0
+  };
+  c.bodyMat = new THREE.MeshLambertMaterial({ color: d.color }); c.cabMat = new THREE.MeshLambertMaterial({ color: shade(d.color, 0.9) });
+  const g = new THREE.Group(), lean = new THREE.Group(); g.add(lean);
+  const m = boatModel(), mk = (geo, mt, sh) => { const o = new THREE.Mesh(geo, mt); o.castShadow = !!sh; lean.add(o); return o; };
+  mk(m.body, c.bodyMat, true); mk(m.det, VCMAT, false); c.glass = mk(m.glass, carMat.glass, false);
+  c.lamps = [mk(m.head, carMat.head, false)]; c.lean = lean;
+  c.mesh = g; scene.add(g); return c;
+}
+function heliModel() {
+  if (_heliM) return _heliM;
+  const sph = (rx, ry, rz) => new THREE.SphereGeometry(1, 14, 10).scale(rx, ry, rz);
+  const B = [[sph(1.15, 1.0, 2.5), 0, 1.5, 0, 0, 0, 0, 0xffffff], [new THREE.CylinderGeometry(0.2, 0.42, 4.6, 10).rotateX(Math.PI / 2), 0, 1.85, 4.4, 0, 0, 0, 0xffffff],
+    [new THREE.BoxGeometry(0.09, 1.25, 1.0), 0, 2.4, 6.45, -0.35, 0, 0, 0xffffff]];
+  const D = [
+    [new THREE.BoxGeometry(1.8, 0.07, 0.5), 0, 1.9, 6.2, 0, 0, 0, 0x2a2d33],
+    [new THREE.BoxGeometry(0.1, 0.1, 3.8), -1.0, 0.1, -0.1, 0, 0, 0, 0x2a2d33], [new THREE.BoxGeometry(0.1, 0.1, 3.8), 1.0, 0.1, -0.1, 0, 0, 0, 0x2a2d33],
+    [new THREE.BoxGeometry(0.08, 0.95, 0.08), -0.95, 0.55, -1.0, 0, 0, 0.12, 0x2a2d33], [new THREE.BoxGeometry(0.08, 0.95, 0.08), 0.95, 0.55, -1.0, 0, 0, -0.12, 0x2a2d33],
+    [new THREE.BoxGeometry(0.08, 0.95, 0.08), -0.95, 0.55, 1.0, 0, 0, 0.12, 0x2a2d33], [new THREE.BoxGeometry(0.08, 0.95, 0.08), 0.95, 0.55, 1.0, 0, 0, -0.12, 0x2a2d33],
+    [new THREE.CylinderGeometry(0.16, 0.2, 0.55, 10), 0, 2.62, -0.2, 0, 0, 0, 0x2a2d33],              // 로터 마스트
+    [new THREE.BoxGeometry(0.55, 0.28, 1.1), 0, 2.4, 0.5, 0, 0, 0, 0x3a3d42],                         // 엔진 커버
+    [new THREE.BoxGeometry(0.06, 1.0, 1.4), -1.14, 1.5, 0.5, 0, 0, 0, 0x2a2d33], [new THREE.BoxGeometry(0.06, 1.0, 1.4), 1.14, 1.5, 0.5, 0, 0, 0, 0x2a2d33],  // 문 틈
+    [new THREE.BoxGeometry(1.0, 0.5, 0.9), 0, 1.0, 1.0, 0, 0, 0, 0x32353a]                           // 뒷좌석
+  ];
+  const G = [[sph(1.02, 0.78, 1.25), 0, 1.78, -1.3, 0, 0, 0, 0xffffff], [new THREE.BoxGeometry(0.04, 0.55, 1.2), -1.145, 1.75, 0.4, 0, 0, 0, 0xffffff], [new THREE.BoxGeometry(0.04, 0.55, 1.2), 1.145, 1.75, 0.4, 0, 0, 0, 0xffffff]];
+  const R = [[new THREE.BoxGeometry(9.6, 0.05, 0.38), 0, 0, 0, 0, 0, 0, 0x1d1f23], [new THREE.BoxGeometry(0.38, 0.05, 9.6), 0, 0.01, 0, 0, 0, 0, 0x1d1f23], [new THREE.CylinderGeometry(0.28, 0.28, 0.14, 10), 0, 0.03, 0, 0, 0, 0, 0x6a6e75]];
+  const T = [[new THREE.BoxGeometry(0.05, 1.5, 0.22), 0, 0, 0, 0, 0, 0, 0x1d1f23], [new THREE.BoxGeometry(0.05, 0.22, 1.5), 0, 0, 0, 0, 0, 0, 0x1d1f23]];
+  return (_heliM = { body: mgeo(B), det: mgeo(D), glass: mgeo(G), rotor: mgeo(R), trot: mgeo(T) });
+}
+function buildHeliObj(d) {
+  const c = {
+    id: d.id, x0: d.x, z0: d.z, yaw0: d.yaw, color: d.color, x: d.x, z: d.z, yaw: d.yaw, v: 0, y: 0, vy: 0, hp: HELI_HP, maxHp: HELI_HP, tires: [1, 1, 1, 1], wreck: false, heli: true,
+    driver: null, drvId: -1, occ: [null, null, null, null], occId: [-1, -1, -1, -1], res: null, in: { th: 0, sr: 0, br: 0 }, inT: 0, smokeT: 0, engT: 0, net: { x: d.x, z: d.z, yaw: d.yaw, y: 0 }, wheels: [],
+    lastYaw: d.yaw, leanV: 0, rs: 0
+  };
+  c.bodyMat = new THREE.MeshLambertMaterial({ color: d.color }); c.cabMat = new THREE.MeshLambertMaterial({ color: shade(d.color, 0.9) });
+  const g = new THREE.Group(), lean = new THREE.Group(); g.add(lean);
+  const m = heliModel(), mk = (geo, mt, sh, par) => { const o = new THREE.Mesh(geo, mt); o.castShadow = !!sh; (par || lean).add(o); return o; };
+  mk(m.body, c.bodyMat, true); mk(m.det, VCMAT, false); c.glass = new THREE.Mesh(m.glass, new THREE.MeshLambertMaterial({ color: 0x1c2630, transparent: true, opacity: 0.78 })); lean.add(c.glass);
+  c.rotor = new THREE.Group(); c.rotor.position.set(0, 2.92, -0.2); lean.add(c.rotor); mk(m.rotor, VCMAT, false, c.rotor);
+  c.disc = new THREE.Mesh(new THREE.CircleGeometry(4.8, 28).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xdddddd, transparent: true, opacity: 0.1, depthWrite: false, side: THREE.DoubleSide }));
+  c.disc.position.set(0, 2.95, -0.2); c.disc.visible = false; lean.add(c.disc);
+  c.trotor = new THREE.Group(); c.trotor.position.set(0.28, 2.0, 6.4); lean.add(c.trotor); mk(m.trot, VCMAT, false, c.trotor);
+  const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), carMat.head); lamp.position.set(0, 1.0, -2.6); lean.add(lamp);
+  const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff2a2a })); beacon.position.set(0, 3.0, 6.7); lean.add(beacon);
+  c.lamps = [lamp, beacon]; c.lean = lean;
+  c.mesh = g; scene.add(g); return c;
+}
+(function () {
+  boatDefs.forEach(d => { const c = buildBoatObj({ id: cars.length, x: d.x, z: d.z, yaw: d.yaw, color: d.color }); cars.push(c); placeCar(c); carVisual(c); });
+  heliDefs.forEach(d => { const c = buildHeliObj({ id: cars.length, x: d.x, z: d.z, yaw: d.yaw, color: d.color }); cars.push(c); placeCar(c); carVisual(c); });
+})();
+function simBoat(c, dt) {
+  let th = c.in.th, sr = c.in.sr;
+  const dr = c.driver;
+  if (!dr || (dr.remote && performance.now() - c.inT > 700)) { th = 0; sr = 0; }
+  const rev = -5; let v = c.v, a = 0;
+  if (th > 0.05) a = 9.5 * Math.max(0.05, 1 - Math.max(0, v) / BOAT_VMAX); else if (th < -0.05) a = v > 0.5 ? -10 : (v > rev ? -5 : 0);
+  a -= v * 0.5 + Math.sign(v) * 0.6; if (c.in.br && Math.abs(v) > 0.1) a -= Math.sign(v) * 7;
+  let nv = v + a * dt; if (v !== 0 && Math.sign(nv) !== Math.sign(v) && Math.abs(th) < 0.05) nv = 0;
+  c.v = clamp(nv, rev, BOAT_VMAX);
+  const sp = Math.abs(c.v), yr = -sr * Math.min(1, sp / 3.2) * (1.35 - 0.6 * Math.min(1, sp / BOAT_VMAX)) * (c.v >= 0 ? 1 : -1);
+  c.yaw += yr * dt;
+  const fx = -Math.sin(c.yaw), fz = -Math.cos(c.yaw), ox = c.x, oz = c.z;
+  c.x += fx * c.v * dt; c.z += fz * c.v * dt;
+  // 해안/다리 충돌: 선수·선미 + 양옆이 물 안쪽에 있어야 한다
+  let hit = false;
+  const co = Math.cos(c.yaw), sn = Math.sin(c.yaw);
+  for (const q of [[0, -2.9], [0, 2.9], [0.95, 0], [-0.95, 0]]) {
+    const wx = c.x + q[0] * co + q[1] * sn, wz = c.z - q[0] * sn + q[1] * co;
+    if (!waterRaw(wx, wz, -0.4) || onBridge(wx, wz)) { hit = true; break; }
+  }
+  const lim = MAP_HALF - 3; if (Math.abs(c.x) > lim || Math.abs(c.z) > lim) hit = true;
+  if (hit) {
+    c.x = ox; c.z = oz;
+    if (sp > 5) { const dmg = (sp - 3) * 6; c.v *= -0.25; if (dr && dr.alive && dmg > 20) { dr.carDeath = true; damage(dr, dmg * 0.1, null, false); } if (dr === player) { hitFlash = Math.min(1, hitFlash + 0.35); sfxTone(80, 0.15, 0.2, 'sawtooth'); } carDamage(c, dmg, dr); }
+    else c.v *= 0.5;
+    // 해안에 닿아 막히면 yaw만 바꿔 빠져나갈 수 있게 살짝 밀어낸다
+  }
+  if (c.wreck) return;
+  for (let j = 0; j < cars.length; j++) {   // 보트끼리 충돌
+    const o = cars[j]; if (o === c || !o.boat) continue;
+    const dx = c.x - o.x, dz = c.z - o.z, d2 = dx * dx + dz * dz, rr = 3.6;
+    if (d2 > rr * rr || d2 < 1e-6) continue;
+    const d = Math.sqrt(d2), push = (rr - d) * 0.5;
+    const nx = c.x + dx / d * push, nz = c.z + dz / d * push; if (waterRaw(nx, nz, -0.5)) { c.x = nx; c.z = nz; }
+    if (sp > 4) { const dmg = (sp - 3) * 3; c.v *= 0.6; carDamage(c, dmg, dr); carDamage(o, dmg, dr); }
+  }
+}
+function simHeli(c, dt) {
+  let th = c.in.th, sr = c.in.sr, br = c.in.br;
+  const dr = c.driver;
+  if (!dr || (dr.remote && performance.now() - c.inT > 700)) { th = 0; sr = 0; br = dr ? 0 : 2; }
+  const want = br === 1 ? HELI_UP : br === 2 ? (dr ? -HELI_UP * 0.8 : -4.5) : 0;
+  c.vy += (want - c.vy) * Math.min(1, dt * 2.4);
+  const vy0 = c.vy; c.y += c.vy * dt;
+  if (c.y > HELI_MAXY) { c.y = HELI_MAXY; c.vy = Math.min(0, c.vy); }
+  if (c.y <= 0) {
+    if (vy0 < -8.5) { const dmg = (-vy0 - 7) * 22; if (dr && dr.alive) { dr.carDeath = true; damage(dr, dmg * 0.25, null, false); } carDamage(c, dmg, dr); }
+    c.y = 0; c.vy = 0;
+  }
+  const air = c.y > 0.7;
+  let v = c.v, a = 0;
+  if (air) {
+    if (th > 0.05) a = 13 * Math.max(0.05, 1 - Math.max(0, v) / HELI_VMAX); else if (th < -0.05) a = v > 0.5 ? -16 : (v > -9 ? -7 : 0);
+    a -= v * 0.45;
+  } else a = -v * 4;
+  c.v = clamp(v + a * dt, -9, HELI_VMAX);
+  const sp = Math.abs(c.v);
+  if (air || (dr && Math.abs(sr) > 0.05)) c.yaw += -sr * (air ? 1.25 : 0.5) * dt;
+  const fx = -Math.sin(c.yaw), fz = -Math.cos(c.yaw), ox = c.x, oz = c.z;
+  c.x += fx * c.v * dt; c.z += fz * c.v * dt;
+  let cx = c.x, cz = c.z;
+  if (c.y < 22) {
+    for (let k = 0; k < 3; k++) {
+      const sgn = (k === 0 ? 2.0 : k === 1 ? -2.2 : 0), t = _carTmp;
+      t.x = c.x + fx * sgn; t.z = c.z + fz * sgn; t.y = c.y + 0.3;
+      const bx = t.x, bz = t.z; moveEntity(t, 0, 0, 1.5, true); cx += (t.x - bx) * 0.8; cz += (t.z - bz) * 0.8;
+    }
+  }
+  const corr = Math.hypot(cx - c.x, cz - c.z);
+  c.x = cx; c.z = cz;
+  const lim = MAP_HALF - 3; c.x = clamp(c.x, -lim, lim); c.z = clamp(c.z, -lim, lim);
+  if (corr > 0.01 && sp > 2) {
+    const ratio = corr / (sp * dt + 1e-4);
+    if (ratio > 0.5) {
+      const dmg = (sp - 1.5) * 9; c.v *= -0.2;
+      if (dr && dr.alive && dmg > 25) { dr.carDeath = true; damage(dr, dmg * 0.15, null, false); }
+      if (dr === player) { hitFlash = Math.min(1, hitFlash + 0.4); sfxTone(80, 0.15, 0.2, 'sawtooth'); }
+      carDamage(c, dmg, dr);
+    } else if (ratio > 0.05) c.v *= 1 - 1.5 * dt;
+  }
+}
+
 function carVisual(c) {
   for (let i = 0; i < c.wheels.length; i++) { const w = c.wheels[i], ok = c.tires[i]; w.scale.set(1, ok ? 1 : 0.62, ok ? 1 : 0.62); w.position.y = c.bike ? (ok ? 0.36 : 0.22) : c.hum ? (ok ? 0.46 : 0.3) : (ok ? 0.4 : 0.25); }
   const dead = c.wreck;
   c.bodyMat.color.setHex(dead ? 0x1d1d1f : c.color); c.cabMat.color.setHex(dead ? 0x161618 : shade(c.color, 0.9)); c.glass.visible = !dead;
   c.lamps.forEach(l => { l.visible = !dead; });
 }
-function placeCar(c) { c.mesh.position.set(c.x, 0, c.z); c.mesh.rotation.y = c.yaw; }
+function placeCar(c) { c.mesh.position.set(c.x, c.boat ? WATER.y + Math.sin(performance.now() / 520 + c.id * 1.7) * 0.035 : (c.y || 0), c.z); c.mesh.rotation.y = c.yaw; }
 function resetCars() {
   cars.forEach(c => {
-    c.x = c.x0; c.z = c.z0; c.yaw = c.yaw0; c.v = 0; c.hp = c.maxHp; c.tires = [1, 1, 1, 1]; c.wreck = false; c.driver = null; c.drvId = -1; c.occ = [null, null, null, null]; c.occId = c.bike ? [-1, -2, -2, -2] : [-1, -1, -1, -1]; c.res = null; c.leanV = 0; c.lastYaw = c.yaw;
+    c.x = c.x0; c.z = c.z0; c.yaw = c.yaw0; c.v = 0; c.hp = c.maxHp; c.tires = [1, 1, 1, 1]; c.wreck = false; c.driver = null; c.drvId = -1; c.occ = [null, null, null, null]; c.occId = c.bike ? [-1, -2, -2, -2] : [-1, -1, -1, -1]; c.res = null; c.leanV = 0; c.lastYaw = c.yaw; c.y = 0; c.vy = 0; c.rs = 0; c.sink = 0; c.net.y = 0;
     c.net.x = c.x; c.net.z = c.z; c.net.yaw = c.yaw; c.in.th = c.in.sr = c.in.br = 0; carVisual(c); placeCar(c);
   });
   player.drv = null;
@@ -2369,21 +2699,21 @@ function rayCars(o, d, best, minT, skipCar) {
     const s = Math.sin(c.yaw), co = Math.cos(c.yaw);
     _co.x = -vx * co + vz * s; _co.z = -vx * s - vz * co; _co.y = o.y;
     _cd.x = d.x * co - d.z * s; _cd.z = d.x * s + d.z * co; _cd.y = d.y;
-    const bk = !!c.bike, t = bk ? rayBox(_co, _cd, -0.34, 0.05, -1.2, 0.34, 1.85, 1.2) : rayBox(_co, _cd, -0.97, 0.18, -2.17, 0.97, c.hum ? 1.72 : 1.5, 2.17);
+    const bk = !!c.bike, t = bk ? rayBox(_co, _cd, -0.34, 0.05, -1.2, 0.34, 1.85, 1.2) : c.boat ? rayBox(_co, _cd, -1.0, 0.0, -3.2, 1.0, 1.5, 3.1) : c.heli ? rayBox(_co, _cd, -1.2, c.y + 0.1, -2.7, 1.2, c.y + 3.0, 3.0) : rayBox(_co, _cd, -0.97, 0.18, -2.17, 0.97, c.hum ? 1.72 : 1.5, 2.17);
     if (t !== null && t >= minT && t < best.t) {
       best.t = t; best.type = 'world'; best.ent = null; best.head = false; best.car = c; best.tire = -1;
       const hx = _co.x + _cd.x * t, hy = _co.y + _cd.y * t, hz = _co.z + _cd.z * t;
       best.hy = hy;
       if (bk) { if (hy < 0.62 && Math.abs(Math.abs(hz) - 0.82) < 0.4) best.tire = hz > 0 ? 1 : 0; }
-      else if (hy < 0.8 && Math.abs(hx) > 0.55 && Math.abs(Math.abs(hz) - 1.4) < 0.62) best.tire = (hx > 0 ? 1 : 0) + (hz > 0 ? 2 : 0);
+      else if (!c.boat && !c.heli && hy < 0.8 && Math.abs(hx) > 0.55 && Math.abs(Math.abs(hz) - 1.4) < 0.62) best.tire = (hx > 0 ? 1 : 0) + (hz > 0 ? 2 : 0);
     }
   }
 }
 function pushFromCars(p, r) {
   for (let i = 0; i < cars.length; i++) {
     const c = cars[i], dx = p.x - c.x, dz = p.z - c.z;
-    if (dx * dx + dz * dz > 12) continue;
-    const s = Math.sin(c.yaw), co = Math.cos(c.yaw), lx = dx * co - dz * s, lz = dx * s + dz * co, hw = (c.bike ? 0.34 : 0.97) + r, hl = (c.bike ? 1.2 : 2.17) + r;
+    if (dx * dx + dz * dz > (c.boat || c.heli ? 40 : 12) || (c.heli && c.y > 0.8)) continue;
+    const dm = cdim(c), s = Math.sin(c.yaw), co = Math.cos(c.yaw), lx = dx * co - dz * s, lz = dx * s + dz * co, hw = dm[0] + r, hl = dm[1] + r;
     if (Math.abs(lx) >= hw || Math.abs(lz) >= hl) continue;
     const px = hw - Math.abs(lx), pz = hl - Math.abs(lz);
     let ox = 0, oz = 0;
@@ -2409,11 +2739,15 @@ function carBoomFx(c) {
   const d = Math.hypot(c.x - camera.position.x, c.z - camera.position.z), v = clamp(1 - d / 170, 0, 1) * 0.5;
   if (v > 0.01) { sfxTone(55, 0.8, v, 'sawtooth'); sfxTone(120, 0.4, v * 0.8, 'square'); sfxTone(35, 1.0, v, 'sine'); }
 }
+function cdim(c) { return c.bike ? [0.34, 1.2] : c.boat ? [1.0, 3.0] : c.heli ? [1.2, 2.6] : [0.97, 2.17]; }
 function seatWorld(c, i, out) {
-  const lx = c.bike ? 0 : (i & 1) ? 0.45 : -0.45, lz = c.bike ? 0.15 : i >= 2 ? 0.9 : -0.3, s = Math.sin(c.yaw), co = Math.cos(c.yaw);
+  const lx = c.bike ? 0 : c.boat ? ((i & 1) ? 0.5 : -0.5) : (i & 1) ? 0.45 : -0.45, lz = c.bike ? 0.15 : c.boat ? (i >= 2 ? 2.0 : 0.9) : c.heli ? (i >= 2 ? 0.9 : -0.5) : i >= 2 ? 0.9 : -0.3, s = Math.sin(c.yaw), co = Math.cos(c.yaw);
   out.x = c.x + lx * co + lz * s; out.z = c.z - lx * s + lz * co; return out;
 }
 function dismountSpot(c, seat) {
+  if (c.boat) {   // 보트: 가장 가까운 물가 땅을 찾는다
+    for (let r = 3.5; r <= 18; r += 2.5) for (let k = 0; k < 12; k++) { const a = k * 0.5236 + c.yaw, x = c.x + Math.cos(a) * r, z = c.z + Math.sin(a) * r; if (pointFree(x, z, 0.4)) return { x, z }; }
+  }
   const co = Math.cos(c.yaw), s = Math.sin(c.yaw), side = (seat & 1) ? 1 : -1, lz0 = seat >= 2 ? 0.9 : -0.3;
   const sd = c.bike ? 1.3 : 2.2, tries = [[side * sd, lz0], [-side * sd, lz0], [side * sd, lz0 + 1.6], [0, c.bike ? 2.2 : 3.4], [0, c.bike ? -2.2 : -3.4]];
   for (let i = 0; i < tries.length; i++) {
@@ -2442,10 +2776,10 @@ function carOpenFor(c, team) { for (let i = 0; i < 4; i++) { const v = c.occId[i
 function nearestCar(x, z) {
   let best = null, bd = 3.6 * 3.6;
   for (let i = 0; i < cars.length; i++) {
-    const c = cars[i]; if (c.wreck || c.occId.indexOf(-1) < 0 || !carOpenFor(c, player.team)) continue;
-    const dx = c.x - x, dz = c.z - z; if (dx * dx + dz * dz > 49) continue;
-    carLocal(c, x, z, _cl);
-    const ex = Math.max(0, Math.abs(_cl.x) - (c.bike ? 0.34 : 0.97)), ez = Math.max(0, Math.abs(_cl.z) - (c.bike ? 1.2 : 2.17)), d2 = ex * ex + ez * ez;
+    const c = cars[i]; if (c.wreck || c.occId.indexOf(-1) < 0 || !carOpenFor(c, player.team) || (c.heli && c.y > 2.5)) continue;
+    const dx = c.x - x, dz = c.z - z; if (dx * dx + dz * dz > 64) continue;
+    carLocal(c, x, z, _cl); const dm = cdim(c);
+    const ex = Math.max(0, Math.abs(_cl.x) - dm[0]), ez = Math.max(0, Math.abs(_cl.z) - dm[1]), d2 = ex * ex + ez * ez;
     if (d2 < bd) { bd = d2; best = c; }
   }
   return best;
@@ -2457,10 +2791,13 @@ function enterCar(c) {
   seatTake(c, player, idx);
   if (idx === 0) { c.in.th = c.in.sr = c.in.br = 0; player.yaw = c.yaw; }
   player.stance = 0; player.reloadT = 0; aiming = false; mouseDown = false; closeLoot();
-  toast(c.hum ? (idx === 0 ? '🪖 험비 운전석 — W/S 가속·후진, A/D 조향, E 하차 · F 지붕 기관총으로 이동' : '🪖 험비 동승 — 좌클릭 사격, E 하차 · F 지붕 기관총으로 이동') : c.bike ? '🏍 오토바이 탑승 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차' : idx === 0 ? '🚗 운전석 탑승 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차' : '🚗 동승 — 좌클릭 사격 가능, E 하차', 3000);
+  if (c.boat) toast(idx === 0 ? '🚤 보트 운전석 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차' : '🚤 보트 동승 — 좌클릭 사격 가능, E 하차', 3000);
+  else if (c.heli) toast(idx === 0 ? '🚁 헬기 조종석 — W/S 전진·후진, A/D 회전, Space 상승, C 하강(모바일: 앉기 버튼), E 하차(착륙 후)' : '🚁 헬기 동승 — 좌클릭 사격 가능, E 하차(착륙 후)', 3600);
+  else toast(c.hum ? (idx === 0 ? '🪖 험비 운전석 — W/S 가속·후진, A/D 조향, E 하차 · F 지붕 기관총으로 이동' : '🪖 험비 동승 — 좌클릭 사격, E 하차 · F 지붕 기관총으로 이동') : c.bike ? '🏍 오토바이 탑승 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차' : idx === 0 ? '🚗 운전석 탑승 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차' : '🚗 동승 — 좌클릭 사격 가능, E 하차', 3000);
 }
 function exitCar() {
   const c = player.drv; if (!c) return;
+  if (c.heli && c.y > 2.5) { toast('착륙한 뒤에 내릴 수 있습니다 (C 키로 하강)', 1500); return; }
   if (NET.mode === 'client') { netSend(NET.hostConn, { t: 'car', a: 'out' }); return; }
   dismount(player, c);
 }
@@ -2480,7 +2817,7 @@ function explodeCar(c, attacker) {
   const occ = c.occ.filter(Boolean), dr = c.occ[0];
   for (let i = 0; i < entities.length; i++) {
     const e = entities[i]; if (!e.alive || e.air) continue;
-    const ER = c.bike ? 6 : 9, inCar = e.drv === c || !!(c.turret && c.turret.user === e), d = Math.hypot(e.pos.x - c.x, e.pos.z - c.z); if (!inCar && d > ER) continue;
+    const ER = c.heli ? 12 : c.bike ? 6 : 9, inCar = e.drv === c || !!(c.turret && c.turret.user === e), d = Math.hypot(e.pos.x - c.x, e.pos.z - c.z); if (!inCar && d > ER) continue;
     const amt = inCar ? 100 : 75 * (1 - d / ER); if (amt < 1) continue;
     e.carDeath = true;
     damage(e, amt, inCar ? null : (attacker && attacker !== e ? attacker : (dr && dr !== e ? dr : null)), false);
@@ -2489,6 +2826,8 @@ function explodeCar(c, attacker) {
   if (c.turret && c.turret.user && c.turret.user.alive) releaseTurret(c.turret.user);
 }
 function simCar(c, dt) {
+  if (c.boat) return simBoat(c, dt);
+  if (c.heli) return simHeli(c, dt);
   let th = c.in.th, sr = c.in.sr, br = c.in.br;
   const dr = c.driver;
   if (!dr || (dr.remote && performance.now() - c.inT > 700)) { th = 0; sr = 0; br = 1; }
@@ -2519,6 +2858,11 @@ function simCar(c, dt) {
   const corr = Math.hypot(cx - c.x, cz - c.z);
   c.x = cx; c.z = cz;
   const lim = MAP_HALF - 3; c.x = clamp(c.x, -lim, lim); c.z = clamp(c.z, -lim, lim);
+  if (waterRaw(c.x, c.z, 0) && !onBridge(c.x, c.z)) {   // 육상 차량이 물에 빠짐: 급감속, 잠시 후 침수로 파손
+    c.v *= Math.max(0, 1 - 2.4 * dt); c.sink = (c.sink || 0) + dt;
+    if (sp > 2 && Math.random() < dt * 8) spawnPart('splash', c.x + rand(-1, 1), 0.3, c.z + rand(-1.5, 1.5), rand(-1, 1), rand(1.5, 3), rand(-1, 1), 0.12, 0.5, 9, 0.5);
+    if (c.sink > 3) carDamage(c, 40 * dt, null);
+  } else c.sink = 0;
   if (corr > 0.01 && sp > 2.5) {
     const ratio = corr / (sp * dt + 1e-4);
     if (ratio > 0.5) {
@@ -2531,7 +2875,7 @@ function simCar(c, dt) {
   if (c.wreck) return;
   // 다른 차량과 충돌
   for (let j = 0; j < cars.length; j++) {
-    const o = cars[j]; if (o === c) continue;
+    const o = cars[j]; if (o === c || o.boat || o.heli) continue;
     const dx = c.x - o.x, dz = c.z - o.z, d2 = dx * dx + dz * dz;
     const rr = (c.bike ? 1.0 : 1.4) + (o.bike ? 1.0 : 1.4);
     if (d2 > rr * rr || d2 < 1e-6) continue;
@@ -2573,16 +2917,18 @@ function updateCars(dt) {
     const c = cars[i];
     if (isClient) {
       const n = c.net, k = Math.min(1, dt * 12);
+      if (c.heli) c.y += ((n.y || 0) - c.y) * k;
       if (Math.abs(n.x - c.x) + Math.abs(n.z - c.z) > 25) { c.x = n.x; c.z = n.z; c.yaw = n.yaw; }
       else { c.x += (n.x - c.x) * k; c.z += (n.z - c.z) * k; c.yaw += angDiff(n.yaw, c.yaw) * k; }
-    } else if (!c.wreck) simCar(c, dt); else c.v = 0;
+    } else if (!c.wreck) simCar(c, dt); else { c.v = 0; if (c.heli && c.y > 0) c.y = Math.max(0, c.y - 16 * dt); }
     if (!isClient) for (let k = 0; k < 4; k++) {
       const e = c.occ[k]; if (!e) continue;
-      seatWorld(c, k, _carTmp); e.pos.x = _carTmp.x; e.pos.z = _carTmp.z; e.pos.y = 0;
-      if (e.remote) { e.net.x = c.x; e.net.z = c.z; e.net.y = 0; e.net.ds = 3; }
+      seatWorld(c, k, _carTmp); e.pos.x = _carTmp.x; e.pos.z = _carTmp.z; e.pos.y = c.heli ? c.y : 0;
+      if (e.remote) { e.net.x = c.x; e.net.z = c.z; e.net.y = c.heli ? c.y : 0; e.net.ds = 3; }
     }
-    if (player.drv === c) { seatWorld(c, player.seat, _carTmp); player.pos.set(_carTmp.x, player.seat ? -0.3 : 0, _carTmp.z); }
+    if (player.drv === c) { seatWorld(c, player.seat, _carTmp); player.pos.set(_carTmp.x, (c.heli ? c.y : 0) + (player.seat ? -0.3 : 0), _carTmp.z); }
     placeCar(c);
+    if (c.boat || c.heli) vehFx(c, dt);
     if (c.turret) {
       const t = c.turret; carTurSync(t);
       const u = player.tur === t ? player : (!isClient ? t.user : null);
@@ -2603,24 +2949,49 @@ function updateCars(dt) {
         const s = Math.sin(c.yaw), co = Math.cos(c.yaw);
         if (c.wreck) {
           c.smokeT = 0.11;
-          spawnPart('smoke', c.x + rand(-0.7, 0.7), 1.0, c.z + rand(-1, 1), rand(-0.2, 0.2), rand(1.2, 2.2), rand(-0.2, 0.2), 0.5, 2.2, 0, 2.5);
-          if (Math.random() < 0.4) spawnPart('spark', c.x + rand(-0.8, 0.8), 1.1, c.z + rand(-1.2, 1.2), rand(-1, 1), rand(2, 4), rand(-1, 1), 0.08, 0.5, 8, 0);
+          spawnPart('smoke', c.x + rand(-0.7, 0.7), 1.0 + (c.y || 0), c.z + rand(-1, 1), rand(-0.2, 0.2), rand(1.2, 2.2), rand(-0.2, 0.2), 0.5, 2.2, 0, 2.5);
+          if (Math.random() < 0.4) spawnPart('spark', c.x + rand(-0.8, 0.8), 1.1 + (c.y || 0), c.z + rand(-1.2, 1.2), rand(-1, 1), rand(2, 4), rand(-1, 1), 0.08, 0.5, 8, 0);
         } else if (c.hp < c.maxHp * 0.35) {
           c.smokeT = 0.22;
-          spawnPart('smoke', c.x - 1.6 * s, 1.0, c.z - 1.6 * co, rand(-0.1, 0.1), rand(0.8, 1.4), rand(-0.1, 0.1), 0.28, 1.6, 0, 2.2);
+          spawnPart('smoke', c.x - 1.6 * s, 1.0 + (c.y || 0), c.z - 1.6 * co, rand(-0.1, 0.1), rand(0.8, 1.4), rand(-0.1, 0.1), 0.28, 1.6, 0, 2.2);
         }
       }
     }
     if (player.drv === c && player.seat === 0) {
       c.engT -= dt;
-      if (c.engT <= 0) { c.engT = 0.08; sfxTone(c.bike ? 78 + Math.abs(c.v) * 6 : 48 + Math.abs(c.v) * 4.2, 0.1, 0.045, 'sawtooth'); }
+      if (c.engT <= 0) { c.engT = 0.08; sfxTone(c.heli ? 26 + (c.rs || 0) * 0.5 : c.boat ? 52 + Math.abs(c.v) * 5 : c.bike ? 78 + Math.abs(c.v) * 6 : 48 + Math.abs(c.v) * 4.2, 0.1, 0.045, c.heli ? 'square' : 'sawtooth'); }
     }
   }
 }
+
+// 보트 물결/흔들림, 헬기 로터/기울기
+function vehFx(c, dt) {
+  const yr = angDiff(c.yaw, c.lastYaw) / Math.max(dt, 1e-3); c.lastYaw = c.yaw;
+  const cam = camera.position, near = (c.x - cam.x) * (c.x - cam.x) + (c.z - cam.z) * (c.z - cam.z) < 160 * 160;
+  if (c.boat) {
+    const tl = clamp(yr * 0.22 * Math.min(1, Math.abs(c.v) / 8), -0.4, 0.4);
+    c.leanV += (tl - c.leanV) * Math.min(1, dt * 6); c.lean.rotation.z = c.wreck ? 0.35 : c.leanV;
+    c.lean.rotation.x = c.wreck ? 0.12 : -Math.min(1, Math.abs(c.v) / 12) * 0.07;
+    c.wakeT -= dt;
+    if (near && !c.wreck && Math.abs(c.v) > 2.5 && c.wakeT <= 0) {
+      c.wakeT = 0.06; const s = Math.sin(c.yaw), co = Math.cos(c.yaw);
+      for (let k = -1; k <= 1; k += 2) spawnPart('splash', c.x + s * 3.0 + co * k * 0.7, 0.2, c.z + co * 3.0 - s * k * 0.7, co * k * 1.6 + rand(-0.4, 0.4), rand(1.2, 2.4), -s * k * 1.6 + rand(-0.4, 0.4), 0.11, 0.5, 8, 0.6);
+    }
+  } else {
+    const on = !c.wreck && c.occId[0] >= 0;
+    c.rs += ((on ? 40 : 0) - c.rs) * Math.min(1, dt * (on ? 0.9 : 0.35));
+    c.rotor.rotation.y += c.rs * dt; c.trotor.rotation.x += c.rs * dt * 1.4;
+    c.disc.visible = c.rs > 14 && !c.wreck;
+    const tl = clamp(yr * 0.3 * Math.min(1, Math.abs(c.v) / 10), -0.45, 0.45);
+    c.leanV += (tl - c.leanV) * Math.min(1, dt * 5); c.lean.rotation.z = c.wreck ? 0.6 : c.leanV;
+    c.lean.rotation.x = c.wreck ? -0.2 : -clamp(c.v / HELI_VMAX, -0.4, 1) * 0.2 + clamp(c.vy * 0.01, -0.05, 0.05);
+    if (near && c.y < 4 && c.rs > 20 && Math.random() < dt * 22) { const a = Math.random() * 6.28; spawnPart('dust', c.x + Math.cos(a) * 3, 0.3, c.z + Math.sin(a) * 3, Math.cos(a) * 5, 0.6, Math.sin(a) * 5, 0.5, 0.8, 0, 2.6); }
+  }
+}
 function applyCarSnap(arr) {
-  for (let i = 0; i + 10 < arr.length; i += 11) {
+  for (let i = 0; i + 11 < arr.length; i += 12) {
     const c = cars[arr[i]]; if (!c) continue;
-    c.net.x = arr[i + 1]; c.net.z = arr[i + 2]; c.net.yaw = arr[i + 3]; c.hp = arr[i + 4]; c.v = arr[i + 10];
+    c.net.x = arr[i + 1]; c.net.z = arr[i + 2]; c.net.yaw = arr[i + 3]; c.hp = arr[i + 4]; c.v = arr[i + 10]; c.net.y = arr[i + 11] || 0;
     const mask = arr[i + 5];
     let chg = false;
     for (let t = 0; t < 4; t++) { const ok = (mask >> t) & 1; if (c.tires[t] && !ok) { carTireFx(c, t); chg = true; } c.tires[t] = ok; }
@@ -2633,7 +3004,7 @@ function applyCarSnap(arr) {
       if (player.drv !== c || player.seat !== mySeat) {
         player.drv = c; player.seat = mySeat; player.carYaw = c.yaw; player.stance = 0; aiming = false; mouseDown = false; closeLoot();
         if (mySeat === 0) player.yaw = c.yaw;
-        toast(c.hum ? '🪖 험비 탑승 — E 하차 · F 지붕 기관총으로 이동' : c.bike ? '🏍 오토바이 탑승 — E 하차' : mySeat === 0 ? '🚗 운전석 탑승 — E 하차' : '🚗 동승 — 좌클릭 사격 가능, E 하차', 2500);
+        toast(c.hum ? '🪖 험비 탑승 — E 하차 · F 지붕 기관총으로 이동' : c.boat ? '🚤 보트 탑승 — E 하차' : c.heli ? '🚁 헬기 탑승 — 조종: Space 상승 · C 하강 · E 하차(착륙 후)' : c.bike ? '🏍 오토바이 탑승 — E 하차' : mySeat === 0 ? '🚗 운전석 탑승 — E 하차' : '🚗 동승 — 좌클릭 사격 가능, E 하차', 2500);
       }
     } else if (player.drv === c) dismount(player, c);
   }
@@ -2660,6 +3031,7 @@ const partGeo = new THREE.SphereGeometry(1, 6, 4);
 const partMats = {
   dust: new THREE.MeshBasicMaterial({ color: 0xb9ad96, transparent: true, opacity: 0.55, depthWrite: false }),
   smoke: new THREE.MeshBasicMaterial({ color: 0xc8c8c8, transparent: true, opacity: 0.32, depthWrite: false }),
+  splash: new THREE.MeshBasicMaterial({ color: 0xcdeaf5, transparent: true, opacity: 0.75, depthWrite: false }),
   spark: new THREE.MeshBasicMaterial({ color: 0xffc05a }), blood: new THREE.MeshBasicMaterial({ color: 0xb01414 })
 };
 function spawnPart(kind, x, y, z, vx, vy, vz, size, life, grav, grow) {
@@ -2791,7 +3163,7 @@ function wipeCheck(team) {
 }
 function kill(t, attacker, head) {
   if (t.zom) { zombieKilled(t, attacker, head); return; }
-  if (t.drv) releaseDriver(t);
+  if (t.drv) { const hl = t.drv.heli; releaseDriver(t); if (hl) { t.pos.y = 0; if (t.net) t.net.y = 0; } }
   if (t.tur) releaseTurret(t);
   t.alive = false; t.hp = 0; t.deathT = 0;
   dropLoot(t);
@@ -3004,6 +3376,9 @@ function probe(x, z, ang, len, half, skip) {
     const vx = c.x - x, vz = c.z - z, al = vx * dx + vz * dz; if (al < 0 || al > best + 2.5) continue;
     if (Math.abs(vx * dz - vz * dx) < 1.6 + half) best = Math.min(best, Math.max(0, al - 2.2));
   }
+  if (!waterRaw(x, z, 0.5)) {   // 물(다리 제외)은 장애물: 차량/보행 봇 모두 피한다
+    for (let d = 3; d < best; d += 3) { const wx = x + dx * d, wz = z + dz * d; if (waterRaw(wx, wz, 1.2) && !onBridge(wx, wz)) { best = d - 1.5; break; } }
+  }
   return best;
 }
 /* ================= 봇 길찾기: 1m 격자 + A* (건물 문/담장 우회) ================= */
@@ -3025,6 +3400,11 @@ function buildNav() {
     const x0 = Math.max(0, Math.ceil(c.minX - R + MAP_HALF - 0.5)), x1 = Math.min(NN - 1, Math.floor(c.maxX + R + MAP_HALF - 0.5));
     const z0 = Math.max(0, Math.ceil(c.minZ - R + MAP_HALF - 0.5)), z1 = Math.min(NN - 1, Math.floor(c.maxZ + R + MAP_HALF - 0.5));
     for (let z = z0; z <= z1; z++) { const row = z * NN; for (let x = x0; x <= x1; x++) navBlock[row + x] = 1; }
+  }
+  // 물: 8m 블록 중심에서 가까운 곳만 칸 단위로 검사
+  for (let bz = 0; bz < NN; bz += 8) for (let bx = 0; bx < NN; bx += 8) {
+    if (!waterRaw(bx + 4 - MAP_HALF, bz + 4 - MAP_HALF, 7)) continue;
+    for (let z = bz; z < bz + 8 && z < NN; z++) for (let x = bx; x < bx + 8 && x < NN; x++) { const wx = x + 0.5 - MAP_HALF, wz = z + 0.5 - MAP_HALF; if (waterRaw(wx, wz, 0.6) && !onBridge(wx, wz)) navBlock[z * NN + x] = 1; }
   }
 }
 const navCell = v => clamp(Math.floor(v + MAP_HALF), 0, NN - 1);
@@ -3121,7 +3501,7 @@ function findCarFor(b, R) {
   let best = null, bd = R * R;
   for (let i = 0; i < cars.length; i++) {
     const c = cars[i];
-    if (c.wreck || c.occId.some(v => v >= 0) || c.hp < c.maxHp * 0.6 || (c.tires[0] + c.tires[1] + c.tires[2] + c.tires[3]) < 4) continue;
+    if (c.boat || c.heli || c.wreck || c.occId.some(v => v >= 0) || c.hp < c.maxHp * 0.6 || (c.tires[0] + c.tires[1] + c.tires[2] + c.tires[3]) < 4) continue;
     if (c.res && c.res !== b && c.res.alive && c.res.carT === c) continue;
     const d2 = (c.x - b.pos.x) * (c.x - b.pos.x) + (c.z - b.pos.z) * (c.z - b.pos.z);
     if (d2 < bd) { bd = d2; best = c; }
@@ -3130,7 +3510,7 @@ function findCarFor(b, R) {
 }
 function findSquadCar(b) {
   for (let i = 0; i < cars.length; i++) {
-    const c = cars[i]; if (c.wreck || c.occId[0] < 0 || c.occId.indexOf(-1) < 0) continue;
+    const c = cars[i]; if (c.boat || c.heli || c.wreck || c.occId[0] < 0 || c.occId.indexOf(-1) < 0) continue;
     const d = c.occ[0]; if (!d || !d.alive || d.team !== b.team || d === b) continue;
     const dx = c.x - b.pos.x, dz = c.z - b.pos.z; if (dx * dx + dz * dz < 38 * 38) return c;
   }
@@ -3961,34 +4341,34 @@ const INDOOR_TBL = [[12, 'gun'], [7, 'smg'], [6, 'shotgun'], [7, 'pistol'], [11,
 function wpick(tbl) { let r = Math.random() * tbl.reduce((a, e) => a + e[0], 0); for (let i = 0; i < tbl.length; i++) { r -= tbl[i][0]; if (r <= 0) return tbl[i][1]; } return tbl[tbl.length - 1][1]; }
 function spawnItems() {
   const place = (type, inBuilding, lvl) => {
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 100; i++) {
       let x, z;
       if (inBuilding) { const p = randomPointInBuilding(); x = p.x; z = p.z; }
       else { x = rand(-ZONE_START, ZONE_START); z = rand(-ZONE_START, ZONE_START); if (Math.hypot(x, z) > ZONE_START - 5) continue; }
       if (pointFree(x, z, 1.1)) { makeItem(type, x, z, lvl || 0, lvl ? armorMax(type, lvl) : 0, 0); return; }
     }
   };
-  for (let i = 0; i < 90; i++) place('gun', i < 52);
-  for (let i = 0; i < 30; i++) place('snipe', i < 22);
-  for (let i = 0; i < 90; i++) place('pistol', i < 50);
-  for (let i = 0; i < 50; i++) place('smg', i < 30);
-  for (let i = 0; i < 36; i++) place('shotgun', i < 24);
-  for (let i = 0; i < 22; i++) place('dmr', i < 14);
-  for (let i = 0; i < 14; i++) place('lmg', i < 10);
-  for (let i = 0; i < 36; i++) place('supp', i < 22);
-  for (let i = 0; i < 40; i++) place('xmag', i < 24);
-  for (let i = 0; i < 80; i++) place('med', i < 40);
-  for (let i = 0; i < 90; i++) place('ammo', i < 45);
-  for (let i = 0; i < 40; i++) place('ammoS', i < 24);
-  for (let i = 0; i < 60; i++) place('ammoP', i < 32);
-  for (let i = 0; i < 50; i++) place('ammoG', i < 28);
-  for (let i = 0; i < 90; i++) place('frag', i < 50);
-  for (let i = 0; i < 70; i++) place('smoke', i < 38);
-  for (let i = 0; i < 55; i++) place('flash', i < 30);
+  for (let i = 0; i < 270; i++) place('gun', i < 156);
+  for (let i = 0; i < 90; i++) place('snipe', i < 66);
+  for (let i = 0; i < 270; i++) place('pistol', i < 150);
+  for (let i = 0; i < 150; i++) place('smg', i < 90);
+  for (let i = 0; i < 108; i++) place('shotgun', i < 72);
+  for (let i = 0; i < 66; i++) place('dmr', i < 42);
+  for (let i = 0; i < 42; i++) place('lmg', i < 30);
+  for (let i = 0; i < 108; i++) place('supp', i < 66);
+  for (let i = 0; i < 120; i++) place('xmag', i < 72);
+  for (let i = 0; i < 240; i++) place('med', i < 120);
+  for (let i = 0; i < 270; i++) place('ammo', i < 135);
+  for (let i = 0; i < 120; i++) place('ammoS', i < 72);
+  for (let i = 0; i < 180; i++) place('ammoP', i < 96);
+  for (let i = 0; i < 150; i++) place('ammoG', i < 84);
+  for (let i = 0; i < 270; i++) place('frag', i < 150);
+  for (let i = 0; i < 210; i++) place('smoke', i < 114);
+  for (let i = 0; i < 165; i++) place('flash', i < 90);
   ['helm', 'vest'].forEach(tp => {
-    for (let i = 0; i < 36; i++) place(tp, i < 14, 1);
-    for (let i = 0; i < 22; i++) place(tp, i < 16, 2);
-    for (let i = 0; i < 3; i++) place(tp, true, 3);
+    for (let i = 0; i < 108; i++) place(tp, i < 42, 1);
+    for (let i = 0; i < 66; i++) place(tp, i < 48, 2);
+    for (let i = 0; i < 9; i++) place(tp, true, 3);
   });
   lootSpots.forEach(sp => {
     for (let i = 0; i < sp.n; i++) {
@@ -4043,7 +4423,7 @@ function updateItems(dt, t) {
   }
   if (lootCrate && (lootCrate.gone || !canAct || Math.hypot(lootCrate.x - px, lootCrate.z - pz) > 4.5)) closeLoot();
   let hint = '';
-  if (player.drv) { const c = player.drv; hint = (player.seat === 0 ? '[E] 하차 · W/S 가속/후진 · A/D 조향 · Space 브레이크   ' : '[E] 하차 · 좌클릭 사격 (탑승 ' + c.occId.filter(v => v >= 0).length + '/4)   ') + Math.round(Math.abs(c.v) * 3.6) + ' km/h · 차체 ' + Math.max(0, Math.round(c.hp / c.maxHp * 100)) + '% · 타이어 ' + (c.bike ? c.tires[0] + c.tires[1] + '/2' : (c.tires[0] + c.tires[1] + c.tires[2] + c.tires[3]) + '/4'); }
+  if (player.drv) { const c = player.drv; hint = (player.seat === 0 ? (c.heli ? '[E] 하차(착륙 후) · W/S 전진/후진 · A/D 회전 · Space 상승 · C 하강   ' : '[E] 하차 · W/S 가속/후진 · A/D 조향 · Space 브레이크   ') : '[E] 하차 · 좌클릭 사격 (탑승 ' + c.occId.filter(v => v >= 0).length + '/4)   ') + Math.round(Math.abs(c.v) * 3.6) + ' km/h · 차체 ' + Math.max(0, Math.round(c.hp / c.maxHp * 100)) + '%' + (c.heli ? ' · 고도 ' + Math.round(c.y) + 'm' : c.boat ? '' : ' · 타이어 ' + (c.bike ? c.tires[0] + c.tires[1] + '/2' : (c.tires[0] + c.tires[1] + c.tires[2] + c.tires[3]) + '/4')); }
   else if (player.tur) hint = '[E] 내리기 · 좌클릭 연사 · 오래 쏘면 과열됩니다 (열 ' + Math.round(player.tur.heat * 100) + '%)';
   else if (!lootCrate && canAct) {
     if (nearCrate) hint = '[E] 보급 상자 열기 (' + nearCrate.items.length + '개)';
@@ -4052,7 +4432,7 @@ function updateItems(dt, t) {
     else if (nearCar || nearGun) {
       const hc = nearCar || nearGun;
       hint = hc.hum ? ((nearCar ? '[E] 험비 ' + (nearCar.occId.indexOf(-1) === 0 ? '운전석' : '동승') + ' 탑승' : '') + (nearCar && nearGun ? ' · ' : '') + (nearGun ? '[F] 지붕 기관총 사수' : ''))
-        : '[E] 차량 탑승 (' + (nearCar.occId.indexOf(-1) === 0 ? '운전석' : '동승') + ')';
+        : '[E] ' + (nearCar.boat ? '보트' : nearCar.heli ? '헬기' : '차량') + ' 탑승 (' + (nearCar.occId.indexOf(-1) === 0 ? '운전석' : '동승') + ')';
     }
   }
   if (player.drv && nearGun) hint += '   [F] 지붕 기관총으로 이동';
@@ -4858,15 +5238,17 @@ function startSlide() {
   sfxTone(150, 0.3, 0.07, 'sawtooth'); sfxTone(90, 0.35, 0.05, 'triangle');
   return true;
 }
+let heliDown = false;
 function updatePlayer(dt) {
   const p = player;
+  if (!(p.drv && p.drv.heli)) heliDown = false;
   if (p.air) { updateDrop(dt); return; }
   if (p.tur) { turretTick(p, dt); return; }
   if (p.drv && p.seat === 0) {
     const c = p.drv;
     driveIn.th = clamp((keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) + joyF, -1, 1);
     driveIn.sr = clamp((keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0) + joyS, -1, 1);
-    driveIn.br = keys.Space ? 1 : 0;
+    driveIn.br = c.heli ? (keys.Space ? 1 : (keys.KeyC || keys.ControlLeft || heliDown) ? 2 : 0) : (keys.Space ? 1 : 0);
     if (NET.mode !== 'client') { c.in.th = driveIn.th; c.in.sr = driveIn.sr; c.in.br = driveIn.br; c.inT = performance.now(); }
     p.yaw += angDiff(c.yaw, p.yaw) * Math.min(1, dt * 5); p.pitch = 0.12; p.moving = false; p.sprint = false;
     p.fireCd -= dt; p.recoil = 0;
@@ -4903,9 +5285,10 @@ function updatePlayer(dt) {
   p.vy -= 22 * dt; p.pos.y += p.vy * dt;
   const sup = getSupport(p.pos, 0.42);   // 충돌 반경(0.4)보다 크게: 낮은 계단은 걸어서 오름
   if (p.pos.y <= sup) { p.pos.y = sup; p.vy = 0; p.grounded = true; } else p.grounded = (p.pos.y - sup) < 0.02;
-  if (keys.Space && p.grounded && p.stance === 0 && !p.jumpLock) { p.vy = 7.6; p.grounded = false; p.pos.y += 0.01; }
+  if (keys.Space && p.grounded && p.stance === 0 && !p.jumpLock && !p.pos.wet) { p.vy = 7.6; p.grounded = false; p.pos.y += 0.01; }
   moveEntity(p.pos, mx * speed * dt, mz * speed * dt, 0.4);
   if (p.moving && p.grounded) { p.walk += dt * speed * 1.4; p.bob += dt * speed * 1.6; }
+  if (p.pos.wet && p.moving) { p.splT = (p.splT || 0) - dt; if (p.splT <= 0) { p.splT = 0.26; for (let k = 0; k < 3; k++) spawnPart('splash', p.pos.x + rand(-0.3, 0.3), 0.15, p.pos.z + rand(-0.3, 0.3), rand(-0.8, 0.8), rand(1.2, 2.2), rand(-0.8, 0.8), 0.07, 0.4, 9, 0.5); sfxClick(900, 0.05, 0.05); } }
 
   // 쿨다운
   p.fireCd -= dt;
@@ -4958,7 +5341,7 @@ function setStance(st) {
 
 /* ================= 수송기 / 낙하 ================= */
 const drop = {
-  planeActive: false, t: 0, sx: 0, sz: 0, dx: 1, dz: 0, len: 900, speed: 32, alt: 500,
+  planeActive: false, t: 0, sx: 0, sz: 0, dx: 1, dz: 0, len: 900, speed: 48, alt: 500,
   state: 'landed', hv: new THREE.Vector3(), vy: 0, chuteAlt: 110, canopy: null, planeMesh: null
 };
 const canopyGeo = new THREE.SphereGeometry(3.2, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2); canopyGeo.scale(1, 0.65, 1);
@@ -5007,7 +5390,7 @@ function initDrop(P) {
   if (P) { drop.dx = P.dx; drop.dz = P.dz; drop.len = P.len; drop.sx = P.sx; drop.sz = P.sz; }
   else {
     const ang = rand(0, Math.PI * 2), dx = Math.cos(ang), dz = Math.sin(ang);
-    const off = rand(-120, 120), R = ZONE_START * 1.05, half = Math.sqrt(R * R - off * off);
+    const off = rand(-120 * MAP_K, 120 * MAP_K), R = ZONE_START * 1.05, half = Math.sqrt(R * R - off * off);
     drop.dx = dx; drop.dz = dz; drop.len = half * 2;
     drop.sx = -dz * off - dx * half; drop.sz = dx * off - dz * half;
   }
@@ -5029,9 +5412,9 @@ function pickDropTarget() {
       const px = x - drop.sx, pz = z - drop.sz;
       u = (px * drop.dx + pz * drop.dz) / drop.len;
       const off = -px * drop.dz + pz * drop.dx;
-      if (Math.abs(off) > 470 || u < 0.03 || u > 0.97) continue;
+      if (Math.abs(off) > ZONE_START * 1.04 || u < 0.03 || u > 0.97) continue;
     } else {
-      u = rand(0.04, 0.96); const off = rand(-440, 440), rp = routePoint(u);
+      u = rand(0.04, 0.96); const off = rand(-ZONE_START * 0.98, ZONE_START * 0.98), rp = routePoint(u);
       x = rp.x - drop.dz * off; z = rp.z + drop.dx * off;
       if (Math.hypot(x, z) > ZONE_START * 0.92) continue;
     }
@@ -5139,10 +5522,10 @@ function updateCamera(dt) {
     camera.lookAt(pos.x, pos.y, pos.z);
     tpsPivot.copy(pos);
   } else if (player.drv && player.seat === 0) {
-    const c = player.drv, fx = -Math.sin(yaw), fz = -Math.cos(yaw), back = (c.bike ? 5.6 : 8.5) + Math.min(Math.abs(c.v), 25) * 0.08;
-    camera.position.set(c.x - fx * back, c.bike ? 2.7 : 3.7, c.z - fz * back);
-    camera.lookAt(c.x + fx * 5, c.bike ? 1.0 : 1.1, c.z + fz * 5);
-    tpsPivot.set(c.x, 1.2, c.z);
+    const c = player.drv, fx = -Math.sin(yaw), fz = -Math.cos(yaw), cy = c.heli ? c.y : 0, back = (c.heli ? 17 : c.boat ? 9.5 : c.bike ? 5.6 : 8.5) + Math.min(Math.abs(c.v), 25) * 0.08;
+    camera.position.set(c.x - fx * back, cy + (c.heli ? 6.2 : c.boat ? 3.6 : c.bike ? 2.7 : 3.7), c.z - fz * back);
+    camera.lookAt(c.x + fx * 5, cy + (c.heli ? 2.2 : c.boat ? 1.0 : c.bike ? 1.0 : 1.1), c.z + fz * 5);
+    tpsPivot.set(c.x, cy + 1.2, c.z);
   } else if (!tps) {
     const bobY = player.moving && player.grounded ? Math.sin(player.bob * 1.0) * 0.035 * (1 - Math.min(stS, 1.6) * 0.5) : 0;
     camera.position.set(pos.x, pos.y + eyeH + bobY, pos.z);
@@ -5387,6 +5770,12 @@ function drawMapTo(ctx, S, cx, cz, range, detail) {
   ctx.clearRect(0, 0, S, S);
   ctx.fillStyle = 'rgba(15,40,70,.85)'; ctx.fillRect(0, 0, S, S);
   ctx.fillStyle = ENV.mapCol; ctx.fillRect(X(-MAP_HALF), Z(-MAP_HALF), MAP_HALF * 2 * sc2, MAP_HALF * 2 * sc2);
+  ctx.fillStyle = '#2f86b8';
+  for (let k = 0; k < WATER.outlines.length; k++) {
+    const o = WATER.outlines[k]; ctx.beginPath();
+    for (let i = 0; i < o.length; i++) { const x = X(o[i][0]), z = Z(o[i][1]); if (i) ctx.lineTo(x, z); else ctx.moveTo(x, z); }
+    ctx.closePath(); ctx.fill();
+  }
   ctx.fillStyle = 'rgba(214,196,140,.9)';
   for (let i = 0; i < roadRects.length; i++) {
     const r = roadRects[i], x0 = X(r.x0), z0 = Z(r.z0), w = Math.max(2.5, (r.x1 - r.x0) * sc2), h = Math.max(2.5, (r.z1 - r.z0) * sc2);
@@ -5424,7 +5813,9 @@ function drawMapTo(ctx, S, cx, cz, range, detail) {
   }
   for (let i = 0; i < cars.length; i++) {
     const c = cars[i], x = X(c.x), z = Z(c.z); if (x < -4 || x > S + 4 || z < -4 || z > S + 4) continue;
-    ctx.fillStyle = c.wreck ? '#555' : c.hum ? '#ff8a1e' : (c.occId.some(v => v >= 0) ? '#4aff7a' : '#ffd23a'); if (c.hum && !c.wreck) ctx.fillRect(x - 4, z - 4, 8, 8); else ctx.fillRect(x - 2, z - 2, 4, 4);
+    ctx.fillStyle = c.wreck ? '#555' : c.hum ? '#ff8a1e' : c.boat ? '#7ae8ff' : c.heli ? '#ffffff' : (c.occId.some(v => v >= 0) ? '#4aff7a' : '#ffd23a');
+    if (c.heli && !c.wreck) { ctx.fillRect(x - 5, z - 5, 10, 10); ctx.fillStyle = '#c0392b'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('H', x, z + 0.5); }
+    else if ((c.hum || c.boat) && !c.wreck) ctx.fillRect(x - 4, z - 4, 8, 8); else ctx.fillRect(x - 2, z - 2, 4, 4);
   }
   if ((NET.tn || 1) > 1) {
     ctx.fillStyle = '#4ab0ff';
@@ -5609,7 +6000,7 @@ function renderLobby(extra) {
     add('div', 'link', '링크: ' + inviteLink());
     add('div', '', '참가자 (' + Object.keys(NET.names).length + '/' + MAX_PLAYERS + ') · 나머지 자리는 봇이 채웁니다');
   } else if (NET.mode === 'client') add('div', '', '방 ' + NET.code + ' 입장 완료 · 방장이 시작하면 자동으로 시작됩니다');
-  if (ZM.sel) add('div', '', '모드: 🧟 좀비 생존 — 생존자 10명 (부족한 자리는 AI 동료)'); else add('div', '', '팀 인원: ' + ['', '솔로', '듀오', '트리오', '스쿼드(4)'][NET.teamN || 1]);
+  if (ZM.sel) add('div', '', '모드: 🧟 좀비 생존 · 난이도 ' + ZM.lv + '단계 (좀비 ' + zmBase() + '마리) — 생존자 10명, 부족한 자리는 AI 동료'); else add('div', '', '팀 인원: ' + ['', '솔로', '듀오', '트리오', '스쿼드(4)'][NET.teamN || 1]);
   if (extra) add('div', '', extra);
   const wrap = document.createElement('div');
   for (const id in NET.names) { const sp = document.createElement('span'); sp.className = 'pl'; sp.textContent = (id == 0 ? '👑 ' : '') + NET.names[id]; wrap.appendChild(sp); }
@@ -5667,9 +6058,9 @@ function onClientMsg(conn, m) {
       conn.pid = NET.nextPid++; conn.nick = String(m.nick || 'PLAYER').slice(0, 10);
       NET.conns.push(conn);
       NET.names = lobbyNames();
-      netSend(conn, { t: 'welcome', id: conn.pid, names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0 });
+      netSend(conn, { t: 'welcome', id: conn.pid, names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0, zl: ZM.lv });
       if (NET.live && (state === 'playing' || state === 'over')) netSend(conn, { t: 'busy' });
-      netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0 }); renderLobby();
+      netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0, zl: ZM.lv }); renderLobby();
       break;
     case 'pog': conn.rtt = Math.round(performance.now() - m.ts); conn.seen = performance.now(); break;
     case 'st':
@@ -5679,8 +6070,8 @@ function onClientMsg(conn, m) {
       if (Array.isArray(m.rs) && m.rs.length >= 3) { rp.res.ar = clamp(m.rs[0] | 0, 0, 999); rp.res.sr = clamp(m.rs[1] | 0, 0, 999); rp.res.pi = clamp(m.rs[2] | 0, 0, 999); rp.res.sh = clamp(m.rs[3] | 0, 0, 999); rp.res.rk = clamp(m.rs[4] | 0, 0, 99); }
       if (rp.drv) {
         const c = rp.drv;
-        if (rp.seat === 0 && Array.isArray(m.ci)) { c.in.th = clamp(+m.ci[0] || 0, -1, 1); c.in.sr = clamp(+m.ci[1] || 0, -1, 1); c.in.br = m.ci[2] ? 1 : 0; c.inT = performance.now(); }
-        rp.net.x = c.x; rp.net.z = c.z; rp.net.y = 0;
+        if (rp.seat === 0 && Array.isArray(m.ci)) { c.in.th = clamp(+m.ci[0] || 0, -1, 1); c.in.sr = clamp(+m.ci[1] || 0, -1, 1); c.in.br = clamp(m.ci[2] | 0, 0, 2); c.inT = performance.now(); }
+        rp.net.x = c.x; rp.net.z = c.z; rp.net.y = c.heli ? c.y : 0;
       } else if (rp.tur && rp.tur.car) { rp.net.x = rp.tur.sx; rp.net.z = rp.tur.sz; rp.net.y = GUN_Y; }
       break;
     case 'ping':
@@ -5695,9 +6086,9 @@ function onClientMsg(conn, m) {
       if (m.a === 'in') {
         const c = cars[m.c | 0]; if (!c || c.wreck || rp.drv || rp.tur) return;
         const idx = c.occId.indexOf(-1); if (idx < 0 || !carOpenFor(c, rp.team)) return;
-        if (Math.hypot(c.x - rp.pos.x, c.z - rp.pos.z) > 7) return;
+        if (Math.hypot(c.x - rp.pos.x, c.z - rp.pos.z) > 8 || (c.heli && c.y > 2.5)) return;
         seatTake(c, rp, idx); if (idx === 0) { c.in.th = c.in.sr = c.in.br = 0; c.inT = performance.now(); }
-      } else if (m.a === 'out') { if (rp.drv) dismount(rp, rp.drv); }
+      } else if (m.a === 'out') { if (rp.drv && !(rp.drv.heli && rp.drv.y > 2.5)) dismount(rp, rp.drv); }
       break;
     case 'f': hostFire(rp, m, false); break;
     case 'k': hostFire(rp, m, true); break;
@@ -5714,7 +6105,7 @@ function onClientLeave(conn) {
   if (rp && rp.drv) releaseDriver(rp);
   if (rp && rp.tur) releaseTurret(rp);
   if (rp && rp.alive) { rp.alive = false; rp.hp = 0; rp.deathT = 0; dropLoot(rp); feed(rp.name + ' — 연결 끊김'); }
-  NET.names = lobbyNames(); netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0 }); renderLobby();
+  NET.names = lobbyNames(); netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0, zl: ZM.lv }); renderLobby();
 }
 function spawnRemote(c) {
   const mesh = makeHuman(SHIRTS[c.pid % SHIRTS.length], 0x2a3a5a, 0x3b4a2a);
@@ -5873,7 +6264,7 @@ function hostSnapshot() {
     const cr = [];
     for (let k = 0; k < cars.length; k++) {
       const q = cars[k]; if (Math.abs(q.x - px) > 400 || Math.abs(q.z - pz) > 400) continue;
-      cr.push(q.id, r1(q.x), r1(q.z), Math.round(q.yaw * 100) / 100, Math.round(q.hp), q.tires[0] | (q.tires[1] << 1) | (q.tires[2] << 2) | (q.tires[3] << 3) | (q.wreck ? 16 : 0), q.occId[0], q.occId[1], q.occId[2], q.occId[3], Math.round(q.v * 10) / 10);
+      cr.push(q.id, r1(q.x), r1(q.z), Math.round(q.yaw * 100) / 100, Math.round(q.hp), q.tires[0] | (q.tires[1] << 1) | (q.tires[2] << 2) | (q.tires[3] << 3) | (q.wreck ? 16 : 0), q.occId[0], q.occId[1], q.occId[2], q.occId[3], Math.round(q.v * 10) / 10, Math.round((q.y || 0) * 10) / 10);
     }
     const tm = [];
     for (let k = 0; k < entities.length; k++) { const q = entities[k]; if (q !== rp && q.team === rp.team) tm.push(q === player ? 0 : q.id, Math.max(0, Math.round(q.hp))); }
@@ -5905,7 +6296,7 @@ function hostStartBroadcast() {
 
 /* ---- 참가자 ---- */
 function setupJoinUI(noAuto) {
-  $('joinRow').style.display = 'none'; $('gmSel').style.display = 'none'; $('startBtn').style.display = 'none'; $('hostBtn').style.display = 'none'; $('teamSel').style.display = 'none'; $('envBox').style.display = 'none';
+  $('joinRow').style.display = 'none'; $('gmSel').style.display = 'none'; $('zlSel').style.display = 'none'; $('startBtn').style.display = 'none'; $('hostBtn').style.display = 'none'; $('teamSel').style.display = 'none'; $('envBox').style.display = 'none';
   const box = $('mpInfo'); box.textContent = '';
   const t = document.createElement('div'); t.textContent = '초대받은 방 코드: ' + NET.code; box.appendChild(t);
   if (typeof Peer === 'undefined') { mpMsg('멀티플레이 모듈(PeerJS)을 불러오지 못했습니다. 인터넷 연결을 확인하세요.'); return; }
@@ -5953,8 +6344,8 @@ function onHostMsg2(m) {
   if (!m || typeof m !== 'object') return;
   switch (m.t) {
     case 'items': (m.a || []).forEach(a => { if (!itemById[a[0]]) makeItem(a[1], a[2], a[3], a[4], a[5], a[6], a[0]); }); break;
-    case 'welcome': ZM.sel = !!m.zm; refreshGm(); NET.myId = m.id; NET.teamN = m.tn || 1; NET.names = m.names || {}; renderLobby(); break;
-    case 'lobby': ZM.sel = !!m.zm; refreshGm(); NET.teamN = m.tn || 1; NET.names = m.names || {}; if (state === 'menu') renderLobby(); break;
+    case 'welcome': ZM.sel = !!m.zm; ZM.lv = m.zl || 2; refreshGm(); NET.myId = m.id; NET.teamN = m.tn || 1; NET.names = m.names || {}; renderLobby(); break;
+    case 'lobby': ZM.sel = !!m.zm; ZM.lv = m.zl || 2; refreshGm(); NET.teamN = m.tn || 1; NET.names = m.names || {}; if (state === 'menu') renderLobby(); break;
     case 'full': mpMsg('방이 가득 찼습니다.'); break;
     case 'busy': renderLobby('게임이 진행 중입니다. 다음 판부터 참가합니다.'); break;
     case 'start': clientStart(m); break;
@@ -6107,7 +6498,8 @@ const ZT = [
   { n: '군인 좀비', hp: 230, spd: 1.2, run: 3.3, det: 44, dmg: 34, cd: 1.35, reach: 1.7, helm: 2, vest: 2, col: [0x3d4a2c, 0x2b3322, 0x3a4230, 0x6b8060] },
   { n: '신속 좀비', hp: 70, spd: 2.4, run: 7.6, det: 58, dmg: 13, cd: 0.55, reach: 1.5, helm: 0, vest: 0, col: [0x7a2a2a, 0x3a3028, 0x2a2a2a, 0xa7a878] }
 ];
-const ZM_BASE = 130, ZVIS = 150;
+const ZVIS = 150;
+const zmBase = () => ZM_LV[ZM.lv - 1] || 130;
 function makeZombieMesh(zt) {
   const T = ZT[zt], m = makeHuman(T.col[0], T.col[1], T.col[2], T.col[3]), u = m.userData;
   setArmedVisual(m, false); u.knife.visible = false; u.zt = zt;
@@ -6165,7 +6557,7 @@ function zmSpawnAway(minD, zt) {
   }
   return null;
 }
-function zmSpawnInit() { ZM.kills = 0; ZM.zc = 0; ZM.spawnT = 2; ZM.hordeT = 55; ZM.cleanT = 2; ZM.warned = false; ZM.done = false; for (let i = 0; i < ZM_BASE; i++) zmSpawnAway(55); }
+function zmSpawnInit() { ZM.kills = 0; ZM.zc = 0; ZM.spawnT = 2; ZM.hordeT = 55; ZM.cleanT = 2; ZM.warned = false; ZM.done = false; for (let i = 0; i < zmBase(); i++) zmSpawnAway(55); }
 function zmMakeAlly(b, i) {
   const p = zmSlotPos(NET.nh + i);
   b.air = false; b.dropState = 'landed'; b.pos.set(p.x, 0, p.z); b.canopy = null; b.fallT = 0; b.name = 'ALLY-' + String(i + 1).padStart(2, '0'); b.yaw = rand(0, Math.PI * 2);
@@ -6302,7 +6694,7 @@ function zmTick(dt) {
     ZM.spawnT = 0.5; let alive = 0;
     for (let i = 0; i < bots.length; i++) if (bots[i].zom && bots[i].alive) alive++;
     ZM.zc = alive;
-    const cap = ZM_BASE + Math.floor(gameTime / 60) * 8;
+    const cap = zmBase() + Math.floor(gameTime / 60) * Math.round(zmBase() * 0.06);
     for (let k = 0; k < Math.min(2, cap - alive); k++) zmSpawnAway(90);
   }
   ZM.hordeT -= dt; if (ZM.hordeT <= 0) { ZM.hordeT = 60; zmHorde(); }
@@ -6388,7 +6780,7 @@ function resetGame(m) {
   buildTeams();
   state = 'playing';
   $('endOverlay').style.display = 'none';
-  if (ZM.on) toast('🧟 좀비 생존 — 생존자 10명 · ' + fmtTime(ZM.T) + ' 동안 버티면 구조 헬기 도착! (총소리는 좀비를 부릅니다)', 8000);
+  if (ZM.on) toast('🧟 좀비 생존 ' + ZM.lv + '단계 (' + zmBase() + '마리) — 생존자 10명 · ' + fmtTime(ZM.T) + ' 동안 버티면 구조 헬기 도착! (총소리는 좀비를 부릅니다)', 8000);
   else toast('수송기 탑승! M: 지도로 항로 확인 → F: 원하는 곳에서 낙하', 6000);
   feedLocal('🌍 오늘의 환경: ' + envLabel() + (ENV.night ? ' (L: 손전등)' : ''));
 }
@@ -6642,21 +7034,27 @@ function refreshEnvUI() {
 
 function refreshGm() {
   document.querySelectorAll('#gmSel button').forEach(b => b.classList.toggle('on', (b.dataset.g === 'zm') === ZM.sel));
-  $('teamSel').style.display = ZM.sel ? 'none' : '';
+  $('teamSel').style.display = ZM.sel ? 'none' : ''; $('zlSel').style.display = ZM.sel ? '' : 'none';
+  document.querySelectorAll('#zlSel button').forEach(b => b.classList.toggle('on', +b.dataset.l === ZM.lv));
   if (typeof renderLobby === 'function' && NET.mode !== 'solo' && state === 'menu') renderLobby();
 }
 document.querySelectorAll('#gmSel button').forEach(b => b.addEventListener('click', () => {
   if (NET.mode === 'client' || NET.pendingJoin) return;
   ZM.sel = b.dataset.g === 'zm'; try { localStorage.setItem('bg3d_gm', ZM.sel ? 'zm' : 'br'); } catch (e) { }
-  refreshGm(); if (NET.mode === 'host') netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0 });
+  refreshGm(); if (NET.mode === 'host') netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0, zl: ZM.lv });
 }));
-try { ZM.sel = localStorage.getItem('bg3d_gm') === 'zm'; } catch (e) { }
+document.querySelectorAll('#zlSel button').forEach(b => b.addEventListener('click', () => {
+  if (NET.mode === 'client' || NET.pendingJoin) return;
+  ZM.lv = +b.dataset.l; try { localStorage.setItem('bg3d_zl', String(ZM.lv)); } catch (e) { }
+  refreshGm(); if (NET.mode === 'host') netAll({ t: 'lobby', names: NET.names, tn: NET.teamN, zm: ZM.sel ? 1 : 0, zl: ZM.lv });
+}));
+try { ZM.sel = localStorage.getItem('bg3d_gm') === 'zm'; ZM.lv = clamp(+(localStorage.getItem('bg3d_zl') || 2) | 0, 1, 3); } catch (e) { }
 refreshGm();
 function setTeamN(n) {
   NET.teamN = n;
   document.querySelectorAll('#teamSel button').forEach(b => b.classList.toggle('on', +b.dataset.n === n));
   try { localStorage.setItem('bg3d_team', String(n)); } catch (e) { }
-  if (NET.mode === 'host') { netAll({ t: 'lobby', names: NET.names, tn: n, zm: ZM.sel ? 1 : 0 }); renderLobby(); }
+  if (NET.mode === 'host') { netAll({ t: 'lobby', names: NET.names, tn: n, zm: ZM.sel ? 1 : 0, zl: ZM.lv }); renderLobby(); }
 }
 document.querySelectorAll('#teamSel button').forEach(b => b.addEventListener('click', () => { if (NET.mode === 'client' || NET.pendingJoin) return; setTeamN(+b.dataset.n); }));
 try { setTeamN(clamp(+(localStorage.getItem('bg3d_team') || 1) | 0, 1, 4)); } catch (e) { setTeamN(1); }
@@ -6813,7 +7211,7 @@ function enterMobile() {
   btn('tbFire', t => { if (bigMapOpen) return; fireId = t.identifier; mouseDown = true; $('tbFire').classList.add('on'); if (lookId === null) { lookId = t.identifier; lookX = t.clientX; lookY = t.clientY; } });
   btn('tbAds', () => { if (player.hasGun && player.alive && !player.air && !bigMapOpen) aiming = !aiming; });
   btn('tbJump', () => sendKey('Space', 'keydown'), () => sendKey('Space', 'keyup'));
-  btn('tbCrouch', () => tap('KeyC')); btn('tbProne', () => tap('KeyZ')); btn('tbReload', () => tap('KeyR'));
+  btn('tbCrouch', () => { if (player.drv && player.drv.heli) heliDown = !heliDown; else tap('KeyC'); }); btn('tbProne', () => tap('KeyZ')); btn('tbReload', () => tap('KeyR'));
   btn('tbE', () => tap('KeyE')); btn('tbF', () => tap('KeyF'));
   let dropT = 0;
   const dropAct = e => {
@@ -6856,6 +7254,7 @@ function loop(now) {
     updateDropWorld(dt);
     if (state === 'playing' && player.alive) updatePlayer(dt);
     if (state === 'playing') specUpdate(dt);
+    updateWater(dt);
     updateCars(dt);
     if (NET.mode !== 'client' && !drop.planeActive && !ZM.on) updateZone(dt);
     if (NET.mode !== 'client' && zoneOn() && player.alive && !player.air && Math.hypot(player.pos.x, player.pos.z) > zone.r) {
