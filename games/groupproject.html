@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>조별과제 무임승차 잔혹사 (Group Project Survival RPG - 중학생 편)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #0f172a;
+      color: #e2e8f0;
+      user-select: none;
+    }
+    
+    .font-fun {
+      font-family: 'Gamja Flower', cursive;
+    }
+
+    /* KakaoTalk Dark Theme Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    /* Speech bubble tails */
+    .chat-bubble-left::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: -8px;
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-right: 10px solid #334155;
+      border-bottom: 6px solid transparent;
+    }
+
+    .chat-bubble-right::after {
+      content: '';
+      position: absolute;
+      top: 10px;
+      right: -8px;
+      width: 0;
+      height: 0;
+      border-top: 6px solid transparent;
+      border-left: 10px solid #facc15;
+      border-bottom: 6px solid transparent;
+    }
+
+    .stat-bar {
+      transition: width 0.5s ease-out, background-color 0.3s;
+    }
+  </style>
+</head>
+<body class="h-screen flex flex-col justify-between overflow-hidden antialiased bg-slate-950 text-slate-100">
+
+  <!-- MODE SELECTION MODAL (Initial Screen) -->
+  <div id="mode-select-modal" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-slate-900 border-2 border-yellow-500/50 rounded-2xl p-6 shadow-2xl text-center space-y-5">
+      <div class="text-4xl animate-bounce">🏫</div>
+      <h1 class="text-2xl md:text-3xl font-black text-yellow-400 font-fun tracking-wider">
+        중학생 조별과제 무임승차 잔혹사
+      </h1>
+      <p class="text-xs md:text-sm text-slate-300 leading-relaxed">
+        어쩌다 보니 네가 <span class="text-yellow-400 font-bold">조장</span>이 됐다!<br>
+        무임승차하는 민수, 나무위키 통째 복붙하는 도윤이, 툭하면 삐치는 에이스 서진이 사이에서 과제를 성공시킬 수 있을까?
+      </p>
+
+      <div class="space-y-3 pt-2">
+        <button id="btn-mode-craft" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base border border-emerald-400/30">
+          <i class="fa-solid fa-scissors text-lg"></i>
+          <span>[기술가정/과학] 우드락 만들기 모드</span>
+        </button>
+        <button id="btn-mode-ppt" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-sm md:text-base border border-blue-400/30">
+          <i class="fa-solid fa-file-powerpoint text-lg"></i>
+          <span>[사회/국어] PPT 발표 모드</span>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-slate-500">※ 조원들의 대화는 100% 중학생 찐 반말로 진행됩니다.</p>
+    </div>
+  </div>
+
+  <!-- TOP HEADER / STATS BAR -->
+  <header class="bg-slate-900 border-b border-slate-800 p-3 shadow-md z-10 flex-shrink-0">
+    <div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+      
+      <!-- Game Title & Day Counter -->
+      <div class="flex items-center justify-between w-full md:w-auto gap-4">
+        <div class="flex items-center space-x-2">
+          <span class="text-yellow-400 text-lg md:text-xl font-black font-fun">📢 조별과제 잔혹사</span>
+          <span id="game-mode-badge" class="bg-slate-800 text-slate-300 text-[10px] px-2 py-0.5 rounded border border-slate-700">모드</span>
+        </div>
+        <div class="bg-red-900/80 text-red-200 border border-red-700 font-bold px-3 py-1 rounded-full text-xs md:text-sm animate-pulse" id="d-day-badge">
+          D-7 (제출 7일 전)
+        </div>
+      </div>
+
+      <!-- 3 Major Stats -->
+      <div class="w-full md:w-auto grid grid-cols-3 gap-2 md:gap-4 text-xs font-semibold">
+        <!-- 과제 완성도 -->
+        <div class="bg-slate-800 p-2 rounded-lg border border-slate-700 flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-blue-400"><i class="fa-solid fa-list-check mr-1"></i>완성도</span>
+            <span id="stat-completion-val" class="font-bold text-blue-300">0%</span>
+          </div>
+          <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+            <div id="stat-completion-bar" class="stat-bar bg-blue-500 h-full w-0"></div>
+          </div>
+        </div>
+
+        <!-- 결과물 퀄리티 -->
+        <div class="bg-slate-800 p-2 rounded-lg border border-slate-700 flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-emerald-400" id="stat-quality-label"><i class="fa-solid fa-star mr-1"></i>퀄리티</span>
+            <span id="stat-presentation-val" class="font-bold text-emerald-300">0%</span>
+          </div>
+          <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+            <div id="stat-presentation-bar" class="stat-bar bg-emerald-500 h-full w-0"></div>
+          </div>
+        </div>
+
+        <!-- 내 멘탈 -->
+        <div class="bg-slate-800 p-2 rounded-lg border border-slate-700 flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-rose-400"><i class="fa-solid fa-brain mr-1"></i>내 멘탈</span>
+            <span id="stat-mental-val" class="font-bold text-rose-300">100%</span>
+          </div>
+          <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden">
+            <div id="stat-mental-bar" class="stat-bar bg-rose-500 h-full w-[100%]"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-5xl w-full mx-auto flex overflow-hidden p-2 md:p-4 gap-4">
+    
+    <!-- LEFT SIDEBAR: TEAM MEMBER STATUS -->
+    <aside class="hidden lg:flex flex-col w-64 bg-slate-900 border border-slate-800 rounded-xl p-3 flex-shrink-0">
+      <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+        <span><i class="fa-solid fa-users mr-2 text-yellow-500"></i>우리 조원들 (4명)</span>
+      </h2>
+      <div class="space-y-3 overflow-y-auto pr-1 flex-1 text-xs" id="team-status-list">
+        <!-- Dynamically Generated -->
+      </div>
+    </aside>
+
+    <!-- CENTER GAME AREA: KakaoTalk Styled Chat -->
+    <section class="flex-1 bg-slate-900 border border-slate-800 rounded-xl flex flex-col overflow-hidden shadow-2xl relative">
+      
+      <!-- Chat Room Header -->
+      <div class="bg-slate-800/90 px-4 py-3 border-b border-slate-700 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-full bg-yellow-500 text-slate-950 font-black flex items-center justify-center text-sm shadow font-fun">
+            3조
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-100 text-sm md:text-base flex items-center gap-2" id="chatroom-title">
+              2학년 3반 조별과제 단톡방 (4명)
+            </h3>
+            <p class="text-xs text-slate-400" id="chatroom-topic">주제 설정 중...</p>
+          </div>
+        </div>
+
+        <button id="toggle-mobile-team" class="lg:hidden bg-slate-700 text-slate-200 px-2 py-1 rounded text-xs hover:bg-slate-600">
+          <i class="fa-solid fa-users mr-1"></i>조원 보기
+        </button>
+      </div>
+
+      <!-- Messages / Logs Container -->
+      <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950/70">
+        <div class="text-center my-2">
+          <span class="bg-slate-800/80 text-slate-400 text-xs px-3 py-1 rounded-full border border-slate-700/50">
+            📢 단톡방이 생성되었습니다. 제출일까지 7일 남았습니다.
+          </span>
+        </div>
+      </div>
+
+      <!-- ACTION CONTROLS / CHOICE BUTTONS -->
+      <div class="bg-slate-900 border-t border-slate-800 p-3 flex-shrink-0">
+        <div id="action-header" class="text-xs text-yellow-400 font-semibold mb-2 flex items-center gap-1">
+          <i class="fa-solid fa-hand-pointer animate-bounce"></i> 오늘 너의 선택은?
+        </div>
+        
+        <div id="choices-container" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <!-- Dynamic Action Buttons -->
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MOBILE TEAM MEMBERS MODAL -->
+  <div id="mobile-team-modal" class="fixed inset-0 bg-black/70 z-50 flex justify-center items-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl w-full max-w-sm p-4 text-slate-100 space-y-3">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <h3 class="font-bold text-sm text-yellow-400"><i class="fa-solid fa-users mr-2"></i>조원 상태</h3>
+        <button id="close-mobile-team" class="text-slate-400 hover:text-slate-100 text-lg">&times;</button>
+      </div>
+      <div id="mobile-team-status-list" class="space-y-3 text-xs max-h-80 overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- ENDING SCREEN MODAL -->
+  <div id="ending-modal" class="fixed inset-0 bg-slate-950/95 z-50 flex items-center justify-center p-4 hidden">
+    <div class="max-w-lg w-full bg-slate-900 border-2 border-yellow-500/50 rounded-2xl p-6 shadow-2xl text-center space-y-5 relative overflow-hidden">
+      
+      <div id="ending-badge" class="inline-block px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest bg-yellow-500 text-slate-950">
+        ENDING UNLOCKED
+      </div>
+
+      <h1 id="ending-title" class="text-2xl md:text-3xl font-black text-yellow-400 font-fun">
+        엔딩 제목
+      </h1>
+
+      <div class="w-full flex justify-center my-3">
+        <div id="ending-icon" class="text-6xl text-yellow-400">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+      </div>
+
+      <p id="ending-description" class="text-sm md:text-base text-slate-300 leading-relaxed font-light whitespace-pre-line bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+        엔딩 설명
+      </p>
+
+      <!-- Final Stats Summary -->
+      <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60 text-xs grid grid-cols-3 gap-2">
+        <div>
+          <span class="text-slate-400 block">완성도</span>
+          <span id="end-stat-comp" class="font-bold text-blue-400 text-base">0%</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block" id="end-stat-qual-label">퀄리티</span>
+          <span id="end-stat-pres" class="font-bold text-emerald-400 text-base">0%</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block">최종 멘탈</span>
+          <span id="end-stat-ment" class="font-bold text-rose-400 text-base">0%</span>
+        </div>
+      </div>
+
+      <button id="btn-restart" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 text-slate-950 font-bold rounded-xl shadow-lg hover:brightness-110 transition active:scale-95 text-sm md:text-base">
+        <i class="fa-solid fa-rotate-right mr-2"></i>처음 모드 선택으로 돌아가기
+      </button>
+
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // GAME STATE & DATA STRUCTURES
+    // ==========================================
+    const gameState = {
+      mode: 'CRAFT', // 'CRAFT' or 'PPT'
+      day: 7,
+      stats: {
+        completion: 10,
+        presentation: 10,
+        mental: 100
+      },
+      members: {
+        minsu: {
+          name: "민수 (무임승차러)",
+          avatar: "😎",
+          role: "재료준비 / 자료조사",
+          status: "잠수 중",
+          stress: 0,
+          contribution: 0,
+          desc: "학원, 롤 랭게임, 축구부 핑계로 맨날 잠수 타는 무임승차 전문 녀석."
+        },
+        doyun: {
+          name: "도윤 (나무위키 마스터)",
+          avatar: "🤓",
+          role: "만들기 돕기 / PPT 작성",
+          status: "위키 복붙 완료",
+          stress: 10,
+          contribution: 20,
+          desc: "5분 만에 숙제 끝냈다며 나무위키/블로그 통째로 복붙해 오거나 이상하게 칼질해 오는 녀석."
+        },
+        seojin: {
+          name: "서진 (예민한 에이스)",
+          avatar: "😤",
+          role: "색칠 및 데코 / 발표",
+          status: "손절각 재는 중",
+          stress: 40,
+          contribution: 30,
+          desc: "전교 상위권이라 성적에 예민함. 조원들 트롤짓 하면 바로 선생님한테 고자질 위협."
+        }
+      },
+      isGameOver: false
+    };
+
+    // Mode 1: CRAFT (기술가정/과학 만들기 과제)
+    const craftEvents = {
+      7: {
+        banner: "D-7 : 만들기 조장 선출 & 우드락 주제 정하기",
+        chatIntro: { text: "기술가정 시간에 교과서 팝업 다리/건축물 만들기 과제가 시작되었다. 네가 조장이다!" },
+        morningMessages: [
+          { sender: "민수", text: "야 나 오늘 수학 학원 칼퇴라 재료는 너네가 사 오면 안 됨? 돈은 입금함 ㅋㅋㅋ" },
+          { sender: "도윤", text: "나 나무위키에서 '에펠탑 만들기' 쳐보니까 5분 만에 만드는 법 나옴! 개쉬움 ㅋ" },
+          { sender: "서진", text: "너네 수행평가 점수 깎이기만 해라. 진짜 쌤한테 다 말한다..." }
+        ],
+        choices: [
+          {
+            title: "민수한테 준비물(우드락, 본드, 칼) 사 오라고 빡세게 시키기",
+            desc: "민수를 어떻게든 굴려보려 시도한다.",
+            effect: () => {
+              updateStats(5, 0, -10);
+              gameState.members.minsu.contribution += 10;
+              addChatMessage("나(조장)", "민수야 학원 끝나고 문구점 들러서 우드락이랑 순간접착제 사 와라 꼭!", true);
+              addChatMessage("민수", "아... 진짜 바쁜데... 일단 알았음... (안 살 확률 90%)");
+            }
+          },
+          {
+            title: "도윤이한테 제대로 된 설명서 찾아오라고 지시하기",
+            desc: "이상한 것 안 가져오게 가이드라인을 준다.",
+            effect: () => {
+              updateStats(10, 5, -5);
+              gameState.members.doyun.contribution += 15;
+              addChatMessage("나(조장)", "도윤아 나무위키 말고 네이버 블로그에 '우드락 도면' 제대로 된 거 찾아봐!", true);
+              addChatMessage("도윤", "오오 오케이! 블로그 캡처해서 카톡으로 보냄 ㅋ");
+            }
+          },
+          {
+            title: "서진이 좋아하는 간식 사주며 달래기",
+            desc: "서진이의 기분을 맞춰서 에이스 탈주를 막는다.",
+            effect: () => {
+              updateStats(0, 15, -5);
+              gameState.members.seojin.stress = Math.max(0, gameState.members.seojin.stress - 20);
+              addChatMessage("나(조장)", "서진아 매점에서 마이쮸 사줄 테니까 디자인은 네가 좀 도와줘 ㅠㅠ", true);
+              addChatMessage("서진", "음... 오케이. 우드락 겉에 색칠이랑 마감은 내가 깔끔하게 해줌.");
+            }
+          },
+          {
+            title: "내가 직접 문구점 가서 우드락 재료 다 사 오기",
+            desc: "내 사비와 멘탈을 갈아 넣는다.",
+            effect: () => {
+              updateStats(20, 5, -20);
+              addChatMessage("나(조장)", "얘들아 내가 문구점 가서 알파문구 우드락이랑 락카 다 사 올게.", true);
+              addChatMessage("서진", "오~ 조장 추진력 좀 있네. 이대로 가자.");
+            }
+          }
+        ]
+      },
+      6: {
+        banner: "D-6 : 우드락 1차 자르기 공작 작업",
+        chatIntro: { text: "방과 후 교실에 남아 우드락 뼈대를 자르기로 한 날이다." },
+        morningMessages: [
+          { sender: "도윤", text: "야 나 칼질 개잘함!! 5분 만에 다 잘라왔다 봐라 [삐뚤빼뚤 찌그러진 우드락 사진]" },
+          { sender: "서진", text: "도윤아 미쳤냐?? 직각 하나도 안 맞잖아!! 조장아 이것 좀 봐봐!!" },
+          { sender: "민수", text: "(읽음 3) ... (디스코드에서 피파 하는 중)" }
+        ],
+        choices: [
+          {
+            title: "민수 디스코드 접속한 거 잡아서 학교로 호출하기",
+            desc: "민수를 억지로 끌고 온다.",
+            effect: () => {
+              updateStats(5, 0, -20);
+              gameState.members.minsu.stress += 30;
+              addChatMessage("나(조장)", "야 강민수 피파 끄고 5분 안에 미술실로 튀어와라 진짜 맞는다", true);
+              addChatMessage("민수", "아 왜 ㅠㅠ 알았어 이번 판만 하고 감 ㅡㅡ");
+            }
+          },
+          {
+            title: "도윤이가 삐뚤빼뚤 깎은 우드락 내가 사포로 다듬기",
+            desc: "망친 우드락 조각을 내가 묵묵히 수정한다.",
+            effect: () => {
+              updateStats(20, 10, -25);
+              gameState.members.doyun.contribution += 10;
+              addChatMessage("나(조장)", "도윤아... 노력은 고마운데 사포로 모서리 좀 다시 갈아볼게 ㅠㅠ", true);
+              addChatMessage("도윤", "올 역시 조장 ㅋ 내 칼질 느낌 살아있지?");
+            }
+          },
+          {
+            title: "서진이한테 건물의 메인 기둥 자르기 전담시키기",
+            desc: "에이스의 정밀한 정밀도를 활용한다.",
+            effect: () => {
+              updateStats(5, 20, -10);
+              gameState.members.seojin.contribution += 15;
+              addChatMessage("나(조장)", "서진아 칼선 정밀한 건 네가 제일 잘하니까 메인 기둥 자르는 것 좀 부탁해!", true);
+              addChatMessage("서진", "역시 나밖에 없지? 버니어캘리퍼스로 치수 재서 정확하게 잘라줌.");
+            }
+          },
+          {
+            title: "매점 가서 포켓몬빵 먹고 오기",
+            desc: "에라 모르겠다 일단 쉬자.",
+            effect: () => {
+              updateStats(0, 0, 25);
+              addChatMessage("나(조장)", "(매점으로 야반도주)", true);
+              addChatMessage("서진", "조장 어디 감?? 도윤이 칼질 똥 싸지른 거 어쩔 건데!!");
+            }
+          }
+        ]
+      },
+      5: {
+        banner: "D-5 : 접착제 대참사 발생!",
+        chatIntro: { text: "⚡ [돌발] 순간접착제 부으려다가 우드락이 녹아내렸다!" },
+        morningMessages: [
+          { sender: "도윤", text: "헐 야 어떡함 ㅋㅋㅋㅋ 순간접착제 짰는데 우드락 구멍 뚫림 ㅋㅋㅋㅋ 녹아내린다 ㅋㅋㅋㅋ" },
+          { sender: "서진", text: "야 이 도윤 미친놈아!! 우드락엔 우드락 전용 본드 써야지 순간접착제 쓰면 어떡해!!" },
+          { sender: "민수", text: "ㅋㅋㅋㅋㅋㅋ 멸망전 개꿀잼" }
+        ],
+        choices: [
+          {
+            title: "녹아내린 부분 파츠 지우개와 찰흙으로 때우기",
+            desc: "임기응변으로 구멍을 메운다.",
+            effect: () => {
+              updateStats(15, -5, -15);
+              addChatMessage("나(조장)", "지우개 깎아서 구멍 메우고 폼코트 덧칠하자!! 긴급 처방이다!", true);
+              addChatMessage("서진", "휴... 그래도 티 살짝 나는데 오공본드로 마감 다시 하자.");
+            }
+          },
+          {
+            title: "민수한테 '너 아무것도 안 했으니까 문구점 가서 전용 본드 사 와' 명령",
+            desc: "민수에게 실질적 미션을 준다.",
+            effect: () => {
+              updateStats(10, 5, -10);
+              gameState.members.minsu.contribution += 15;
+              addChatMessage("나(조장)", "민수야 너 양심이 있으면 지금 문구점 가서 우드락본드랑 테이프 사 와라", true);
+              addChatMessage("민수", "아 자전거 타고 다녀옴 ㅡㅡ 사 오면 나 오늘 과제 다 한 거다?");
+            }
+          },
+          {
+            title: "멘붕 온 서진이 멘탈 케어해 주기",
+            desc: "서진이가 울면서 집에 가려는 것을 막는다.",
+            effect: () => {
+              updateStats(0, 15, -15);
+              gameState.members.seojin.stress = 10;
+              addChatMessage("나(조장)", "서진아 울지마 ㅠㅠ 내가 밤새서 녹은 부분 파츠 다시 잘라올게!", true);
+              addChatMessage("서진", "진짜... 나 수행평가 감점 나오면 우울증 걸린단 말이야...");
+            }
+          },
+          {
+            title: "도윤이 꿀밤 때리고 자 도면 다시 그리게 하기",
+            desc: "원인 제공자 도윤이를 구른다.",
+            effect: () => {
+              updateStats(10, 0, -5);
+              gameState.members.doyun.contribution += 10;
+              addChatMessage("나(조장)", "도윤아 장난치지 말고 2번 파츠 도면 다시 그려라 ㅡㅡ", true);
+              addChatMessage("도윤", "넵... 죄송함다 자 대고 똑바로 그릴게요.");
+            }
+          }
+        ]
+      },
+      4: {
+        banner: "D-4 : 기술선생님의 중간점검!",
+        chatIntro: { text: "📢 기술 선생님이 기가 시간에 3조 우드락 조형물 중간 점검을 실시했다!" },
+        morningMessages: [
+          { sender: "서진", text: "쌤이 우리 조 보더니 '이건 모형이 아니라 폐자재 쓰레기 더미냐?' 라고 하셨음... 망함..." },
+          { sender: "도윤", text: "쌤 너무하네 ㅋ 나름 빈티지 감성인데" },
+          { sender: "민수", text: "쌤 저 오늘 축구부 훈련 있어서 방과 후 못 남아용 ㅂㅇ" }
+        ],
+        choices: [
+          {
+            title: "선생님께 포기하지 않고 순발력 입털기로 컨셉 설명하기",
+            desc: "조장의 화술로 위기를 모면한다.",
+            effect: () => {
+              updateStats(10, 20, -15);
+              addChatMessage("나(조장)", "쌤! 이건 해체주의 입체파 건축 양식을 모티브로 한 친환경 팝업 아트입니다!", true);
+              addChatMessage("서진", "와... 조장 혀 굴리는 거 봐라. 쌤이 픽 웃으면서 일단 봐주신단다.");
+            }
+          },
+          {
+            title: "서진이의 입체 색칠 기술로 visual 퀄리티 반전 노리기",
+            desc: "서진이의 도색 능력을 극대화한다.",
+            effect: () => {
+              updateStats(5, 25, -10);
+              gameState.members.seojin.contribution += 20;
+              addChatMessage("나(조장)", "서진아! 네가 아크릴 물감으로 그라데이션 색칠 깔끔하게 입혀줘!", true);
+              addChatMessage("서진", "내 아크릴 도색 실력을 보여주지. 겉모습은 완벽하게 만든다.");
+            }
+          },
+          {
+            title: "민수 잡으러 운동장으로 뛰어가기",
+            desc: "축구하는 민수 바짓가랑이를 잡는다.",
+            effect: () => {
+              updateStats(10, 0, -20);
+              gameState.members.minsu.contribution += 20;
+              addChatMessage("나(조장)", "강민수 축구공 압수. 골대 앞에서 우드락 사포질해라.", true);
+              addChatMessage("민수", "아 진짜 조장 악마냐??? 할게 할게 ㅠㅠ");
+            }
+          },
+          {
+            title: "솔직하게 미완성 인정하고 쌤한테 사과하기",
+            desc: "멘탈은 지키지만 평가 점수가 떨어진다.",
+            effect: () => {
+              updateStats(-10, -10, 10);
+              addChatMessage("나(조장)", "쌤 죄송합니다. 재료 조율 실패로 보완해서 완성하겠습니다...", true);
+              addChatMessage("서진", "하... 내 수행평가 점수 날아가는 소리 들린다...");
+            }
+          }
+        ]
+      },
+      3: {
+        banner: "D-3 : 서진이의 빡침과 손절 폭발",
+        chatIntro: { text: "⚡ 에이스 서진이가 참다못해 폭발했다!" },
+        morningMessages: [
+          { sender: "서진", text: "나 더 이상 못 참겠어. 민수는 축구하러 가고 도윤이는 우드락에 이상한 낙서나 하고... 나 쌤한테 가서 조 바꿔달라고 할 거임." },
+          { sender: "도윤", text: "낙서 아니라 낙서화(Graffiti) 아트인데... 🥺" },
+          { sender: "민수", text: "(읽음 2)" }
+        ],
+        choices: [
+          {
+            title: "서진이한테 싹싹 빌며 '민수 이름 결과물에서 뺄게!' 약속하기",
+            desc: "서진이를 달래고 조 폭파를 막는다.",
+            effect: () => {
+              updateStats(5, 15, -15);
+              gameState.members.seojin.stress = 10;
+              addChatMessage("나(조장)", "서진아 제발 참아줘 ㅠㅠ 내가 제출할 때 무임승차 평가서에 민수 이름 지우고 빵점 줄게!", true);
+              addChatMessage("서진", "좋아. 민수 이름 뺀다는 거 확답했다. 그럼 끝까지 함.");
+            }
+          },
+          {
+            title: "도윤이 낙서 깔끔하게 흰색 락카로 다 덮어버리기",
+            desc: "도윤이의 트롤링을 정돈한다.",
+            effect: () => {
+              updateStats(20, 10, -20);
+              addChatMessage("나(조장)", "도윤아 고생했는데 화이트 스프레이로 싹 덮고 미니멀리즘으로 가자!", true);
+              addChatMessage("도윤", "내 그래피티 덮였네... 아쉽지만 심플해서 예쁘긴 하다 ㅋ");
+            }
+          },
+          {
+            title: "민수 집 찾아가서 우드락 받침대 목공 작업 시키기",
+            desc: "민수를 끝까지 굴린다.",
+            effect: () => {
+              updateStats(15, -5, -25);
+              gameState.members.minsu.contribution += 25;
+              addChatMessage("나(조장)", "민수야 문 열어. 네 집 거실에서 받침대 합판 붙이자.", true);
+              addChatMessage("민수", "헐 우리 집엔 어떻게 옴??? 알았어 양면테이프 붙일게!!");
+            }
+          },
+          {
+            title: "멘탈 나가서 피시방 가서 롤 한 판 때리기",
+            desc: "멘탈을 충전하지만 과제는 방치된다.",
+            effect: () => {
+              updateStats(-15, -10, 30);
+              addChatMessage("나(조장)", "(소환사의 협곡에 접속했습니다)", true);
+              addChatMessage("서진", "조장까지 멘탈 나갔네 ㅋㅋㅋ 이 조 망함 ㅃㅃ");
+            }
+          }
+        ]
+      },
+      2: {
+        banner: "D-2 : 최종 조립 및 마감 작업",
+        chatIntro: { text: "만들기 과제 제출 2일 전. 부품 조립 및 최종 마감을 해야 한다." },
+        morningMessages: [
+          { sender: "도윤", text: "조장아! 나 우드락 조형물에 켜지는 꼬마전구 달아왔어!! 삐까뻔쩍하지? (합선 위험)" },
+          { sender: "서진", text: "도윤아 테이프 덕지덕지 붙여서 개지저분하잖아... 떼라 진짜." },
+          { sender: "민수", text: "나 손가락에 본드 붙어서 오늘 조립 못 도움 ㅠㅠ" }
+        ],
+        choices: [
+          {
+            title: "밤샘 작업! 꼬마전구 전선 깔끔하게 테이핑 정돈하고 조립 마감",
+            desc: "완성도를 극대화한다.",
+            effect: () => {
+              updateStats(25, 10, -30);
+              addChatMessage("나(조장)", "전선 깔끔하게 밑바닥으로 숨기고 글루건으로 조형물 고정 완료!", true);
+              addChatMessage("서진", "와... 불 켜니까 불빛 미쳤다. 전시회 내도 되겠는데?");
+            }
+          },
+          {
+            title: "서진이랑 같이 만들기 설명서 및 작품 설명 판넬 제작",
+            desc: "결과물 퀄리티를 최상으로 올린다.",
+            effect: () => {
+              updateStats(5, 30, -15);
+              gameState.members.seojin.contribution += 20;
+              addChatMessage("나(조장)", "서진아! 우리 작품 주제랑 제작 과정 적은 우드락 판넬 따로 만들자!", true);
+              addChatMessage("서진", "역시 조장 센스 굿. 판넬까지 제출하면 점수 만점 각이다.");
+            }
+          },
+          {
+            title: "민수한테 맛있는 거 사달라고 뜯어내기",
+            desc: "민수에게 무임승차 대가를 지불하게 한다.",
+            effect: () => {
+              updateStats(5, 5, -10);
+              gameState.members.minsu.contribution += 10;
+              addChatMessage("나(조장)", "민수야 작업 안 도울 거면 떡볶이랑 튀김 사 와라", true);
+              addChatMessage("민수", "떡볶이 3인분 결제 완료! 맛있게 먹고 잘 만들어라 ㅋ");
+            }
+          },
+          {
+            title: "도윤이보고 라벨지로 작품 이름표 프린트해 오라고 시키기",
+            desc: "도윤이에게 깔끔한 마무리를 맡긴다.",
+            effect: () => {
+              updateStats(10, 5, -5);
+              gameState.members.doyun.contribution += 10;
+              addChatMessage("나(조장)", "도윤아 라벨지에 [3조: 미래형 친환경 건축 모형] 프린트해서 붙여줘!", true);
+              addChatMessage("도윤", "오케이! 폰트 제일 예쁜 걸로 출력해 감!");
+            }
+          }
+        ]
+      },
+      1: {
+        banner: "D-1 : 제출 전날 밤 (마지막 점검)",
+        chatIntro: { text: "🌙 제출 전날 밤 10시. 내일 1교시 기술 시간에 최종 제출 및 전시다!" },
+        morningMessages: [
+          { sender: "서진", text: "나 판넬 코팅까지 완료함. 조장아 모형 박스에 잘 넣어놨지?" },
+          { sender: "도윤", text: "내일 내가 제일 먼저 등교해서 교탁에 올려놓음 ㅋ" },
+          { sender: "민수", text: "내일 늦잠 안 자고 8시까지 감 ㅋㅋㅋ" }
+        ],
+        choices: [
+          {
+            title: "최종 마감 꼼꼼히 점검! 박스 포장 및 마감 보강",
+            desc: "마지막 완성도를 쥐어짜지만 피곤해진다.",
+            effect: () => {
+              updateStats(15, 10, -25);
+              addChatMessage("나(조장)", "흔들려도 안 깨지게 에어캡으로 들고 갈 준비 완료!", true);
+              addChatMessage("서진", "완벽하다. 내일 A+ 받자.");
+            }
+          },
+          {
+            title: "서진이와 1:1로 작품 소개 1분 발표 멘트 준비",
+            desc: "제출 시 선생님 설명 평가 퀄리티 상승.",
+            effect: () => {
+              updateStats(5, 20, -10);
+              addChatMessage("나(조장)", "서진아 쌤이 작품 설명해 보라고 할 때 할 멘트 짜봤어!", true);
+              addChatMessage("서진", "좋아. 준비 완벽하다.");
+            }
+          },
+          {
+            title: "슬그머니 작품 판넬 조원 이름에서 민수 이름 지우기 😈",
+            desc: "무임승차 처단! 사이다 엔딩 조건.",
+            effect: () => {
+              updateStats(0, 5, 10);
+              gameState.members.minsu.deleted = true;
+              addChatMessage("나(조장)", "(작품 설명 판넬 조원 명단: [조장, 서진, 도윤] / 민수 이름 화이트로 지움)", true);
+              addChatMessage("시스템", "😈 [사이다 실행] 민수의 이름이 제출 판넬에서 삭제되었습니다!");
+            }
+          },
+          {
+            title: "내일을 위해 일찍 자고 푹 쉬기",
+            desc: "멘탈을 회복한다.",
+            effect: () => {
+              updateStats(0, 0, 25);
+              addChatMessage("나(조장)", "얘들아 고생했다. 내일 8시까지 교실에서 보자. 잘 자!", true);
+              addChatMessage("도윤", "조장 잘 자라~! 내일 보쟈!");
+            }
+          }
+        ]
+      }
+    };
+
+    // Mode 2: PPT (사회/국어 PPT 발표 과제)
+    const pptEvents = {
+      7: {
+        banner: "D-7 : PPT 주제 선정 & 역할 분담",
+        chatIntro: { text: "사회 수업 시간! PPT 발표 조별 과제가 시작되었다. 네가 조장이다!" },
+        morningMessages: [
+          { sender: "민수", text: "아 조장아 나 이번 주 피시방 대회 있어서 자료조사 쉬운 거 주면 안 됨? ㅠ" },
+          { sender: "도윤", text: "나 PPT 디자인 개잘함! 5분 만에 만들 수 있음 ㅋ" },
+          { sender: "서진", text: "대충 해서 발표 망치기만 해라. 바로 쌤한테 메일 쓴다." }
+        ],
+        choices: [
+          {
+            title: "민수한테 자료조사 A4 3장 분량 빡세게 할당하기",
+            desc: "민수를 억지로 일시키려 시도한다.",
+            effect: () => {
+              updateStats(5, 0, -10);
+              gameState.members.minsu.contribution += 10;
+              addChatMessage("나(조장)", "민수야 대회 있어도 사회 교과서 50~65p 요약 내일까지 보내라", true);
+              addChatMessage("민수", "아... 진짜 빡센데... 일단 알았음... (안 할 확률 높음)");
+            }
+          },
+          {
+            title: "도윤이한테 템플릿 사이트 링크 보내주며 가이드하기",
+            desc: "이상한 보노보노 PPT를 막기 위한 조치.",
+            effect: () => {
+              updateStats(10, 5, -5);
+              gameState.members.doyun.contribution += 15;
+              addChatMessage("나(조장)", "도윤아 나무위키 캡처하지 말고 깔끔한 무료 PPT 템플릿 써줘!", true);
+              addChatMessage("도윤", "헐 나무위키가 짱인데... 일단 템플릿 찾아봄!");
+            }
+          },
+          {
+            title: "서진이한테 맛있는 과자 사주며 발표 전담 부탁하기",
+            desc: "발표 에이스 서진이의 멘탈을 챙긴다.",
+            effect: () => {
+              updateStats(0, 15, -5);
+              gameState.members.seojin.stress = Math.max(0, gameState.members.seojin.stress - 20);
+              addChatMessage("나(조장)", "서진아 매점에서 초코에몽 사줄 테니까 발표 대본이랑 발표 맡아줘!", true);
+              addChatMessage("서진", "음... 오케이. 조장 성의 봐서 발표는 내가 깔끔하게 해줌.");
+            }
+          },
+          {
+            title: "내가 직접 슬라이드 목차 및 전체 틀 다 짜놓기",
+            desc: "멘탈을 바쳐서 완성도를 챙긴다.",
+            effect: () => {
+              updateStats(20, 5, -20);
+              addChatMessage("나(조장)", "얘들아 내가 목차랑 1~10번 슬라이드 뼈대 다 짜놨어. 확인해 봐!", true);
+              addChatMessage("서진", "오, 조장 일 좀 하네? 이 틀대로 자료 넣자.");
+            }
+          }
+        ]
+      },
+      6: {
+        banner: "D-6 : 1차 자료 수집 & PPT 결합",
+        chatIntro: { text: "도윤이가 5분 만에 만든 PPT 파일이 도착했다!" },
+        morningMessages: [
+          { sender: "도윤", text: "조장아 PPT 다 만들었다!! 파일 첨부함! [사회과제_3조_최종.pptx]" },
+          { sender: "서진", text: "잠깐만... 도윤아 이거 글꼴 전부 굴림체 36pt에 나무위키 캡처 통으로 넣은 거 아니야? 장난함?" },
+          { sender: "민수", text: "(읽음 3) ... (답장 없음)" }
+        ],
+        choices: [
+          {
+            title: "민수한테 개인톡으로 전화를 10통 걸어서 갈구기",
+            desc: "민수를 압박해본다.",
+            effect: () => {
+              updateStats(5, 0, -20);
+              gameState.members.minsu.stress += 30;
+              addChatMessage("나(조장)", "강민수 전화 왜 안 받냐? 카톡 읽었으면 자료 보내라", true);
+              addChatMessage("민수", "아 미안 ㅠㅠ 폰 무음이라 몰랐음 지금 학원이라 밤에 보냄!");
+            }
+          },
+          {
+            title: "도윤이 굴림체 PPT 밤새서 깔끔 폰트로 전면 수정하기",
+            desc: "도윤이의 똥을 직접 닦아낸다.",
+            effect: () => {
+              updateStats(20, 10, -25);
+              gameState.members.doyun.contribution += 10;
+              addChatMessage("나(조장)", "도윤아 고생했어! 디자인이랑 폰트만 내가 살짝 가다듬을게~", true);
+              addChatMessage("도윤", "우와 조장 천재 ㅋ 고마워!");
+            }
+          },
+          {
+            title: "서진이 멘탈 케어하며 발표 대본 작성 요청하기",
+            desc: "발표 퀄리티를 위해 서진이를 달랜다.",
+            effect: () => {
+              updateStats(5, 20, -10);
+              gameState.members.seojin.contribution += 15;
+              addChatMessage("나(조장)", "서진아 화나는 거 이해해 ㅠㅠ 대본 뼈대 잡아주면 내가 PPT 보완할게!", true);
+              addChatMessage("서진", "휴... 조장 봐서 참는다. 대본 작성 시작함.");
+            }
+          },
+          {
+            title: "혼자 치킨 시켜먹고 멘탈 회복하기",
+            desc: "과제는 잠시 잊고 쉰다.",
+            effect: () => {
+              updateStats(0, 0, 25);
+              addChatMessage("나(조장)", "(단톡 안 읽음... 치킨 배달 완료)", true);
+              addChatMessage("서진", "조장 어디 감? 도윤이 이 쓰레기 자료 어쩔 건데...");
+            }
+          }
+        ]
+      },
+      5: {
+        banner: "D-5 : 민수의 잠수 핑계 폭격!",
+        chatIntro: { text: "⚡ [돌발] 민수가 단톡방에 의문의 핑계 장문을 남겼다!" },
+        morningMessages: [
+          { sender: "민수", text: "얘들아 진짜 미안한데... 내가 시골 할머니 집에 갑자기 내려가게 돼서 데이터가 안 터짐... 과제 참여 못할 듯 ㅠㅠ" },
+          { sender: "서진", text: "강민수 너 저번 달 과학 조별과제 때도 할머니 집 간다 하지 않았냐? 장난해?" },
+          { sender: "도윤", text: "헐... 할머니 잘 다녀와..." }
+        ],
+        choices: [
+          {
+            title: "민수한테 '네 할당량 안 보내면 쌤한테 무임승차 보고함' 경고하기",
+            desc: "민수를 압박해 최후통첩을 날린다.",
+            effect: () => {
+              updateStats(10, 0, -15);
+              gameState.members.minsu.contribution += 10;
+              addChatMessage("나(조장)", "민수야 데이터 터지는 곳 가서 오늘 밤 12시까지 요약본 보내라. 안 보내면 쌤한테 말함.", true);
+              addChatMessage("민수", "아... 알았어... PC방 찾아서 보낼게...", false);
+            }
+          },
+          {
+            title: "민수 몫까지 내가 전부 다 밤새서 PPT 슬라이드 만들기",
+            desc: "완성도는 오르지만 멘탈이 나간다.",
+            effect: () => {
+              updateStats(25, 5, -30);
+              addChatMessage("나(조장)", "괜찮아 민수야 잘 다녀와! 민수 파트는 내가 다 만들게.", true);
+              addChatMessage("서진", "조장 너무 호구처럼 굴지 마... 너 그러다 쓰러진다.");
+            }
+          },
+          {
+            title: "서진이에게 민수 파트 발표 대본 보완 부탁하기",
+            desc: "서진이의 부담을 늘리지만 발표 퀄리티 상승.",
+            effect: () => {
+              updateStats(10, 15, -10);
+              gameState.members.seojin.stress += 25;
+              addChatMessage("나(조장)", "서진아, 민수 파트 짧으니까 네가 발표 대본에 살짝 합쳐줄 수 있어?", true);
+              addChatMessage("서진", "하... 기가 차네. 대신 수행평가 조원 평가 때 민수 점수 빵점 줘라.");
+            }
+          },
+          {
+            title: "도윤이에게 뉴스 기사 캡처 추가로 넣어달라고 하기",
+            desc: "도윤이를 구른다.",
+            effect: () => {
+              updateStats(10, -5, -5);
+              gameState.members.doyun.contribution += 20;
+              addChatMessage("나(조장)", "도윤아! 민수 대신 네이버 뉴스 사회면 기사 3개만 더 캡처해서 첨부해 줘!", true);
+              addChatMessage("도윤", "네!! 캡처 전문이지! 바로 긁어옴!");
+            }
+          }
+        ]
+      },
+      4: {
+        banner: "D-4 : 사회 선생님의 불시 슬라이드 검사!",
+        chatIntro: { text: "📢 사회 선생님이 3조 PPT 파일 중간 점검을 실시했다!" },
+        morningMessages: [
+          { sender: "서진", text: "조장아!! 쌤이 지금 우리 PPT 파일 띄워보라는데?? 도윤이 보노보노 배경 보고 쌤 표정 썩으심 ㅠㅠ" },
+          { sender: "도윤", text: "보노보노 귀여운데 왜... 🥺" },
+          { sender: "민수", text: "(마이웨이) 나 지금 버스 안임 ㅋ" }
+        ],
+        choices: [
+          {
+            title: "조장의 임기응변! 뻔뻔하게 '컨셉형 발표'라고 입털기",
+            desc: "조장의 입담으로 위기를 넘어간다.",
+            effect: () => {
+              updateStats(10, 20, -15);
+              addChatMessage("나(조장)", "선생님! 이건 풍자적 요소를 넣기 위한 의도된 초안 슬라이드였습니다!", true);
+              addChatMessage("서진", "와... 조장 혀 굴리는 거 미쳤다. 쌤이 일단 고개 끄덕이심.");
+            }
+          },
+          {
+            title: "발표 에이스 서진이가 직접 쌤 질문에 완벽 답변하기",
+            desc: "서진이를 등판시킨다.",
+            effect: () => {
+              updateStats(5, 25, -5);
+              gameState.members.seojin.stress += 15;
+              addChatMessage("나(조장)", "서진아! 네가 준비한 교과서 파트 선생님한테 설명해 줘!", true);
+              addChatMessage("서진", "선생님, 3번 슬라이드는 저희가 수집한 통계청 자료에 기반한 것으로...", false);
+            }
+          },
+          {
+            title: "솔직하게 미완성 고백하고 죄송하다고 사과하기",
+            desc: "멘탈은 지키지만 퀄리티가 하락한다.",
+            effect: () => {
+              updateStats(-10, -10, 10);
+              addChatMessage("나(조장)", "선생님 죄송합니다. 조원들 자료가 늦어져 아직 보완 중입니다...", true);
+              addChatMessage("서진", "하... 쪽팔려... 나 그냥 이 조 나가면 안 되냐?");
+            }
+          },
+          {
+            title: "도윤이한테 보노보노 배경 전부 지우라고 강경 명령",
+            desc: "도윤이의 이상한 취향을 교정한다.",
+            effect: () => {
+              updateStats(15, 0, -10);
+              gameState.members.doyun.contribution += 15;
+              addChatMessage("나(조장)", "도윤아 쌤 표정 봤지? 오늘 밤까지 캐릭터 배경 다 지워라.", true);
+              addChatMessage("도윤", "힝... 미안 ㅠㅠ 밤새서 싹 지울게 ㅠㅠ");
+            }
+          }
+        ]
+      },
+      3: {
+        banner: "D-3 : 서진이의 멘탈 붕괴 위기",
+        chatIntro: { text: "⚡ 에이스 서진이가 참다못해 폭발하기 직전이다!" },
+        morningMessages: [
+          { sender: "서진", text: "나 더 이상 못 참아. 민수는 계속 잠수고 도윤이는 PPT 애니메이션 50개 넣어서 눈 아프고... 나 쌤한테 개인 발표로 바꿔달라고 할 거임." },
+          { sender: "도윤", text: "애니메이션 넣어야 화려하고 멋진데... 🥺" },
+          { sender: "민수", text: "(읽음 2)" }
+        ],
+        choices: [
+          {
+            title: "서진이한테 싹싹 빌며 '최종 발표 때 민수 이름 뺄게!' 약속하기",
+            desc: "서진이를 달래서 조 폭파를 막는다.",
+            effect: () => {
+              updateStats(5, 15, -15);
+              gameState.members.seojin.stress = 10;
+              addChatMessage("나(조장)", "서진아 제발 참아줘 ㅠㅠ 내가 제출할 때 무임승차 평가서에 민수 이름 빼버릴게!", true);
+              addChatMessage("서진", "좋아. 이름 뺀다는 거 꼭 지켜라. 그럼 끝까지 감.");
+            }
+          },
+          {
+            title: "PPT 애니메이션 50개 전면 삭제하고 심플 블랙앤화이트 수정",
+            desc: "디자인 퀄리티를 올린다.",
+            effect: () => {
+              updateStats(20, 10, -20);
+              addChatMessage("나(조장)", "도윤아 고생했는데 뿅뿅 소리 나는 애니메이션은 다 뺐어!", true);
+              addChatMessage("도윤", "내 애니메이션... 아쉽지만 조장이 만든 게 깔끔하긴 하다 ㅋ");
+            }
+          },
+          {
+            title: "민수 잡으러 피시방 급습하기 (단톡방 인증샷)",
+            desc: "민수를 강제 집행한다.",
+            effect: () => {
+              updateStats(15, -5, -25);
+              gameState.members.minsu.contribution += 25;
+              addChatMessage("나(조장)", "강민수 롤 픽창이지? 네 뒤다. 놋북 켜라.", true);
+              addChatMessage("민수", "헐 조장 진짜 옴??? 미안 ㅠㅠ 타이핑 칠게!!");
+            }
+          },
+          {
+            title: "에라 모르겠다 피시방 가서 롤 한 판 하기",
+            desc: "멘탈을 충전하지만 과제는 방치된다.",
+            effect: () => {
+              updateStats(-15, -10, 30);
+              addChatMessage("나(조장)", "(소환사의 협곡에 접속했습니다)", true);
+              addChatMessage("서진", "조장까지 멘탈 나갔네... 이 조 망함 ㅃㅃ");
+            }
+          }
+        ]
+      },
+      2: {
+        banner: "D-2 : 발표 대본 작성 & 리허설",
+        chatIntro: { text: "발표 2일 전. PPT 완성과 발표 스크립트를 맞춰봐야 한다." },
+        morningMessages: [
+          { sender: "도윤", text: "조장아! 나 PPT 마지막 슬라이드에 '감사합니다 Q&A' 보노보노 짤 넣었는데 이건 괜찮지?" },
+          { sender: "서진", text: "안 괜찮으니까 당장 빼라... 그리고 발표 대본 타이밍 안 맞잖아." },
+          { sender: "민수", text: "나 감기 걸려서 열나는데 오늘 리허설 못 감 ㅠㅠ" }
+        ],
+        choices: [
+          {
+            title: "밤샘 작업! PPT 폰트 고딕체로 통일하고 최종 마감",
+            desc: "완성도를 최고치로 올린다.",
+            effect: () => {
+              updateStats(25, 10, -30);
+              addChatMessage("나(조장)", "폰트 깨짐 방지 처리하고 구글 드라이브 업로드 완료!", true);
+              addChatMessage("서진", "오... 이제 좀 PPT다운 PPT 같네. 고생했다 조장.");
+            }
+          },
+          {
+            title: "서진이와 1:1 디스코드로 발표 예상 질문 Q&A 대본 작성",
+            desc: "발표 퀄리티를 최상으로 올린다.",
+            effect: () => {
+              updateStats(5, 30, -15);
+              gameState.members.seojin.contribution += 20;
+              addChatMessage("나(조장)", "서진아! 쌤이 물어볼 만한 공격 질문 3개 완벽하게 답변 짜봤어.", true);
+              addChatMessage("서진", "좋아. 이 대본이면 발표 점수 만점 각이다.");
+            }
+          },
+          {
+            title: "민수한테 기프티콘 보내며 당일 날 오기라도 하라고 구걸",
+            desc: "민수를 어떻게든 참석시킨다.",
+            effect: () => {
+              updateStats(5, 5, -10);
+              gameState.members.minsu.contribution += 10;
+              addChatMessage("나(조장)", "민수야 약 먹고 힘내라... 내일 발표 때 늦지나 말고 오기라도 해 ㅠㅠ", true);
+              addChatMessage("민수", "고맙다 ㅠㅠ 내일 제일 먼저 교실 가있을게!");
+            }
+          },
+          {
+            title: "도윤이보고 PPT 슬라이드 넘기는 넘기미 역할 부여",
+            desc: "도윤이에게 역할을 준다.",
+            effect: () => {
+              updateStats(10, 5, -5);
+              gameState.members.doyun.contribution += 10;
+              addChatMessage("나(조장)", "도윤아! 너 발표 때 서진이 멘트에 맞춰서 PPT 슬라이드 타이밍 맞게 넘겨줘!", true);
+              addChatMessage("도윤", "오케이! 스페이스바 연타 타이밍 신의 손으로 맞춰줌!");
+            }
+          }
+        ]
+      },
+      1: {
+        banner: "D-1 : 발표 전날 밤 (결전의 날 전야)",
+        chatIntro: { text: "🌙 발표 전날 밤 11시. 내일 2교시 사회 시간에 최종 PPT 발표다!" },
+        morningMessages: [
+          { sender: "서진", text: "나 발표 스크립트 외우기 완료함. 조장아 최종 파일 준비 됐지?" },
+          { sender: "도윤", text: "내일 발표할 때 호응 빡세게 해줌 ㅋ 화이팅!" },
+          { sender: "민수", text: "나 내일 늦잠 잘까 봐 지금 안 자는 중 ㅋㅋㅋ" }
+        ],
+        choices: [
+          {
+            title: "최종 벼락치기 점검! USB 2개 백업 & 폰트 임베딩 확인",
+            desc: "마지막 완성도를 올린다.",
+            effect: () => {
+              updateStats(15, 10, -25);
+              addChatMessage("나(조장)", "USB 2개에 넣고 쌤 메일로도 파일 전송 완료!", true);
+              addChatMessage("서진", "완벽하다. 내일 A+ 찢어놓자.");
+            }
+          },
+          {
+            title: "서진이 발표 멘탈 코칭 및 마지막 대본 리허설",
+            desc: "발표 퀄리티 상승.",
+            effect: () => {
+              updateStats(5, 20, -10);
+              addChatMessage("나(조장)", "서진아 목소리 톤 아주 좋아! 쌤 눈 똑바로 쳐다보고 발표해!", true);
+              addChatMessage("서진", "오케이! 내일 만점 받아온다.");
+            }
+          },
+          {
+            title: "슬그머니 PPT 첫 표지에서 민수 이름 지워버리기 😈",
+            desc: "무임승차 처단! 사이다 엔딩 조건.",
+            effect: () => {
+              updateStats(0, 5, 10);
+              gameState.members.minsu.deleted = true;
+              addChatMessage("나(조장)", "(PPT 표지 조원 명단: [조장, 발표 서진, 자료 도윤] / 민수 이름 삭제 완료)", true);
+              addChatMessage("시스템", "😈 [사이다 실행] 민수의 이름이 PPT 표지에서 삭제되었습니다!");
+            }
+          },
+          {
+            title: "내일을 위해 일찍 잠자리에 들기",
+            desc: "멘탈 회복.",
+            effect: () => {
+              updateStats(0, 0, 25);
+              addChatMessage("나(조장)", "얘들아 고생했다. 내일 8시 반까지 교실에서 보자. 굿밤!", true);
+              addChatMessage("도윤", "조장잘자~! 내일 보자!");
+            }
+          }
+        ]
+      }
+    };
+
+    // Endings List
+    const endings = {
+      MENTAL_BREAKDOWN: {
+        title: "엔딩 F : 멘탈 파산과 PC방 야반도주",
+        badge: "GAME OVER (멘탈 0%)",
+        icon: '<i class="fa-solid fa-skull-crossbones text-rose-500"></i>',
+        desc: "더 이상 조원들의 무임승차와 똥치우기를 견디지 못한 너...\n제출 당일 아침, 폰을 끄고 피시방으로 야반도주를 감행했다!\n\n단톡방은 멘붕에 빠졌고 과제는 미제출 처리되어 너는 수행평가 0점을 받게 되었다."
+      },
+      CIDER_SOLO: {
+        title: "엔딩 사이다 : 무임승차 처단과 독자 생존 만점",
+        badge: "SPECIAL ENDING",
+        icon: '<i class="fa-solid fa-bolt text-yellow-400"></i>',
+        desc: "제출 당일! 너는 아무것도 안 한 '민수'의 이름을 과감히 삭제하고 선생님께 기여도 0점 보고서를 제출했다!\n\n민수는 교실에서 경악했지만 선생님은 너의 결단력과 완성도 높은 결과물에 감탄하며 너와 서진이에게 만점을 주었다. 사이다 맛이 아주 달콤하다!"
+      },
+      PERFECT_CARRY: {
+        title: "엔딩 A+ : 전설의 보스 캐리 조장",
+        badge: "BEST ENDING",
+        icon: '<i class="fa-solid fa-crown text-amber-400"></i>',
+        desc: "너의 피땀 어린 리더십 덕분에 완성도 100% & 퀄리티 100%라는 미친 기록을 달성했다!\n\n선생님은 학급 전체 앞에서 \"역대 중학생 조별과제 중 최고\"라며 극찬을 아끼지 않았고, 조원들은 너를 '갓조장'이라 부르며 매점에서 빵을 사 바치기 시작했다."
+      },
+      SUCCESS_B_PLUS: {
+        title: "엔딩 B+ : 무난하게 살아남은 중학 생활",
+        badge: "NORMAL ENDING",
+        icon: '<i class="fa-solid fa-graduation-cap text-blue-400"></i>',
+        desc: "몇 번의 위기와 빡침이 오갔지만, 어찌저찌 완성도 높은 결과물을 제출했다.\n\n만점은 아쉽게 놓쳤지만 무난한 B+ 수행평가 점수를 받았다. 조원들과 원수가 되지는 않았으니 훈훈한 결말이다."
+      },
+      DESPAIR_C: {
+        title: "엔딩 C : 엉망진창 멸망전 (수행평가 감점)",
+        badge: "BAD ENDING",
+        icon: '<i class="fa-solid fa-poop text-amber-700"></i>',
+        desc: "나무위키 복붙 자료와 찌그러진 결과물, 허접한 마무리의 삼위일체!\n선생님의 한숨 소리가 교실에 울려 퍼졌다.\n\n결과는 수행평가 대폭 감점... 너는 다음 조별과제 때는 절대로 조장을 맡지 않겠다고 맹세했다."
+      }
+    };
+
+    // ==========================================
+    // UI & HELPER FUNCTIONS
+    // ==========================================
+
+    function updateStats(compDelta, presDelta, mentDelta) {
+      gameState.stats.completion = Math.min(100, Math.max(0, gameState.stats.completion + compDelta));
+      gameState.stats.presentation = Math.min(100, Math.max(0, gameState.stats.presentation + presDelta));
+      gameState.stats.mental = Math.min(100, Math.max(0, gameState.stats.mental + mentDelta));
+
+      const cBar = document.getElementById("stat-completion-bar");
+      const pBar = document.getElementById("stat-presentation-bar");
+      const mBar = document.getElementById("stat-mental-bar");
+
+      cBar.style.width = gameState.stats.completion + "%";
+      pBar.style.width = gameState.stats.presentation + "%";
+      mBar.style.width = gameState.stats.mental + "%";
+
+      document.getElementById("stat-completion-val").textContent = gameState.stats.completion + "%";
+      document.getElementById("stat-presentation-val").textContent = gameState.stats.presentation + "%";
+      document.getElementById("stat-mental-val").textContent = gameState.stats.mental + "%";
+
+      if (gameState.stats.mental < 30) {
+        mBar.classList.remove("bg-rose-500");
+        mBar.classList.add("bg-red-600", "animate-pulse");
+      } else {
+        mBar.classList.add("bg-rose-500");
+        mBar.classList.remove("bg-red-600", "animate-pulse");
+      }
+
+      if (gameState.stats.mental <= 0 && !gameState.isGameOver) {
+        triggerEnding('MENTAL_BREAKDOWN');
+      }
+    }
+
+    function addChatMessage(sender, text, isPlayer = false) {
+      const container = document.getElementById("chat-container");
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `flex flex-col ${isPlayer ? 'items-end' : 'items-start'} space-y-1 animate-fade-in`;
+
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      if (isPlayer) {
+        messageDiv.innerHTML = `
+          <div class="flex items-end space-x-2">
+            <span class="text-[10px] text-slate-500 mb-1">${timeStr}</span>
+            <div class="relative bg-yellow-400 text-slate-950 font-medium px-3.5 py-2 rounded-2xl rounded-tr-none text-xs md:text-sm max-w-xs md:max-w-md shadow chat-bubble-right">
+              ${text}
+            </div>
+          </div>
+        `;
+      } else {
+        let avatar = "👤";
+        if (sender === "민수") avatar = gameState.members.minsu.avatar;
+        if (sender === "도윤") avatar = gameState.members.doyun.avatar;
+        if (sender === "서진") avatar = gameState.members.seojin.avatar;
+
+        messageDiv.innerHTML = `
+          <span class="text-xs text-slate-400 font-semibold ml-1">${avatar} ${sender}</span>
+          <div class="flex items-end space-x-2">
+            <div class="relative bg-slate-800 border border-slate-700 text-slate-200 px-3.5 py-2 rounded-2xl rounded-tl-none text-xs md:text-sm max-w-xs md:max-w-md shadow chat-bubble-left">
+              ${text}
+            </div>
+            <span class="text-[10px] text-slate-500 mb-1">${timeStr}</span>
+          </div>
+        `;
+      }
+
+      container.appendChild(messageDiv);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderTeamStatus() {
+      const desktopList = document.getElementById("team-status-list");
+      const mobileList = document.getElementById("mobile-team-status-list");
+
+      const htmlContent = Object.keys(gameState.members).map(key => {
+        const m = gameState.members[key];
+        let statusBadgeClass = "bg-slate-700 text-slate-300";
+        if (m.stress > 50) statusBadgeClass = "bg-rose-900/80 text-rose-300 border border-rose-700";
+        if (m.contribution > 40) statusBadgeClass = "bg-emerald-900/80 text-emerald-300 border border-emerald-700";
+
+        return `
+          <div class="bg-slate-800/80 p-2.5 rounded-lg border border-slate-700/60 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-200">${m.avatar} ${m.name}</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded ${statusBadgeClass}">${m.status}</span>
+            </div>
+            <div class="text-[11px] text-slate-400">담당: ${m.role}</div>
+            
+            <div class="space-y-1 pt-1">
+              <div class="flex justify-between text-[10px] text-slate-400">
+                <span>기여도</span>
+                <span class="font-bold text-yellow-400">${m.contribution}%</span>
+              </div>
+              <div class="w-full bg-slate-950 h-1 rounded-full overflow-hidden">
+                <div class="bg-yellow-500 h-full" style="width: ${m.contribution}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      desktopList.innerHTML = htmlContent;
+      mobileList.innerHTML = htmlContent;
+    }
+
+    // ==========================================
+    // GAME ENGINE & TURN SYSTEM
+    // ==========================================
+
+    function startDay(dayNum) {
+      if (dayNum <= 0) {
+        evaluateDDayEnding();
+        return;
+      }
+
+      gameState.day = dayNum;
+      
+      const badge = document.getElementById("d-day-badge");
+      badge.textContent = `D-${dayNum} (제출 ${dayNum}일 전)`;
+
+      const currentEvents = gameState.mode === 'CRAFT' ? craftEvents : pptEvents;
+      const dayData = currentEvents[dayNum];
+
+      const container = document.getElementById("chat-container");
+      const dayDivider = document.createElement("div");
+      dayDivider.className = "text-center my-4";
+      dayDivider.innerHTML = `
+        <span class="bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 font-bold text-xs px-4 py-1.5 rounded-full shadow-sm">
+          📅 ${dayData.banner}
+        </span>
+      `;
+      container.appendChild(dayDivider);
+
+      if (dayData.chatIntro) {
+        const introDiv = document.createElement("div");
+        introDiv.className = "text-center my-2";
+        introDiv.innerHTML = `
+          <span class="text-xs text-slate-400 italic">
+            ${dayData.chatIntro.text}
+          </span>
+        `;
+        container.appendChild(introDiv);
+      }
+
+      dayData.morningMessages.forEach((msg, idx) => {
+        setTimeout(() => {
+          addChatMessage(msg.sender, msg.text, false);
+        }, (idx + 1) * 300);
+      });
+
+      renderChoices(dayData.choices);
+      renderTeamStatus();
+    }
+
+    function renderChoices(choices) {
+      const container = document.getElementById("choices-container");
+      container.innerHTML = "";
+
+      choices.forEach((c, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "w-full text-left bg-slate-800 hover:bg-slate-700 active:bg-yellow-500 active:text-slate-950 border border-slate-700 p-2.5 rounded-lg transition duration-150 flex flex-col justify-between group";
+        btn.innerHTML = `
+          <div class="font-bold text-xs md:text-sm text-yellow-300 group-hover:text-yellow-400 flex items-center justify-between">
+            <span>${idx + 1}. ${c.title}</span>
+            <i class="fa-solid fa-chevron-right text-[10px] text-slate-500 group-hover:text-yellow-400"></i>
+          </div>
+          <div class="text-[11px] text-slate-400 mt-1 line-clamp-1">${c.desc}</div>
+        `;
+
+        btn.onclick = () => {
+          container.querySelectorAll("button").forEach(b => b.disabled = true);
+          c.effect();
+          renderTeamStatus();
+
+          setTimeout(() => {
+            if (!gameState.isGameOver) {
+              startDay(gameState.day - 1);
+            }
+          }, 1200);
+        };
+
+        container.appendChild(btn);
+      });
+    }
+
+    // ==========================================
+    // MULTI-ENDING EVALUATION
+    // ==========================================
+
+    function evaluateDDayEnding() {
+      gameState.isGameOver = true;
+      const { completion, presentation } = gameState.stats;
+      const isMinsuDeleted = gameState.members.minsu.deleted;
+
+      let chosenEndingKey = 'SUCCESS_B_PLUS';
+
+      if (isMinsuDeleted && completion >= 60) {
+        chosenEndingKey = 'CIDER_SOLO';
+      } else if (completion >= 85 && presentation >= 80) {
+        chosenEndingKey = 'PERFECT_CARRY';
+      } else if (completion >= 55 && presentation >= 50) {
+        chosenEndingKey = 'SUCCESS_B_PLUS';
+      } else {
+        chosenEndingKey = 'DESPAIR_C';
+      }
+
+      triggerEnding(chosenEndingKey);
+    }
+
+    function triggerEnding(endingKey) {
+      gameState.isGameOver = true;
+      const data = endings[endingKey];
+
+      const modal = document.getElementById("ending-modal");
+      const title = document.getElementById("ending-title");
+      const badge = document.getElementById("ending-badge");
+      const icon = document.getElementById("ending-icon");
+      const desc = document.getElementById("ending-description");
+
+      document.getElementById("end-stat-comp").textContent = gameState.stats.completion + "%";
+      document.getElementById("end-stat-pres").textContent = gameState.stats.presentation + "%";
+      document.getElementById("end-stat-ment").textContent = gameState.stats.mental + "%";
+
+      title.textContent = data.title;
+      badge.textContent = data.badge;
+      icon.innerHTML = data.icon;
+      desc.textContent = data.desc;
+
+      modal.classList.remove("hidden");
+    }
+
+    // ==========================================
+    // INITIALIZATION & RESTART LOGIC
+    // ==========================================
+
+    function initGame(selectedMode) {
+      gameState.mode = selectedMode;
+      gameState.day = 7;
+      gameState.stats.completion = 10;
+      gameState.stats.presentation = 10;
+      gameState.stats.mental = 100;
+      gameState.isGameOver = false;
+
+      // Reset Teammates
+      gameState.members.minsu.stress = 0;
+      gameState.members.minsu.contribution = 0;
+      gameState.members.minsu.deleted = false;
+
+      gameState.members.doyun.stress = 10;
+      gameState.members.doyun.contribution = 20;
+
+      gameState.members.seojin.stress = 40;
+      gameState.members.seojin.contribution = 30;
+
+      // Adjust role text according to mode
+      if (selectedMode === 'CRAFT') {
+        gameState.members.minsu.role = "재료 준비 / 사포질";
+        gameState.members.doyun.role = "우드락 자르기 / 도면";
+        gameState.members.seojin.role = "색칠 및 데코 마감";
+        document.getElementById("game-mode-badge").textContent = "우드락 만들기 모드";
+        document.getElementById("stat-quality-label").innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-1"></i>작품 퀄';
+        document.getElementById("end-stat-qual-label").textContent = "작품 퀄리티";
+        document.getElementById("chatroom-title").textContent = "기술가정 3조 우드락 만들기 (4명)";
+        document.getElementById("chatroom-topic").textContent = "주제: 우드락으로 팝업 건축 모형 만들기";
+      } else {
+        gameState.members.minsu.role = "자료 조사";
+        gameState.members.doyun.role = "PPT 슬라이드 작성";
+        gameState.members.seojin.role = "발표 스크립트 / 발표";
+        document.getElementById("game-mode-badge").textContent = "PPT 발표 모드";
+        document.getElementById("stat-quality-label").innerHTML = '<i class="fa-solid fa-microphone-lines mr-1"></i>발표 퀄';
+        document.getElementById("end-stat-qual-label").textContent = "발표 퀄리티";
+        document.getElementById("chatroom-title").textContent = "사회과목 3조 PPT 발표 (4명)";
+        document.getElementById("chatroom-topic").textContent = "주제: 우리 지역 사회 문제와 해결 방안";
+      }
+
+      // Hide Start Modal
+      document.getElementById("mode-select-modal").classList.add("hidden");
+      document.getElementById("ending-modal").classList.add("hidden");
+
+      // Reset Chat
+      document.getElementById("chat-container").innerHTML = `
+        <div class="text-center my-2">
+          <span class="bg-slate-800/80 text-slate-400 text-xs px-3 py-1 rounded-full border border-slate-700/50">
+            📢 단톡방이 생성되었습니다. 제출일까지 7일 남았습니다.
+          </span>
+        </div>
+      `;
+
+      updateStats(0, 0, 0);
+      renderTeamStatus();
+      startDay(7);
+    }
+
+    // Event Listeners for Mode Selection
+    document.getElementById("btn-mode-craft").onclick = () => initGame('CRAFT');
+    document.getElementById("btn-mode-ppt").onclick = () => initGame('PPT');
+    
+    document.getElementById("btn-restart").onclick = () => {
+      document.getElementById("ending-modal").classList.add("hidden");
+      document.getElementById("mode-select-modal").classList.remove("hidden");
+    };
+
+    // Mobile team modal toggles
+    document.getElementById("toggle-mobile-team").onclick = () => {
+      document.getElementById("mobile-team-modal").classList.remove("hidden");
+    };
+    document.getElementById("close-mobile-team").onclick = () => {
+      document.getElementById("mobile-team-modal").classList.add("hidden");
+    };
+  </script>
+</body>
+</html>
