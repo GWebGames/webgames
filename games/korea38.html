@@ -324,7 +324,7 @@ function addUnit(side,fac,type,name,str,prov){
   G.units.push(u);return u;
 }
 function newGame(player,diff){
-  G={turn:1,max:38,player,diff,own:P.map(p=>COM_START.includes(p.k)?'COM':'UN'),units:[],uid:1,sel:new Set(),selProv:-1,hover:-1,targets:new Map(),log:[],phase:'init',over:false,dirtyFill:true,dirtyHi:true,endResolve:null,chnSeen:false,cam:newCamMap(),mods:{},bonus:{UN:0,COM:0},objs:[],supSet:null};
+  G={turn:1,max:38,player,diff,own:P.map(p=>COM_START.includes(p.k)?'COM':'UN'),units:[],uid:1,sel:new Set(),selProv:-1,hover:-1,targets:new Map(),log:[],phase:'init',over:false,dirtyFill:true,dirtyHi:true,endResolve:null,chnSeen:false,cam:newCamMap(),mods:{},bonus:{UN:0,COM:0},objs:[],supSet:null,alt:{seen:{},last:-9}};
   for(const s of SCRIPT){if(s[0]===1){let st=s[5];st=s[1]==='COM'?Math.max(2,Math.round(st*.75)):Math.max(2,Math.round(st*1.35));addUnit(s[1],s[2],s[3],s[4],st,PK[s[6]]);}}
   glog('1950년 6월 25일 — 38선 전역에서 전쟁이 시작되었다.','sys');
 }
@@ -355,7 +355,8 @@ function updateHUD(){
   calcSupply();
   const a=vpOf('UN'),b=vpOf('COM'),t=a+b;
   const nu=G.own.filter(o=>o==='UN').length,nc=P.length-nu;
-  $('vp').innerHTML=`<div class="vrow"><span>승점</span><span><b class="un">${a}</b> : <b class="com">${b}</b></span></div><div class="vbar"><i class="un" style="width:${a/t*100}%"></i><i class="com" style="width:${b/t*100}%"></i></div><div class="vrow"><span>유엔군 ${nu}개 지역</span><span>공산군 ${nc}개 지역</span></div><div style="color:var(--dim);margin-top:3px">종전(1953.7)까지 ${G.max-G.turn}턴 · 당신: <b style="color:var(--${G.player==='UN'?'un':'com'})">${SIDE_N[G.player]}</b></div>`;
+  const dv=divergences(),dvN=dv.length,dvTip=dv.map(d=>P[d.p].sn+': 현실 '+SIDE_N[d.real]+' / 현재 '+SIDE_N[d.now]).join('\n').replace(/"/g,'');
+  $('vp').innerHTML=`<div class="vrow"><span>승점</span><span><b class="un">${a}</b> : <b class="com">${b}</b></span></div><div class="vbar"><i class="un" style="width:${a/t*100}%"></i><i class="com" style="width:${b/t*100}%"></i></div><div class="vrow"><span>유엔군 ${nu}개 지역</span><span>공산군 ${nc}개 지역</span></div><div style="color:#b9aedb;margin-top:3px" title="${dvTip}">🌀 역사 이탈 <b>${dvN}</b>곳 <span style="color:var(--dim)">(현실 전황과 다른 지역)</span></div><div style="color:var(--dim);margin-top:3px">종전(1953.7)까지 ${G.max-G.turn}턴 · 당신: <b style="color:var(--${G.player==='UN'?'un':'com'})">${SIDE_N[G.player]}</b></div>`;
   $('bTurn').textContent=`${G.turn}턴 · ${dateStr(G.turn)}`;
   $('objs').innerHTML=objHud();
 }
@@ -2813,7 +2814,7 @@ function autoMods(pid,att){
   const m=G.mods,def=opp(att);let pa=1,pd=1;
   if(m.surprise&&G.turn<=m.surprise.until&&def===m.surprise.side)pd*=.92;
   if(m.chn&&G.turn<=m.chn.until&&att==='COM'&&COM_START.includes(P[pid].k))pa*=1.15;
-  if(m.offensive&&G.turn<=m.offensive.until&&att==='COM')pa*=1.2;
+  if(m.offensive&&G.turn<=m.offensive.until&&att==='COM')pa*=(m.offensive.pa||1.2);
   if(m.trench)pd*=1.1;
   return{pa,pd};
 }
@@ -2907,9 +2908,183 @@ const EVENTS=[
   text:'협상이 마지막 조율 단계에 들어갔습니다. 정전 시 현재의 점령선이 곧 군사분계선이 되므로 양측 모두 마지막 한 뼘의 땅을 위해 총력전을 폅니다.',
   run(){return['정전 협정 시 지배 지역에 따라 승점이 결정됩니다'];}}
 ];
+// ---- 가상 역사: 현실의 전황표와 현재 전황을 비교해, 어긋나면 "현실과 다른 역사적 사건"을 띄운다
+// 각 턴 시작 시점(= 직전 달 말)의 실제 지배 상황. 확실치 않은 지역은 Q(비교 제외)로 둔다.
+const HIST=[
+ {t:1,COM:'hb ry hn hh pb pn py hbk hsn gw',UN:'se ic gg cb cn jb jn gb gn bs dg dj gj us'},
+ {t:2,COM:'se ic gg'},                                              // 6.28 서울 함락
+ {t:3,COM:'cb cn dj jb jn gj',Q:'gb gn'},                           // 7.20 대전, 7.29 광주
+ {t:5,UN:'se ic gg cb cn dj gb gn',Q:'gw jb jn gj'},                // 9.28 서울 수복, 낙동강 돌파
+ {t:6,UN:'py pn hbk hsn hh hn gw jb jn gj',Q:'pb ry hb'},           // 10.19 평양, 10.10 원산
+ {t:7,Q:'pb ry hb gw'},
+ {t:8,COM:'py pn hbk hsn hh hn pb ry hb',Q:'gw'},                   // 12.5 평양 포기, 12.24 흥남
+ {t:9,COM:'se ic gg',Q:'cb cn gb gw'},                             // 1.4 서울 재함락
+ {t:10,UN:'ic',Q:'gg cb cn gb'},                                    // 2.10 인천 탈환
+ {t:11,UN:'se ic gg cb cn gb',Q:'hbk gw'}                           // 3.15 서울 재수복, 캔자스선
+];
+function histOwner(k,t){
+  let r=null;
+  for(const h of HIST){
+    if(h.t>t)break;
+    if(h.UN&&h.UN.split(' ').includes(k))r='UN';
+    if(h.COM&&h.COM.split(' ').includes(k))r='COM';
+    if(h.Q&&h.Q.split(' ').includes(k))r=null;
+  }
+  return r;
+}
+function divergences(){
+  const out=[];
+  P.forEach((p,i)=>{const h=histOwner(p.k,G.turn);if(h&&G.own[i]!==h)out.push({p:i,real:h,now:G.own[i]});});
+  return out;
+}
+const ownK=k=>G.own[PK[k]];
+const landOf=(side,f)=>G.units.filter(u=>u.side===side&&isLand(u)&&(!f||f(u)));
+function healSide(side,n,f){let c=0;for(const u of landOf(side,f)){const v=Math.min(u.max,u.str+n);if(v>u.str){u.str=v;c++;}}return c;}
+function hurtSide(side,n,f){let c=0;for(const u of landOf(side,f)){const v=Math.max(1,u.str-n);if(v<u.str){u.str=v;c++;}}return c;}
+
+// 예정된 역사 사건의 전제가 깨졌을 때, 그 사건을 대신하는 가상 역사 버전
+const NORTH_K=['py','pn','hbk','hsn','hh','hn','pb','ry','hb'];
+const SOUTH_K=['cb','cn','dj','jb','jn','gj','gb','gn','dg','bs','us'];
+const ALT={
+ 2:()=>{
+  if(ownK('se')==='UN')return{ic:'🌉',title:'가상 역사 — 서울을 지켜낸 6월',
+   real:'현실: 6.28 서울 함락 · 한강 인도교 조기 폭파로 다리 위의 피란민과 장병 수백 명 희생',
+   text:'현실에서는 개전 사흘 만에 서울이 넘어갔고, 7월 5일 죽미령에서 미 제24사단 선발대가 첫 전투를 치렀습니다. 이 전개에서는 수도가 버티는 가운데 유엔 안전보장이사회 결의에 따라 참전이 이어집니다. 후방을 정비할 시간을 번 만큼 병력이 온전합니다.',
+   run(){const c=healSide('UN',1);return[`한강선 유지로 병력 보전: 유엔군 지상부대 ${c}개 병력 +1`,'미 극동공군·제7함대·제24보병사단 등 증원이 순차 도착합니다'];}};
+  if(SOUTH_K.some(k=>ownK(k)==='COM'))return{ic:'🔻',title:'가상 역사 — 남부까지 번진 7월',
+   real:'현실: 7월 초 전선은 한강~오산 일대 · 7.20 대전 함락',
+   text:'현실에서는 7월 5일 죽미령에서 북한군 전차를 막으려던 미 제24사단 선발대가 패퇴했고, 대전이 무너진 것은 7월 20일이었습니다. 이 전개에서는 북한군이 벌써 남부 깊숙이 들어와 있어, 유엔군은 증원이 닿기도 전에 시간에 쫓깁니다.',
+   run(){const c=hurtSide('UN',1);return[`지연전 실패로 소모 가중: 유엔군 지상부대 ${c}개 병력 −1`,'미 극동공군·제7함대·제24보병사단 등 증원은 예정대로 도착합니다'];}};
+  return null;
+ },
+ 4:()=>{
+  if(ownK('dg')==='COM'||ownK('bs')==='COM')return{ic:'💀',title:'가상 역사 — 무너진 낙동강 방어선',
+   real:'현실: 8~9월 워커 장군의 사수 명령과 기동 예비대로 낙동강 방어선 유지',
+   text:'현실에서는 워커 장군의 사수 명령 아래 예비대를 돌려 막으며 낙동강 선을 지켜 냈고, 그 덕에 9월 15일 인천 상륙이 가능했습니다. 이 전개에서는 방어선이 뚫려 상륙작전을 구상할 여유가 없고, 사령부는 철수 계획까지 거론합니다.',
+   run(){G.mods.offensive={side:'COM',until:G.turn,pa:1.1};const c=hurtSide('UN',1);return['이번 턴: 공산군 공격 전투력 +10% (자동 전투)',`방어선 붕괴로 유엔군 지상부대 ${c}개 병력 −1`,'인천상륙작전은 실행되지 않습니다'];}};
+  if(ownK('se')==='UN')return{ic:'🛡️',title:'가상 역사 — 상륙이 필요 없던 가을',
+   real:'현실: 서울을 잃은 채 낙동강에 갇힌 유엔군이 9.15 인천상륙으로 적 후방 차단',
+   text:'현실의 인천상륙작전은 서울을 내주고 낙동강에 몰린 유엔군이 적 보급선의 심장부를 끊기 위해 건 도박이었습니다. 이 전개에서는 한강선이 무너지지 않아, 위험한 상륙 대신 정면 반격을 택할 수 있습니다.',
+   run(){const c=healSide('UN',1);return[`반격 준비 완료: 유엔군 지상부대 ${c}개 병력 +1`,'인천상륙작전은 실행되지 않습니다'];}};
+  return null;
+ },
+ 5:()=>{
+  if(COM_START.some(k=>ownK(k)==='UN'))return null;
+  if(ownK('se')==='UN'&&!SOUTH_K.some(k=>ownK(k)==='COM'))return null; // 남부를 수복했다면 현실과 크게 다르지 않음
+  return{ic:'🐉',title:'가상 역사 — 38선에 이르지 못한 가을',
+   real:'현실: 10.3 저우언라이가 38선 돌파 시 개입을 경고 → 10.19 중공군 압록강 도하',
+   text:'현실에서 중국은 유엔군의 38선 돌파를 개입의 분수령으로 경고했고, 10월 19일 압록강을 건넜습니다. 이 전개에서는 유엔군이 아직 남부조차 되찾지 못했지만, 완충지대를 잃지 않으려는 중국은 병력을 국경에 집결시키고 북한 방어를 위해 증원을 보냅니다.',
+   run(){G.chnSeen=true;return['중공군·소련 공군 증원이 도착합니다','유엔군이 북진하지 않았으므로 기습 효과는 없습니다'];}};
+ },
+ 8:()=>{
+  if(!NORTH_K.some(k=>ownK(k)==='UN'))return null;
+  return{ic:'🔥',title:'가상 역사 — 평양을 지켜낸 겨울',
+   real:'현실: 11월 말 중공군 공세로 12.5 평양 포기 · 12.24 흥남 철수 · 1.4 서울 재함락',
+   text:'현실에서는 중공군 제2차 공세에 유엔군이 평양을 불태우고 물러났으며, 1월 4일 서울마저 다시 넘어갔습니다. 이 전개에서는 북쪽의 거점을 쥔 채 겨울을 맞아, 신정공세의 기세가 현실만큼 거세지 않습니다.',
+   run(){G.mods.offensive={side:'COM',until:G.turn,pa:1.1};return['이번 턴: 공산군 공격 전투력 +10% (자동 전투)','현실의 “제압 상태 시작” 불이익은 발생하지 않습니다'];}};
+ },
+ 14:()=>{
+  if(ownK('se')==='COM')return{ic:'📜',title:'가상 역사 — 서울을 쥔 정전 회담',
+   real:'현실: 1951.7 정전회담은 서울이 유엔군 수중에 있고 전선이 38선 부근에서 굳은 채 시작',
+   text:'현실에서는 개성 회담이 열릴 때 서울은 유엔군이 쥐고 있었습니다. 이 전개에서는 공산군이 서울을 쥔 채 협상 탁자에 앉아, 군사분계선 논의의 무게추가 크게 기웁니다. 그럼에도 전선에서는 협상 우위를 위한 고지 쟁탈전이 이어집니다.',
+   run(){G.mods.trench=true;return['이후 계속: 모든 방어 전투력 +10% (참호전 시대)'];}};
+  if(ownK('py')==='UN')return{ic:'📜',title:'가상 역사 — 평양을 쥔 정전 회담',
+   real:'현실: 1951.7 정전회담 당시 평양은 북한이 쥐고 있었고 전선은 38선 부근',
+   text:'현실에서는 북한이 평양을 지킨 채 협상에 나섰습니다. 이 전개에서는 유엔군이 북한의 수도를 쥐고 회담을 맞아, 공산군이 휴전을 서두릅니다. 협상의 유불리가 걸린 만큼 전선의 고지 쟁탈전은 오히려 더 치열해집니다.',
+   run(){G.mods.trench=true;return['이후 계속: 모든 방어 전투력 +10% (참호전 시대)'];}};
+  return null;
+ }
+};
+
+// 예정된 사건이 없는 턴(또는 사건이 하나뿐인 턴)에, 지역 단위로 현실과 어긋난 전황을 짚는 가상 역사 사건
+const SPECIAL={
+ se:(d,t)=>{
+  if(d.now==='UN'&&t<=4)return{ic:'🌉',title:'가상 역사 — 한강선을 지켜낸 서울',
+   real:'현실: 6.28 한강 인도교 조기 폭파, 서울은 사흘 만에 함락',
+   text:'현실에서는 개전 사흘째 새벽 한강 인도교가 폭파되어 다리 위의 피란민과 병력 수백 명이 희생되었고, 한강 이북의 병력은 중장비를 버린 채 흩어졌습니다. 이 전개에서 서울은 버텨 냈고, 정부와 병력이 질서를 유지한 채 후방 방어선을 정비할 시간을 벌었습니다.',
+   run:()=>{const c=healSide('UN',1);return[`한강선 유지로 병력 보전: 유엔군 지상부대 ${c}개 병력 +1`];}};
+  if(d.now==='UN')return{ic:'🌉',title:'가상 역사 — 다시 내주지 않은 서울',
+   real:'현실: 1951.1.4 서울 재함락 → 3.15 재수복',
+   text:'현실에서는 1951년 1월 4일 중공군의 신정공세로 서울이 다시 넘어가, 시민들이 얼어붙은 한강을 건너 피란길에 올랐습니다. 이 전개에서는 수도를 지켜 냈기에, 되찾기 위한 시가전과 또 한 번의 피란 행렬이 없습니다.',
+   run:()=>{const c=healSide('UN',1);return[`수도 방어 성공: 유엔군 지상부대 ${c}개 병력 +1`];}};
+  if(t<=8)return{ic:'🏚️',title:'가상 역사 — 수복되지 못한 서울',
+   real:'현실: 9.15 인천상륙 → 9.28 서울 수복',
+   text:'현실에서는 인천 상륙 후 보름 가까운 시가전 끝에 9월 28일 서울이 수복되었습니다. 이 전개에서 서울은 아직 공산군 치하에 있고, 시민들은 점령군의 징집과 보복, 폭격 속에 갇혀 있습니다.',
+   run:()=>{const c=healSide('COM',1);return[`점령지 방어 강화: 공산군 지상부대 ${c}개 병력 +1`];}};
+  return{ic:'🏚️',title:'가상 역사 — 주인이 거듭 바뀐 서울',
+   real:'현실: 1951.3.15 서울 재수복 이후 정전까지 유엔군 수중',
+   text:'현실에서는 1951년 3월 서울이 유엔군에 되돌아온 뒤 다시 넘어가지 않았습니다. 이 전개에서 서울은 몇 차례나 주인이 바뀐 도시가 되었고, 폐허 속에 남은 시민은 크게 줄었습니다.',
+   run:()=>{const c=healSide('COM',1);return[`점령지 방어 강화: 공산군 지상부대 ${c}개 병력 +1`];}};
+ },
+ py:(d,t)=>{
+  if(d.now==='UN')return{ic:'🏙️',title:'가상 역사 — 앞당겨진 평양 입성',
+   real:'현실: 10.19 평양 점령 → 12.5 중공군 남하로 포기',
+   text:'현실에서 평양은 10월 19일에야 유엔군 손에 들어왔고, 12월 5일 중공군이 내려오자 불타는 시가를 남기고 포기되었습니다. 이 전개에서는 북한의 수도가 시간표보다 먼저 흔들렸고, 지휘부와 병참 중심이 압록강 쪽으로 밀려났습니다.',
+   run:()=>{const c=hurtSide('COM',1);return[`북한 지휘·보급 체계 혼란: 공산군 지상부대 ${c}개 병력 −1`];}};
+  return{ic:'🏙️',title:'가상 역사 — 끝내 열리지 않은 평양',
+   real:'현실: 10.19 평양 점령 · “크리스마스까지 귀환” 낙관론',
+   text:'현실에서는 10월 19일 평양이 열렸고 유엔군은 크리스마스 귀환을 입에 올릴 만큼 낙관했습니다. 이 전개에서 평양은 끝내 버텼고, 중국은 한층 여유 있게 참전 준비를 마쳤습니다.',
+   run:()=>{const c=healSide('COM',1);return[`수도 방어 성공: 공산군 지상부대 ${c}개 병력 +1`];}};
+ },
+ dj:(d)=>d.now==='UN'?{ic:'🛡️',title:'가상 역사 — 대전을 지켜낸 7월',
+   real:'현실: 7.20 대전 함락 · 미 24사단장 딘 소장이 후퇴 중 낙오되어 포로가 됨',
+   text:'현실에서는 7월 20일 대전이 함락되고, 미 제24사단장 딘 소장이 후퇴 중 낙오되어 끝내 포로가 되었습니다. 이 전개에서는 대전이 버텨 낙동강까지의 후퇴가 늦춰졌고 사단 지휘부도 온전합니다.',
+   run:()=>{const c=healSide('UN',1);return[`지연전 성공: 유엔군 지상부대 ${c}개 병력 +1`];}}:null,
+ bs:(d,t)=>d.now==='COM'?collapseEv(d):null,
+ dg:(d,t)=>d.now==='COM'?collapseEv(d):null,
+ pb:(d)=>d.now==='UN'?yaluEv(d):null,
+ ry:(d)=>d.now==='UN'?yaluEv(d):null,
+ hb:(d)=>d.now==='UN'?yaluEv(d):null
+};
+function collapseEv(d){
+  return{ic:'💀',title:'가상 역사 — 무너진 낙동강 방어선',
+   real:'현실: 8~9월 워커 장군의 사수 명령과 기동 예비대로 방어선 유지',
+   text:`현실에서는 워커 장군이 예비대를 돌려 막으며 낙동강 방어선을 끝까지 지켜 냈습니다. 이 전개에서는 「${P[d.p].sn}」 일대가 뚫렸고, 사령부는 철수 계획까지 거론합니다.`,
+   run:()=>{G.mods.offensive={side:'COM',until:G.turn,pa:1.1};const c=hurtSide('UN',1);return['이번 턴: 공산군 공격 전투력 +10% (자동 전투)',`방어선 동요로 유엔군 지상부대 ${c}개 병력 −1`];}};
+}
+function yaluEv(d){
+  return{ic:'🧭',title:'가상 역사 — 너무 일찍 닿은 압록강',
+   real:'현실: 10.26 국군 6사단 선봉이 압록강변 초산에 이르렀으나 곧 중공군에 격퇴',
+   text:'현실에서 유엔군이 압록강 물을 처음 본 것은 10월 하순이었고, 그마저 곧 중공군의 매복에 밀려났습니다. 이 전개에서는 국경이 일찍 위협받았고, 중국은 개입 시점을 앞당겨 병력을 서둘러 투입합니다.',
+   run:()=>{const p=pickEntry('COM',['pb','ry','hb','py']);if(p<0)return['증원이 투입될 지역이 없습니다'];
+     addUnit('COM','CHN','inf','중공 인민지원군 선발 군단',6,p);return[`중공군 선발 군단이 ${P[p].n}에 도착했습니다`];}};
+}
+function whatIfEv(d){
+  const p=P[d.p],t=G.turn,when=dateStr(t),north=COM_START.includes(p.k);
+  const head=`<b>${p.sn}</b> · 현실(${when}) ${SIDE_N[d.real]} 장악 → 이 게임 ${SIDE_N[d.now]} 장악`;
+  const sp=SPECIAL[p.k]&&SPECIAL[p.k](d,t);
+  if(sp)return Object.assign({},sp,{real:head+(sp.real?`<br>${sp.real}`:'')});
+  const t1=`현실의 ${when}에는 「${p.sn}」 지역을 ${SIDE_N[d.real]}이 장악하고 있었습니다.`;
+  const t2=d.now==='UN'
+    ?(north?'이 전개에서는 유엔군이 시간표보다 먼저 이곳에 도달해, 북한 후방의 보급과 행정이 흔들립니다.':'이 전개에서는 유엔군이 이 지역을 끝까지 지켜 내어, 점령과 피란의 피해를 면했습니다.')
+    :(north?'이 전개에서는 공산군이 이곳을 끝까지 틀어쥐고 있어, 유엔군의 북진 시간표가 어긋납니다.':'이 전개에서는 공산군이 이 지역을 아직 점령하고 있고, 주민들은 징발과 보복, 포격에 시달립니다.');
+  return{ic:'🌀',title:`가상 역사 — 「${p.sn}」의 주인이 다르다`,real:head,text:t1+' '+t2,
+    run:()=>{const a=healSide(d.now,1,u=>u.prov===d.p);const b=hurtSide(d.real,1,u=>u.prov===d.p||ADJ[d.p].has(u.prov));
+      const l=[];if(a)l.push(`${SIDE_N[d.now]} 주둔 부대 ${a}개 병력 +1`);if(b)l.push(`${SIDE_N[d.real]} 인접 부대 ${b}개 병력 −1`);
+      return l.length?l:['직접 영향을 받는 부대는 없지만, 전황의 균형이 현실과 달라졌습니다'];}};
+}
+function pickWhatIf(){
+  const A=G.alt,t=G.turn;
+  if(t-A.last<2)return null;
+  const ds=divergences().filter(d=>!A.seen[P[d.p].k+d.now]);
+  if(!ds.length)return null;
+  ds.sort((a,b)=>P[b.p].vp-P[a.p].vp);
+  const d=ds[0];A.seen[P[d.p].k+d.now]=1;A.last=t;
+  return whatIfEv(d);
+}
+const altHead=ev=>ev.alt?'<div style="color:#c9a0ff;font-size:11px;letter-spacing:.14em;margin-bottom:2px">🌀 가상 역사 — 현실과 다른 전개</div>':'';
+const altReal=ev=>ev.alt&&ev.real?`<div style="margin:8px 0;padding:6px 10px;border-left:3px solid #6a5a9a;background:#120f1c;font-size:12.5px;line-height:1.6;color:#b9aedb">${ev.real}</div>`:'';
+
 async function runEvents(){
   const newObjs=objsStarting();
-  const evs=EVENTS.filter(e=>e.t===G.turn&&(!e.cond||e.cond()));
+  const evs=[];
+  for(const e of EVENTS){
+    if(e.t!==G.turn)continue;
+    const a=ALT[e.t]&&ALT[e.t]();
+    if(a){a.alt=true;evs.push(a);}
+    else if(!e.cond||e.cond())evs.push(e);
+  }
+  if(evs.length<=1&&!evs.some(e=>e.alt)){const w=pickWhatIf();if(w){w.alt=true;evs.push(w);}}
   if(!evs.length&&!newObjs.length)return;
   let first=true;
   for(const ev of evs){
@@ -2918,13 +3093,14 @@ async function runEvents(){
     const objHtml=first&&newObjs.length?'<h4>🎯 새 목표</h4><ul>'+newObjs.map(o=>`<li>${objLine(o)}</li>`).join('')+'</ul>':'';
     first=false;
     let go=true;
+    if(ev.alt)glog(`[가상 역사] ${ev.title.replace('가상 역사 — ','')}`,'sys');
     if(asked){
-      go=await modal(`<h2>${ev.ic} ${ev.title}</h2><p>${ev.text}</p><p style="color:var(--gold);margin-top:6px">${ev.ask.q}</p>${objHtml}`,[{t:ev.ask.yes,v:true,cls:'pri'},{t:ev.ask.no,v:false}]);
+      go=await modal(`${altHead(ev)}<h2>${ev.ic} ${ev.title}</h2><p>${ev.text}</p>${altReal(ev)}<p style="color:var(--gold);margin-top:6px">${ev.ask.q}</p>${objHtml}`,[{t:ev.ask.yes,v:true,cls:'pri'},{t:ev.ask.no,v:false}]);
       const lines=ev.run(go);lines.forEach(l=>glog(`[사건] ${l}`,'sys'));
     }else{
       if(ev.ask)go=true; // AI는 항상 감행
       const lines=ev.run(go);
-      await modal(`<h2>${ev.ic} ${ev.title}</h2><p>${ev.text}</p>${lines.length?'<h4>영향</h4><ul>'+lines.map(l=>`<li>${l}</li>`).join('')+'</ul>':''}${objHtml}`,[{t:'확인',v:1,cls:'pri'}]);
+      await modal(`${altHead(ev)}<h2>${ev.ic} ${ev.title}</h2><p>${ev.text}</p>${altReal(ev)}${lines.length?'<h4>영향</h4><ul>'+lines.map(l=>`<li>${l}</li>`).join('')+'</ul>':''}${objHtml}`,[{t:'확인',v:1,cls:'pri'}]);
       lines.forEach(l=>glog(`[사건] ${l}`,'sys'));
     }
   }
