@@ -79,6 +79,12 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 .cardfoot{display:flex;align-items:center;margin-top:10px}
 .cardfoot .play{margin-top:0}
 .now[hidden]{display:none}
+.sortbar{width:min(100%,980px);margin-top:30px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sortbar .lab{font-size:.8rem;color:var(--muted);margin-right:4px}
+.sortbar button{font:inherit;font-size:.82rem;padding:7px 14px;border-radius:999px;border:1px solid var(--line,#35586a);background:transparent;color:var(--muted);cursor:pointer;transition:.15s}
+.sortbar button:hover{color:#fff;border-color:#6f9db3}
+.sortbar button[aria-pressed="true"]{background:#e8c36a;border-color:#e8c36a;color:#10202a;font-weight:700}
+.sortbar+.grid{margin-top:14px}
 .now.zero{color:var(--muted)}
 .now.zero::before{background:#5b6b78;animation:none}
 .now{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;color:#8fd6a8;white-space:nowrap}
@@ -109,6 +115,12 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
     <div class="hot-head"><h2><b>LIVE</b>지금 가장 인기 있는 게임</h2><span class="live" id="liveState"><i></i><span>연결 중…</span></span></div>
     <div class="podium" id="podium"></div>
   </section>
+  <div class="sortbar" id="sortbar" role="group" aria-label="게임 정렬">
+    <span class="lab">정렬</span>
+    <button type="button" data-sort="default" aria-pressed="true">기본순</button>
+    <button type="button" data-sort="total" aria-pressed="false">누적 인기순</button>
+    <button type="button" data-sort="live" aria-pressed="false">실시간 인기순</button>
+  </div>
   <div class="grid" id="grid"></div>
   <p class="last" id="last"></p>
   <footer>게임을 추가하려면 코드 안의 GAMES 배열에 항목을 한 줄 추가하세요.</footer>
@@ -358,7 +370,7 @@ const GAMES=[
   {
     id:'groupproject',
     title:'중학생 조별과제 무임승차 잔혹사', hanja:'',
-    desc:'[놀랍게도 개발자의 실화기반]일을 짬맞아서 조장이 되어버렸다. 팀원들을 잘 갈궈서 7일 안에 조별과제를 끝내라. 우드락 만들기와 PPT 발표 두 가지 모드, 엔딩 5종.',
+    desc:'[놀랍게도 개발자의 실화기반] 일을 짬맞아서 조장이 되어버렸다. 팀원들을 잘 갈궈서 7일 안에 조별과제를 끝내라. 우드락 만들기와 PPT 발표 두 가지 모드, 엔딩 5종.',
     keys:'마우스 클릭 · 선택지를 골라 7일간 단톡방 대화 진행',
     src:'games/groupproject.html',
     ready:true,
@@ -406,7 +418,7 @@ GAMES.forEach(g=>{
       `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
       `<p class="desc">${esc(g.desc)}</p>`+
       (g.keys?`<span class="keys">${esc(g.keys)}</span>`:'')+
-      `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" data-always></span></span>`+
+      `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" data-always></span><span class="cnt" data-cnt="${g.id}"></span></span>`+
     `</span>`+
     (g.ready?'':'<span class="badge">COMING SOON</span>');
   if(g.ready)b.addEventListener('click',()=>open(g));
@@ -471,6 +483,8 @@ function thumbHTML(g){return `<span class="thumb">${g.thumb||defaultThumb}<img s
 
 function renderStats(){
   /* 카드마다 플레이 횟수 + TOP3 표시 */
+  document.querySelectorAll('[data-cnt]').forEach(el=>{const n=+plays[el.dataset.cnt]||0;el.textContent=n?'▶ '+fmt(n)+'회 플레이':'';});
+  sortGrid();
   const top=ranked();
   document.querySelectorAll('.card .mini').forEach(m=>m.remove());
   top.forEach((x,k)=>{const c=grid.querySelector(`[data-id="${x.g.id}"] .thumb`);if(c){const m=document.createElement('span');m.className='mini';m.textContent='TOP '+(k+1);c.appendChild(m);}});
@@ -547,8 +561,35 @@ function stopPresence(){
   myGame=null;mySid=null;
 }
 addEventListener('pagehide',stopPresence);
+/* ---------- 정렬: 기본순 / 누적 인기순 / 실시간 인기순 ---------- */
+let sortMode='default';
+try{const m=localStorage.getItem('lobby-sort');if(['default','total','live'].includes(m))sortMode=m;}catch(e){}
+function sortGrid(){
+  const idx=Object.fromEntries(GAMES.map((g,i)=>[g.id,i]));
+  const ready=id=>{const g=GAMES[idx[id]];return g&&g.ready?0:1;};
+  const P=id=>+plays[id]||0,L=id=>+(typeof live!=='undefined'&&live[id])||0;
+  const cmp={
+    default:(a,b)=>idx[a]-idx[b],
+    total:(a,b)=>P(b)-P(a)||L(b)-L(a)||idx[a]-idx[b],
+    live:(a,b)=>L(b)-L(a)||P(b)-P(a)||idx[a]-idx[b]
+  }[sortMode];
+  const cards=[...grid.children];
+  const sorted=cards.slice().sort((x,y)=>ready(x.dataset.id)-ready(y.dataset.id)||cmp(x.dataset.id,y.dataset.id));
+  if(sorted.some((c,i)=>c!==cards[i]))sorted.forEach(c=>grid.appendChild(c));
+}
+document.querySelectorAll('#sortbar [data-sort]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    sortMode=b.dataset.sort;
+    try{localStorage.setItem('lobby-sort',sortMode);}catch(e){}
+    syncSortBtns();sortGrid();
+  });
+});
+function syncSortBtns(){document.querySelectorAll('#sortbar [data-sort]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.sort===sortMode)));}
+syncSortBtns();
+
 function updateNow(){
   document.querySelectorAll('[data-now]').forEach(el=>{const n=live[el.dataset.now]||0;const al=el.hasAttribute('data-always');el.hidden=!n&&!al;el.classList.toggle('zero',!n);el.textContent=n?n.toLocaleString('ko-KR')+'명 플레이 중':'현재 0명';});
+  if(sortMode==='live')sortGrid();
 }
 function readLive(d){
   const now=Date.now(),out={},stale=[];
