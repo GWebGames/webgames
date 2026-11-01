@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>벼락치기 기말고사 주식시장 (중학생 편)</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              500: '#06b6d4',
+              600: '#0891b2',
+              900: '#164e63',
+            }
+          },
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Pulse Glow Animations */
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+    .animate-pulse-glow {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+
+    /* Ticker Text Animations */
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    .ticker-content {
+      display: inline-block;
+      white-space: nowrap;
+      animation: ticker 25s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white font-sans antialiased relative overflow-x-hidden">
+
+  <!-- BACKGROUND GLOW EFFECTS -->
+  <div class="fixed top-0 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none animate-pulse-glow"></div>
+  <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[120px] pointer-events-none animate-pulse-glow" style="animation-delay: 1.5s;"></div>
+
+  <!-- TOP HEADER / DASHBOARD NAVBAR -->
+  <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 px-4 py-3 shadow-xl">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- LOGO & TITLE -->
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/30 flex items-center justify-center">
+          <i data-lucide="candlestick-chart" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg leading-tight flex items-center gap-2 tracking-tight text-white">
+            벼락치기 기말고사 주식시장
+            <span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded-full font-semibold">FINAL EXAM</span>
+          </h1>
+          <p class="text-xs text-slate-400 font-medium">단톡방 찌라시 믿고 벼락치기 시험 범위에 몰빵하자</p>
+        </div>
+      </div>
+
+      <!-- DASHBOARD STATS -->
+      <div class="flex items-center gap-2 sm:gap-4 bg-slate-950/80 border border-slate-800/80 px-3 sm:px-5 py-2 rounded-2xl shadow-inner">
+        <!-- D-DAY COUNTER -->
+        <div class="text-center px-2 sm:px-3 border-r border-slate-800">
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">남은 시간</p>
+          <div id="dday-tag" class="text-lg sm:text-xl font-black text-amber-400 tracking-tight">D-7</div>
+        </div>
+        <!-- CASH -->
+        <div class="text-center px-2 sm:px-3 border-r border-slate-800">
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">내 용돈</p>
+          <div id="user-cash" class="text-base sm:text-lg font-black text-emerald-400">100,000 P</div>
+        </div>
+        <!-- NET WORTH -->
+        <div class="text-center px-2 sm:px-3">
+          <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">총 평가 자산</p>
+          <div id="user-total-val" class="text-base sm:text-lg font-black text-indigo-300">100,000 P</div>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="flex items-center gap-2">
+        <button id="sound-toggle-btn" onclick="toggleSound()" class="p-2.5 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 rounded-xl text-slate-300 transition-all active:scale-95" title="음향 온/오프">
+          <i data-lucide="volume-2" id="sound-icon" class="w-5 h-5 text-emerald-400"></i>
+        </button>
+        <button id="next-turn-btn" onclick="nextTurn()" class="bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-600 hover:from-indigo-600 hover:via-purple-700 hover:to-pink-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-500/25 active:scale-95 transition-all flex items-center gap-2 text-sm">
+          <span id="next-btn-text">다음 날로 (D-6)</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- BREAKING NEWS TICKER -->
+  <div class="bg-slate-900 border-b border-slate-800/80 py-1.5 px-4 overflow-hidden flex items-center gap-3">
+    <div class="flex items-center gap-1.5 text-xs font-bold text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2 py-0.5 rounded-md shrink-0">
+      <i data-lucide="megaphone" class="w-3.5 h-3.5 animate-bounce"></i> 속보
+    </div>
+    <div class="overflow-hidden w-full relative">
+      <div id="ticker-container" class="ticker-content text-xs text-slate-300 font-medium">
+        [단톡방] 기말고사 D-7!! 반 단톡방 찌라시 잘 보고 나올 것 같은 과목에 몰빵해라 ㅋㅋ
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN DASHBOARD CONTENT GRID -->
+  <main class="max-w-7xl mx-auto w-full p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
+
+    <!-- LEFT & CENTER (2 COLS): STOCKS & CHART -->
+    <section class="lg:col-span-2 space-y-6">
+
+      <!-- STOCKS GRID -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-bold flex items-center gap-2 text-slate-100">
+            <i data-lucide="layout-grid" class="w-5 h-5 text-indigo-400"></i> 과목별 시험 출제 예상 주가
+          </h2>
+          <span class="text-xs text-slate-400 font-normal">쌤 한마디에 폭등·폭락</span>
+        </div>
+        <div id="stock-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Dynamically populated by JS -->
+        </div>
+      </div>
+
+      <!-- REAL-TIME CHART -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-2xl backdrop-blur-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-800/80">
+          <div class="flex items-center gap-2">
+            <div class="p-1.5 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+              <i data-lucide="line-chart" class="w-4 h-4 text-purple-400"></i>
+            </div>
+            <h3 class="text-sm font-bold text-slate-200">주가 변동 추이 그래프</h3>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-slate-400">
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 수학</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> 영어</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> 국어</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-pink-500"></span> 과학</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-500"></span> 역사</span>
+          </div>
+        </div>
+        <div class="relative w-full h-64 sm:h-72">
+          <canvas id="stockChart"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT COLUMN (1 COL): RUMORS & PORTFOLIO -->
+    <section class="space-y-6 flex flex-col">
+
+      <!-- RUMOR / NEWS FEED -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-2xl backdrop-blur-sm flex flex-col h-80">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800/80">
+          <h2 class="text-sm font-bold flex items-center gap-2 text-slate-100">
+            <i data-lucide="newspaper" class="w-4 h-4 text-amber-400"></i> 우리 반 단톡방 찌라시
+          </h2>
+          <span class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold animate-pulse">LIVE</span>
+        </div>
+        <div id="news-feed" class="flex-1 overflow-y-auto space-y-3 py-3 pr-1">
+          <!-- News items populated by JS -->
+        </div>
+      </div>
+
+      <!-- MY PORTFOLIO SUMMARY -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-2xl backdrop-blur-sm">
+        <h2 class="text-sm font-bold mb-3 flex items-center gap-2 text-slate-100">
+          <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i> 내 보유 과목
+        </h2>
+        <div id="portfolio-list" class="space-y-2">
+          <!-- Portfolio items populated by JS -->
+        </div>
+      </div>
+
+      <!-- HIGHSCORE BOARD -->
+      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-xs text-slate-400 space-y-2 mt-auto">
+        <div class="flex justify-between items-center">
+          <span class="flex items-center gap-1.5 font-medium">
+            <i data-lucide="trophy" class="w-4 h-4 text-amber-400"></i> 최고 기록 (All-Time):
+          </span>
+          <span id="best-score" class="font-extrabold text-slate-100 text-sm">-</span>
+        </div>
+        <div class="flex justify-between items-center pt-1 border-t border-slate-800/60">
+          <span class="text-[11px] text-slate-500">기록은 내 폰/컴퓨터에 자동 저장돼요.</span>
+          <button onclick="resetHighscore()" class="text-[11px] text-slate-500 underline hover:text-slate-300">기록 초기화</button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-4 text-center text-xs text-slate-600">
+    벼락치기 기말고사 주식시장 &copy; 2026
+  </footer>
+
+  <!-- RESULT / REPORT CARD MODAL -->
+  <div id="ending-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md hidden items-center justify-center z-50 p-4 transition-all duration-300 opacity-0">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden transform scale-95 transition-transform duration-300" id="ending-modal-content">
+      
+      <!-- BACKGROUND GLOW -->
+      <div class="absolute -top-16 -right-16 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- MODAL HEADER -->
+      <div class="text-center space-y-1">
+        <span class="text-[11px] font-extrabold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">REPORT CARD</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-100 pt-2">기말고사 성적표</h2>
+      </div>
+
+      <!-- GRADE BADGE -->
+      <div class="flex flex-col items-center justify-center p-6 bg-slate-950/70 border border-slate-800 rounded-2xl space-y-2 relative">
+        <div id="modal-grade" class="text-7xl font-black text-amber-400 tracking-tighter drop-shadow-lg">S</div>
+        <div id="modal-title" class="text-lg font-bold text-slate-100">전교 1등 벼락치기의 신</div>
+        <p id="modal-desc" class="text-xs text-slate-400 text-center max-w-xs leading-relaxed">
+          완벽한 정보 분석력으로 시험 범위를 완벽 적중시켰습니다!
+        </p>
+      </div>
+
+      <!-- STATS BREAKDOWN -->
+      <div class="space-y-2.5 text-sm bg-slate-950/50 p-4 rounded-2xl border border-slate-800/80">
+        <div class="flex justify-between text-slate-400">
+          <span>시작 용돈:</span>
+          <span class="font-medium text-slate-200">100,000 P</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>최종 평가 자산:</span>
+          <span id="modal-final-asset" class="font-extrabold text-emerald-400">0 P</span>
+        </div>
+        <div class="flex justify-between text-slate-400 border-t border-slate-800/80 pt-2.5 font-semibold">
+          <span>최종 수익률:</span>
+          <span id="modal-return-rate" class="text-indigo-400 font-bold">+0.0%</span>
+        </div>
+      </div>
+
+      <!-- RESTART BUTTON -->
+      <button onclick="restartGame()" class="w-full py-4 bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-600 hover:from-indigo-600 hover:via-purple-700 hover:to-pink-700 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/30 active:scale-95 transition-all text-center flex items-center justify-center gap-2">
+        <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+        <span>다시 도전 (2학기 시작)</span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- GAME LOGIC SCRIPT -->
+  <script>
+    // -------------------------------------------------------------
+    // AUDIO SYNTHESIZER (Web Audio API)
+    // -------------------------------------------------------------
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        const now = ctx.currentTime;
+
+        if (type === 'buy') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'sell') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(659.25, now); // E5
+          osc.frequency.exponentialRampToValueAtTime(329.63, now + 0.12); // E4
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'next') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(660, now + 0.15);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'fanfare') {
+          // Final Result Fanfare Chord
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g);
+            g.connect(ctx.destination);
+            o.type = 'triangle';
+            o.frequency.setValueAtTime(freq, now + (i * 0.08));
+            g.gain.setValueAtTime(0.15, now + (i * 0.08));
+            g.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+            o.start(now + (i * 0.08));
+            o.stop(now + 0.8);
+          });
+        }
+      } catch (e) {
+        console.warn('Audio play prevented:', e);
+      }
+    }
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const icon = document.getElementById('sound-icon');
+      if (soundEnabled) {
+        icon.setAttribute('data-lucide', 'volume-2');
+        icon.className = 'w-5 h-5 text-emerald-400';
+      } else {
+        icon.setAttribute('data-lucide', 'volume-x');
+        icon.className = 'w-5 h-5 text-slate-500';
+      }
+      lucide.createIcons();
+    }
+
+    // -------------------------------------------------------------
+    // GAME STATE & STOCKS DEFINITION
+    // -------------------------------------------------------------
+    const TOTAL_DAYS = 7;
+    let currentDay = 7;
+    let cash = 100000;
+
+    const stocks = [
+      { id: 'math', name: '수학-연립방정식',   price: 10000, history: [10000], owned: 0, color: '#3b82f6' },
+      { id: 'eng',  name: '영어-to부정사',     price: 10000, history: [10000], owned: 0, color: '#10b981' },
+      { id: 'kor',  name: '국어-시의 표현법',  price: 10000, history: [10000], owned: 0, color: '#f59e0b' },
+      { id: 'sci',  name: '과학-물질의 상태변화', price: 10000, history: [10000], owned: 0, color: '#ec4899' },
+      { id: 'his',  name: '역사-조선 후기',    price: 10000, history: [10000], owned: 0, color: '#8b5cf6' }
+    ];
+
+    // Rumors database
+    const newsPool = [
+      { stockId: 'math', text: "수학 쌤이 칠판에 별표(★) 3개 치면서 '이건 무조건 나온다~' 하셨대!", impact: 0.35, type: 'up' },
+      { stockId: 'math', text: "수학 학원 선생님: '학교 시험은 기본 문제집 변형이라 쉽게 나올 듯?' 이라는 제보", impact: -0.20, type: 'down' },
+      { stockId: 'math', text: "수학 쌤: '연립방정식 서술형 안 풀면 시험지 절반 날아간다.'", impact: 0.40, type: 'up' },
+      { stockId: 'math', text: "3반 애들이 수학 프린트 뒷면에 적힌 문제가 기출이라고 단톡방에 뿌림!", impact: 0.28, type: 'up' },
+
+      { stockId: 'eng', text: "영어 쌤이 수업 때 받아쓰기 시켰던 지문, 그대로 시험에 나온대!", impact: 0.30, type: 'up' },
+      { stockId: 'eng', text: "영어 쌤 감기로 3일 결근... 진도 못 나가서 시험 범위 줄었다는 소문!", impact: -0.25, type: 'down' },
+      { stockId: 'eng', text: "영어 쌤: 'to부정사 문법 문제는 매년 한 문제도 빠짐없이 낸다.'", impact: 0.35, type: 'up' },
+      { stockId: 'eng', text: "영어 단어 시험 통과 못 하면 서술형 점수 깎는다고 공지 떴어", impact: 0.22, type: 'up' },
+
+      { stockId: 'kor', text: "국어 수행평가 낸 애들이 반도 안 돼서 시험을 어렵게 낸다는 썰...", impact: 0.38, type: 'up' },
+      { stockId: 'kor', text: "국어 프린트 2장이 통째로 시험 범위에서 빠졌대. 완전 꿀!", impact: -0.22, type: 'down' },
+      { stockId: 'kor', text: "국어 쌤이 '시의 운율이랑 비유법 구분하는 문제 꼭 낸다'고 3번 말씀하심", impact: 0.28, type: 'up' },
+      { stockId: 'kor', text: "국어 쌤: '이번 시험 객관식은 교과서 예시 그대로 낸다~'", impact: -0.18, type: 'down' },
+
+      { stockId: 'sci', text: "과학 쌤: '실험 보고서 쓴 애들만 서술형 풀 수 있게 낼 거다' 라고 하심!", impact: 0.32, type: 'up' },
+      { stockId: 'sci', text: "과학 실험 영상 시청한 부분은 시험에 거의 안 나온다는 선배 족보!", impact: -0.28, type: 'down' },
+      { stockId: 'sci', text: "과학 쌤: '상태변화 그래프 해석, 이번에 변별력 문제로 낼 거야~'", impact: 0.42, type: 'up' },
+      { stockId: 'sci', text: "과학 쌤이 시험 1주 전에 문제집 3단원 풀어오라고 숙제를 내셨다!", impact: 0.25, type: 'up' },
+
+      { stockId: 'his', text: "역사 쌤이 수업 시간에 '임진왜란 순서 틀리면 안 돼~' 하고 5번 강조하심", impact: 0.30, type: 'up' },
+      { stockId: 'his', text: "역사 연표 외울 게 너무 많아서 학생들이 항의 → 범위 살짝 줄었대!", impact: -0.18, type: 'down' },
+      { stockId: 'his', text: "역사 쌤이 퀴즈로 냈던 문제를 그대로 시험에 낸다는 확실한 제보!", impact: 0.35, type: 'up' },
+      { stockId: 'his', text: "역사 쌤: '이번엔 서술형 없이 객관식만 낸다' → 암기 부담 완화", impact: -0.20, type: 'down' }
+    ];
+
+    let stockChart = null;
+
+    // -------------------------------------------------------------
+    // INITIALIZATION & CHART SETUP
+    // -------------------------------------------------------------
+    window.onload = () => {
+      lucide.createIcons();
+      initChart();
+      updateUI();
+      loadHighscore();
+      addNews("📢 [단톡방] 기말고사 D-7! 벼락치기 주식 시장 개장!! 찌라시 믿고 몰빵 ㄱㄱ", "info");
+    };
+
+    function initChart() {
+      const ctx = document.getElementById('stockChart').getContext('2d');
+      stockChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['D-7'],
+          datasets: stocks.map(s => ({
+            label: s.name.split('-')[0],
+            data: [...s.history],
+            borderColor: s.color,
+            backgroundColor: s.color + '15',
+            borderWidth: 2.5,
+            tension: 0.35,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: false
+          }))
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              borderColor: '#334155',
+              borderWidth: 1,
+              titleColor: '#f8fafc',
+              bodyColor: '#cbd5e1',
+              padding: 10,
+              boxPadding: 4,
+              usePointStyle: true
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(51, 65, 85, 0.4)' },
+              ticks: { color: '#94a3b8', font: { size: 11, weight: 'bold' } }
+            },
+            y: {
+              grid: { color: 'rgba(51, 65, 85, 0.4)' },
+              ticks: { 
+                color: '#94a3b8', 
+                font: { size: 11 },
+                callback: function(value) { return value.toLocaleString() + 'P'; }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChart() {
+      const labels = Array.from({ length: TOTAL_DAYS - currentDay + 1 }, (_, i) => {
+        const d = 7 - i;
+        return d === 0 ? 'D-Day' : `D-${d}`;
+      });
+
+      stockChart.data.labels = labels;
+      stockChart.data.datasets.forEach((ds, idx) => {
+        ds.data = [...stocks[idx].history];
+      });
+      stockChart.update();
+    }
+
+    // -------------------------------------------------------------
+    // GAME CORE ENGINE
+    // -------------------------------------------------------------
+    function nextTurn() {
+      if (currentDay <= 0) return;
+
+      playSound('next');
+      currentDay--;
+
+      if (currentDay === 0) {
+        processFinalDay();
+      } else {
+        processRegularTurn();
+      }
+
+      updateUI();
+      updateChart();
+
+      if (currentDay === 0) {
+        setTimeout(showEndingScreen, 800);
+      }
+    }
+
+    function processRegularTurn() {
+      // Pick 2 random rumors
+      const shuffled = [...newsPool].sort(() => 0.5 - Math.random());
+      const selectedNews = shuffled.slice(0, 2);
+
+      let priceChangeMap = {};
+
+      selectedNews.forEach(n => {
+        addNews(n.text, n.type);
+        priceChangeMap[n.stockId] = (priceChangeMap[n.stockId] || 0) + n.impact;
+      });
+
+      // Calculate new stock prices
+      stocks.forEach(s => {
+        let baseImpact = priceChangeMap[s.id] || 0;
+        // Random noise (-12% to +12%)
+        let randomNoise = (Math.random() * 0.24) - 0.12;
+        let totalMultiplier = 1 + baseImpact + randomNoise;
+
+        s.price = Math.max(1000, Math.round(s.price * totalMultiplier));
+        s.history.push(s.price);
+      });
+
+      // Update Breaking Ticker
+      const tickerText = selectedNews.map(n => `[찌라시] ${n.text}`).join(' &nbsp;&nbsp;&nbsp;&nbsp; ');
+      document.getElementById('ticker-container').innerHTML = tickerText;
+    }
+
+    function processFinalDay() {
+      addNews("🔥 D-Day! 시험지가 나왔다!! 예상이 맞았을까...? 폭등·폭락 발생!", "alert");
+      document.getElementById('ticker-container').innerHTML = "🔥 [D-DAY] 시험 끝!! 성적표 나오기 직전... 정산 결과 발표!";
+
+      stocks.forEach(s => {
+        // Volatility range: -70% to +150%
+        let finalFactor = (Math.random() * 2.2) - 0.7;
+        s.price = Math.max(500, Math.round(s.price * (1 + finalFactor)));
+        s.history.push(s.price);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // BUY & SELL LOGIC
+    // -------------------------------------------------------------
+    function buyStock(stockId, amountType) {
+      const stock = stocks.find(s => s.id === stockId);
+      if (!stock || currentDay <= 0) return;
+
+      let qty = 1;
+      if (amountType === 5) qty = 5;
+      if (amountType === 'max') qty = Math.floor(cash / stock.price);
+
+      if (qty <= 0) {
+        alert("용돈이 부족해요!");
+        return;
+      }
+
+      const cost = stock.price * qty;
+      if (cash < cost) {
+        alert("용돈이 부족해요!");
+        return;
+      }
+
+      cash -= cost;
+      stock.owned += qty;
+      playSound('buy');
+      updateUI();
+    }
+
+    function sellStock(stockId, amountType) {
+      const stock = stocks.find(s => s.id === stockId);
+      if (!stock || currentDay <= 0) return;
+
+      let qty = 1;
+      if (amountType === 5) qty = 5;
+      if (amountType === 'all') qty = stock.owned;
+
+      if (stock.owned < qty || qty <= 0) {
+        alert("팔 수 있는 수량이 부족해요!");
+        return;
+      }
+
+      cash += stock.price * qty;
+      stock.owned -= qty;
+      playSound('sell');
+      updateUI();
+    }
+
+    // -------------------------------------------------------------
+    // RENDERING DASHBOARD
+    // -------------------------------------------------------------
+    function updateUI() {
+      // 1. Header & Buttons
+      const ddayTag = document.getElementById('dday-tag');
+      ddayTag.innerText = currentDay === 0 ? "D-Day" : `D-${currentDay}`;
+      
+      const nextBtnText = document.getElementById('next-btn-text');
+      const nextBtn = document.getElementById('next-turn-btn');
+
+      if (currentDay > 1) {
+        nextBtnText.innerText = `다음 날로 (D-${currentDay - 1})`;
+      } else if (currentDay === 1) {
+        nextBtnText.innerText = `시험 보러 가기 (D-Day)`;
+      } else {
+        nextBtnText.innerText = `시험 끝!`;
+        nextBtn.disabled = true;
+        nextBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+
+      // Calculated Financials
+      let totalStockVal = stocks.reduce((acc, s) => acc + (s.price * s.owned), 0);
+      let totalAsset = cash + totalStockVal;
+
+      document.getElementById('user-cash').innerText = cash.toLocaleString() + ' P';
+      document.getElementById('user-total-val').innerText = totalAsset.toLocaleString() + ' P';
+
+      // 2. Render Stock Cards
+      const stockListEl = document.getElementById('stock-list');
+      stockListEl.innerHTML = stocks.map(s => {
+        const prevPrice = s.history.length > 1 ? s.history[s.history.length - 2] : s.price;
+        const diff = s.price - prevPrice;
+        const diffPercent = prevPrice === 0 ? 0 : ((diff / prevPrice) * 100).toFixed(1);
+        
+        let colorClass = "text-slate-400";
+        let bgTagClass = "bg-slate-800 text-slate-300";
+        let icon = "minus";
+
+        if (diff > 0) {
+          colorClass = "text-red-400";
+          bgTagClass = "bg-red-500/10 text-red-400 border border-red-500/20";
+          icon = "trending-up";
+        } else if (diff < 0) {
+          colorClass = "text-blue-400";
+          bgTagClass = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
+          icon = "trending-down";
+        }
+
+        return `
+          <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 flex flex-col justify-between space-y-3 hover:border-slate-700 transition-all shadow-xl backdrop-blur-sm group">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-bold text-sm text-slate-200 group-hover:text-indigo-300 transition-colors">${s.name}</span>
+                <span class="text-[11px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 ${bgTagClass}">
+                  <i data-lucide="${icon}" class="w-3 h-3"></i>
+                  ${diff > 0 ? '+' : ''}${diffPercent}%
+                </span>
+              </div>
+              <div class="text-2xl font-black text-white tracking-tight">
+                ${s.price.toLocaleString()} <span class="text-xs font-semibold text-slate-500">P</span>
+              </div>
+              <div class="text-xs text-slate-400 mt-1 flex justify-between">
+                <span>보유 수량: <strong class="text-indigo-400 font-bold">${s.owned}주</strong></span>
+                <span>평가금: ${(s.price * s.owned).toLocaleString()}P</span>
+              </div>
+            </div>
+
+            <!-- BUY/SELL CONTROLS -->
+            <div class="space-y-1.5 pt-2 border-t border-slate-800/80">
+              <!-- Buy Row -->
+              <div class="grid grid-cols-3 gap-1">
+                <button onclick="buyStock('${s.id}', 1)" class="bg-slate-800 hover:bg-emerald-600/20 hover:text-emerald-300 hover:border-emerald-500/40 border border-slate-700/60 text-[11px] text-slate-300 font-semibold py-1.5 rounded-xl transition-all">
+                  +1 매수
+                </button>
+                <button onclick="buyStock('${s.id}', 5)" class="bg-slate-800 hover:bg-emerald-600/20 hover:text-emerald-300 hover:border-emerald-500/40 border border-slate-700/60 text-[11px] text-slate-300 font-semibold py-1.5 rounded-xl transition-all">
+                  +5 매수
+                </button>
+                <button onclick="buyStock('${s.id}', 'max')" class="bg-slate-800 hover:bg-emerald-600/30 hover:text-emerald-300 hover:border-emerald-500/50 border border-slate-700/60 text-[11px] text-emerald-400 font-bold py-1.5 rounded-xl transition-all">
+                  MAX
+                </button>
+              </div>
+              <!-- Sell Row -->
+              <div class="grid grid-cols-3 gap-1">
+                <button onclick="sellStock('${s.id}', 1)" class="bg-slate-800 hover:bg-red-600/20 hover:text-red-300 hover:border-red-500/40 border border-slate-700/60 text-[11px] text-slate-300 font-semibold py-1.5 rounded-xl transition-all">
+                  -1 매도
+                </button>
+                <button onclick="sellStock('${s.id}', 5)" class="bg-slate-800 hover:bg-red-600/20 hover:text-red-300 hover:border-red-500/40 border border-slate-700/60 text-[11px] text-slate-300 font-semibold py-1.5 rounded-xl transition-all">
+                  -5 매도
+                </button>
+                <button onclick="sellStock('${s.id}', 'all')" class="bg-slate-800 hover:bg-red-600/30 hover:text-red-300 hover:border-red-500/50 border border-slate-700/60 text-[11px] text-red-400 font-bold py-1.5 rounded-xl transition-all">
+                  ALL
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 3. Render Portfolio Summary
+      const portfolioEl = document.getElementById('portfolio-list');
+      const ownedStocks = stocks.filter(s => s.owned > 0);
+
+      if (ownedStocks.length === 0) {
+        portfolioEl.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs border border-dashed border-slate-800 rounded-2xl">
+            아직 투자한 과목이 없어요. 일단 뭐라도 사 보자!
+          </div>`;
+      } else {
+        portfolioEl.innerHTML = ownedStocks.map(s => `
+          <div class="flex items-center justify-between bg-slate-950/80 p-2.5 rounded-2xl border border-slate-800 text-xs">
+            <div>
+              <div class="font-bold text-slate-200">${s.name.split('-')[0]}</div>
+              <div class="text-[10px] text-slate-500 font-medium">${s.owned}주 보유 (${(s.price * s.owned).toLocaleString()} P)</div>
+            </div>
+            <button onclick="sellStock('${s.id}', 'all')" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 text-[10px] px-2.5 py-1 rounded-lg transition-all font-bold">
+              전량 매도
+            </button>
+          </div>
+        `).join('');
+      }
+
+      lucide.createIcons();
+    }
+
+    function addNews(text, type) {
+      const feed = document.getElementById('news-feed');
+      let badgeColor = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+      let icon = "info";
+
+      if (type === 'up') {
+        badgeColor = "bg-red-500/10 text-red-400 border-red-500/20";
+        icon = "trending-up";
+      } else if (type === 'down') {
+        badgeColor = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+        icon = "trending-down";
+      } else if (type === 'alert') {
+        badgeColor = "bg-amber-500/10 text-amber-400 border-amber-500/30 font-bold";
+        icon = "zap";
+      }
+
+      const timeLabel = currentDay === 0 ? "D-Day" : `D-${currentDay}`;
+
+      const newsItem = document.createElement('div');
+      newsItem.className = `p-3 rounded-2xl border text-xs leading-relaxed space-y-1 bg-slate-950/90 ${badgeColor} backdrop-blur-sm transition-all duration-300`;
+      newsItem.innerHTML = `
+        <div class="flex items-center justify-between text-[10px] opacity-75 font-semibold">
+          <span class="flex items-center gap-1"><i data-lucide="${icon}" class="w-3 h-3"></i> 단톡방 제보</span>
+          <span>${timeLabel}</span>
+        </div>
+        <div class="font-medium">${text}</div>
+      `;
+
+      feed.prepend(newsItem);
+      lucide.createIcons();
+    }
+
+    // -------------------------------------------------------------
+    // ENDING & HIGHSCORE SYSTEM
+    // -------------------------------------------------------------
+    function showEndingScreen() {
+      playSound('fanfare');
+
+      let totalStockVal = stocks.reduce((acc, s) => acc + (s.price * s.owned), 0);
+      let finalAsset = cash + totalStockVal;
+      let returnRate = ((finalAsset - 100000) / 100000) * 100;
+
+      document.getElementById('modal-final-asset').innerText = finalAsset.toLocaleString() + ' P';
+      document.getElementById('modal-return-rate').innerText = `${returnRate >= 0 ? '+' : ''}${returnRate.toFixed(1)}%`;
+
+      // Grade logic
+      let grade = 'F';
+      let title = '엄마한테 성적표 숨기는 중';
+      let desc = '찌라시를 너무 믿었다... 학원 하나 더 늘어날 예감. 다음엔 주식 말고 문제집을 펴자!';
+
+      if (returnRate >= 120) {
+        grade = 'S';
+        title = '벼락치기의 신 (우리 학년 1등)';
+        desc = '쌤 마음을 완전히 읽었다! 찌라시 정확도 100%, 엄마가 치킨 시켜주신대!';
+      } else if (returnRate >= 50) {
+        grade = 'A';
+        title = '우등생 벼락치기러';
+        desc = '시험에 나올 곳을 잘 맞혔어요! 이 정도면 엄마가 용돈 올려줄지도?';
+      } else if (returnRate >= 0) {
+        grade = 'B';
+        title = '평범한 중학생 (딱 평균)';
+        desc = '손해는 안 봤지만 크게 번 것도 아님. 딱 평균! 그래도 안 망한 게 어디야.';
+      }
+
+      document.getElementById('modal-grade').innerText = grade;
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-desc').innerText = desc;
+
+      saveHighscore(finalAsset, returnRate);
+
+      const modal = document.getElementById('ending-modal');
+      const content = document.getElementById('ending-modal-content');
+      
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+      }, 50);
+    }
+
+    function saveHighscore(finalAsset, returnRate) {
+      let best = localStorage.getItem('exam_stock_best_score');
+      if (!best || finalAsset > JSON.parse(best).asset) {
+        localStorage.setItem('exam_stock_best_score', JSON.stringify({ asset: finalAsset, rate: returnRate.toFixed(1) }));
+      }
+      loadHighscore();
+    }
+
+    function loadHighscore() {
+      let best = localStorage.getItem('exam_stock_best_score');
+      const el = document.getElementById('best-score');
+      if (best) {
+        let data = JSON.parse(best);
+        el.innerText = `${data.asset.toLocaleString()} P (+${data.rate}%)`;
+      } else {
+        el.innerText = '기록 없음';
+      }
+    }
+
+    function resetHighscore() {
+      if (confirm('최고 기록을 초기화하시겠습니까?')) {
+        localStorage.removeItem('exam_stock_best_score');
+        loadHighscore();
+      }
+    }
+
+    function restartGame() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>
