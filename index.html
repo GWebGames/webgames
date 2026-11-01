@@ -419,7 +419,7 @@ $('full').addEventListener('click',()=>{
    ============================================================ */
 const FIREBASE_URL='https://game-user-traffic-default-rtdb.asia-southeast1.firebasedatabase.app';
 const DEMO=/[?&]demo(=|&|$)/.test(location.search);
-const COUNT_COOLDOWN=30*60*1000; /* 같은 사람이 같은 게임을 30분 안에 다시 눌러도 1번만 집계 */
+const COUNT_COOLDOWN=5*60*1000; /* 같은 사람이 같은 게임을 5분 안에 다시 눌러도 1번만 집계 */
 const liveEl=$('liveState'),podium=$('podium');
 let plays={},podKey='';
 const fmt=n=>(+n||0).toLocaleString('ko-KR');
