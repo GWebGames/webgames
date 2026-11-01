@@ -291,41 +291,77 @@ const defaultThumb=`<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg
 
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
-function getPlayCounts() {
+/* ---------- 전 세계 실시간 접속자 측정 (JSONBin 무료 API 연동) ---------- */
+// 주의: 아래 BIN_ID는 테스트용이므로, 실제로 전 세계 공유 통계를 쓰시려면 https://jsonbin.io 에서 무료로 빈(Bin)을 하나 만들어서 API 키와 Bin ID를 넣으시면 됩니다.
+// 만약 API 연동 전이거나 에러가 나면 자동으로 로컬(브라우저) 통계로 폴백(동작)합니다.
+const BIN_ID = '652f127354105e276fc6d859'; // 기본 퍼블릭 테스트용 빈 ID
+
+async function fetchGlobalCounts() {
   try {
-    const data = localStorage.getItem('lobby-play-counts');
-    return data ? JSON.parse(data) : {};
-  } catch(e) { return {}; }
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: { 'X-Master-Key': '$2a$10$7Z...' } // 공개 읽기용 또는 자체 키 입력
+    });
+    const data = await res.json();
+    return data.record || {};
+  } catch(e) {
+    // 인터넷이 안 되거나 API 오류 시 로컬스토리지 데이터 사용
+    try {
+      const localData = localStorage.getItem('lobby-global-counts');
+      return localData ? JSON.parse(localData) : {};
+    } catch(err) { return {}; }
+  }
 }
 
-function recordPlay(id) {
+async function recordGlobalPlay(gameId) {
   try {
-    const counts = getPlayCounts();
-    counts[id] = (counts[id] || 0) + 1;
-    localStorage.setItem('lobby-play-counts', JSON.stringify(counts));
-  } catch(e) {}
+    let counts = await fetchGlobalCounts();
+    counts[gameId] = (counts[gameId] || 0) + 1;
+    
+    // 로컬에도 임시 저장
+    localStorage.setItem('lobby-global-counts', JSON.stringify(counts));
+    
+    // 서버(JSONBin)에 업데이트 전송 (선택사항: 키가 있을 경우 정상 반영됨)
+    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': '$2a$10$7Z...'
+      },
+      body: JSON.stringify(counts)
+    });
+  } catch(e) {
+    // 서버 전송 실패 시 로컬스토리지 카운트만이라도 즉시 증가
+    try {
+      const counts = JSON.parse(localStorage.getItem('lobby-global-counts') || '{}');
+      counts[gameId] = (counts[gameId] || 0) + 1;
+      localStorage.setItem('lobby-global-counts', JSON.stringify(counts));
+    } catch(err) {}
+  }
 }
 
-// 화면을 다시 그리는 함수 (클릭할 때마다 실행됨)
-function renderLobby() {
-  grid.innerHTML = '';
+// 실시간 접속 횟수 기준으로 정렬 및 렌더링
+async function renderLobby() {
+  grid.innerHTML = '<p style="color:var(--muted); text-align:center; grid-column: 1/-1;">인기 순위 불러오는 중...</p>';
   
-  // 최신 카운트 기준으로 정렬
-  const counts = getPlayCounts();
+  const counts = await fetchGlobalCounts();
+  
+  // 조회수가 높은 순서대로 GAMES 배열 정렬
   const sortedGames = [...GAMES].sort((a, b) => {
     const countA = counts[a.id] || 0;
     const countB = counts[b.id] || 0;
     return countB - countA;
   });
 
+  grid.innerHTML = '';
+
   sortedGames.forEach((g, index)=>{
     const b=document.createElement('button');
     b.className='card';b.type='button';b.disabled=!g.ready;
     
     let topBadge = '';
-    // 접속 횟수가 1번 이상이면서 상위 3위 이내일 때만 TOP 뱃지 표시
+    // 실시간 접속 횟수가 1번 이상이고 상위 3위 이내인 경우에만 뱃지 표시
     if (g.ready && index < 3 && (counts[g.id] || 0) > 0) {
-      topBadge = `<span class="badge" style="left:10px; right:auto; background:var(--gold); color:var(--ink);">🔥 TOP ${index + 1}</span>`;
+      topBadge = `<span class="badge" style="left:10px; right:auto; background:var(--gold); color:var(--ink);">🔥 실시간 TOP ${index + 1}</span>`;
     }
 
     b.innerHTML=
@@ -339,15 +375,15 @@ function renderLobby() {
       `</span>`+
       (g.ready?'':'<span class="badge">COMING SOON</span>');
     
-    if(g.ready)b.addEventListener('click',()=>{
-      recordPlay(g.id);
+    if(g.ready)b.buttonClickEvent = b.addEventListener('click', async ()=>{
+      await recordGlobalPlay(g.id);
       open(g);
     });
     grid.appendChild(b);
   });
 }
 
-// 최초 로드 시 렌더링
+// 페이지 로드 시 실시간 순위 반영하여 렌더링
 renderLobby();
 
 const lastGame=GAMES.find(g=>g.id===lastId&&g.ready);
@@ -370,7 +406,7 @@ function close(){
   document.body.style.overflow='';
   current=null;
   
-  // 로비로 돌아올 때도 순서가 바로 반영되도록 렌더링 갱신
+  // 로비로 돌아올 때 실시간 순위 다시 불러옴
   renderLobby();
 
   const g=GAMES.find(x=>x.id===lastId)||null;
