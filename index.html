@@ -79,12 +79,6 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 </section>
 
 <script>
-/* ============================================================
-   게임 목록 — 새 게임은 여기에 객체 하나만 추가하면 됩니다.
-   src    : 게임 HTML 파일 경로 (이 로비 파일 기준 상대경로)
-   ready : false 면 "준비 중" 카드로 표시 (코드 받으면 true + src 채우기)
-   thumb : 대체용 SVG 그림. 실제 대표 이미지는 thumbs/<id>.jpg (16:9, 800x450 권장)를 넣으면 자동으로 사용돼요
-   ============================================================ */
 const GAMES=[
   {
     id:'hansan',
@@ -285,7 +279,18 @@ const GAMES=[
   }
 ];
 
-/* ---------- 접속 횟수(조회수) 기반 정렬 로직 (GitHub Pages 호환) ---------- */
+const $=id=>document.getElementById(id);
+const grid=$('grid'),stage=$('stage'),frame=$('frame');
+let current=null;
+let lastId=null;
+try{lastId=localStorage.getItem('lobby-last');}catch(e){}
+
+const defaultThumb=`<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#14252d"/>
+  <g stroke="#35586a" stroke-width="2" fill="none" stroke-dasharray="6 6"><rect x="110" y="50" width="100" height="80" rx="6"/></g>
+  <text x="160" y="102" text-anchor="middle" font-size="30" fill="#6f858e" font-family="serif">?</text></svg>`;
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
 function getPlayCounts() {
   try {
     const data = localStorage.getItem('lobby-play-counts');
@@ -301,54 +306,49 @@ function recordPlay(id) {
   } catch(e) {}
 }
 
-// 접속 횟수가 높은 순으로 GAMES 배열 정렬 (조회수가 같으면 원래 순서 유지)
-const counts = getPlayCounts();
-GAMES.sort((a, b) => {
-  const countA = counts[a.id] || 0;
-  const countB = counts[b.id] || 0;
-  return countB - countA;
-});
-
-/* ---------- 렌더링 ---------- */
-const $=id=>document.getElementById(id);
-const grid=$('grid'),stage=$('stage'),frame=$('frame');
-let current=null;
-let lastId=null;
-try{lastId=localStorage.getItem('lobby-last');}catch(e){}
-
-const defaultThumb=`<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#14252d"/>
-  <g stroke="#35586a" stroke-width="2" fill="none" stroke-dasharray="6 6"><rect x="110" y="50" width="100" height="80" rx="6"/></g>
-  <text x="160" y="102" text-anchor="middle" font-size="30" fill="#6f858e" font-family="serif">?</text></svg>`;
-
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-
-GAMES.forEach((g, index)=>{
-  const b=document.createElement('button');
-  b.className='card';b.type='button';b.disabled=!g.ready;
+// 화면을 다시 그리는 함수 (클릭할 때마다 실행됨)
+function renderLobby() {
+  grid.innerHTML = '';
   
-  // 인기 Top 3 게임에 TOP 뱃지 부여
-  let topBadge = '';
-  if (g.ready && index < 3) {
-    topBadge = `<span class="badge" style="left:10px; right:auto; background:var(--gold); color:var(--ink);">🔥 TOP ${index + 1}</span>`;
-  }
-
-  b.innerHTML=
-    topBadge +
-    `<span class="thumb">${g.thumb||defaultThumb}<img src="thumbs/${g.id}.jpg" alt="" loading="lazy" onerror="this.remove()"></span>`+
-    `<span class="info">`+
-      `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
-      `<p class="desc">${esc(g.desc)}</p>`+
-      (g.keys?`<span class="keys">${esc(g.keys)}</span>`:'')+
-      `<span class="play">${g.ready?'플레이':'준비 중'}</span>`+
-    `</span>`+
-    (g.ready?'':'<span class="badge">COMING SOON</span>');
-  
-  if(g.ready)b.addEventListener('click',()=>{
-    recordPlay(g.id);
-    open(g);
+  // 최신 카운트 기준으로 정렬
+  const counts = getPlayCounts();
+  const sortedGames = [...GAMES].sort((a, b) => {
+    const countA = counts[a.id] || 0;
+    const countB = counts[b.id] || 0;
+    return countB - countA;
   });
-  grid.appendChild(b);
-});
+
+  sortedGames.forEach((g, index)=>{
+    const b=document.createElement('button');
+    b.className='card';b.type='button';b.disabled=!g.ready;
+    
+    let topBadge = '';
+    // 접속 횟수가 1번 이상이면서 상위 3위 이내일 때만 TOP 뱃지 표시
+    if (g.ready && index < 3 && (counts[g.id] || 0) > 0) {
+      topBadge = `<span class="badge" style="left:10px; right:auto; background:var(--gold); color:var(--ink);">🔥 TOP ${index + 1}</span>`;
+    }
+
+    b.innerHTML=
+      topBadge +
+      `<span class="thumb">${g.thumb||defaultThumb}<img src="thumbs/${g.id}.jpg" alt="" loading="lazy" onerror="this.remove()"></span>`+
+      `<span class="info">`+
+        `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
+        `<p class="desc">${esc(g.desc)}</p>`+
+        (g.keys?`<span class="keys">${esc(g.keys)}</span>`:'')+
+        `<span class="play">${g.ready?'플레이':'준비 중'}</span>`+
+      `</span>`+
+      (g.ready?'':'<span class="badge">COMING SOON</span>');
+    
+    if(g.ready)b.addEventListener('click',()=>{
+      recordPlay(g.id);
+      open(g);
+    });
+    grid.appendChild(b);
+  });
+}
+
+// 최초 로드 시 렌더링
+renderLobby();
 
 const lastGame=GAMES.find(g=>g.id===lastId&&g.ready);
 if(lastGame)$('last').textContent='최근 플레이: '+lastGame.title;
@@ -366,9 +366,13 @@ function open(g){
 function focusGame(){try{frame.focus();frame.contentWindow.focus();}catch(e){}}
 function close(){
   stage.classList.remove('on');
-  frame.src='about:blank'; /* 게임(소리·타이머)을 완전히 종료 */
+  frame.src='about:blank';
   document.body.style.overflow='';
   current=null;
+  
+  // 로비로 돌아올 때도 순서가 바로 반영되도록 렌더링 갱신
+  renderLobby();
+
   const g=GAMES.find(x=>x.id===lastId)||null;
   try{lastId=localStorage.getItem('lobby-last');}catch(e){}
   const lg=GAMES.find(x=>x.id===lastId);
@@ -381,7 +385,6 @@ $('full').addEventListener('click',()=>{
   if(document.fullscreenElement)document.exitFullscreen();
   else if(el.requestFullscreen)el.requestFullscreen().then(focusGame).catch(()=>{});
 });
-/* 게임 안에서 Esc 는 게임이 쓰므로, 로비 복귀는 상단 버튼으로만 */
 </script>
 </body>
 </html>
