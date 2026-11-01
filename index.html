@@ -78,9 +78,14 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 .cnt{font-size:.74rem;color:var(--muted);margin-left:auto;align-self:center}
 .cardfoot{display:flex;align-items:center;margin-top:10px}
 .cardfoot .play{margin-top:0}
+.now[hidden]{display:none}
+.now{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;color:#8fd6a8;white-space:nowrap}
+.now::before{content:"";width:7px;height:7px;border-radius:50%;background:#4fd186;animation:ping 1.8s infinite}
+.cardfoot{flex-wrap:wrap;gap:6px 12px}
+.pod .now{margin-top:2px}
 .mini{position:absolute;top:10px;left:10px;z-index:2;background:rgba(13,27,36,.88);border:1px solid var(--gold);color:var(--gold);font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:3px}
 @media (max-width:760px){.podium{grid-template-columns:1fr}.pod{flex-direction:row}.pod .thumb{width:44%;flex:none;aspect-ratio:16/10}.pod .info{justify-content:center}}
-@media (prefers-reduced-motion:reduce){.live.on i,.flash{animation:none}.pod,.card,.thumb img{transition:none}}
+@media (prefers-reduced-motion:reduce){.live.on i,.flash,.now::before{animation:none}.pod,.card,.thumb img{transition:none}}
 
 /* ===== 플레이 화면 ===== */
 #stage{position:fixed;inset:0;display:none;flex-direction:column;background:var(--ink);z-index:10}
@@ -363,7 +368,7 @@ GAMES.forEach(g=>{
       `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
       `<p class="desc">${esc(g.desc)}</p>`+
       (g.keys?`<span class="keys">${esc(g.keys)}</span>`:'')+
-      `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="cnt" data-cnt="${g.id}"></span></span>`+
+      `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" hidden></span><span class="cnt" data-cnt="${g.id}"></span></span>`+
     `</span>`+
     (g.ready?'':'<span class="badge">COMING SOON</span>');
   if(g.ready)b.addEventListener('click',()=>open(g));
@@ -378,6 +383,7 @@ if(lastGame)$('last').textContent='최근 플레이: '+lastGame.title;
 function open(g){
   current=g;
   track(g);
+  startPresence(g);
   try{localStorage.setItem('lobby-last',g.id);}catch(e){}
   $('title').textContent=g.title;
   frame.src=g.src;
@@ -388,6 +394,7 @@ function open(g){
 function focusGame(){try{frame.focus();frame.contentWindow.focus();}catch(e){}}
 function close(){
   stage.classList.remove('on');
+  stopPresence();
   frame.src='about:blank'; /* 게임(소리·타이머)을 완전히 종료 */
   document.body.style.overflow='';
   current=null;
@@ -437,6 +444,7 @@ function renderStats(){
     podium.innerHTML=`<div class="hot-empty" style="grid-column:1/-1">${(FIREBASE_URL||DEMO)
       ?'아직 플레이 기록이 없어요.<br>첫 번째 플레이어가 되어 1위를 차지해 보세요!'
       :'실시간 인기 순위가 곧 열려요.<br>모두가 가장 많이 플레이한 게임 TOP 3가 여기에 표시됩니다.'}</div>`;
+    updateNow();
     return;
   }
   const key=top.map(x=>x.g.id).join('|'),max=top[0].n;
@@ -447,7 +455,7 @@ function renderStats(){
       const b=document.createElement('button');b.type='button';b.className='pod r'+(k+1);b.dataset.id=x.g.id;
       b.innerHTML=`<span class="rank">${k+1}</span>${thumbHTML(x.g)}`+
         `<span class="info"><span class="pname">${esc(x.g.title)}</span>`+
-        `<span class="pcnt"><strong data-n>${fmt(x.n)}</strong>회 플레이</span>`+
+        `<span class="pcnt"><strong data-n>${fmt(x.n)}</strong>회 플레이</span>`+`<span class="now" data-now="${x.g.id}" hidden></span>`+
         `<span class="meter"><span style="width:${Math.max(6,x.n/max*100)}%"></span></span></span>`;
       b.addEventListener('click',()=>open(x.g));
       podium.appendChild(b);
@@ -460,6 +468,7 @@ function renderStats(){
       b.querySelector('.meter span').style.width=Math.max(6,x.n/max*100)+'%';
     });
   }
+  updateNow();
 }
 
 /* 플레이 시작할 때 서버 숫자를 +1 (서버가 직접 더해서 동시에 눌러도 정확해요) */
@@ -473,24 +482,70 @@ function track(g){
   fetch(`${FIREBASE_URL}/plays/${encodeURIComponent(g.id)}.json`,{method:'PUT',body:JSON.stringify({'.sv':{increment:1}}),keepalive:true}).catch(()=>{});
 }
 
+/* ---------- "지금 N명 플레이 중" ----------
+   게임을 여는 동안 15초마다 서버에 "나 여기 있어요" 도장(서버 시각)을 찍고, 나가면 지워요.
+   60초 안에 도장이 찍힌 사람만 "플레이 중"으로 세요. */
+const BEAT_MS=15000,ALIVE_MS=60000;
+let live={},mySid=null,beatTimer=null,myGame=null;
+const newSid=()=>Array.from(crypto.getRandomValues(new Uint8Array(10)),b=>(b%36).toString(36)).join('');
+function beat(){
+  if(!myGame||!FIREBASE_URL)return;
+  fetch(`${FIREBASE_URL}/live/${encodeURIComponent(myGame)}/${mySid}.json`,{method:'PUT',body:JSON.stringify({'.sv':'timestamp'}),keepalive:true}).catch(()=>{});
+}
+function startPresence(g){
+  stopPresence();
+  myGame=g.id;mySid=newSid();
+  if(DEMO){live[g.id]=(live[g.id]||0)+1;updateNow();return;}
+  if(!FIREBASE_URL)return;
+  beat();beatTimer=setInterval(beat,BEAT_MS);
+  live[g.id]=(live[g.id]||0)+1;updateNow(); /* 내 화면에는 바로 반영 */
+}
+function stopPresence(){
+  clearInterval(beatTimer);beatTimer=null;
+  if(myGame&&mySid){
+    if(DEMO)live[myGame]=Math.max(0,(live[myGame]||1)-1);
+    else if(FIREBASE_URL){live[myGame]=Math.max(0,(live[myGame]||1)-1);fetch(`${FIREBASE_URL}/live/${encodeURIComponent(myGame)}/${mySid}.json`,{method:'DELETE',keepalive:true}).catch(()=>{});}
+    updateNow();
+  }
+  myGame=null;mySid=null;
+}
+addEventListener('pagehide',stopPresence);
+function updateNow(){
+  document.querySelectorAll('[data-now]').forEach(el=>{const n=live[el.dataset.now]||0;el.hidden=!n;el.textContent=n?n.toLocaleString('ko-KR')+'명 플레이 중':'';});
+}
+function readLive(d){
+  const now=Date.now(),out={},stale=[];
+  for(const g in d||{})for(const sid in d[g]){
+    const ts=+d[g][sid]||0,age=now-ts;
+    if(age<ALIVE_MS&&age>-ALIVE_MS)out[g]=(out[g]||0)+1;
+    else if(age>10*60*1000&&stale.length<5)stale.push(`${g}/${sid}`); /* 비정상 종료로 남은 오래된 기록 청소 */
+  }
+  stale.forEach(k=>fetch(`${FIREBASE_URL}/live/${k}.json`,{method:'DELETE'}).catch(()=>{}));
+  live=out;updateNow();
+}
+
 /* 연결을 계속 열어 두지 않고 10초마다 숫자만 가져와요 → 동시에 몇 명이 있어도 Firebase 무료 연결 한도(100)에 안 걸려요 */
 const POLL_MS=10000;
 let pollTimer=null;
 function poll(){
   clearTimeout(pollTimer);
   if(document.hidden){return;} /* 탭이 가려져 있으면 쉬었다가 다시 보일 때 바로 갱신 */
-  fetch(FIREBASE_URL+'/plays.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{
+  const get=u=>fetch(FIREBASE_URL+u,{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();});
+  get('/plays.json').then(d=>{
     d=d||{};
     for(const k in d){plays[k]=Math.max(+d[k]||0,+plays[k]||0);} /* 방금 내가 올린 +1이 잠깐 사라져 보이지 않게 */
     setLive('on','실시간');renderStats();
-  }).catch(()=>setLive('','재연결 중…')).finally(()=>{pollTimer=setTimeout(poll,POLL_MS);});
+  }).catch(()=>setLive('','재연결 중…'))
+  .then(()=>get('/live.json')).then(readLive).catch(()=>{}) /* 접속자 집계가 막혀 있어도(규칙 미설정 등) 순위는 계속 동작 */
+  .finally(()=>{pollTimer=setTimeout(poll,POLL_MS);});
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&FIREBASE_URL&&!DEMO)poll();});
 function startLive(){
   if(DEMO){
     plays={hansan:1280,silentbreach:960,ittycoon:430,battleground:2140,tetris:1760,stickduel:880,korea38:610,zerozone:1495,baseball:1210,ilgito:1530,segryeok:790};
-    setLive('demo','데모 데이터');renderStats();
-    setInterval(()=>{const r=GAMES.filter(g=>g.ready);const g=r[Math.floor(Math.random()*r.length)];plays[g.id]=(+plays[g.id]||0)+1+Math.floor(Math.random()*3);renderStats();},2200);
+    live={hansan:3,silentbreach:2,ittycoon:1,battleground:12,tetris:7,stickduel:2,korea38:4,zerozone:5,baseball:6,ilgito:9,segryeok:3};
+    setLive('demo','데모 데이터');renderStats();updateNow();
+    setInterval(()=>{const r=GAMES.filter(g=>g.ready);const g=r[Math.floor(Math.random()*r.length)];plays[g.id]=(+plays[g.id]||0)+1+Math.floor(Math.random()*3);const h=r[Math.floor(Math.random()*r.length)].id;live[h]=Math.max(0,(live[h]||0)+(Math.random()<.5?-1:1));renderStats();},2200);
     return;
   }
   renderStats();
