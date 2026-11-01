@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>세력의 조건 - 주가조작 시뮬레이터</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;800&family=Share+Tech+Mono&display=swap');
+        
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #0b0e14;
+            color: #e1e7ef;
+            user-select: none;
+        }
+        
+        .font-mono-tech {
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .pulse-red {
+            animation: pulse-red-anim 1.5s infinite;
+        }
+        @keyframes pulse-red-anim {
+            0%, 100% { background-color: rgba(239, 68, 68, 0.15); }
+            50% { background-color: rgba(239, 68, 68, 0.35); }
+        }
+
+        .glow-green {
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.3);
+        }
+        .glow-red {
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            accent-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden bg-slate-950 text-slate-100">
+
+    <!-- START SCREEN / DIFFICULTY SELECT MODAL -->
+    <div id="start-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4">
+        <div class="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl relative">
+            <div class="text-center mb-6">
+                <div class="inline-block p-3 bg-blue-500/10 border border-blue-500/20 rounded-2xl mb-3">
+                    <i class="fa-solid font-black fa-chart-line-up text-3xl text-blue-400"></i>
+                </div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white mb-2">세력의 조건 <span class="text-xs font-normal px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">M&A / 작전주 EDITION</span></h1>
+                <p class="text-sm text-slate-400">자본의 힘으로 시장을 흔들고 개미들의 고혈을 짜내어 최고 수익을 달성하십시오.</p>
+            </div>
+
+            <div class="space-y-3 mb-6">
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">난이도 선택</label>
+                
+                <!-- 난이도: 하 -->
+                <div onclick="selectDifficulty('easy')" id="diff-easy" class="diff-card cursor-pointer border border-slate-700 hover:border-emerald-500 bg-slate-800/50 p-4 rounded-xl transition flex items-center justify-between group">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg font-bold group-hover:scale-110 transition">하</div>
+                        <div>
+                            <div class="text-sm font-bold text-slate-200">초보 세력 (쉬움)</div>
+                            <div class="text-xs text-slate-400">초기 원금 300억 원 | 금감원 감시 느림 | 순진한 개미들</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-emerald-400 transition"></i>
+                </div>
+
+                <!-- 난이도: 중 -->
+                <div onclick="selectDifficulty('medium')" id="diff-medium" class="diff-card cursor-pointer border border-blue-500 bg-blue-500/10 p-4 rounded-xl transition flex items-center justify-between group">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 text-lg font-bold group-hover:scale-110 transition">중</div>
+                        <div>
+                            <div class="text-sm font-bold text-slate-200">베테랑 세력 (보통)</div>
+                            <div class="text-xs text-slate-400">초기 원금 100억 원 | 표준 감시도 | 현실적인 수급 반응</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-blue-400 transition"></i>
+                </div>
+
+                <!-- 난이도: 상 -->
+                <div onclick="selectDifficulty('hard')" id="diff-hard" class="diff-card cursor-pointer border border-slate-700 hover:border-rose-500 bg-slate-800/50 p-4 rounded-xl transition flex items-center justify-between group">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 text-lg font-bold group-hover:scale-110 transition">상</div>
+                        <div>
+                            <div class="text-sm font-bold text-slate-200">전설의 작전주 (어려움)</div>
+                            <div class="text-xs text-slate-400">초기 원금 50억 원 | 매서운 금감원 추적 | 눈치 빠른 칼손절 개미</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-500 group-hover:text-rose-400 transition"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs text-slate-400 mb-6 space-y-1">
+                <p>• 목표: <strong>30 영업일</strong> 동안 최고 수익 달성 후 안전하게 익절</p>
+                <p>• 위험: 금감원 감시도가 <strong>100%</strong>에 도달하면 즉시 구속 및 전재산 몰수됩니다.</p>
+            </div>
+
+            <button onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg transition transform active:scale-95">
+                작전 개시 (게임 시작)
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN HTS CONTAINER -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- HEADER / TOP NAV -->
+        <header class="h-14 bg-slate-900 border-b border-slate-800 px-4 flex items-center justify-between shrink-0">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xl font-black text-rose-500"><i class="fa-solid fa-chart-candlestick"></i> MARKET WHALE</span>
+                    <span class="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-400 border border-slate-700">코스닥 상장사 [099880] (주)바이오퓨처</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-3 text-xs border-l border-slate-800 pl-4">
+                    <span class="text-slate-400">남은 기간: <strong id="time-display" class="text-yellow-400 font-mono-tech text-sm">30일 09:00</strong></span>
+                    <span class="text-slate-400">시가총액: <strong id="mcap-display" class="text-slate-200 font-mono-tech">100억</strong></span>
+                </div>
+            </div>
+
+            <!-- Global Status Pills -->
+            <div class="flex items-center space-x-3">
+                <!-- SEC Alert Bar -->
+                <div class="flex items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                    <i class="fa-solid fa-shield-halved text-xs text-slate-400" id="sec-icon"></i>
+                    <span class="text-xs text-slate-400 hidden sm:inline">금감원 감시:</span>
+                    <div class="w-20 bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="sec-bar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 10%;"></div>
+                    </div>
+                    <span id="sec-text" class="text-xs font-mono-tech font-bold text-emerald-400">10%</span>
+                </div>
+
+                <!-- Retail Sentiment Badge -->
+                <div id="sentiment-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold border bg-blue-500/10 border-blue-500/30 text-blue-400 flex items-center space-x-1">
+                    <i class="fa-solid fa-users"></i>
+                    <span id="sentiment-text">개미 심리: 관망중</span>
+                </div>
+
+                <!-- Control Buttons -->
+                <button onclick="togglePause()" id="pause-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded text-xs border border-slate-700">
+                    <i class="fa-solid fa-pause"></i> 일시정지
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN WORKSPACE GRID -->
+        <div class="flex-1 grid grid-cols-12 gap-1 p-1 bg-slate-950 overflow-hidden">
+            
+            <!-- LEFT PANEL: CHART & TICKER (7 COLS) -->
+            <div class="col-span-12 lg:col-span-8 flex flex-col space-y-1 h-full overflow-hidden">
+                
+                <!-- STOCK PRICE & CHART HEADER -->
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex flex-wrap items-center justify-between shrink-0 gap-2">
+                    <div class="flex items-baseline space-x-3">
+                        <span class="text-2xl font-black font-mono-tech" id="current-price">1,000</span>
+                        <span class="text-xs font-bold text-slate-400">KRW</span>
+                        <span id="price-change-badge" class="text-xs font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                            +0.00% (+0)
+                        </span>
+                    </div>
+
+                    <div class="flex items-center space-x-4 text-xs font-mono-tech">
+                        <div><span class="text-slate-500">고가:</span> <span id="high-price" class="text-rose-400">1,000</span></div>
+                        <div><span class="text-slate-500">저가:</span> <span id="low-price" class="text-blue-400">1,000</span></div>
+                        <div><span class="text-slate-500">거래량:</span> <span id="total-volume" class="text-slate-200">0</span></div>
+                    </div>
+                </div>
+
+                <!-- CANVAS CHART CONTAINER -->
+                <div class="bg-slate-900 border border-slate-800 rounded-lg flex-1 relative p-2 flex flex-col min-h-[250px]">
+                    <div class="absolute top-3 left-4 z-10 flex space-x-2 text-[10px] font-semibold text-slate-400">
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-rose-500 mr-1"></span> 양봉/양선</span>
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-blue-500 mr-1"></span> 음봉/음선</span>
+                        <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-1"></span> 자전거래</span>
+                    </div>
+                    
+                    <div class="flex-1 w-full relative">
+                        <canvas id="stockChart" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+
+                <!-- LIVE RETAIL CHAT / TALK BOARD (종목토론방) -->
+                <div class="h-36 bg-slate-900 border border-slate-800 rounded-lg flex flex-col overflow-hidden shrink-0">
+                    <div class="bg-slate-950/60 px-3 py-1.5 border-b border-slate-800 flex justify-between items-center text-xs">
+                        <span class="font-bold text-slate-300 flex items-center"><i class="fa-solid fa-comments text-blue-400 mr-1.5"></i> 팍스넷 / 네이버 종목토론방 (실시간)</span>
+                        <span class="text-[10px] text-slate-500">개미 잔여 물량: <strong id="retail-shares-display" class="text-slate-300">8,000,000</strong>주</span>
+                    </div>
+                    <div id="chat-feed" class="flex-1 p-2 space-y-1.5 overflow-y-auto font-mono-tech text-xs">
+                        <!-- Messages dynamic append -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: PORTFOLIO & TACTICAL CONTROL DESK (5 COLS) -->
+            <div class="col-span-12 lg:col-span-4 flex flex-col space-y-1 h-full overflow-y-auto">
+                
+                <!-- ACCOUNT & ASSETS STATUS -->
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 space-y-2 shrink-0">
+                    <div class="text-xs font-bold text-slate-400 border-b border-slate-800 pb-1 flex justify-between items-center">
+                        <span><i class="fa-solid fa-wallet text-indigo-400 mr-1"></i> 세력 비밀 계좌 현황</span>
+                        <span id="diff-tag" class="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded">난이도: 보통</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="bg-slate-950 p-2 rounded border border-slate-800">
+                            <div class="text-slate-500 text-[10px]">보유 현금</div>
+                            <div id="player-cash" class="font-mono-tech font-bold text-sm text-emerald-400">8,000,000,000 원</div>
+                        </div>
+                        <div class="bg-slate-950 p-2 rounded border border-slate-800">
+                            <div class="text-slate-500 text-[10px]">보유 주식 (지분율)</div>
+                            <div id="player-shares" class="font-mono-tech font-bold text-sm text-yellow-400">2,000,000 주 (20%)</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-2 rounded border border-slate-800 flex justify-between items-center text-xs">
+                        <span class="text-slate-400">총 평가 자산:</span>
+                        <span id="player-networth" class="font-mono-tech font-extrabold text-base text-white">10,000,000,000 원</span>
+                    </div>
+                    
+                    <div class="flex justify-between text-[11px] text-slate-400 px-1">
+                        <span>초기 원금: <span id="initial-cash-display" class="font-mono-tech">10,000,000,000</span></span>
+                        <span>수익률: <strong id="roi-display" class="font-mono-tech text-rose-400">+0.00%</strong></span>
+                    </div>
+                </div>
+
+                <!-- TACTICAL COMMAND CENTER (ACTIONS) -->
+                <div class="bg-slate-900 border border-slate-800 rounded-lg p-3 flex-1 flex flex-col justify-between space-y-3">
+                    <div class="text-xs font-bold text-slate-400 border-b border-slate-800 pb-1 flex justify-between items-center">
+                        <span><i class="fa-solid fa-gamepad text-rose-400 mr-1"></i> 주가 조작 실행 단말기</span>
+                        <span class="text-[10px] text-slate-500">쿨타임 주의</span>
+                    </div>
+
+                    <!-- DIRECT MARKET ORDER BUTTONS -->
+                    <div class="space-y-2">
+                        <div class="text-[11px] font-semibold text-slate-400 flex justify-between">
+                            <span>시장가 직접 거래</span>
+                            <span class="text-[10px] text-slate-500">수량 조절 가능</span>
+                        </div>
+                        
+                        <!-- QUANTITY SLIDER -->
+                        <div class="bg-slate-950 p-2 rounded border border-slate-800 space-y-1">
+                            <div class="flex justify-between text-[10px] text-slate-400">
+                                <span>1회 주문 비중:</span>
+                                <span id="trade-amount-text" class="font-mono-tech text-blue-400 font-bold">10% (100,000주)</span>
+                            </div>
+                            <input type="range" id="trade-slider" min="5" max="50" step="5" value="10" oninput="updateTradeSliderText()" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="executeAction('buy')" class="py-2.5 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white rounded-lg font-bold text-xs shadow transition flex flex-col items-center justify-center">
+                                <span><i class="fa-solid fa-arrow-trend-up mr-1"></i> 대량 매수 (펌핑)</span>
+                                <span class="text-[9px] font-normal opacity-80">주가 상방 자금 투입</span>
+                            </button>
+                            <button onclick="executeAction('sell')" class="py-2.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-lg font-bold text-xs shadow transition flex flex-col items-center justify-center">
+                                <span><i class="fa-solid fa-arrow-trend-down mr-1"></i> 대량 매도 (덤핑)</span>
+                                <span class="text-[9px] font-normal opacity-80">개미에게 물량 넘기기</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SPECIAL MANIPULATION TACTICS -->
+                    <div class="space-y-2">
+                        <div class="text-[11px] font-semibold text-slate-400">특수 작전 기술</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            
+                            <!-- 자전거래 -->
+                            <button onclick="executeAction('wash')" id="btn-wash" class="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 rounded-lg text-left transition relative overflow-hidden group">
+                                <div class="text-xs font-bold text-emerald-400 mb-0.5"><i class="fa-solid fa-rotate mr-1"></i> 자전거래 (Wash Trading)</div>
+                                <div class="text-[10px] text-slate-400">통정매매로 거래량 뻥튀기</div>
+                                <div class="text-[9px] text-yellow-500/80 mt-1">비용: 5,000만 | 감시도 +3%</div>
+                                <div id="cd-wash" class="absolute inset-0 bg-slate-950/90 flex items-center justify-center text-xs font-bold text-amber-400 hidden">쿨다운 5s</div>
+                            </button>
+
+                            <!-- 가짜 호재 유포 -->
+                            <button onclick="executeAction('rumor_good')" id="btn-rumor-good" class="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 rounded-lg text-left transition relative overflow-hidden group">
+                                <div class="text-xs font-bold text-rose-400 mb-0.5"><i class="fa-solid fa-bullhorn mr-1"></i> 가짜 호재 유포</div>
+                                <div class="text-[10px] text-slate-400">FDA 승인/M&A 찌라시 살포</div>
+                                <div class="text-[9px] text-yellow-500/80 mt-1">비용: 1억 | 감시도 +6%</div>
+                                <div id="cd-rumor_good" class="absolute inset-0 bg-slate-950/90 flex items-center justify-center text-xs font-bold text-amber-400 hidden">쿨다운 10s</div>
+                            </button>
+
+                            <!-- 악재 공포 유포 -->
+                            <button onclick="executeAction('rumor_bad')" id="btn-rumor-bad" class="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 rounded-lg text-left transition relative overflow-hidden group">
+                                <div class="text-xs font-bold text-blue-400 mb-0.5"><i class="fa-solid fa-skull-crossbones mr-1"></i> 악재/공포 유포</div>
+                                <div class="text-[10px] text-slate-400">횡령설 루머로 투매 유도</div>
+                                <div class="text-[9px] text-yellow-500/80 mt-1">비용: 1억 | 감시도 +5%</div>
+                                <div id="cd-rumor_bad" class="absolute inset-0 bg-slate-950/90 flex items-center justify-center text-xs font-bold text-amber-400 hidden">쿨다운 10s</div>
+                            </button>
+
+                            <!-- 블록딜 / 차명세탁 -->
+                            <button onclick="executeAction('blockdeal')" id="btn-blockdeal" class="p-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 border border-slate-700 rounded-lg text-left transition relative overflow-hidden group">
+                                <div class="text-xs font-bold text-amber-400 mb-0.5"><i class="fa-solid fa-user-ninja mr-1"></i> 차명 로비 (감시 감소)</div>
+                                <div class="text-[10px] text-slate-400">금감원 로비로 감시도 -18%</div>
+                                <div class="text-[9px] text-yellow-500/80 mt-1">비용: 3억</div>
+                                <div id="cd-blockdeal" class="absolute inset-0 bg-slate-950/90 flex items-center justify-center text-xs font-bold text-amber-400 hidden">쿨다운 15s</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- NEWS TICKER -->
+                    <div class="bg-slate-950 p-2 rounded border border-slate-800 text-xs">
+                        <div class="text-[10px] text-slate-500 font-bold mb-1 flex items-center"><i class="fa-solid fa-newspaper mr-1 text-blue-400"></i> 단속 및 뉴스 속보</div>
+                        <div id="news-feed" class="text-slate-300 truncate">
+                            [속보] (주)바이오퓨처, 신규 줄기세포 치료제 임상 3상 모멘텀에 강세...
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- GAME OVER / RESULT MODAL -->
+    <div id="end-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-lg p-4 hidden">
+        <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-4 shadow-2xl relative">
+            <div id="end-icon" class="text-5xl my-2">🚨</div>
+            <h2 id="end-title" class="text-2xl font-black text-white">작전 종료</h2>
+            <p id="end-subtitle" class="text-xs text-slate-400">최종 결과를 확인하십시오.</p>
+
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 font-mono-tech text-xs text-left">
+                <div class="flex justify-between">
+                    <span class="text-slate-500">초기 원금 자금:</span>
+                    <span id="res-initial" class="text-slate-300">10,000,000,000 원</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">최종 회수 자금:</span>
+                    <span id="res-final" class="text-slate-100 font-bold">0 원</span>
+                </div>
+                <div class="flex justify-between border-t border-slate-800 pt-2 text-sm">
+                    <span class="text-slate-400">수익률 (ROI):</span>
+                    <span id="res-roi" class="font-bold text-rose-400">+0%</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">금융감독원 적발 여부:</span>
+                    <span id="res-sec" class="text-emerald-400">안전</span>
+                </div>
+            </div>
+
+            <div id="end-evaluation" class="p-3 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">
+                평가: 개미들의 피눈물을 흘리게 만든 주식 시장의 악마!
+            </div>
+
+            <button onclick="resetGame()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow transition">
+                다시 작전 시작하기
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT GAME ENGINE -->
+    <script>
+        /* ==========================================================================
+           AUDIO ENGINE (Web Audio API Synthesizer)
+           ========================================================================== */
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+            playTone(freq, type = 'sine', duration = 0.1, gainVal = 0.1) {
+                if (!this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+            playBuy() {
+                this.init();
+                this.playTone(440, 'triangle', 0.08, 0.15);
+                setTimeout(() => this.playTone(880, 'triangle', 0.12, 0.15), 60);
+            }
+            playSell() {
+                this.init();
+                this.playTone(600, 'sawtooth', 0.08, 0.12);
+                setTimeout(() => this.playTone(300, 'sawtooth', 0.15, 0.12), 60);
+            }
+            playAlert() {
+                this.init();
+                this.playTone(900, 'square', 0.1, 0.2);
+                setTimeout(() => this.playTone(1200, 'square', 0.2, 0.2), 100);
+            }
+            playRumor() {
+                this.init();
+                this.playTone(350, 'sine', 0.2, 0.15);
+            }
+        }
+        const audio = new SoundEngine();
+
+        /* ==========================================================================
+           GAME CONSTANTS & CONFIGURATIONS
+           ========================================================================== */
+        const TOTAL_SHARES = 10000000; // 1,000만 주
+        const INITIAL_PRICE = 1000;    // 시가 1,000원
+
+        const DIFFICULTIES = {
+            easy: {
+                name: "초보 세력 (쉬움)",
+                totalCapital: 30000000000,
+                shareRatio: 0.30,
+                secMultiplier: 0.5,
+                retailFomoRate: 1.5,
+                retailPanicRate: 0.8
+            },
+            medium: {
+                name: "베테랑 세력 (보통)",
+                totalCapital: 10000000000,
+                shareRatio: 0.20,
+                secMultiplier: 1.0,
+                retailFomoRate: 1.0,
+                retailPanicRate: 1.0
+            },
+            hard: {
+                name: "전설의 작전주 (어려움)",
+                totalCapital: 5000000000,
+                shareRatio: 0.10,
+                secMultiplier: 1.8,
+                retailFomoRate: 0.7,
+                retailPanicRate: 1.6
+            }
+        };
+
+        /* ==========================================================================
+           GAME STATE
+           ========================================================================== */
+        let diffKey = 'medium';
+        let config = DIFFICULTIES.medium;
+
+        let gameState = {
+            day: 1,
+            hour: 9,
+            minute: 0,
+            isPaused: false,
+            isOver: false,
+            
+            price: INITIAL_PRICE,
+            prevClosePrice: INITIAL_PRICE,
+            highPrice: INITIAL_PRICE,
+            lowPrice: INITIAL_PRICE,
+            volume: 0,
+            
+            cash: 0,
+            shares: 0,
+            initialNetWorth: 0,
+            
+            retailShares: 0,
+            retailSentiment: 0,
+            secAlert: 10,
+            
+            cooldowns: {
+                wash: 0,
+                rumor_good: 0,
+                rumor_bad: 0,
+                blockdeal: 0
+            },
+
+            candles: []
+        };
+
+        let currentCandle = { open: INITIAL_PRICE, high: INITIAL_PRICE, low: INITIAL_PRICE, close: INITIAL_PRICE, volume: 0, isWash: false };
+        let timerInterval = null;
+
+        const CHAT_TEMPLATES = {
+            fomo: [
+                "바이오퓨처 가즈아아아아! 구조대 도착했다!!",
+                "세력 형님들 충성충성^^7 5000원까지 쏘나요?",
+                "지금 안 사면 평생 후회한다 ㅋㅋㅋ 풀매수 들어감",
+                "이거 상한가 직행각이다. 풀비상!",
+                "네이버 실검 1위 실화냐? 개떡상 가자!!"
+            ],
+            bullish: [
+                "차트 예쁘게 만드네. 누군가 관리하는 듯?",
+                "오늘 거래량 터지는 거 보소.. 주포 살아있다",
+                "바이오퓨처 M&A 대형 호재 떴다는데 진짠가요?",
+                "단타족들 털고 단단하게 올라가네 굿"
+            ],
+            neutral: [
+                "오늘 주가 심심하네.. 점심이나 먹으러 가야지",
+                "여기 아직도 살아있는 사람 있냐?",
+                "보합권 지루하다. 방빼라"
+            ],
+            bearish: [
+                "아 음봉 존나 세게 박히네.. 탈출해야 되나",
+                "윗꼬리 달고 밀리는데 세력 털고 도망친 거 아님?",
+                "개미 꼬시기용 짭등이었네 ㅡㅡ 낚였다",
+                "손절 친다 퉤퉤 다신 안 옴"
+            ],
+            panic: [
+                "씨발 하한가 가냐???? 살려줘라 ㅠㅠㅠ",
+                "아 내 주식 인생 망함... 공시 악재 떠서 투매나옴",
+                "금감원 조사받는다는데 사실임?? 좆됐다!",
+                "한강 물 따뜻하냐? 주포 개XX야 내 돈 돌려내라"
+            ]
+        };
+
+        const USER_NAMES = [
+            "한강뷰꿈나무", "주식초보99", "코스닥전설", "존버는승리한다", "단타의신",
+            "영끌풀매수", "주린이살려", "떡상기원", "상한가사냥꾼", "주식으로집사기"
+        ];
+
+        /* ==========================================================================
+           INITIALIZATION
+           ========================================================================== */
+        function selectDifficulty(key) {
+            diffKey = key;
+            document.querySelectorAll('.diff-card').forEach(el => {
+                el.classList.remove('border-emerald-500', 'border-blue-500', 'border-rose-500', 'bg-blue-500/10');
+                el.classList.add('border-slate-700', 'bg-slate-800/50');
+            });
+
+            const selectedEl = document.getElementById(`diff-${key}`);
+            if (key === 'easy') selectedEl.classList.add('border-emerald-500', 'bg-emerald-500/10');
+            if (key === 'medium') selectedEl.classList.add('border-blue-500', 'bg-blue-500/10');
+            if (key === 'hard') selectedEl.classList.add('border-rose-500', 'bg-rose-500/10');
+        }
+
+        function startGame() {
+            audio.init();
+            config = DIFFICULTIES[diffKey];
+            
+            gameState.day = 1;
+            gameState.hour = 9;
+            gameState.minute = 0;
+            gameState.isPaused = false;
+            gameState.isOver = false;
+
+            gameState.price = INITIAL_PRICE;
+            gameState.prevClosePrice = INITIAL_PRICE;
+            gameState.highPrice = INITIAL_PRICE;
+            gameState.lowPrice = INITIAL_PRICE;
+            gameState.volume = 0;
+
+            const stockAssetValue = config.totalCapital * config.shareRatio;
+            gameState.shares = Math.floor(stockAssetValue / INITIAL_PRICE);
+            gameState.cash = config.totalCapital - (gameState.shares * INITIAL_PRICE);
+            
+            gameState.retailShares = TOTAL_SHARES - gameState.shares;
+            gameState.initialNetWorth = gameState.cash + (gameState.shares * gameState.price);
+
+            gameState.retailSentiment = 0;
+            gameState.secAlert = 10;
+            gameState.candles = [];
+
+            currentCandle = { open: INITIAL_PRICE, high: INITIAL_PRICE, low: INITIAL_PRICE, close: INITIAL_PRICE, volume: 0, isWash: false };
+            
+            for(let i = 0; i < 15; i++) {
+                let p = INITIAL_PRICE + (Math.sin(i) * 20);
+                gameState.candles.push({ open: p, high: p + 10, low: p - 10, close: p, volume: Math.floor(Math.random() * 50000 + 10000), isWash: false });
+            }
+
+            document.getElementById('start-modal').classList.add('hidden');
+            document.getElementById('end-modal').classList.add('hidden');
+
+            document.getElementById('diff-tag').innerText = `난이도: ${config.name.split(' ')[0]}`;
+            document.getElementById('initial-cash-display').innerText = formatKRW(gameState.initialNetWorth);
+
+            addNews("[개장] 코스닥 작전 유망주 (주)바이오퓨처 정규 장 개시. 세력 움직임 주목.");
+            addChat("주식초보", "오늘부터 바이오퓨처 탑승합니다 잘 부탁드립니다!");
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(gameTick, 1000);
+
+            updateUI();
+        }
+
+        function togglePause() {
+            gameState.isPaused = !gameState.isPaused;
+            const btn = document.getElementById('pause-btn');
+            if (gameState.isPaused) {
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> 재개`;
+                btn.classList.replace('bg-slate-800', 'bg-emerald-600');
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> 일시정지`;
+                btn.classList.replace('bg-emerald-600', 'bg-slate-800');
+            }
+        }
+
+        /* ==========================================================================
+           MAIN TICK
+           ========================================================================== */
+        function gameTick() {
+            if (gameState.isPaused || gameState.isOver) return;
+
+            gameState.minute += 15;
+            if (gameState.minute >= 60) {
+                gameState.minute = 0;
+                gameState.hour += 1;
+            }
+
+            if (gameState.hour >= 15 && gameState.minute >= 30) {
+                endTradingDay();
+                return;
+            }
+
+            simulateRetailAction();
+            triggerRandomEvents();
+            updateSecAlertLevel();
+            updateCandleData();
+            updateUI();
+            drawChart();
+            checkGameEndConditions();
+        }
+
+        function endTradingDay() {
+            gameState.day += 1;
+            gameState.hour = 9;
+            gameState.minute = 0;
+            gameState.prevClosePrice = gameState.price;
+
+            addNews(`[장마감] ${gameState.day - 1}일차 거래 종료. 종가: ${formatNumber(gameState.price)}원`);
+
+            if (gameState.day > 30) {
+                triggerGameOver("30일 작전 기간 만료", "계획했던 30일간의 작전 기간이 종료되었습니다. 최종 수익금을 정산합니다.");
+            }
+        }
+
+        /* ==========================================================================
+           RETAIL SIMULATION
+           ========================================================================== */
+        function simulateRetailAction() {
+            const priceChangeRatio = (gameState.price - gameState.prevClosePrice) / gameState.prevClosePrice;
+            
+            if (priceChangeRatio > 0.05) gameState.retailSentiment += 4 * config.retailFomoRate;
+            else if (priceChangeRatio < -0.05) gameState.retailSentiment -= 5 * config.retailPanicRate;
+            
+            gameState.retailSentiment *= 0.95;
+            gameState.retailSentiment = Math.max(-100, Math.min(100, gameState.retailSentiment));
+
+            let netRetailBuyShares = 0;
+            
+            if (gameState.retailSentiment > 20) {
+                const buyIntensity = (gameState.retailSentiment / 100) * 0.02 * config.retailFomoRate;
+                netRetailBuyShares = Math.floor(gameState.retailShares * buyIntensity);
+            } else if (gameState.retailSentiment < -20) {
+                const sellIntensity = (Math.abs(gameState.retailSentiment) / 100) * 0.025 * config.retailPanicRate;
+                netRetailBuyShares = -Math.floor(gameState.retailShares * sellIntensity);
+            } else {
+                netRetailBuyShares = Math.floor((Math.random() - 0.5) * 5000);
+            }
+
+            if (netRetailBuyShares !== 0) {
+                applyMarketImpact(netRetailBuyShares, false);
+            }
+
+            if (Math.random() < 0.4) {
+                generateRetailChatter();
+            }
+        }
+
+        function applyMarketImpact(sharesDelta, isPlayer = false, isWash = false) {
+            const impactFactor = 0.08;
+            const priceShift = (sharesDelta / TOTAL_SHARES) * gameState.price * impactFactor;
+
+            gameState.price = Math.max(10, Math.round(gameState.price + priceShift));
+            
+            const tradedVol = Math.abs(sharesDelta);
+            gameState.volume += tradedVol;
+            currentCandle.volume += tradedVol;
+
+            if (isWash) currentCandle.isWash = true;
+
+            if (gameState.price > gameState.highPrice) gameState.highPrice = gameState.price;
+            if (gameState.price < gameState.lowPrice) gameState.lowPrice = gameState.price;
+        }
+
+        function updateSecAlertLevel() {
+            const priceChangeFromClose = Math.abs((gameState.price - gameState.prevClosePrice) / gameState.prevClosePrice);
+            
+            if (priceChangeFromClose > 0.20) {
+                gameState.secAlert += 0.8 * config.secMultiplier;
+            }
+
+            if (gameState.volume > TOTAL_SHARES * 0.3 && Math.abs(gameState.retailSentiment) < 10) {
+                gameState.secAlert += 0.5 * config.secMultiplier;
+            }
+
+            if (priceChangeFromClose < 0.05) {
+                gameState.secAlert = Math.max(0, gameState.secAlert - 0.2);
+            }
+
+            gameState.secAlert = Math.min(100, Math.max(0, gameState.secAlert));
+        }
+
+        /* ==========================================================================
+           PLAYER ACTIONS & COOLDOWNS (UI Fix Included)
+           ========================================================================== */
+        function updateTradeSliderText() {
+            const val = parseInt(document.getElementById('trade-slider').value) / 100;
+            const maxBuyableableByCash = Math.floor((gameState.cash * 0.9) / gameState.price);
+            const maxBuyable = Math.min(maxBuyableableByCash, gameState.retailShares);
+            const targetShares = Math.floor(maxBuyable * val);
+            document.getElementById('trade-amount-text').innerText = `${Math.round(val * 100)}% (${formatNumber(targetShares)}주)`;
+        }
+
+        function triggerCooldown(key, seconds) {
+            gameState.cooldowns[key] = seconds;
+            const cdEl = document.getElementById(`cd-${key}`);
+            if (!cdEl) return;
+
+            cdEl.classList.remove('hidden');
+            cdEl.innerText = `쿨다운 ${seconds}s`;
+
+            const timer = setInterval(() => {
+                gameState.cooldowns[key]--;
+                const rem = gameState.cooldowns[key];
+                if (rem <= 0) {
+                    clearInterval(timer);
+                    gameState.cooldowns[key] = 0;
+                    cdEl.classList.add('hidden');
+                } else {
+                    cdEl.innerText = `쿨다운 ${rem}s`;
+                }
+            }, 1000);
+        }
+
+        function executeAction(actionType) {
+            if (gameState.isOver || gameState.isPaused) return;
+
+            const sliderPercent = parseInt(document.getElementById('trade-slider').value) / 100;
+
+            switch (actionType) {
+                case 'buy': {
+                    if (gameState.retailShares <= 0) {
+                        addNews("⚠️ [경고] 시장에 유통되는 개미 물량이 없습니다. (지분율 100% 달성)");
+                        return;
+                    }
+
+                    const maxAffordableShares = Math.floor((gameState.cash * 0.9) / gameState.price);
+                    let sharesToBuy = Math.floor(maxAffordableShares * sliderPercent);
+                    sharesToBuy = Math.min(sharesToBuy, gameState.retailShares);
+
+                    if (sharesToBuy <= 0 || gameState.cash < sharesToBuy * gameState.price) {
+                        addNews("⚠️ [경고] 보유 현금이 부족하거나 더 이상 매수할 주식이 없습니다.");
+                        return;
+                    }
+
+                    const cost = sharesToBuy * gameState.price;
+                    gameState.cash -= cost;
+                    gameState.shares += sharesToBuy;
+                    gameState.retailShares = Math.max(0, gameState.retailShares - sharesToBuy);
+
+                    applyMarketImpact(sharesToBuy, true);
+                    gameState.retailSentiment += 15 * config.retailFomoRate;
+                    gameState.secAlert += 2.0 * config.secMultiplier;
+
+                    audio.playBuy();
+                    addNews(`[세력 매수] ${formatNumber(sharesToBuy)}주 대량 매수 체결! (주가 상승 자금 투입)`);
+                    break;
+                }
+
+                case 'sell': {
+                    let sharesToSell = Math.floor(gameState.shares * sliderPercent);
+                    sharesToSell = Math.min(sharesToSell, gameState.shares);
+
+                    if (sharesToSell <= 0 || gameState.shares < sharesToSell) {
+                        addNews("⚠️ [경고] 매도할 보유 주식이 부족합니다.");
+                        return;
+                    }
+
+                    const revenue = sharesToSell * gameState.price;
+                    gameState.cash += revenue;
+                    gameState.shares -= sharesToSell;
+                    gameState.retailShares = Math.min(TOTAL_SHARES, gameState.retailShares + sharesToSell);
+
+                    applyMarketImpact(-sharesToSell, true);
+                    gameState.retailSentiment -= 20 * config.retailPanicRate;
+                    gameState.secAlert += 2.5 * config.secMultiplier;
+
+                    audio.playSell();
+                    addNews(`[세력 덤핑] ${formatNumber(sharesToSell)}주 물량 개미에게 덤핑 완료! (수익 실현)`);
+                    break;
+                }
+
+                case 'wash': {
+                    if (gameState.cooldowns.wash > 0) return;
+                    const fee = 50000000;
+                    if (gameState.cash < fee) {
+                        addNews("⚠️ 자전거래 비용(5,000만원)이 부족합니다.");
+                        return;
+                    }
+
+                    gameState.cash -= fee;
+                    triggerCooldown('wash', 5);
+
+                    const fakeVol = Math.floor(TOTAL_SHARES * 0.08);
+                    gameState.volume += fakeVol;
+                    currentCandle.volume += fakeVol;
+                    currentCandle.isWash = true;
+
+                    gameState.retailSentiment += 12;
+                    gameState.secAlert += 3.5 * config.secMultiplier;
+
+                    audio.playRumor();
+                    addNews("🚨 [자전거래] 통정매매 실행: 가짜 거래량을 폭발시켜 거래량 상위 차트에 노출시킵니다.");
+                    break;
+                }
+
+                case 'rumor_good': {
+                    if (gameState.cooldowns.rumor_good > 0) return;
+                    const fee = 100000000;
+                    if (gameState.cash < fee) {
+                        addNews("⚠️ 찌라시 유포 비용(1억원)이 부족합니다.");
+                        return;
+                    }
+
+                    gameState.cash -= fee;
+                    triggerCooldown('rumor_good', 10);
+
+                    gameState.retailSentiment += 45 * config.retailFomoRate;
+                    gameState.secAlert += 6.0 * config.secMultiplier;
+
+                    audio.playRumor();
+                    const rumors = [
+                        "[찌라시] (주)바이오퓨처, 글로벌 제약사와 2조원대 기술이전(L/O) 계약 임박설!",
+                        "[단독] 삼성-현대 협력체 M&A 인수 타겟 후보에 바이오퓨처 포함 소식",
+                        "[특징주] 바이오퓨처, 무상증자 1:5 전격 결정 찌라시에 개미들 광풍"
+                    ];
+                    addNews(`📢 ${rumors[Math.floor(Math.random() * rumors.length)]}`);
+                    break;
+                }
+
+                case 'rumor_bad': {
+                    if (gameState.cooldowns.rumor_bad > 0) return;
+                    const fee = 100000000;
+                    if (gameState.cash < fee) {
+                        addNews("⚠️ 공포 유포 비용(1억원)이 부족합니다.");
+                        return;
+                    }
+
+                    gameState.cash -= fee;
+                    triggerCooldown('rumor_bad', 10);
+
+                    gameState.retailSentiment -= 50 * config.retailPanicRate;
+                    gameState.secAlert += 5.0 * config.secMultiplier;
+
+                    audio.playRumor();
+                    addNews("💀 [공포 찌라시] 대표이사 배임횡령 검찰 조사 루머 유포! 개미들의 투매를 유도합니다.");
+                    break;
+                }
+
+                case 'blockdeal': {
+                    if (gameState.cooldowns.blockdeal > 0) return;
+                    const fee = 300000000;
+                    if (gameState.cash < fee) {
+                        addNews("⚠️ 로비 및 차명 계좌 세탁 비용(3억원)이 부족합니다.");
+                        return;
+                    }
+
+                    gameState.cash -= fee;
+                    triggerCooldown('blockdeal', 15);
+
+                    gameState.secAlert = Math.max(0, gameState.secAlert - 18);
+
+                    audio.playBuy();
+                    addNews("🕵️ [차명 세탁] 금융감독원 및 언론사 로비 완료. 감시 지표가 크게 감소합니다 (-18%).");
+                    break;
+                }
+            }
+
+            updateUI();
+        }
+
+        /* ==========================================================================
+           EVENTS & CANDLES
+           ========================================================================== */
+        function triggerRandomEvents() {
+            if (Math.random() < 0.025) {
+                const events = [
+                    {
+                        title: "🔍 [속보] 금융감독원 기획조사반, 바이오퓨처 이상 거래 정황 포착!",
+                        effect: () => {
+                            gameState.secAlert += 15;
+                            gameState.retailSentiment -= 20;
+                            audio.playAlert();
+                        }
+                    },
+                    {
+                        title: "🔥 [유튜브/삼프로TV] 유명 주식 유튜버의 추천 종목으로 언급!",
+                        effect: () => { gameState.retailSentiment += 30; }
+                    },
+                    {
+                        title: "📉 [시장 악재] 코스닥 지수 -3% 대폭락... 투심 위축",
+                        effect: () => { gameState.retailSentiment -= 15; }
+                    },
+                    {
+                        title: "💎 [공시] 진짜 특허 등록 성공 공시 발표!",
+                        effect: () => {
+                            gameState.retailSentiment += 25;
+                            applyMarketImpact(TOTAL_SHARES * 0.05, false);
+                        }
+                    }
+                ];
+
+                const ev = events[Math.floor(Math.random() * events.length)];
+                addNews(ev.title);
+                ev.effect();
+            }
+        }
+
+        function updateCandleData() {
+            currentCandle.close = gameState.price;
+            if (gameState.price > currentCandle.high) currentCandle.high = gameState.price;
+            if (gameState.price < currentCandle.low) currentCandle.low = gameState.price;
+
+            if (gameState.minute === 0) {
+                gameState.candles.push({ ...currentCandle });
+                if (gameState.candles.length > 40) gameState.candles.shift();
+
+                currentCandle = {
+                    open: gameState.price,
+                    high: gameState.price,
+                    low: gameState.price,
+                    close: gameState.price,
+                    volume: 0,
+                    isWash: false
+                };
+            }
+        }
+
+        /* ==========================================================================
+           UI UPDATE
+           ========================================================================== */
+        function updateUI() {
+            const priceEl = document.getElementById('current-price');
+            priceEl.innerText = formatNumber(gameState.price);
+
+            const diff = gameState.price - gameState.prevClosePrice;
+            const diffPct = ((diff / gameState.prevClosePrice) * 100).toFixed(2);
+            const badge = document.getElementById('price-change-badge');
+
+            if (diff >= 0) {
+                priceEl.className = "text-2xl font-black font-mono-tech text-rose-500";
+                badge.className = "text-xs font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                badge.innerText = `+${diffPct}% (+${formatNumber(diff)})`;
+            } else {
+                priceEl.className = "text-2xl font-black font-mono-tech text-blue-500";
+                badge.className = "text-xs font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30";
+                badge.innerText = `${diffPct}% (${formatNumber(diff)})`;
+            }
+
+            document.getElementById('high-price').innerText = formatNumber(gameState.highPrice);
+            document.getElementById('low-price').innerText = formatNumber(gameState.lowPrice);
+            document.getElementById('total-volume').innerText = formatNumber(gameState.volume);
+
+            document.getElementById('time-display').innerText = `${gameState.day}일차 ${String(gameState.hour).padStart(2, '0')}:${String(gameState.minute).padStart(2, '0')}`;
+            const mcap = gameState.price * TOTAL_SHARES;
+            document.getElementById('mcap-display').innerText = formatKRW(mcap);
+
+            const secBar = document.getElementById('sec-bar');
+            const secText = document.getElementById('sec-text');
+            const secVal = Math.round(gameState.secAlert);
+            secBar.style.width = `${secVal}%`;
+            secText.innerText = `${secVal}%`;
+
+            if (secVal > 75) {
+                secBar.className = "bg-rose-600 h-full transition-all duration-300 pulse-red";
+                secText.className = "text-xs font-mono-tech font-bold text-rose-500 animate-pulse";
+            } else if (secVal > 45) {
+                secBar.className = "bg-amber-500 h-full transition-all duration-300";
+                secText.className = "text-xs font-mono-tech font-bold text-amber-400";
+            } else {
+                secBar.className = "bg-emerald-500 h-full transition-all duration-300";
+                secText.className = "text-xs font-mono-tech font-bold text-emerald-400";
+            }
+
+            const sentBadge = document.getElementById('sentiment-badge');
+            const sentText = document.getElementById('sentiment-text');
+            const sent = gameState.retailSentiment;
+
+            if (sent > 50) {
+                sentBadge.className = "px-2.5 py-1 rounded-lg text-xs font-bold border bg-rose-500/20 border-rose-500/40 text-rose-400 glow-red";
+                sentText.innerText = "개미 심리: 🚀 광풍 / FOMO";
+            } else if (sent > 15) {
+                sentBadge.className = "px-2.5 py-1 rounded-lg text-xs font-bold border bg-rose-500/10 border-rose-500/20 text-rose-300";
+                sentText.innerText = "개미 심리: 🔥 매수세과열";
+            } else if (sent < -50) {
+                sentBadge.className = "px-2.5 py-1 rounded-lg text-xs font-bold border bg-blue-600/30 border-blue-500/50 text-blue-300 glow-green";
+                sentText.innerText = "개미 심리: 💀 공포 / 패닉투매";
+            } else if (sent < -15) {
+                sentBadge.className = "px-2.5 py-1 rounded-lg text-xs font-bold border bg-blue-500/10 border-blue-500/20 text-blue-400";
+                sentText.innerText = "개미 심리: ❄️ 심리 위축";
+            } else {
+                sentBadge.className = "px-2.5 py-1 rounded-lg text-xs font-bold border bg-slate-800 border-slate-700 text-slate-400";
+                sentText.innerText = "개미 심리: 👁️ 관망세";
+            }
+
+            document.getElementById('player-cash').innerText = formatKRW(gameState.cash);
+            const stakeRatio = ((gameState.shares / TOTAL_SHARES) * 100).toFixed(1);
+            document.getElementById('player-shares').innerText = `${formatNumber(gameState.shares)} 주 (${stakeRatio}%)`;
+
+            const currentNetWorth = gameState.cash + (gameState.shares * gameState.price);
+            document.getElementById('player-networth').innerText = formatKRW(currentNetWorth);
+
+            const roi = (((currentNetWorth - gameState.initialNetWorth) / gameState.initialNetWorth) * 100).toFixed(2);
+            const roiEl = document.getElementById('roi-display');
+            if (roi >= 0) {
+                roiEl.className = "font-mono-tech text-rose-400 font-bold";
+                roiEl.innerText = `+${roi}%`;
+            } else {
+                roiEl.className = "font-mono-tech text-blue-400 font-bold";
+                roiEl.innerText = `${roi}%`;
+            }
+
+            document.getElementById('retail-shares-display').innerText = `${formatNumber(gameState.retailShares)}주`;
+            updateTradeSliderText();
+        }
+
+        function addNews(text) {
+            document.getElementById('news-feed').innerText = text;
+        }
+
+        function generateRetailChatter() {
+            let pool = CHAT_TEMPLATES.neutral;
+            if (gameState.retailSentiment > 50) pool = CHAT_TEMPLATES.fomo;
+            else if (gameState.retailSentiment > 15) pool = CHAT_TEMPLATES.bullish;
+            else if (gameState.retailSentiment < -50) pool = CHAT_TEMPLATES.panic;
+            else if (gameState.retailSentiment < -15) pool = CHAT_TEMPLATES.bearish;
+
+            const msg = pool[Math.floor(Math.random() * pool.length)];
+            const user = USER_NAMES[Math.floor(Math.random() * USER_NAMES.length)];
+            addChat(user, msg);
+        }
+
+        function addChat(user, text) {
+            const feed = document.getElementById('chat-feed');
+            const div = document.createElement('div');
+            div.className = "flex items-start space-x-2 border-b border-slate-800/40 pb-1";
+            div.innerHTML = `
+                <span class="text-slate-500 font-bold shrink-0">[${user}]</span>
+                <span class="text-slate-300">${text}</span>
+            `;
+            feed.prepend(div);
+            if (feed.children.length > 25) feed.removeChild(feed.lastChild);
+        }
+
+        /* ==========================================================================
+           CANVAS DRAWING
+           ========================================================================== */
+        function resizeCanvas() {
+            const canvas = document.getElementById('stockChart');
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            drawChart();
+        }
+
+        function drawChart() {
+            const canvas = document.getElementById('stockChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const data = [...gameState.candles, currentCandle];
+            if (data.length === 0) return;
+
+            const volumeHeight = height * 0.25;
+            const priceHeight = height * 0.70;
+
+            let minP = Math.min(...data.map(d => d.low));
+            let maxP = Math.max(...data.map(d => d.high));
+            if (minP === maxP) { minP *= 0.95; maxP *= 1.05; }
+            
+            minP *= 0.98;
+            maxP *= 1.02;
+
+            let maxVol = Math.max(...data.map(d => d.volume), 1000);
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 4; i++) {
+                let y = (priceHeight / 4) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+
+                let priceLabel = Math.round(maxP - ((maxP - minP) / 4) * i);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '10px monospace';
+                ctx.fillText(formatNumber(priceLabel), width - 50, y - 3);
+            }
+
+            const candleWidth = Math.max(4, (width - 60) / data.length);
+            const gap = Math.max(2, candleWidth * 0.25);
+
+            data.forEach((d, i) => {
+                const x = i * candleWidth + gap;
+                const isUp = d.close >= d.open;
+
+                const openY = priceHeight - ((d.open - minP) / (maxP - minP)) * priceHeight;
+                const closeY = priceHeight - ((d.close - minP) / (maxP - minP)) * priceHeight;
+                const highY = priceHeight - ((d.high - minP) / (maxP - minP)) * priceHeight;
+                const lowY = priceHeight - ((d.low - minP) / (maxP - minP)) * priceHeight;
+
+                const candleColor = d.isWash ? '#22c55e' : (isUp ? '#ef4444' : '#3b82f6');
+
+                ctx.strokeStyle = candleColor;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(x + (candleWidth - gap) / 2, highY);
+                ctx.lineTo(x + (candleWidth - gap) / 2, lowY);
+                ctx.stroke();
+
+                ctx.fillStyle = candleColor;
+                const bodyY = Math.min(openY, closeY);
+                const bodyH = Math.max(2, Math.abs(openY - closeY));
+                ctx.fillRect(x, bodyY, candleWidth - gap, bodyH);
+
+                const volH = (d.volume / maxVol) * volumeHeight;
+                const volY = height - volH;
+                ctx.fillStyle = d.isWash ? 'rgba(34, 197, 94, 0.4)' : (isUp ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)');
+                ctx.fillRect(x, volY, candleWidth - gap, volH);
+            });
+        }
+
+        /* ==========================================================================
+           GAME END ENGINE
+           ========================================================================== */
+        function checkGameEndConditions() {
+            if (gameState.secAlert >= 100) {
+                audio.playAlert();
+                triggerGameOver(
+                    "🚨 금융감독원 수사관 긴급 체포!",
+                    "시세조종 및 통정매매 혐의가 입증되어 구속되었습니다. 모든 자산이 국고 환수 처리됩니다."
+                );
+                return;
+            }
+
+            const totalVal = gameState.cash + (gameState.shares * gameState.price);
+            if (totalVal < 10000000) {
+                triggerGameOver(
+                    "💸 파산 / 작전 실패",
+                    "자금이 모두 고갈되어 작전 부티크가 해산되었습니다."
+                );
+            }
+        }
+
+        function triggerGameOver(title, subtitle) {
+            gameState.isOver = true;
+            if (timerInterval) clearInterval(timerInterval);
+
+            const finalNet = gameState.cash + (gameState.shares * gameState.price);
+            const isArrested = gameState.secAlert >= 100;
+
+            const resFinalVal = isArrested ? 0 : finalNet;
+            const roi = (((resFinalVal - gameState.initialNetWorth) / gameState.initialNetWorth) * 100).toFixed(2);
+
+            document.getElementById('end-title').innerText = title;
+            document.getElementById('end-subtitle').innerText = subtitle;
+            document.getElementById('res-initial').innerText = formatKRW(gameState.initialNetWorth);
+            document.getElementById('res-final').innerText = formatKRW(resFinalVal);
+            
+            const roiEl = document.getElementById('res-roi');
+            roiEl.innerText = `${roi}%`;
+            roiEl.className = roi >= 0 ? "font-bold text-rose-400" : "font-bold text-blue-400";
+
+            document.getElementById('res-sec').innerText = isArrested ? "🚨 적발 (구속)" : "🟢 안전 (미적발)";
+            document.getElementById('res-sec').className = isArrested ? "text-rose-500 font-bold" : "text-emerald-400";
+
+            const evalEl = document.getElementById('end-evaluation');
+            if (isArrested) {
+                evalEl.innerText = "평가: 옥살이 10년형 확정! 탐욕이 과하면 철창 신세를 면하지 못합니다.";
+                document.getElementById('end-icon').innerText = "🚔";
+            } else if (roi > 300) {
+                evalEl.innerText = "평가: 신의 손! 코스닥을 지배한 차세대 전설의 작전주 대부!";
+                document.getElementById('end-icon').innerText = "👑";
+            } else if (roi > 50) {
+                evalEl.innerText = "평가: 성공적인 익절! 개미들의 고혈로 짭짤한 수익을 챙겼습니다.";
+                document.getElementById('end-icon').innerText = "💰";
+            } else {
+                evalEl.innerText = "평가: 미미한 성과... 차라리 삼성전자 적금이나 들 걸 그랬습니다.";
+                document.getElementById('end-icon').innerText = "📉";
+            }
+
+            document.getElementById('end-modal').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            document.getElementById('end-modal').classList.add('hidden');
+            document.getElementById('start-modal').classList.remove('hidden');
+        }
+
+        function formatNumber(num) {
+            return new Intl.NumberFormat('ko-KR').format(num);
+        }
+
+        function formatKRW(amount) {
+            if (amount >= 100000000) {
+                const uk = Math.floor(amount / 100000000);
+                const rest = Math.floor((amount % 100000000) / 10000);
+                return rest > 0 ? `${formatNumber(uk)}억 ${formatNumber(rest)}만원` : `${formatNumber(uk)}억원`;
+            } else if (amount >= 10000) {
+                return `${formatNumber(Math.floor(amount / 10000))}만원`;
+            }
+            return `${formatNumber(amount)}원`;
+        }
+
+        window.onload = function() {
+            selectDifficulty('medium');
+        };
+    </script>
+</body>
+</html>
