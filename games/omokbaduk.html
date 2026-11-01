@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>오목 & 바둑 스튜디오 (Omok & Baduk Studio)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PeerJS for WebRTC P2P Online Multiplayer -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        /* Wooden Board Styling */
+        .board-container {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            background: #e6b87d;
+            background-image: radial-gradient(circle at 50% 50%, #f4cb93 0%, #e0ac67 100%);
+        }
+
+        /* Glassmorphic elements */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Top Navigation Header -->
+    <header class="w-full bg-slate-900/90 border-b border-slate-800 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center font-bold text-xl text-slate-950 shadow-lg shadow-amber-600/30">
+                碁
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight tracking-wide text-amber-400">오목 & 바둑 Studio</h1>
+                <p class="text-xs text-slate-400">AI · 친구와 한 기기 · 깃허브 온라인 대전</p>
+            </div>
+        </div>
+
+        <!-- Quick Game Options / Status -->
+        <div class="flex items-center space-x-2">
+            <button id="btn-settings" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-2 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        
+        <!-- Left Sidebar: Controls & Game Settings -->
+        <div class="lg:col-span-4 space-y-4">
+            
+            <!-- Game Mode Selector Card -->
+            <div class="glass-panel p-4 rounded-2xl shadow-xl space-y-4">
+                <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <i data-lucide="gamepad-2" class="w-4 h-4 text-amber-500"></i> 게임 설정 (Game Setup)
+                </h2>
+
+                <!-- Game Type Switcher -->
+                <div class="grid grid-cols-2 gap-2 bg-slate-900/80 p-1 rounded-xl border border-slate-800">
+                    <button id="mode-omok" class="py-2.5 rounded-lg text-sm font-semibold transition flex justify-center items-center gap-2 bg-amber-600 text-slate-950 shadow">
+                        <i data-lucide="circle-dot" class="w-4 h-4"></i> 오목 (Omok)
+                    </button>
+                    <button id="mode-baduk" class="py-2.5 rounded-lg text-sm font-semibold text-slate-400 transition hover:text-white flex justify-center items-center gap-2">
+                        <i data-lucide="grid" class="w-4 h-4"></i> 바둑 (Go)
+                    </button>
+                </div>
+
+                <!-- Board Size (Only active for Baduk or standard setup) -->
+                <div class="space-y-1.5">
+                    <label class="text-xs text-slate-300 font-medium">판 크기 (Board Size)</label>
+                    <select id="select-board-size" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="15" selected>15 x 15 (오목 표준 / 바둑)</option>
+                        <option value="19">19 x 19 (정식 바둑판)</option>
+                        <option value="9">9 x 9 (바둑 입문용)</option>
+                        <option value="13">13 x 13 (바둑 중급용)</option>
+                    </select>
+                </div>
+
+                <!-- Opponent Type -->
+                <div class="space-y-1.5">
+                    <label class="text-xs text-slate-300 font-medium">대국 모드 (Match Type)</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button id="match-ai" class="py-2 rounded-lg border border-amber-500/50 bg-amber-500/10 text-amber-400 text-xs font-medium flex flex-col items-center gap-1 transition">
+                            <i data-lucide="bot" class="w-4 h-4"></i> AI 대국
+                        </button>
+                        <button id="match-local" class="py-2 rounded-lg border border-slate-700 bg-slate-900 text-slate-400 text-xs font-medium flex flex-col items-center gap-1 hover:border-slate-600 transition">
+                            <i data-lucide="users" class="w-4 h-4"></i> 한 기기 (2P)
+                        </button>
+                        <button id="match-online" class="py-2 rounded-lg border border-slate-700 bg-slate-900 text-slate-400 text-xs font-medium flex flex-col items-center gap-1 hover:border-slate-600 transition">
+                            <i data-lucide="globe" class="w-4 h-4"></i> 온라인 대전
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AI Level Options (shown when AI active) -->
+                <div id="ai-options-panel" class="p-3 bg-slate-900/60 border border-slate-800 rounded-xl space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-400">AI 난이도 (Difficulty):</span>
+                        <div class="flex gap-2">
+                            <label class="inline-flex items-center gap-1 cursor-pointer">
+                                <input type="radio" name="ai-level" value="easy" class="text-amber-500 focus:ring-0">
+                                <span class="text-xs text-slate-300">쉬움</span>
+                            </label>
+                            <label class="inline-flex items-center gap-1 cursor-pointer">
+                                <input type="radio" name="ai-level" value="normal" checked class="text-amber-500 focus:ring-0">
+                                <span class="text-xs text-slate-300">보통</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Online PeerJS Room Panel (shown when Online active) -->
+                <div id="online-panel" class="hidden p-3 bg-slate-900/80 border border-amber-500/30 rounded-xl space-y-3">
+                    <div class="text-xs font-medium text-amber-400 flex items-center gap-1">
+                        <i data-lucide="wifi" class="w-3.5 h-3.5"></i> P2P 온라인 룸 (WebRTC)
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <button id="btn-create-room" class="flex-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold py-1.5 px-3 rounded-lg text-xs transition">
+                                방 만들기
+                            </button>
+                            <button id="btn-copy-link" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1">
+                                <i data-lucide="copy" class="w-3.5 h-3.5"></i> 링크 복사
+                            </button>
+                        </div>
+
+                        <div class="flex gap-2">
+                            <input id="input-room-id" type="text" placeholder="방 코드 입력" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-200">
+                            <button id="btn-join-room" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-1 px-3 rounded-lg text-xs transition whitespace-nowrap">
+                                참가
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="online-status-text" class="text-[11px] text-slate-400 text-center">
+                        방을 생성하거나 친구의 방 코드를 입력하세요.
+                    </div>
+                </div>
+
+                <!-- Reset / New Game Button -->
+                <button id="btn-restart" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-400 font-semibold text-sm transition flex items-center justify-center gap-2 border border-slate-700">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 새 게임 시작 (Restart)
+                </button>
+            </div>
+
+            <!-- Game Status & Scoreboard -->
+            <div class="glass-panel p-4 rounded-2xl shadow-xl space-y-3">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">현재 상황 (Status)</span>
+                    <span id="game-rule-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        오목 (Omok)
+                    </span>
+                </div>
+
+                <!-- Current Turn Banner -->
+                <div id="turn-banner" class="flex items-center justify-between p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div id="turn-stone-icon" class="w-6 h-6 rounded-full bg-slate-950 border border-slate-600 shadow-inner"></div>
+                        <div>
+                            <div id="turn-text" class="text-sm font-bold text-slate-100">흑돌 차례 (Black Turn)</div>
+                            <div id="sub-status-text" class="text-xs text-slate-400">착수 대기 중...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Baduk Specific Captures & Controls -->
+                <div id="baduk-stats-panel" class="hidden grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                        <span class="text-slate-400">흑(Black) 따낸 돌:</span>
+                        <span id="black-captures" class="text-base font-bold text-amber-400">0개</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 flex flex-col justify-between">
+                        <span class="text-slate-400">백(White) 따낸 돌:</span>
+                        <span id="white-captures" class="text-base font-bold text-amber-400">0개</span>
+                    </div>
+                </div>
+
+                <!-- Action Controls (Pass & Resign for Baduk/Omok) -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button id="btn-pass" class="py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center justify-center gap-1.5 disabled:opacity-40">
+                        <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i> 한수 쉬기 (Pass)
+                    </button>
+                    <button id="btn-resign" class="py-2 rounded-xl bg-red-950/40 border border-red-800/50 hover:bg-red-900/40 text-red-300 text-xs font-medium transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="flag" class="w-3.5 h-3.5"></i> 기권 (Resign)
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right / Center Area: Game Board Canvas -->
+        <div class="lg:col-span-8 flex flex-col items-center justify-center space-y-3">
+            
+            <!-- Mobile Zoom / Pan Info Banner -->
+            <div class="w-full flex justify-between items-center text-xs text-slate-400 px-2">
+                <span class="flex items-center gap-1"><i data-lucide="mouse-pointer" class="w-3.5 h-3.5"></i> 클릭 / 터치하여 착수</span>
+                <span class="hidden sm:inline-flex items-center gap-1"><i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> 마우스 오버로 미리보기 지원</span>
+            </div>
+
+            <!-- Canvas Board Wrap -->
+            <div class="relative w-full flex justify-center items-center">
+                <div class="board-container rounded-2xl p-2 sm:p-4 border-4 border-amber-900/40 relative max-w-full overflow-hidden">
+                    <canvas id="game-canvas" class="cursor-pointer rounded-lg block shadow-2xl"></canvas>
+                    
+                    <!-- Touch Confirm Overlay Button (Mobile Friendly UX) -->
+                    <div id="touch-confirm-bar" class="hidden absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-slate-900/95 border border-amber-500/50 shadow-2xl rounded-full px-4 py-2 z-30 backdrop-blur-md">
+                        <span class="text-xs text-amber-300 font-semibold" id="confirm-coords">선택: (8, 8)</span>
+                        <button id="btn-confirm-move" class="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-3 py-1 rounded-full text-xs shadow">
+                            착수 (Confirm)
+                        </button>
+                        <button id="btn-cancel-move" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-full text-xs">
+                            취소
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Logs & Information -->
+            <div class="w-full glass-panel p-3 rounded-2xl flex flex-col space-y-2">
+                <div class="flex justify-between items-center text-xs text-slate-400 font-semibold border-b border-slate-800 pb-1">
+                    <span>수순 기록 (Move Log)</span>
+                    <span id="move-count">총 0수</span>
+                </div>
+                <div id="move-history" class="h-16 overflow-y-auto text-xs text-slate-300 font-mono space-x-2 flex flex-wrap items-center p-1">
+                    <span class="text-slate-500 italic">게임을 시작하세요.</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal Dialog (Game Over / Alerts) -->
+    <div id="modal-dialog" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel border border-slate-700 rounded-3xl p-6 max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <div id="modal-icon-wrap" class="w-16 h-16 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center mx-auto">
+                <i data-lucide="trophy" class="w-8 h-8"></i>
+            </div>
+            <h3 id="modal-title" class="text-xl font-bold text-slate-100">승리!</h3>
+            <p id="modal-message" class="text-sm text-slate-300">흑돌이 5목을 완성하여 승리하였습니다.</p>
+            <div class="pt-2 flex justify-center gap-2">
+                <button id="modal-btn-close" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-sm transition">
+                    확인
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        /**
+         * Omok & Baduk Core Engine & UI Implementation
+         */
+
+        // Game Configuration State
+        const CONFIG = {
+            gameType: 'omok',      // 'omok' or 'baduk'
+            boardSize: 15,          // 9, 13, 15, 19
+            matchType: 'ai',        // 'ai', 'local', 'online'
+            aiLevel: 'normal',      // 'easy', 'normal'
+            playerColor: 1          // 1: Black (First), 2: White (Second)
+        };
+
+        // Board Constants
+        const EMPTY = 0;
+        const BLACK = 1;
+        const WHITE = 2;
+
+        // Dynamic State
+        let board = [];
+        let currentPlayer = BLACK;
+        let moveHistory = [];
+        let gameOver = false;
+        let selectedCell = null; // For touch target confirm mode on mobile
+        let blackCaptures = 0;
+        let whiteCaptures = 0;
+        let passCount = 0;
+        let koPos = null; // Baduk Ko Rule: position forbidden for immediate recapture
+
+        // PeerJS Connection State
+        let peer = null;
+        let conn = null;
+        let isHost = false;
+        let myOnlineRole = BLACK;
+
+        // Canvas Elements & Drawing Parameters
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        let cellSize = 30;
+        let padding = 30;
+
+        // Sound System using Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playStoneSound() {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            // Crisp stone click simulation
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.08);
+
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+        }
+
+        // Initialize Board Matrix
+        function initBoard() {
+            board = Array(CONFIG.boardSize).fill(0).map(() => Array(CONFIG.boardSize).fill(EMPTY));
+            moveHistory = [];
+            currentPlayer = BLACK;
+            gameOver = false;
+            selectedCell = null;
+            blackCaptures = 0;
+            whiteCaptures = 0;
+            passCount = 0;
+            koPos = null;
+
+            updateUI();
+            resizeCanvas();
+            drawBoard();
+        }
+
+        // Window & Responsive Canvas Sizing
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const maxW = Math.min(container.clientWidth - 16, 600);
+            
+            // Keep square ratio
+            canvas.width = maxW;
+            canvas.height = maxW;
+
+            padding = Math.max(20, Math.floor(maxW / (CONFIG.boardSize + 2)));
+            cellSize = (maxW - padding * 2) / (CONFIG.boardSize - 1);
+
+            drawBoard();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Drawing Functions
+        function drawBoard() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Wood texture background fill
+            ctx.fillStyle = '#e6b87d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Grid Lines
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#4a2e12';
+
+            for (let i = 0; i < CONFIG.boardSize; i++) {
+                // Horizontal line
+                ctx.beginPath();
+                ctx.moveTo(padding, padding + i * cellSize);
+                ctx.lineTo(canvas.width - padding, padding + i * cellSize);
+                ctx.stroke();
+
+                // Vertical line
+                ctx.beginPath();
+                ctx.moveTo(padding + i * cellSize, padding);
+                ctx.lineTo(padding + i * cellSize, canvas.height - padding);
+                ctx.stroke();
+            }
+
+            // Star Points (Hoshi)
+            const hoshiPoints = getHoshiPoints(CONFIG.boardSize);
+            ctx.fillStyle = '#4a2e12';
+            hoshiPoints.forEach(([r, c]) => {
+                const x = padding + c * cellSize;
+                const y = padding + r * cellSize;
+                ctx.beginPath();
+                ctx.arc(x, y, Math.max(3, cellSize * 0.1), 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Coordinate labels (A-T, 1-19)
+            ctx.fillStyle = '#6e4720';
+            ctx.font = `${Math.max(9, cellSize * 0.35)}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            for (let i = 0; i < CONFIG.boardSize; i++) {
+                const char = String.fromCharCode(65 + (i >= 8 ? i + 1 : i)); // Skip 'I' in traditional Go notation
+                // Top & Bottom letters
+                ctx.fillText(char, padding + i * cellSize, padding / 2);
+                ctx.fillText(char, padding + i * cellSize, canvas.height - padding / 2);
+
+                // Left & Right numbers
+                const numStr = (CONFIG.boardSize - i).toString();
+                ctx.fillText(numStr, padding / 2, padding + i * cellSize);
+                ctx.fillText(numStr, canvas.width - padding / 2, padding + i * cellSize);
+            }
+
+            // Draw Placed Stones
+            for (let r = 0; r < CONFIG.boardSize; r++) {
+                for (let c = 0; c < CONFIG.boardSize; c++) {
+                    if (board[r][c] !== EMPTY) {
+                        drawStone(r, c, board[r][c]);
+                    }
+                }
+            }
+
+            // Highlight Last Move
+            if (moveHistory.length > 0) {
+                const lastMove = moveHistory[moveHistory.length - 1];
+                if (lastMove.type === 'move') {
+                    const lx = padding + lastMove.col * cellSize;
+                    const ly = padding + lastMove.row * cellSize;
+                    ctx.strokeStyle = lastMove.color === BLACK ? '#38bdf8' : '#ef4444';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    ctx.arc(lx, ly, cellSize * 0.25, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+
+            // Selected cell indicator (Mobile tap select)
+            if (selectedCell) {
+                const sx = padding + selectedCell.col * cellSize;
+                const sy = padding + selectedCell.row * cellSize;
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(sx, sy, cellSize * 0.45, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        // Draw Individual 3D-shaded Stone
+        function drawStone(row, col, color) {
+            const x = padding + col * cellSize;
+            const y = padding + row * cellSize;
+            const radius = cellSize * 0.44;
+
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+
+            // 3D Radial Gradient for realistic stone look
+            const grad = ctx.createRadialGradient(
+                x - radius * 0.3, y - radius * 0.3, radius * 0.1,
+                x, y, radius
+            );
+
+            if (color === BLACK) {
+                grad.addColorStop(0, '#555555');
+                grad.addColorStop(0.8, '#111111');
+                grad.addColorStop(1, '#000000');
+            } else {
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.8, '#e2e8f0');
+                grad.addColorStop(1, '#cbd5e1');
+            }
+
+            ctx.fillStyle = grad;
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 3;
+            ctx.fill();
+
+            ctx.shadowColor = 'transparent'; // Reset shadow
+        }
+
+        // Hoshi (Star points) placement by board dimension
+        function getHoshiPoints(size) {
+            if (size === 19) {
+                return [
+                    [3, 3], [3, 9], [3, 15],
+                    [9, 3], [9, 9], [9, 15],
+                    [15, 3], [15, 9], [15, 15]
+                ];
+            } else if (size === 15) {
+                return [
+                    [3, 3], [3, 11], [7, 7], [11, 3], [11, 11]
+                ];
+            } else if (size === 13) {
+                return [
+                    [3, 3], [3, 9], [6, 6], [9, 3], [9, 9]
+                ];
+            } else if (size === 9) {
+                return [
+                    [2, 2], [2, 6], [4, 4], [6, 2], [6, 6]
+                ];
+            }
+            return [];
+        }
+
+        // Core Gameplay Action Handler
+        function handleBoardClick(row, col) {
+            if (gameOver) return;
+
+            // Online Turn Check
+            if (CONFIG.matchType === 'online') {
+                if (currentPlayer !== myOnlineRole) {
+                    showModal("순서가 아닙니다", "상대방의 착수를 기다려주세요.");
+                    return;
+                }
+            }
+
+            // AI Turn Check
+            if (CONFIG.matchType === 'ai' && currentPlayer !== BLACK) {
+                return; // Wait for AI
+            }
+
+            // Check if cell is valid
+            if (row < 0 || row >= CONFIG.boardSize || col < 0 || col >= CONFIG.boardSize) return;
+
+            if (board[row][col] !== EMPTY) return;
+
+            // Execute Move Logic
+            executeMove(row, col, currentPlayer);
+        }
+
+        function executeMove(row, col, color) {
+            if (CONFIG.gameType === 'omok') {
+                // Place Stone
+                board[row][col] = color;
+                playStoneSound();
+                moveHistory.push({ type: 'move', row, col, color });
+
+                // Check Win Condition
+                if (checkOmokWin(row, col, color)) {
+                    drawBoard();
+                    gameOver = true;
+                    const winnerName = color === BLACK ? "흑돌 (Black)" : "백돌 (White)";
+                    showModal("승리!", `${winnerName}이(가) 오목 5목을 완성하여 승리했습니다!`);
+                    updateUI();
+                    broadcastMove({ action: 'move', row, col, color });
+                    return;
+                }
+
+                switchTurn();
+                broadcastMove({ action: 'move', row, col, color });
+
+            } else if (CONFIG.gameType === 'baduk') {
+                // Check Ko rule
+                if (koPos && koPos.row === row && koPos.col === col) {
+                    showModal("금지된 착수", "패(Ko) 규칙으로 인해 바로 다시 따낼 수 없습니다.");
+                    return;
+                }
+
+                // Temporary place to calculate liberties & captures
+                board[row][col] = color;
+                const opponentColor = color === BLACK ? WHITE : BLACK;
+                
+                // Find opponent stones captured by this move
+                const capturedStones = getCapturedStones(row, col, opponentColor);
+
+                // Suicide Rule Check: If no opponent captured and self group has 0 liberties
+                if (capturedStones.length === 0 && countLiberties(row, col).size === 0) {
+                    board[row][col] = EMPTY; // Revert
+                    showModal("착수 금지", "자충수(수사/자살수) 위치에는 돌을 놓을 수 없습니다.");
+                    return;
+                }
+
+                // Process Captures
+                capturedStones.forEach(([r, c]) => {
+                    board[r][c] = EMPTY;
+                });
+
+                if (color === BLACK) blackCaptures += capturedStones.length;
+                else whiteCaptures += capturedStones.length;
+
+                // Update Ko position
+                if (capturedStones.length === 1 && countGroupSize(row, col) === 1 && countLiberties(row, col).size === 1) {
+                    koPos = { row: capturedStones[0][0], col: capturedStones[0][1] };
+                } else {
+                    koPos = null;
+                }
+
+                playStoneSound();
+                passCount = 0;
+                moveHistory.push({ type: 'move', row, col, color, captured: capturedStones.length });
+
+                switchTurn();
+                broadcastMove({ action: 'move', row, col, color });
+            }
+
+            selectedCell = null;
+            document.getElementById('touch-confirm-bar').classList.add('hidden');
+            drawBoard();
+            updateUI();
+
+            // Trigger AI if applicable
+            if (!gameOver && CONFIG.matchType === 'ai' && currentPlayer === WHITE) {
+                setTimeout(triggerAIMove, 400);
+            }
+        }
+
+        function switchTurn() {
+            currentPlayer = currentPlayer === BLACK ? WHITE : BLACK;
+        }
+
+        // ==========================================
+        // OMOK (GOMOKU) ENGINE RULES
+        // ==========================================
+        function checkOmokWin(r, c, color) {
+            const dirs = [
+                [[0, 1], [0, -1]],   // Horizontal
+                [[1, 0], [-1, 0]],   // Vertical
+                [[1, 1], [-1, -1]],  // Diagonal \
+                [[1, -1], [-1, 1]]   // Diagonal /
+            ];
+
+            for (let d of dirs) {
+                let count = 1;
+                for (let step of d) {
+                    let nr = r + step[0];
+                    let nc = c + step[1];
+                    while (nr >= 0 && nr < CONFIG.boardSize && nc >= 0 && nc < CONFIG.boardSize && board[nr][nc] === color) {
+                        count++;
+                        nr += step[0];
+                        nc += step[1];
+                    }
+                }
+                if (count >= 5) return true;
+            }
+            return false;
+        }
+
+        // ==========================================
+        // BADUK (GO) ENGINE RULES
+        // ==========================================
+        function getCapturedStones(placedR, placedC, targetColor) {
+            const captured = [];
+            const visited = Array(CONFIG.boardSize).fill(0).map(() => Array(CONFIG.boardSize).fill(false));
+            const neighbors = getNeighbors(placedR, placedC);
+
+            neighbors.forEach(([nr, nc]) => {
+                if (board[nr][nc] === targetColor && !visited[nr][nc]) {
+                    const group = [];
+                    const liberties = new Set();
+                    exploreGroup(nr, nc, targetColor, visited, group, liberties);
+
+                    if (liberties.size === 0) {
+                        captured.push(...group);
+                    }
+                }
+            });
+
+            return captured;
+        }
+
+        function countLiberties(r, c) {
+            const color = board[r][c];
+            const visited = Array(CONFIG.boardSize).fill(0).map(() => Array(CONFIG.boardSize).fill(false));
+            const group = [];
+            const liberties = new Set();
+            exploreGroup(r, c, color, visited, group, liberties);
+            return liberties;
+        }
+
+        function countGroupSize(r, c) {
+            const color = board[r][c];
+            const visited = Array(CONFIG.boardSize).fill(0).map(() => Array(CONFIG.boardSize).fill(false));
+            const group = [];
+            const liberties = new Set();
+            exploreGroup(r, c, color, visited, group, liberties);
+            return group.length;
+        }
+
+        function exploreGroup(r, c, color, visited, group, liberties) {
+            visited[r][c] = true;
+            group.push([r, c]);
+
+            const neighbors = getNeighbors(r, c);
+            neighbors.forEach(([nr, nc]) => {
+                if (board[nr][nc] === EMPTY) {
+                    liberties.add(`${nr},${nc}`);
+                } else if (board[nr][nc] === color && !visited[nr][nc]) {
+                    exploreGroup(nr, nc, color, visited, group, liberties);
+                }
+            });
+        }
+
+        function getNeighbors(r, c) {
+            const list = [];
+            if (r > 0) list.push([r - 1, c]);
+            if (r < CONFIG.boardSize - 1) list.push([r + 1, c]);
+            if (c > 0) list.push([r, c - 1]);
+            if (c < CONFIG.boardSize - 1) list.push([r, c + 1]);
+            return list;
+        }
+
+        // Pass Action (Baduk)
+        function handlePass() {
+            if (gameOver) return;
+            if (CONFIG.matchType === 'online' && currentPlayer !== myOnlineRole) return;
+
+            passCount++;
+            moveHistory.push({ type: 'pass', color: currentPlayer });
+            broadcastMove({ action: 'pass', color: currentPlayer });
+
+            if (passCount >= 2) {
+                gameOver = true;
+                showModal("대국 종료", "양 플레이어가 연속으로 한수 쉬기를 하여 대국이 종료되었습니다.");
+            } else {
+                switchTurn();
+                updateUI();
+                if (CONFIG.matchType === 'ai' && currentPlayer === WHITE) {
+                    setTimeout(triggerAIMove, 400);
+                }
+            }
+        }
+
+        // Resign Action
+        function handleResign() {
+            if (gameOver) return;
+            gameOver = true;
+            const loserName = currentPlayer === BLACK ? "흑돌" : "백돌";
+            const winnerName = currentPlayer === BLACK ? "백돌" : "흑돌";
+            showModal("기권승", `${loserName}이(가) 기권하여 ${winnerName}이(가) 승리했습니다.`);
+            broadcastMove({ action: 'resign', color: currentPlayer });
+            updateUI();
+        }
+
+        // ==========================================
+        // ARTIFICIAL INTELLIGENCE (AI) BOT ENGINE
+        // ==========================================
+        function triggerAIMove() {
+            if (gameOver || currentPlayer !== WHITE) return;
+
+            if (CONFIG.gameType === 'omok') {
+                const bestMove = getBestOmokMove(CONFIG.aiLevel);
+                if (bestMove) {
+                    executeMove(bestMove.row, bestMove.col, WHITE);
+                }
+            } else {
+                const bestMove = getBestBadukMove();
+                if (bestMove) {
+                    executeMove(bestMove.row, bestMove.col, WHITE);
+                } else {
+                    handlePass();
+                }
+            }
+        }
+
+        // Omok Heuristic Scoring AI
+        function getBestOmokMove(level) {
+            const candidates = [];
+            for (let r = 0; r < CONFIG.boardSize; r++) {
+                for (let c = 0; c < CONFIG.boardSize; c++) {
+                    if (board[r][c] === EMPTY) {
+                        // Check distance to center or existing stones
+                        if (hasAdjacentStones(r, c, 2) || moveHistory.length === 0) {
+                            const score = evaluateOmokPoint(r, c, WHITE, BLACK);
+                            candidates.push({ row: r, col: c, score });
+                        }
+                    }
+                }
+            }
+
+            if (candidates.length === 0) {
+                const center = Math.floor(CONFIG.boardSize / 2);
+                return { row: center, col: center };
+            }
+
+            candidates.sort((a, b) => b.score - a.score);
+
+            if (level === 'easy' && candidates.length > 2) {
+                // Randomness for easy mode
+                const pickIndex = Math.floor(Math.random() * Math.min(3, candidates.length));
+                return candidates[pickIndex];
+            }
+
+            return candidates[0];
+        }
+
+        function hasAdjacentStones(r, c, radius) {
+            for (let dr = -radius; dr <= radius; dr++) {
+                for (let dc = -radius; dc <= radius; dc++) {
+                    const nr = r + dr;
+                    const nc = c + dc;
+                    if (nr >= 0 && nr < CONFIG.boardSize && nc >= 0 && nc < CONFIG.boardSize) {
+                        if (board[nr][nc] !== EMPTY) return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function evaluateOmokPoint(r, c, myColor, oppColor) {
+            board[r][c] = myColor;
+            if (checkOmokWin(r, c, myColor)) {
+                board[r][c] = EMPTY;
+                return 100000; // Winning move
+            }
+            board[r][c] = EMPTY;
+
+            // Check if opponent would win here
+            board[r][c] = oppColor;
+            if (checkOmokWin(r, c, oppColor)) {
+                board[r][c] = EMPTY;
+                return 50000; // Critical block
+            }
+            board[r][c] = EMPTY;
+
+            // Score patterns
+            let score = 0;
+            score += evaluatePatterns(r, c, myColor) * 1.2;
+            score += evaluatePatterns(r, c, oppColor);
+            return score;
+        }
+
+        function evaluatePatterns(r, c, color) {
+            let total = 0;
+            const dirs = [[0, 1], [1, 0], [1, 1], [1, -1]];
+            for (let [dr, dc] of dirs) {
+                let count = 1;
+                for (let dir of [1, -1]) {
+                    let nr = r + dr * dir;
+                    let nc = c + dc * dir;
+                    while (nr >= 0 && nr < CONFIG.boardSize && nc >= 0 && nc < CONFIG.boardSize && board[nr][nc] === color) {
+                        count++;
+                        nr += dr * dir;
+                        nc += dc * dir;
+                    }
+                }
+                total += Math.pow(10, count);
+            }
+            return total;
+        }
+
+        // Lightweight Baduk AI Strategy
+        function getBestBadukMove() {
+            const validMoves = [];
+            for (let r = 0; r < CONFIG.boardSize; r++) {
+                for (let c = 0; c < CONFIG.boardSize; c++) {
+                    if (board[r][c] === EMPTY) {
+                        // Simulate candidate move
+                        board[r][c] = WHITE;
+                        const captures = getCapturedStones(r, c, BLACK);
+                        const liberties = countLiberties(r, c);
+                        board[r][c] = EMPTY;
+
+                        if (liberties.size > 0) {
+                            let score = liberties.size * 2 + captures.length * 20;
+                            // Prefer corners and sides initially
+                            const distFromEdge = Math.min(r, c, CONFIG.boardSize - 1 - r, CONFIG.boardSize - 1 - c);
+                            if (distFromEdge === 2 || distFromEdge === 3) score += 5;
+                            validMoves.push({ row: r, col: c, score });
+                        }
+                    }
+                }
+            }
+
+            if (validMoves.length === 0) return null;
+            validMoves.sort((a, b) => b.score - a.score);
+            return validMoves[0];
+        }
+
+        // ==========================================
+        // WEBRTC P2P MULTIPLAYER ENGINE (PEERJS)
+        // ==========================================
+        function initPeerJS() {
+            const statusEl = document.getElementById('online-status-text');
+            statusEl.innerText = "P2P 서버 접속 중...";
+
+            peer = new Peer();
+
+            peer.on('open', (id) => {
+                document.getElementById('input-room-id').value = id;
+                statusEl.innerText = `온라인 준비 완료! 내 코드: ${id}`;
+            });
+
+            peer.on('connection', (connection) => {
+                conn = connection;
+                isHost = true;
+                myOnlineRole = BLACK;
+                setupConnectionListeners();
+                statusEl.innerText = "상대방과 연결되었습니다! 대국을 시작합니다.";
+            });
+
+            peer.on('error', (err) => {
+                console.error(err);
+                statusEl.innerText = `접속 오류: ${err.type}`;
+            });
+        }
+
+        function createRoom() {
+            if (!peer) initPeerJS();
+            const statusEl = document.getElementById('online-status-text');
+            statusEl.innerText = "방 생성 완료. 상대방의 입장을 기다리는 중...";
+        }
+
+        function joinRoom() {
+            const targetId = document.getElementById('input-room-id').value.trim();
+            if (!targetId) {
+                showModal("경고", "올바른 방 코드를 입력하세요.");
+                return;
+            }
+            if (!peer) initPeerJS();
+
+            const statusEl = document.getElementById('online-status-text');
+            statusEl.innerText = "상대방 방에 연결 시도 중...";
+
+            conn = peer.connect(targetId);
+            isHost = false;
+            myOnlineRole = WHITE;
+            setupConnectionListeners();
+        }
+
+        function setupConnectionListeners() {
+            conn.on('open', () => {
+                document.getElementById('online-status-text').innerText = 
+                    `연결 성공! 당신은 ${myOnlineRole === BLACK ? '흑돌(선공)' : '백돌(후공)'}입니다.`;
+            });
+
+            conn.on('data', (data) => {
+                if (data.action === 'move') {
+                    executeMove(data.row, data.col, data.color);
+                } else if (data.action === 'pass') {
+                    handlePass();
+                } else if (data.action === 'resign') {
+                    handleResign();
+                } else if (data.action === 'restart') {
+                    initBoard();
+                    showModal("알림", "상대방에 의해 새 게임이 시작되었습니다.");
+                }
+            });
+
+            conn.on('close', () => {
+                document.getElementById('online-status-text').innerText = "상대방과 연결이 끊겼습니다.";
+            });
+        }
+
+        function broadcastMove(data) {
+            if (CONFIG.matchType === 'online' && conn && conn.open) {
+                conn.send(data);
+            }
+        }
+
+        // ==========================================
+        // UI & EVENT HANDLERS
+        // ==========================================
+        function updateUI() {
+            // Update Turn Display
+            const turnText = document.getElementById('turn-text');
+            const turnIcon = document.getElementById('turn-stone-icon');
+            const subStatus = document.getElementById('sub-status-text');
+
+            if (currentPlayer === BLACK) {
+                turnText.innerText = "흑돌 차례 (Black Turn)";
+                turnIcon.style.backgroundColor = '#111111';
+            } else {
+                turnText.innerText = "백돌 차례 (White Turn)";
+                turnIcon.style.backgroundColor = '#ffffff';
+            }
+
+            if (CONFIG.matchType === 'online') {
+                subStatus.innerText = currentPlayer === myOnlineRole ? "당신의 차례입니다!" : "상대방의 착수를 기다리는 중...";
+            } else if (CONFIG.matchType === 'ai') {
+                subStatus.innerText = currentPlayer === BLACK ? "당신의 차례입니다." : "AI가 생각 중입니다...";
+            } else {
+                subStatus.innerText = "한 기기에서 번갈아 착수하세요.";
+            }
+
+            // Baduk Captures
+            document.getElementById('black-captures').innerText = `${blackCaptures}개`;
+            document.getElementById('white-captures').innerText = `${whiteCaptures}개`;
+
+            // Move History List
+            const historyContainer = document.getElementById('move-history');
+            document.getElementById('move-count').innerText = `총 ${moveHistory.length}수`;
+
+            if (moveHistory.length === 0) {
+                historyContainer.innerHTML = '<span class="text-slate-500 italic">게임을 시작하세요.</span>';
+            } else {
+                historyContainer.innerHTML = moveHistory.map((m, idx) => {
+                    const cStr = m.color === BLACK ? '흑' : '백';
+                    if (m.type === 'pass') return `<span class="bg-slate-800 px-1.5 py-0.5 rounded text-slate-400">${idx+1}.${cStr}패스</span>`;
+                    const char = String.fromCharCode(65 + (m.col >= 8 ? m.col + 1 : m.col));
+                    const num = CONFIG.boardSize - m.row;
+                    return `<span class="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">${idx+1}.${cStr}(${char}${num})</span>`;
+                }).join(' ');
+                historyContainer.scrollTop = historyContainer.scrollHeight;
+            }
+        }
+
+        function showModal(title, msg) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = msg;
+            document.getElementById('modal-dialog').classList.remove('hidden');
+        }
+
+        // Canvas Touch & Pointer Event Setup
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            const col = Math.round((x - padding) / cellSize);
+            const row = Math.round((y - padding) / cellSize);
+
+            return { row, col };
+        }
+
+        // Pointer interactions for Mobile vs PC
+        canvas.addEventListener('click', (e) => {
+            const { row, col } = getCanvasCoords(e);
+            
+            // On touch screens or small devices, ask for confirmation before placement
+            if (window.innerWidth < 640) {
+                if (row >= 0 && row < CONFIG.boardSize && col >= 0 && col < CONFIG.boardSize) {
+                    if (board[row][col] === EMPTY) {
+                        selectedCell = { row, col };
+                        const char = String.fromCharCode(65 + (col >= 8 ? col + 1 : col));
+                        const num = CONFIG.boardSize - row;
+                        document.getElementById('confirm-coords').innerText = `선택: (${char}, ${num})`;
+                        document.getElementById('touch-confirm-bar').classList.remove('hidden');
+                        drawBoard();
+                    }
+                }
+            } else {
+                handleBoardClick(row, col);
+            }
+        });
+
+        // Touch Confirm Bar buttons
+        document.getElementById('btn-confirm-move').addEventListener('click', () => {
+            if (selectedCell) {
+                handleBoardClick(selectedCell.row, selectedCell.col);
+            }
+        });
+        document.getElementById('btn-cancel-move').addEventListener('click', () => {
+            selectedCell = null;
+            document.getElementById('touch-confirm-bar').classList.add('hidden');
+            drawBoard();
+        });
+
+        // DOM Event Listeners & Mode Switchers
+        document.getElementById('mode-omok').addEventListener('click', (e) => {
+            CONFIG.gameType = 'omok';
+            document.getElementById('game-rule-badge').innerText = '오목 (Omok)';
+            document.getElementById('baduk-stats-panel').classList.add('hidden');
+            e.target.className = 'py-2.5 rounded-lg text-sm font-semibold transition flex justify-center items-center gap-2 bg-amber-600 text-slate-950 shadow';
+            document.getElementById('mode-baduk').className = 'py-2.5 rounded-lg text-sm font-semibold text-slate-400 transition hover:text-white flex justify-center items-center gap-2';
+            initBoard();
+        });
+
+        document.getElementById('mode-baduk').addEventListener('click', (e) => {
+            CONFIG.gameType = 'baduk';
+            document.getElementById('game-rule-badge').innerText = '바둑 (Go)';
+            document.getElementById('baduk-stats-panel').classList.remove('hidden');
+            e.target.className = 'py-2.5 rounded-lg text-sm font-semibold transition flex justify-center items-center gap-2 bg-amber-600 text-slate-950 shadow';
+            document.getElementById('mode-omok').className = 'py-2.5 rounded-lg text-sm font-semibold text-slate-400 transition hover:text-white flex justify-center items-center gap-2';
+            initBoard();
+        });
+
+        document.getElementById('select-board-size').addEventListener('change', (e) => {
+            CONFIG.boardSize = parseInt(e.target.value);
+            initBoard();
+        });
+
+        // Match Type Buttons
+        const matchButtons = {
+            ai: document.getElementById('match-ai'),
+            local: document.getElementById('match-local'),
+            online: document.getElementById('match-online')
+        };
+
+        function setMatchMode(mode) {
+            CONFIG.matchType = mode;
+            Object.keys(matchButtons).forEach(k => {
+                if (k === mode) {
+                    matchButtons[k].className = 'py-2 rounded-lg border border-amber-500/50 bg-amber-500/10 text-amber-400 text-xs font-medium flex flex-col items-center gap-1 transition';
+                } else {
+                    matchButtons[k].className = 'py-2 rounded-lg border border-slate-700 bg-slate-900 text-slate-400 text-xs font-medium flex flex-col items-center gap-1 hover:border-slate-600 transition';
+                }
+            });
+
+            document.getElementById('ai-options-panel').classList.toggle('hidden', mode !== 'ai');
+            document.getElementById('online-panel').classList.toggle('hidden', mode !== 'online');
+
+            if (mode === 'online' && !peer) {
+                initPeerJS();
+            }
+
+            initBoard();
+        }
+
+        matchButtons.ai.addEventListener('click', () => setMatchMode('ai'));
+        matchButtons.local.addEventListener('click', () => setMatchMode('local'));
+        matchButtons.online.addEventListener('click', () => setMatchMode('online'));
+
+        document.querySelectorAll('input[name="ai-level"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                CONFIG.aiLevel = e.target.value;
+            });
+        });
+
+        // Room Controls
+        document.getElementById('btn-create-room').addEventListener('click', createRoom);
+        document.getElementById('btn-join-room').addEventListener('click', joinRoom);
+        document.getElementById('btn-copy-link').addEventListener('click', () => {
+            const roomId = document.getElementById('input-room-id').value;
+            if (roomId) {
+                const shareUrl = `${window.location.origin}${window.location.pathname}?room=${roomId}`;
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    showModal("링크 복사 완료", "초대 링크가 클립보드에 복사되었습니다. 친구에게 전달하세요!");
+                }).catch(() => {
+                    document.execCommand('copy');
+                });
+            }
+        });
+
+        // Game Action Buttons
+        document.getElementById('btn-restart').addEventListener('click', () => {
+            initBoard();
+            broadcastMove({ action: 'restart' });
+        });
+        document.getElementById('btn-pass').addEventListener('click', handlePass);
+        document.getElementById('btn-resign').addEventListener('click', handleResign);
+        document.getElementById('modal-btn-close').addEventListener('click', () => {
+            document.getElementById('modal-dialog').classList.add('hidden');
+        });
+
+        // Auto-join from URL parameter for GitHub Pages sharing
+        window.addEventListener('load', () => {
+            lucide.createIcons();
+            initBoard();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomParam = urlParams.get('room');
+            if (roomParam) {
+                setMatchMode('online');
+                document.getElementById('input-room-id').value = roomParam;
+                setTimeout(joinRoom, 800);
+            }
+        });
+    </script>
+</body>
+</html>
