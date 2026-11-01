@@ -473,19 +473,19 @@ function track(g){
   fetch(`${FIREBASE_URL}/plays/${encodeURIComponent(g.id)}.json`,{method:'PUT',body:JSON.stringify({'.sv':{increment:1}}),keepalive:true}).catch(()=>{});
 }
 
-function applyEvent(type,raw){
-  let d;try{d=JSON.parse(raw);}catch(e){return;}
-  if(!d||typeof d.path!=='string')return;
-  if(d.path==='/'){plays=type==='put'?(d.data||{}):Object.assign(plays,d.data||{});}
-  else{const k=d.path.split('/')[1];if(k)plays[k]=d.data||0;}
-  renderStats();
-}
+/* 연결을 계속 열어 두지 않고 10초마다 숫자만 가져와요 → 동시에 몇 명이 있어도 Firebase 무료 연결 한도(100)에 안 걸려요 */
+const POLL_MS=10000;
 let pollTimer=null;
 function poll(){
   clearTimeout(pollTimer);
-  fetch(FIREBASE_URL+'/plays.json').then(r=>r.json()).then(d=>{plays=d||{};setLive('on','실시간');renderStats();})
-    .catch(()=>setLive('','재연결 중…')).finally(()=>{pollTimer=setTimeout(poll,8000);});
+  if(document.hidden){return;} /* 탭이 가려져 있으면 쉬었다가 다시 보일 때 바로 갱신 */
+  fetch(FIREBASE_URL+'/plays.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{
+    d=d||{};
+    for(const k in d){plays[k]=Math.max(+d[k]||0,+plays[k]||0);} /* 방금 내가 올린 +1이 잠깐 사라져 보이지 않게 */
+    setLive('on','실시간');renderStats();
+  }).catch(()=>setLive('','재연결 중…')).finally(()=>{pollTimer=setTimeout(poll,POLL_MS);});
 }
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&FIREBASE_URL&&!DEMO)poll();});
 function startLive(){
   if(DEMO){
     plays={hansan:1280,silentbreach:960,ittycoon:430,battleground:2140,tetris:1760,stickduel:880,korea38:610,zerozone:1495,baseball:1210,ilgito:1530,segryeok:790};
@@ -495,12 +495,7 @@ function startLive(){
   }
   renderStats();
   if(!FIREBASE_URL){setLive('','집계 준비 중');return;}
-  if(!window.EventSource){poll();return;}
-  const es=new EventSource(FIREBASE_URL+'/plays.json');
-  es.addEventListener('open',()=>setLive('on','실시간'));
-  es.addEventListener('put',e=>applyEvent('put',e.data));
-  es.addEventListener('patch',e=>applyEvent('patch',e.data));
-  es.addEventListener('error',()=>{setLive('','재연결 중…');if(es.readyState===2){es.close();poll();}});
+  poll();
 }
 startLive();
 
