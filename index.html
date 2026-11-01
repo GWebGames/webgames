@@ -79,6 +79,8 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 .cardfoot{display:flex;align-items:center;margin-top:10px}
 .cardfoot .play{margin-top:0}
 .now[hidden]{display:none}
+.now.zero{color:var(--muted)}
+.now.zero::before{background:#5b6b78;animation:none}
 .now{display:inline-flex;align-items:center;gap:6px;font-size:.76rem;color:#8fd6a8;white-space:nowrap}
 .now::before{content:"";width:7px;height:7px;border-radius:50%;background:#4fd186;animation:ping 1.8s infinite}
 .cardfoot{flex-wrap:wrap;gap:6px 12px}
@@ -368,7 +370,7 @@ GAMES.forEach(g=>{
       `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
       `<p class="desc">${esc(g.desc)}</p>`+
       (g.keys?`<span class="keys">${esc(g.keys)}</span>`:'')+
-      `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" hidden></span><span class="cnt" data-cnt="${g.id}"></span></span>`+
+      `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" data-always></span></span>`+
     `</span>`+
     (g.ready?'':'<span class="badge">COMING SOON</span>');
   if(g.ready)b.addEventListener('click',()=>open(g));
@@ -433,7 +435,6 @@ function thumbHTML(g){return `<span class="thumb">${g.thumb||defaultThumb}<img s
 
 function renderStats(){
   /* 카드마다 플레이 횟수 + TOP3 표시 */
-  document.querySelectorAll('[data-cnt]').forEach(el=>{const n=+plays[el.dataset.cnt]||0;el.textContent=n?'▶ '+fmt(n):'';});
   const top=ranked();
   document.querySelectorAll('.card .mini').forEach(m=>m.remove());
   top.forEach((x,k)=>{const c=grid.querySelector(`[data-id="${x.g.id}"] .thumb`);if(c){const m=document.createElement('span');m.className='mini';m.textContent='TOP '+(k+1);c.appendChild(m);}});
@@ -511,7 +512,7 @@ function stopPresence(){
 }
 addEventListener('pagehide',stopPresence);
 function updateNow(){
-  document.querySelectorAll('[data-now]').forEach(el=>{const n=live[el.dataset.now]||0;el.hidden=!n;el.textContent=n?n.toLocaleString('ko-KR')+'명 플레이 중':'';});
+  document.querySelectorAll('[data-now]').forEach(el=>{const n=live[el.dataset.now]||0;const al=el.hasAttribute('data-always');el.hidden=!n&&!al;el.classList.toggle('zero',!n);el.textContent=n?n.toLocaleString('ko-KR')+'명 플레이 중':'현재 0명';});
 }
 function readLive(d){
   const now=Date.now(),out={},stale=[];
