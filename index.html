@@ -345,6 +345,24 @@ const GAMES=[
       <g fill="rgba(239,68,68,.3)"><rect x="25" y="160" width="10" height="12"/><rect x="55" y="156" width="10" height="16"/><rect x="85" y="150" width="10" height="22"/></g><rect x="145" y="140" width="10" height="32" fill="rgba(34,197,94,.45)"/>
       <rect x="262" y="14" width="46" height="18" rx="3" fill="#0f172a" stroke="#ef4444"/><text x="285" y="27" text-anchor="middle" font-size="10" fill="#f87171" font-family="monospace" font-weight="700">SEC 97%</text>
     </svg>`
+  },
+  {
+    id:'stockexam',
+    title:'벼락치기 기말고사 주식시장', hanja:'',
+    desc:'기말고사 D-7! 단톡방에 도는 찌라시를 믿고 과목별 주식에 용돈을 몰빵하라. 쌤의 한마디에 수학·영어·국어·과학·역사 주가가 폭등하고 폭락한다. 시험 당일, 내 용돈은 얼마가 될까?',
+    keys:'마우스 클릭 · 매수/매도 버튼 · 다음 날로 넘기기',
+    src:'games/stockexam.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#0b1020"/><path d="M20 130L70 100L110 118L160 70L210 90L260 40L300 55" stroke="#818cf8" stroke-width="4" fill="none"/><text x="160" y="160" text-anchor="middle" font-size="18" fill="#c7d2fe" font-family="sans-serif">D-7 기말고사 주식</text></svg>`
+  },
+  {
+    id:'groupproject',
+    title:'중학생 조별과제 무임승차 잔혹사', hanja:'',
+    desc:'어쩌다 조장이 됐다! 잠수 타는 민수, 나무위키 복붙하는 도윤이, 예민한 에이스 서진이 사이에서 7일 안에 조별과제를 끝내라. 우드락 만들기와 PPT 발표 두 가지 모드, 엔딩 5종.',
+    keys:'마우스 클릭 · 선택지를 골라 7일간 단톡방 대화 진행',
+    src:'games/groupproject.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#0f172a"/><rect x="40" y="40" width="150" height="34" rx="14" fill="#334155"/><rect x="130" y="90" width="150" height="34" rx="14" fill="#facc15"/><text x="160" y="160" text-anchor="middle" font-size="18" fill="#fde68a" font-family="sans-serif">3조 단톡방</text></svg>`
   }
 ];
 
@@ -543,8 +561,8 @@ function poll(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&FIREBASE_URL&&!DEMO)poll();});
 function startLive(){
   if(DEMO){
-    plays={hansan:1280,silentbreach:960,ittycoon:430,battleground:2140,tetris:1760,stickduel:880,korea38:610,zerozone:1495,baseball:1210,ilgito:1530,segryeok:790};
-    live={hansan:3,silentbreach:2,ittycoon:1,battleground:12,tetris:7,stickduel:2,korea38:4,zerozone:5,baseball:6,ilgito:9,segryeok:3};
+    plays={hansan:1280,silentbreach:960,ittycoon:430,battleground:2140,tetris:1760,stickduel:880,korea38:610,zerozone:1495,baseball:1210,ilgito:1530,segryeok:790,stockexam:1340,groupproject:1620};
+    live={hansan:3,silentbreach:2,ittycoon:1,battleground:12,tetris:7,stickduel:2,korea38:4,zerozone:5,baseball:6,ilgito:9,segryeok:3,stockexam:8,groupproject:11};
     setLive('demo','데모 데이터');renderStats();updateNow();
     setInterval(()=>{const r=GAMES.filter(g=>g.ready);const g=r[Math.floor(Math.random()*r.length)];plays[g.id]=(+plays[g.id]||0)+1+Math.floor(Math.random()*3);const h=r[Math.floor(Math.random()*r.length)].id;live[h]=Math.max(0,(live[h]||0)+(Math.random()<.5?-1:1));renderStats();},2200);
     return;
