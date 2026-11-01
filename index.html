@@ -363,6 +363,24 @@ const GAMES=[
     src:'games/groupproject.html',
     ready:true,
     thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#0f172a"/><rect x="40" y="40" width="150" height="34" rx="14" fill="#334155"/><rect x="130" y="90" width="150" height="34" rx="14" fill="#facc15"/><text x="160" y="160" text-anchor="middle" font-size="18" fill="#fde68a" font-family="sans-serif">3조 단톡방</text></svg>`
+  },
+  {
+    id:'omokbaduk',
+    title:'오목 & 바둑 스튜디오', hanja:'碁',
+    desc:'오목과 바둑을 한 곳에서! AI 대국, 한 기기 2인 대국, 링크로 친구와 하는 온라인 대전을 지원해요. 9·13·15·19줄 판 크기를 고를 수 있고, 바둑은 따낸 돌·패 규칙까지 들어 있어요.',
+    keys:'마우스/터치로 착수 · 한수 쉬기 · 기권 · 온라인 방 코드 공유',
+    src:'games/omokbaduk.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#d9a766"/><g stroke="#4a2e12"><path d="M60 20H260M60 60H260M60 100H260M60 140H260M60 20V140M110 20V140M160 20V140M210 20V140M260 20V140"/></g><circle cx="110" cy="60" r="14" fill="#111"/><circle cx="160" cy="100" r="14" fill="#fff"/><circle cx="160" cy="60" r="14" fill="#111"/></svg>`
+  },
+  {
+    id:'chess',
+    title:'웹 체스', hanja:'',
+    desc:'AI와 한 판, 한 기기에서 2인 대결, 링크로 친구와 1:1 온라인 대전까지. 쉬움·보통·어려움 AI와 무르기, 이동 가능 칸 표시, 체크메이트 판정을 지원하는 정통 체스.',
+    keys:'기물 클릭 후 이동할 칸 클릭 · 설정에서 대전 모드/난이도 선택',
+    src:'games/chess.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#0f172a"/><g><rect x="80" y="10" width="40" height="40" fill="#fef3c7"/><rect x="120" y="10" width="40" height="40" fill="#92400e"/><rect x="160" y="10" width="40" height="40" fill="#fef3c7"/><rect x="200" y="10" width="40" height="40" fill="#92400e"/><rect x="80" y="50" width="40" height="40" fill="#92400e"/><rect x="120" y="50" width="40" height="40" fill="#fef3c7"/><rect x="160" y="50" width="40" height="40" fill="#92400e"/><rect x="200" y="50" width="40" height="40" fill="#fef3c7"/></g><text x="140" y="42" font-size="34" text-anchor="middle" fill="#0f172a">♞</text><text x="180" y="82" font-size="34" text-anchor="middle" fill="#fff">♕</text></svg>`
   }
 ];
 
@@ -561,8 +579,8 @@ function poll(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&FIREBASE_URL&&!DEMO)poll();});
 function startLive(){
   if(DEMO){
-    plays={hansan:1280,silentbreach:960,ittycoon:430,battleground:2140,tetris:1760,stickduel:880,korea38:610,zerozone:1495,baseball:1210,ilgito:1530,segryeok:790,stockexam:1340,groupproject:1620};
-    live={hansan:3,silentbreach:2,ittycoon:1,battleground:12,tetris:7,stickduel:2,korea38:4,zerozone:5,baseball:6,ilgito:9,segryeok:3,stockexam:8,groupproject:11};
+    plays={hansan:1280,silentbreach:960,ittycoon:430,battleground:2140,tetris:1760,stickduel:880,korea38:610,zerozone:1495,baseball:1210,ilgito:1530,segryeok:790,stockexam:1340,groupproject:1620,omokbaduk:980,chess:1150};
+    live={hansan:3,silentbreach:2,ittycoon:1,battleground:12,tetris:7,stickduel:2,korea38:4,zerozone:5,baseball:6,ilgito:9,segryeok:3,stockexam:8,groupproject:11,omokbaduk:4,chess:6};
     setLive('demo','데모 데이터');renderStats();updateNow();
     setInterval(()=>{const r=GAMES.filter(g=>g.ready);const g=r[Math.floor(Math.random()*r.length)];plays[g.id]=(+plays[g.id]||0)+1+Math.floor(Math.random()*3);const h=r[Math.floor(Math.random()*r.length)].id;live[h]=Math.max(0,(live[h]||0)+(Math.random()<.5?-1:1));renderStats();},2200);
     return;
