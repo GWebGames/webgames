@@ -433,7 +433,7 @@ GAMES.forEach(g=>{
       `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" data-always></span><span class="mine" data-mine="${g.id}"></span><span class="cnt" data-cnt="${g.id}"></span></span>`+
     `</span>`+
     (g.ready?'':'<span class="badge">COMING SOON</span>');
-  if(g.ready)b.addEventListener('click',()=>open(g));
+  if(g.ready)b.addEventListener('click',()=>openGame(g));
   b.dataset.id=g.id;
   grid.appendChild(b);
 });
@@ -442,7 +442,7 @@ const lastGame=GAMES.find(g=>g.id===lastId&&g.ready);
 if(lastGame)$('last').textContent='최근 플레이: '+lastGame.title;
 
 /* ---------- 게임 열기 / 닫기 ---------- */
-function open(g){
+function openGame(g){
   current=g;
   track(g);
   startPresence(g);
@@ -454,7 +454,7 @@ function open(g){
   frame.addEventListener('load',focusGame,{once:true});
 }
 function focusGame(){try{frame.focus();frame.contentWindow.focus();}catch(e){}}
-function close(){
+function closeGame(){
   stage.classList.remove('on');
   if(typeof pushDirty==='function')setTimeout(pushDirty,300);
   stopPresence();
@@ -466,7 +466,7 @@ function close(){
   const lg=GAMES.find(x=>x.id===lastId);
   if(lg)$('last').textContent='최근 플레이: '+lg.title;
 }
-$('back').addEventListener('click',close);
+$('back').addEventListener('click',closeGame);
 $('reload').addEventListener('click',()=>{if(current){frame.src='about:blank';setTimeout(()=>{frame.src=current.src;frame.addEventListener('load',focusGame,{once:true});},50);}});
 $('full').addEventListener('click',()=>{
   const el=stage;
@@ -521,7 +521,7 @@ function renderStats(){
         `<span class="info"><span class="pname">${esc(x.g.title)}</span>`+
         `<span class="pcnt"><strong data-n>${fmt(x.n)}</strong>회 플레이</span>`+`<span class="now" data-now="${x.g.id}" hidden></span>`+
         `<span class="meter"><span style="width:${Math.max(6,x.n/max*100)}%"></span></span></span>`;
-      b.addEventListener('click',()=>open(x.g));
+      b.addEventListener('click',()=>openGame(x.g));
       podium.appendChild(b);
     });
   }else{
