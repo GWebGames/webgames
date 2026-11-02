@@ -14,7 +14,7 @@
   /* 테마용 추가 변수 (다크 값 = 기존 로비 디자인) */
   --on-accent:#e9e2cf;--gold-on:#10202a;--glow:#1b3a49;--shade:rgba(13,27,36,.55);--chip:rgba(13,27,36,.85);--chip2:rgba(13,27,36,.88);
   --dis-bg:#14252d;--dis-play-bg:#2c4652;--dis-play-fg:#6f858e;--meter-bg:rgba(255,255,255,.08);
-  --ok:#8fd6a8;--warn:#f0a89c;--foot:#5d747d;--card-shadow:none;
+  --ok:#8fd6a8;--warn:#f0a89c;--foot:#5d747d;--card-shadow:none;--bar:#0a151c;
   --f-display:"Nanum Myeongjo","Batang",serif;
   --f-body:"Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
   color-scheme:dark;
@@ -25,7 +25,7 @@
   --foam:#17323f;--gold:#96690f;--muted:#587079;
   --on-accent:#ffffff;--gold-on:#ffffff;--glow:#fff0c9;--shade:rgba(23,50,63,.22);--chip:rgba(255,255,255,.92);--chip2:rgba(255,255,255,.92);
   --dis-bg:#ece7da;--dis-play-bg:#ddd8c9;--dis-play-fg:#8a9a9f;--meter-bg:rgba(23,50,63,.1);
-  --ok:#1f8a4c;--warn:#b3392a;--foot:#7d8e94;--card-shadow:0 2px 10px -4px rgba(23,50,63,.2);
+  --ok:#1f8a4c;--warn:#b3392a;--foot:#7d8e94;--card-shadow:0 2px 10px -4px rgba(23,50,63,.2);--bar:#ece6d5;
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -135,8 +135,8 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 .sortbar button:hover{color:var(--foam)}
 footer{color:var(--foot)}
 footer b{color:var(--muted);font-weight:700}
-/* 게임 플레이 화면은 항상 어두운 톤 유지 */
-#stage{--ink:#0d1b24;--panel:#1f4252;--line:#35586a;--foam:#e9e2cf;--gold:#d9a441;--muted:#8fa4ad;color:#e9e2cf}
+/* 게임 플레이 화면도 선택한 라이트/다크 모드를 따라가요 */
+#stage{color:var(--foam)}
 
 /* ===== 테마 전환 버튼 ===== */
 .themebtn{position:fixed;top:12px;right:12px;z-index:5;display:inline-flex;align-items:center;gap:7px;font-size:.8rem;padding:7px 13px;
@@ -202,6 +202,20 @@ footer b{color:var(--muted);font-weight:700}
 @media (max-width:760px){.rk-list{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
 @media (prefers-reduced-motion:reduce){.rk-bar span{transition:none}}
 
+/* ===== 닉네임 설정 창 ===== */
+#nickDlg{background:var(--panel);color:var(--foam);border:2px solid var(--line);border-radius:8px;padding:22px;width:min(92vw,380px);box-shadow:0 20px 50px -10px rgba(0,0,0,.5)}
+#nickDlg::backdrop{background:rgba(5,12,18,.6)}
+#nickDlg h3{margin:0 0 6px;font-family:var(--f-display);font-weight:800;font-size:1.2rem;letter-spacing:.06em}
+#nickDlg .nd-sub{margin:0 0 14px;color:var(--muted);font-size:.82rem;line-height:1.55}
+#nickDlg input{width:100%;font:inherit;font-size:1rem;padding:10px 12px;border-radius:6px;border:1px solid var(--line);background:var(--ink);color:var(--foam)}
+#nickDlg input:focus{outline:2px solid var(--gold);outline-offset:1px}
+#nickDlg .nd-err{min-height:1.2em;margin:6px 0 0;color:var(--warn);font-size:.8rem}
+#nickDlg .nd-btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:10px}
+#nickDlg .nd-btns button{font:inherit;font-size:.86rem;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted)}
+#nickDlg .nd-btns button:hover{border-color:var(--gold);color:var(--foam)}
+#nickDlg .nd-btns .primary{background:var(--cinnabar);border-color:var(--cinnabar);color:var(--on-accent);font-weight:700}
+#nickDlg .nd-btns .primary:hover{color:var(--on-accent);filter:brightness(1.08)}
+
 /* ===== 게임 이름 옆 라벨 (NEW / UPDATE / BIG UPDATE) ===== */
 .glabel{display:inline-block;vertical-align:middle;margin-left:8px;font-family:var(--f-body);font-size:.66rem;font-weight:800;letter-spacing:.08em;
   line-height:1;padding:4px 7px;border-radius:3px;color:#fff;white-space:nowrap;text-transform:uppercase}
@@ -214,7 +228,7 @@ footer b{color:var(--muted);font-weight:700}
 /* ===== 플레이 화면 ===== */
 #stage{position:fixed;inset:0;display:none;flex-direction:column;background:var(--ink);z-index:10}
 #stage.on{display:flex}
-.bar{display:flex;align-items:center;gap:10px;padding:6px 10px;background:#0a151c;border-bottom:1px solid var(--line);flex:none}
+.bar{display:flex;align-items:center;gap:10px;padding:6px 10px;background:var(--bar);border-bottom:1px solid var(--line);flex:none}
 .bar button{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:5px 12px;font-size:.85rem}
 .bar button:hover{border-color:var(--gold)}
 #title{font-family:var(--f-display);font-weight:700;letter-spacing:.08em;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -240,7 +254,7 @@ footer b{color:var(--muted);font-weight:700}
     <div class="podium" id="podium"></div>
   </section>
   <section class="lb" id="rank" aria-label="플레이어 랭킹" hidden>
-    <div class="lb-head"><h2><b>RANK</b>가장 많이 플레이한 사람</h2><span class="lb-note">로그인한 플레이어 기준 · 이름은 가운데를 가려서 표시돼요</span></div>
+    <div class="lb-head"><h2><b>RANK</b>가장 많이 플레이한 사람</h2><span class="lb-note">로그인한 플레이어 기준 · 닉네임이 없으면 계정 이름은 가운데를 가려서 표시돼요</span></div>
     <ol class="rk-list" id="rkList"></ol>
   </section>
   <div class="sortbar" id="sortbar" role="group" aria-label="게임 정렬">
@@ -253,6 +267,20 @@ footer b{color:var(--muted);font-weight:700}
   <p class="last" id="last"></p>
   <footer>게임 관련 오류 제보/자기 게임 업로드 신청은 <b>dolgodora7942@gmail.com</b>으로</footer>
 </main>
+
+<dialog id="nickDlg" aria-labelledby="nickTitle">
+  <form id="nickForm" autocomplete="off">
+    <h3 id="nickTitle">닉네임 설정</h3>
+    <p class="nd-sub" id="nickSub">순위표와 로비에 표시돼요. 2~12자, 한글·영문·숫자·공백·_ - . 만 쓸 수 있어요.</p>
+    <input id="nickInput" type="text" maxlength="12" placeholder="닉네임" aria-label="닉네임">
+    <p class="nd-err" id="nickErr" role="alert"></p>
+    <div class="nd-btns">
+      <button type="button" id="nickReset">기본 이름 사용</button>
+      <button type="button" id="nickCancel">취소</button>
+      <button type="submit" class="primary">저장</button>
+    </div>
+  </form>
+</dialog>
 
 <section id="stage" aria-label="게임 화면">
   <div class="bar">
@@ -781,8 +809,9 @@ function renderAuth(msg){
   if(!authApi){authbar.hidden=true;return;}
   authbar.hidden=false;
   if(me){
-    authbar.innerHTML=`<span class="who">${me.photo?`<img src="${esc(me.photo)}" alt="" referrerpolicy="no-referrer">`:''}<span>${esc(me.name||'플레이어')}</span></span><button type="button" class="out" id="btnOut">로그아웃</button>`;
+    authbar.innerHTML=`<span class="who">${me.photo?`<img src="${esc(me.photo)}" alt="" referrerpolicy="no-referrer">`:''}<span>${esc(myNick()||me.name||'플레이어')}</span></span><button type="button" class="out" id="btnNick">닉네임 변경</button><button type="button" class="out" id="btnOut">로그아웃</button>`;
     $('btnOut').addEventListener('click',doLogout);
+    $('btnNick').addEventListener('click',()=>openNick(false));
   }else{
     authbar.innerHTML=`${msg?`<span class="amsg">${esc(msg)}</span>`:''}<button type="button" class="abtn" id="btnIn">${G_ICON}Google로 로그인</button>`;
     $('btnIn').addEventListener('click',()=>{
@@ -822,7 +851,7 @@ async function loadMine(){
    게임들은 최고 기록·저장 데이터를 이 브라우저(localStorage)에 저장해요. 로비와 게임은 같은 주소라서 로비가 그걸 읽어
    내 계정에 백업하고, 다른 기기·브라우저에서 로그인하면 내려받아요.
    ※ 새 게임이 localStorage 에 저장하는 키가 있으면 아래 SYNC_KEYS 에 이름을 추가하세요. */
-const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv'];
+const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick'];
 const SYNC_MAX=300000; /* 키 하나당 최대 글자 수 */
 const encKey=k=>k.replace(/\./g,'__dot__');
 const hashStr=v=>{if(v==null)return null;let h=5381;for(let i=0;i<v.length;i++)h=((h<<5)+h+v.charCodeAt(i))|0;return v.length+':'+h;};
@@ -889,7 +918,7 @@ async function doLogout(){
 function onUser(u){
   me=u||null;mine={};
   renderAuth();renderMine();
-  if(me&&FIREBASE_URL&&!DEMO){loadMine();syncDown();}
+  if(me&&FIREBASE_URL&&!DEMO){Promise.all([loadMine(),syncDown()]).then(afterLogin);}
 }
 async function initAuth(){
   if(window.LOBBY_AUTH_STUB){authApi=window.LOBBY_AUTH_STUB;authApi.onChange(onUser);return;} /* 테스트용 */
@@ -1006,8 +1035,9 @@ function startLive(){
 }
 /* ============================================================
    플레이어 랭킹 — 로그인한 사람이 게임을 시작한 횟수(내 기록 합계) TOP 10.
-   · 서버(/ranks/<uid>)에는 "마스킹한 이름"과 횟수만 올려요. 진짜 이름·사진·이메일은 올리지 않아요.
-   · 마스킹: 가운데 글자를 *로 가려요. 예) 홍길동 → 홍*동, Alexander → A******r(최대 4개)
+   · 서버(/ranks/<uid>)에는 "닉네임"(없으면 가운데를 가린 계정 이름)과 횟수만 올려요. 진짜 이름·사진·이메일은 올리지 않아요.
+   · 마스킹: 가운데 글자를 *로 가려요. 예) 홍길동 → 홍*동, Alexander → A****r(최대 4개)
+   · 닉네임은 있는 그대로 보여줘요. 닉네임도 가리고 싶으면 아래 MASK_NICKNAME 을 true 로 바꾸세요.
    · Firebase 규칙에 ranks 항목이 있어야 동작해요 (README/안내 참고). 없으면 순위표는 조용히 "아직 기록이 없어요"로 보여요.
    ============================================================ */
 const RANK_TOP=10,RANK_REFRESH_MS=60000;
@@ -1024,7 +1054,7 @@ function renderRanks(list){
   rkList.innerHTML=list.map((x,i)=>{
     const my=me&&x.uid===me.uid;
     return `<li class="rk r${i+1}${my?' me':''}"><span class="rk-no">${i+1}</span>`+
-      `<span class="rk-name">${esc(maskName(x.name))}${my?'<i>나</i>':''}</span>`+
+      `<span class="rk-name">${esc(String(x.name).slice(0,30))}${my?'<i>나</i>':''}</span>`+
       `<span class="rk-n"><strong>${fmt(x.n)}</strong>회</span>`+
       `<span class="rk-bar"><span style="width:${Math.max(6,x.n/max*100)}%"></span></span></li>`;
   }).join('');
@@ -1055,12 +1085,60 @@ function pushRank(){
     if(!me||n<=0)return;
     try{
       const t=await me.getToken();
-      const r=await fetch(`${FIREBASE_URL}/ranks/${encodeURIComponent(me.uid)}.json?auth=${encodeURIComponent(t)}`,{method:'PUT',body:JSON.stringify({n,name:maskName(me.name)})});
+      const r=await fetch(`${FIREBASE_URL}/ranks/${encodeURIComponent(me.uid)}.json?auth=${encodeURIComponent(t)}`,{method:'PUT',body:JSON.stringify({n,name:rankName()})});
       if(r.ok){rankMsg('');loadRanks();}
       else{console.warn('[랭킹] 내 기록 저장 실패: HTTP '+r.status+' — Firebase 규칙에 ranks 항목이 있는지 확인하세요');rankMsg(r.status===401||r.status===403?'내 기록을 저장하지 못했어요 (Firebase 규칙에 ranks 추가 필요)':'내 기록 저장 실패 (HTTP '+r.status+')');}
     }catch(e){console.warn('[랭킹] 내 기록 저장 실패',e);}
   },800);
 }
+/* ============================================================
+   닉네임 — 로그인한 사람이 정해요. 이 브라우저(localStorage 'lobby-nick')에 저장되고,
+   SYNC_KEYS 덕분에 계정에 백업돼서 다른 기기에서 로그인해도 따라와요.
+   ============================================================ */
+const NICK_KEY='lobby-nick',NICK_MIN=2,NICK_MAX=12;
+const MASK_NICKNAME=false; /* true 면 닉네임도 순위표에서 가운데를 가려요 */
+const NICK_RE=/^[\p{L}\p{N} _.\-]+$/u;
+function myNick(){return me?String(lget(NICK_KEY)||'').trim().slice(0,NICK_MAX):'';}
+function rankName(){const nk=myNick();return nk?(MASK_NICKNAME?maskName(nk):nk):maskName(me.name);}
+function checkNick(raw){
+  const v=String(raw||'').replace(/\s+/g,' ').trim(),len=Array.from(v).length;
+  if(len<NICK_MIN||len>NICK_MAX)return {err:`닉네임은 ${NICK_MIN}~${NICK_MAX}자로 적어 주세요`};
+  if(!NICK_RE.test(v))return {err:'한글·영문·숫자·공백·_ - . 만 쓸 수 있어요'};
+  return {v};
+}
+const nickDlg=$('nickDlg'),nickInput=$('nickInput'),nickErr=$('nickErr');
+function openNick(first){
+  if(!me||typeof nickDlg.showModal!=='function')return;
+  $('nickTitle').textContent=first?'닉네임을 정해 보세요':'닉네임 설정';
+  $('nickCancel').textContent=first?'나중에':'취소';
+  nickInput.value=myNick();nickErr.textContent='';
+  if(!nickDlg.open)nickDlg.showModal();
+  nickInput.focus();nickInput.select();
+}
+function applyNick(v){
+  try{if(v)localStorage.setItem(NICK_KEY,v);else localStorage.removeItem(NICK_KEY);}catch(e){}
+  renderAuth();schedulePush();pushDirty();pushRank();
+}
+$('nickForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const r=checkNick(nickInput.value);
+  if(r.err){nickErr.textContent=r.err;nickInput.focus();return;}
+  applyNick(r.v);nickDlg.close();
+});
+$('nickCancel').addEventListener('click',()=>nickDlg.close());
+$('nickReset').addEventListener('click',()=>{applyNick('');nickDlg.close();});
+nickInput.addEventListener('input',()=>{nickErr.textContent='';});
+function afterLogin(){
+  if(!me)return;
+  renderAuth();pushRank();
+  /* 닉네임이 아직 없고, 이 기기에서 물어본 적 없으면 한 번만 물어봐요 (동기화가 끝난 뒤라 다른 기기에서 정한 닉네임이 있으면 묻지 않아요) */
+  let asked={};try{asked=JSON.parse(localStorage.getItem('lobby-nick-asked')||'{}');}catch(e){}
+  if(!myNick()&&!asked[me.uid]){
+    asked[me.uid]=1;try{localStorage.setItem('lobby-nick-asked',JSON.stringify(asked));}catch(e){}
+    openNick(true);
+  }
+}
+
 function startRanks(){
   if(DEMO){
     renderRanks([['김*수',482],['M***k',377],['박*준',351],['S****y',296],['최*우',240],['ha***o',198],['정*은',163],['J**n',120],['오*',96],['L*e',71]].map(([name,n],i)=>({uid:'demo'+i,name,n})));
