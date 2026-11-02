@@ -135,7 +135,7 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
   </div>
   <div class="grid" id="grid"></div>
   <p class="last" id="last"></p>
-  <footer>게임 추가/오류 신고/기타 문의: dolgodora7942@gmail.com</footer>
+  <footer>게임을 추가하려면 코드 안의 GAMES 배열에 항목을 한 줄 추가하세요.</footer>
 </main>
 
 <section id="stage" aria-label="게임 화면">
@@ -456,6 +456,7 @@ function open(g){
 function focusGame(){try{frame.focus();frame.contentWindow.focus();}catch(e){}}
 function close(){
   stage.classList.remove('on');
+  if(typeof pushDirty==='function')setTimeout(pushDirty,300);
   stopPresence();
   frame.src='about:blank'; /* 게임(소리·타이머)을 완전히 종료 */
   document.body.style.overflow='';
@@ -560,7 +561,7 @@ function renderAuth(msg){
   authbar.hidden=false;
   if(me){
     authbar.innerHTML=`<span class="who">${me.photo?`<img src="${esc(me.photo)}" alt="" referrerpolicy="no-referrer">`:''}<span>${esc(me.name||'플레이어')}</span></span><button type="button" class="out" id="btnOut">로그아웃</button>`;
-    $('btnOut').addEventListener('click',()=>authApi.signOut());
+    $('btnOut').addEventListener('click',doLogout);
   }else{
     authbar.innerHTML=`${msg?`<span class="amsg">${esc(msg)}</span>`:''}<button type="button" class="abtn" id="btnIn">${G_ICON}Google로 로그인</button>`;
     $('btnIn').addEventListener('click',()=>{
@@ -579,7 +580,8 @@ function renderMine(){
 async function userReq(path,method,body){
   if(!me)return null;
   const t=await me.getToken();
-  const r=await fetch(`${FIREBASE_URL}/users/${encodeURIComponent(me.uid)}${path}.json?auth=${encodeURIComponent(t)}`,{method:method||'GET',body:body===undefined?undefined:JSON.stringify(body),keepalive:true});
+  const payload=body===undefined?undefined:JSON.stringify(body);
+  const r=await fetch(`${FIREBASE_URL}/users/${encodeURIComponent(me.uid)}${path}.json?auth=${encodeURIComponent(t)}`,{method:method||'GET',body:payload,keepalive:!!payload&&payload.length<60000});
   if(!r.ok)throw 0;return r.json();
 }
 function userPut(path,body){userReq(path,'PUT',body).catch(()=>{});}
@@ -594,10 +596,78 @@ async function loadMine(){
   }catch(e){mine={};}
   renderMine();
 }
+/* ---------- 게임 기록 동기화 (로그인한 사람만) ----------
+   게임들은 최고 기록·저장 데이터를 이 브라우저(localStorage)에 저장해요. 로비와 게임은 같은 주소라서 로비가 그걸 읽어
+   내 계정에 백업하고, 다른 기기·브라우저에서 로그인하면 내려받아요.
+   ※ 새 게임이 localStorage 에 저장하는 키가 있으면 아래 SYNC_KEYS 에 이름을 추가하세요. */
+const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv'];
+const SYNC_MAX=300000; /* 키 하나당 최대 글자 수 */
+const encKey=k=>k.replace(/\./g,'__dot__');
+const hashStr=v=>{if(v==null)return null;let h=5381;for(let i=0;i<v.length;i++)h=((h<<5)+h+v.charCodeAt(i))|0;return v.length+':'+h;};
+function loadMeta(){try{const m=JSON.parse(localStorage.getItem('lobby-syncmeta')||'null');if(m&&m.h)return m;}catch(e){}return {uid:null,t:0,h:{}};}
+function saveMeta(m){try{localStorage.setItem('lobby-syncmeta',JSON.stringify(m));}catch(e){}}
+const lget=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
+function wipeLocal(){SYNC_KEYS.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});try{localStorage.removeItem('lobby-syncmeta');}catch(e){}}
+let syncing=false,pushTimer=null;
+async function syncDown(){
+  if(!me||syncing)return;syncing=true;
+  try{
+    const remote=(await userReq('/save'))||{};
+    let meta=loadMeta();
+    if(meta.uid&&meta.uid!==me.uid){wipeLocal();meta={uid:null,t:0,h:{}};} /* 다른 계정이 쓰던 기기 → 그 기록은 지우고 내 기록만 */
+    const same=meta.uid===me.uid,push={};
+    for(const k of SYNC_KEYS){
+      const r=remote[encKey(k)],l=lget(k),lh=hashStr(l),mh=same?meta.h[k]:undefined;
+      if(r&&typeof r.v==='string'){
+        const rh=hashStr(r.v);
+        if(l==null){
+          if(same&&mh!==undefined){push[k]=null;} /* 이 기기에서 지운 기록 → 계정에서도 삭제 */
+          else{try{localStorage.setItem(k,r.v);}catch(e){}meta.h[k]=rh;}
+        }else if(lh===rh){meta.h[k]=rh;}
+        else if(same&&mh!==undefined&&lh!==mh&&(rh===mh||(+r.t||0)<=meta.t)){push[k]=l;} /* 이 기기에서만 바뀜(또는 더 최근) → 올리기 */
+        else{try{localStorage.setItem(k,r.v);}catch(e){}meta.h[k]=rh;} /* 계정 기록이 기준 */
+      }else if(l!=null){push[k]=l;} /* 계정에 없고 이 기기에만 있음 → 올리기 */
+    }
+    meta.uid=me.uid;saveMeta(meta);
+    await pushKeys(push);
+  }catch(e){}
+  syncing=false;
+}
+async function pushKeys(push){
+  const keys=Object.keys(push);if(!keys.length||!me)return true;
+  const body={},now=Date.now();
+  for(const k of keys){
+    const v=push[k];
+    if(v===null)body[encKey(k)]=null;
+    else if(v.length<=SYNC_MAX)body[encKey(k)]={v,t:now};
+  }
+  if(!Object.keys(body).length)return true;
+  try{
+    await userReq('/save','PATCH',body);
+    const meta=loadMeta();meta.uid=me.uid;meta.t=now;
+    for(const k of keys){if(push[k]===null)delete meta.h[k];else if(push[k].length<=SYNC_MAX)meta.h[k]=hashStr(push[k]);}
+    saveMeta(meta);return true;
+  }catch(e){return false;}
+}
+async function pushDirty(){
+  if(!me||syncing)return true;
+  const meta=loadMeta();if(meta.uid!==me.uid)return true;
+  const push={};
+  for(const k of SYNC_KEYS){const l=lget(k),lh=hashStr(l),mh=meta.h[k];if(lh!==(mh===undefined?null:mh))push[k]=l;}
+  return pushKeys(push);
+}
+function schedulePush(){clearTimeout(pushTimer);pushTimer=setTimeout(pushDirty,2500);}
+addEventListener('storage',e=>{if(me&&(e.key===null||SYNC_KEYS.includes(e.key)))schedulePush();});
+addEventListener('pagehide',()=>{pushDirty();});
+async function doLogout(){
+  const ok=await pushDirty(); /* 마지막으로 백업 → 성공했을 때만 이 기기의 기록을 지워요(공용 컴퓨터 보호) */
+  if(ok)wipeLocal();
+  authApi.signOut();
+}
 function onUser(u){
   me=u||null;mine={};
   renderAuth();renderMine();
-  if(me&&FIREBASE_URL&&!DEMO)loadMine();
+  if(me&&FIREBASE_URL&&!DEMO){loadMine();syncDown();}
 }
 async function initAuth(){
   if(window.LOBBY_AUTH_STUB){authApi=window.LOBBY_AUTH_STUB;authApi.onChange(onUser);return;} /* 테스트용 */
