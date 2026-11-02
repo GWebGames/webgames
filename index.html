@@ -79,6 +79,17 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 .cardfoot{display:flex;align-items:center;margin-top:10px}
 .cardfoot .play{margin-top:0}
 .now[hidden]{display:none}
+.authbar{width:min(100%,980px);display:flex;justify-content:flex-end;align-items:center;gap:10px;min-height:34px;margin-bottom:6px}
+.authbar[hidden]{display:none}
+.authbar .abtn{font:inherit;font-size:.82rem;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--foam);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.authbar .abtn:hover{border-color:var(--gold)}
+.authbar .abtn svg{width:16px;height:16px}
+.authbar .who{display:inline-flex;align-items:center;gap:8px;font-size:.84rem;color:var(--foam)}
+.authbar .who img{width:26px;height:26px;border-radius:50%;object-fit:cover;background:var(--sea)}
+.authbar .amsg{font-size:.76rem;color:#f0a89c}
+.authbar .out{background:none;border:0;color:var(--muted);font-size:.78rem;text-decoration:underline;cursor:pointer;padding:0}
+.mine{font-size:.74rem;color:var(--gold);white-space:nowrap}
+.mine:empty{display:none}
 .sortbar{width:min(100%,980px);margin-top:30px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .sortbar .lab{font-size:.8rem;color:var(--muted);margin-right:4px}
 .sortbar button{font:inherit;font-size:.82rem;padding:7px 14px;border-radius:999px;border:1px solid var(--line,#35586a);background:transparent;color:var(--muted);cursor:pointer;transition:.15s}
@@ -109,6 +120,7 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 <body>
 
 <main id="lobby">
+  <div class="authbar" id="authbar" hidden></div>
   <h1>게임 로비</h1>
   <p class="sub">GAME LOBBY</p>
   <section class="hot" id="hot" aria-label="실시간 인기 게임 TOP 3">
@@ -370,7 +382,7 @@ const GAMES=[
   {
     id:'groupproject',
     title:'중학생 조별과제 무임승차 잔혹사', hanja:'',
-    desc:'[놀랍게도 개발자의 실화기반] 일을 짬맞아서 조장이 되어버렸다. 팀원들을 잘 갈궈서 7일 안에 조별과제를 끝내라. 우드락 만들기와 PPT 발표 두 가지 모드, 엔딩 5종.',
+    desc:'[놀랍게도 개발자의 실화기반]일을 짬맞아서 조장이 되어버렸다. 팀원들을 잘 갈궈서 7일 안에 조별과제를 끝내라. 우드락 만들기와 PPT 발표 두 가지 모드, 엔딩 5종.',
     keys:'마우스 클릭 · 선택지를 골라 7일간 단톡방 대화 진행',
     src:'games/groupproject.html',
     ready:true,
@@ -418,7 +430,7 @@ GAMES.forEach(g=>{
       `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
       `<p class="desc">${esc(g.desc)}</p>`+
       (g.keys?`<span class="keys">${esc(g.keys)}</span>`:'')+
-      `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" data-always></span><span class="cnt" data-cnt="${g.id}"></span></span>`+
+      `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" data-always></span><span class="mine" data-mine="${g.id}"></span><span class="cnt" data-cnt="${g.id}"></span></span>`+
     `</span>`+
     (g.ready?'':'<span class="badge">COMING SOON</span>');
   if(g.ready)b.addEventListener('click',()=>open(g));
@@ -529,8 +541,78 @@ function track(g){
   const now=Date.now();if(now-(seen[g.id]||0)<COUNT_COOLDOWN)return;
   seen[g.id]=now;try{localStorage.setItem('lobby-seen',JSON.stringify(seen));}catch(e){}
   plays[g.id]=(+plays[g.id]||0)+1;renderStats();
+  if(me){mine[g.id]=(+mine[g.id]||0)+1;renderMine();userPut('/plays/'+encodeURIComponent(g.id),{'.sv':{increment:1}});userPut('/seen/'+encodeURIComponent(g.id),now);}
   if(DEMO)return;
   fetch(`${FIREBASE_URL}/plays/${encodeURIComponent(g.id)}.json`,{method:'PUT',body:JSON.stringify({'.sv':{increment:1}}),keepalive:true}).catch(()=>{});
+}
+
+/* ============================================================
+   구글 로그인 (선택) — 로그인 안 해도 모든 게임을 할 수 있어요.
+   로그인하면: 내가 한 게임 횟수가 계정에 저장되고, 같은 게임 연속 집계 방지가 기기를 바꿔도 유지돼요.
+   쓰려면 Firebase 콘솔 → 프로젝트 설정 → 내 앱(웹)에서 apiKey·appId 를 복사해 아래에 붙여 넣으세요. 비워두면 로그인 버튼이 안 보여요.
+   ============================================================ */
+const FIREBASE_WEB={apiKey:'AIzaSyCGkqC0JWpotSv0Ny19gLzf6H9iMI62aEE',authDomain:'game-user-traffic.firebaseapp.com',projectId:'game-user-traffic',appId:'1:567607516540:web:8a60dc2f2dbd89676218f9'};
+let me=null,mine={},authApi=null;
+const authbar=$('authbar');
+const G_ICON='<svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.5 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>';
+function renderAuth(msg){
+  if(!authApi){authbar.hidden=true;return;}
+  authbar.hidden=false;
+  if(me){
+    authbar.innerHTML=`<span class="who">${me.photo?`<img src="${esc(me.photo)}" alt="" referrerpolicy="no-referrer">`:''}<span>${esc(me.name||'플레이어')}</span></span><button type="button" class="out" id="btnOut">로그아웃</button>`;
+    $('btnOut').addEventListener('click',()=>authApi.signOut());
+  }else{
+    authbar.innerHTML=`${msg?`<span class="amsg">${esc(msg)}</span>`:''}<button type="button" class="abtn" id="btnIn">${G_ICON}Google로 로그인</button>`;
+    $('btnIn').addEventListener('click',()=>{
+      renderAuth('');
+      Promise.resolve(authApi.signIn()).catch(e=>{
+        const c=(e&&e.code)||'';
+        if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request')return;
+        renderAuth(c==='auth/unauthorized-domain'?'이 주소가 Firebase 승인 도메인에 없어요':'로그인에 실패했어요. 다시 시도해 주세요');
+      });
+    });
+  }
+}
+function renderMine(){
+  document.querySelectorAll('[data-mine]').forEach(el=>{const n=me?(+mine[el.dataset.mine]||0):0;el.textContent=n?'내 '+fmt(n)+'회':'';});
+}
+async function userReq(path,method,body){
+  if(!me)return null;
+  const t=await me.getToken();
+  const r=await fetch(`${FIREBASE_URL}/users/${encodeURIComponent(me.uid)}${path}.json?auth=${encodeURIComponent(t)}`,{method:method||'GET',body:body===undefined?undefined:JSON.stringify(body),keepalive:true});
+  if(!r.ok)throw 0;return r.json();
+}
+function userPut(path,body){userReq(path,'PUT',body).catch(()=>{});}
+async function loadMine(){
+  try{
+    const d=(await userReq(''))||{};
+    mine=d.plays||{};
+    /* 계정에 저장된 "마지막 집계 시각"을 이 브라우저 기록과 합쳐요 → 기기를 바꿔도 연속 집계가 안 돼요 */
+    let seen={};try{seen=JSON.parse(localStorage.getItem('lobby-seen')||'{}');}catch(e){}
+    for(const k in d.seen||{})seen[k]=Math.max(+seen[k]||0,+d.seen[k]||0);
+    try{localStorage.setItem('lobby-seen',JSON.stringify(seen));}catch(e){}
+  }catch(e){mine={};}
+  renderMine();
+}
+function onUser(u){
+  me=u||null;mine={};
+  renderAuth();renderMine();
+  if(me&&FIREBASE_URL&&!DEMO)loadMine();
+}
+async function initAuth(){
+  if(window.LOBBY_AUTH_STUB){authApi=window.LOBBY_AUTH_STUB;authApi.onChange(onUser);return;} /* 테스트용 */
+  if(!FIREBASE_WEB.apiKey||DEMO||!FIREBASE_URL){renderAuth();return;}
+  try{
+    const base='https://www.gstatic.com/firebasejs/10.12.2/';
+    const [App,A]=await Promise.all([import(base+'firebase-app.js'),import(base+'firebase-auth.js')]);
+    const auth=A.getAuth(App.initializeApp(FIREBASE_WEB));
+    authApi={
+      signIn:()=>A.signInWithPopup(auth,new A.GoogleAuthProvider()),
+      signOut:()=>A.signOut(auth),
+      onChange:cb=>A.onAuthStateChanged(auth,u=>cb(u&&{uid:u.uid,name:u.displayName,photo:u.photoURL,getToken:()=>u.getIdToken()}))
+    };
+    authApi.onChange(onUser);
+  }catch(e){authApi=null;renderAuth();} /* 로그인 모듈을 못 불러와도 로비는 그대로 동작 */
 }
 
 /* ---------- "지금 N명 플레이 중" ----------
@@ -631,6 +713,7 @@ function startLive(){
   poll();
 }
 startLive();
+initAuth();
 
 </script>
 </body>
