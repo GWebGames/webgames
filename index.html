@@ -299,6 +299,7 @@ const NOTICE_NEW_DAYS=7; /* 며칠 동안 NEW 표시를 붙일지 */
    src   : 게임 HTML 파일 경로 (이 로비 파일 기준 상대경로)
    ready : false 면 "준비 중" 카드로 표시 (코드 받으면 true + src 채우기)
    label : (선택) 게임 이름 옆에 띄울 라벨. 'new' | 'update' | 'big_update' | 'none'(기본값 = 라벨 없음, 줄을 안 써도 같아요)
+           여러 개도 돼요: label:'new,update'  또는  label:['new','update']  (날짜 labelDate 는 모두 공통)
    labelDate : (선택) 라벨을 단 날짜 'YYYY-MM-DD'. 이 날부터 LABEL_DAYS(3)일이 지나면 라벨이 저절로 사라져요.
            날짜를 안 쓰면 사라지지 않고 계속 떠요. ※ label 줄 끝의 쉼표(,)를 꼭 붙이세요!
            예) {id:'tetris', title:'테트리스', label:'update', labelDate:'2026-11-05', ...}
@@ -580,8 +581,11 @@ function labelAlive(g){
   return Date.now()<start+LABEL_DAYS*864e5;
 }
 function labelHTML(g){
-  const k=String(g.label||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
-  return LABELS[k]&&labelAlive(g)?`<span class="glabel" data-l="${k}">${LABELS[k]}</span>`:'';
+  if(!labelAlive(g))return '';
+  const raw=Array.isArray(g.label)?g.label:String(g.label||'').split(/[,|+]/); /* 'new,update' 또는 ['new','update'] */
+  const seen={};
+  return raw.map(x=>String(x).trim().toLowerCase().replace(/[\s-]+/g,'_')).filter(k=>LABELS[k]&&!seen[k]&&(seen[k]=1))
+    .map(k=>`<span class="glabel" data-l="${k}">${LABELS[k]}</span>`).join('');
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
@@ -1038,8 +1042,10 @@ async function loadRanks(){
     try{d=await get('/ranks.json?orderBy=%22n%22&limitToLast='+RANK_TOP);} /* 인덱스(.indexOn)가 있으면 상위 N명만 가져와요 */
     catch(e){d=await get('/ranks.json');} /* 인덱스가 없으면 전체를 받아 정렬 */
     renderRanks(normRanks(d));
-  }catch(e){if(!rkList.children.length)renderRanks([]);}
+  }catch(e){console.warn('[랭킹] 순위 불러오기 실패 — Firebase 규칙에서 ranks 읽기가 허용돼 있는지 확인하세요');if(!rkList.children.length)renderRanks([]);}
 }
+const RANK_NOTE_DEFAULT=document.querySelector('.lb-note').textContent;
+function rankMsg(t){const el=document.querySelector('.lb-note');el.textContent=t||RANK_NOTE_DEFAULT;el.style.color=t?'var(--warn)':'';}
 let rankTimer=null;
 function pushRank(){
   if(!me||DEMO||!FIREBASE_URL)return;
@@ -1050,8 +1056,9 @@ function pushRank(){
     try{
       const t=await me.getToken();
       const r=await fetch(`${FIREBASE_URL}/ranks/${encodeURIComponent(me.uid)}.json?auth=${encodeURIComponent(t)}`,{method:'PUT',body:JSON.stringify({n,name:maskName(me.name)})});
-      if(r.ok)loadRanks();
-    }catch(e){}
+      if(r.ok){rankMsg('');loadRanks();}
+      else{console.warn('[랭킹] 내 기록 저장 실패: HTTP '+r.status+' — Firebase 규칙에 ranks 항목이 있는지 확인하세요');rankMsg(r.status===401||r.status===403?'내 기록을 저장하지 못했어요 (Firebase 규칙에 ranks 추가 필요)':'내 기록 저장 실패 (HTTP '+r.status+')');}
+    }catch(e){console.warn('[랭킹] 내 기록 저장 실패',e);}
   },800);
 }
 function startRanks(){
