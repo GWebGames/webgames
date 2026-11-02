@@ -179,6 +179,15 @@ footer b{color:var(--muted);font-weight:700}
 .morebtn[hidden]{display:none}
 @media (prefers-reduced-motion:reduce){.note,.themebtn,.note summary::after{transition:none}}
 
+/* ===== 게임 이름 옆 라벨 (NEW / UPDATE / BIG UPDATE) ===== */
+.glabel{display:inline-block;vertical-align:middle;margin-left:8px;font-family:var(--f-body);font-size:.66rem;font-weight:800;letter-spacing:.08em;
+  line-height:1;padding:4px 7px;border-radius:3px;color:#fff;white-space:nowrap;text-transform:uppercase}
+.glabel[data-l="new"]{background:#2f9e5f}
+.glabel[data-l="update"]{background:#3a63f0}
+.glabel[data-l="big_update"]{background:linear-gradient(135deg,#c8402b,#e0791f);box-shadow:0 0 0 1px rgba(217,164,65,.7),0 0 12px -2px rgba(224,121,31,.7);animation:glow 1.8s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 1px rgba(217,164,65,.9),0 0 18px 0 rgba(224,121,31,.95)}}
+@media (prefers-reduced-motion:reduce){.glabel{animation:none!important}}
+
 /* ===== 플레이 화면 ===== */
 #stage{position:fixed;inset:0;display:none;flex-direction:column;background:var(--ink);z-index:10}
 #stage.on{display:flex}
@@ -244,19 +253,17 @@ footer b{color:var(--muted);font-weight:700}
     body:['## 추가','대결 모드에 상대 점수 표시','## 수정','일시정지 후 블록이 한 칸 내려가던 문제']},
    ============================================================ */
 const NOTICES=[
-  {date:'2026-11-02', tag:'패치', title:'gwebgames 게임 모음 로비 v1.0.0 공식 오픈',
+  {date:'2026-11-02', tag:'패치', title:'라이트/다크 모드와 공지 게시판이 생겼어요',
    body:[
      '## 추가',
-     '알파 버전 패치노트는 모두 생략되어 지금부터 올라옵니다.',
-     '공지 게시판이 생겼어요. 앞으로 패치노트와 공지가 여기에 올라와요.',
+     '로비 오른쪽 위 버튼으로 라이트 모드와 다크 모드를 바꿀 수 있어요. 선택은 이 브라우저에 기억돼요.',
+     '이 공지 게시판이 생겼어요. 앞으로 패치노트와 공지가 여기에 올라와요.',
      '## 변경',
-     '로비 기본 화면이 밝은 라이트 모드로 바뀌었어요. 예전 로비는 다크 모드에서 그대로 볼 수 있어요.',
-     '## 소개',
-     'v1.0.0 기준 총 15개의 게임이 존재합니다. 게임 인기도 실시간 집계와 구글 로그인 & 게임 자동 저장 기능을 지원합니다.'
+     '로비 기본 화면이 밝은 라이트 모드로 바뀌었어요. 예전의 어두운 로비는 다크 모드에서 그대로 볼 수 있어요.'
    ]}
 ];
 const NOTICE_VISIBLE=3;  /* 처음에 보여줄 글 개수 (나머지는 "이전 공지 더보기") */
-const NOTICE_NEW_DAYS=5; /* 며칠 동안 NEW 표시를 붙일지 */
+const NOTICE_NEW_DAYS=7; /* 며칠 동안 NEW 표시를 붙일지 */
 </script>
 
 <script>
@@ -264,6 +271,8 @@ const NOTICE_NEW_DAYS=5; /* 며칠 동안 NEW 표시를 붙일지 */
    게임 목록 — 새 게임은 여기에 객체 하나만 추가하면 됩니다.
    src   : 게임 HTML 파일 경로 (이 로비 파일 기준 상대경로)
    ready : false 면 "준비 중" 카드로 표시 (코드 받으면 true + src 채우기)
+   label : (선택) 게임 이름 옆에 띄울 라벨. 'new' | 'update' | 'big_update'  — 없애려면 이 줄을 지우세요.
+           예) {id:'tetris', title:'테트리스', label:'update', ...}
    thumb : 대체용 SVG 그림. 실제 대표 이미지는 thumbs/<id>.jpg (16:9, 800x450 권장)를 넣으면 자동으로 사용돼요
    ============================================================ */
 const GAMES=[
@@ -530,6 +539,11 @@ const defaultThumb=`<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg
   <g stroke="#35586a" stroke-width="2" fill="none" stroke-dasharray="6 6"><rect x="110" y="50" width="100" height="80" rx="6"/></g>
   <text x="160" y="102" text-anchor="middle" font-size="30" fill="#6f858e" font-family="serif">?</text></svg>`;
 
+const LABELS={new:'NEW',update:'UPDATE',big_update:'BIG UPDATE'};
+function labelHTML(g){
+  const k=String(g.label||'').trim().toLowerCase().replace(/[\s-]+/g,'_');
+  return LABELS[k]?`<span class="glabel" data-l="${k}">${LABELS[k]}</span>`:'';
+}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 GAMES.forEach(g=>{
@@ -538,7 +552,7 @@ GAMES.forEach(g=>{
   b.innerHTML=
     `<span class="thumb">${g.thumb||defaultThumb}<img src="thumbs/${g.id}.jpg" alt="" loading="lazy" onerror="this.remove()"></span>`+
     `<span class="info">`+
-      `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}</span>`+
+      `<span class="name">${esc(g.title)}${g.hanja?`<small>${esc(g.hanja)}</small>`:''}${labelHTML(g)}</span>`+
       `<p class="desc">${esc(g.desc)}</p>`+
       (g.keys?`<span class="keys">${esc(g.keys)}</span>`:'')+
       `<span class="cardfoot"><span class="play">${g.ready?'플레이':'준비 중'}</span><span class="now" data-now="${g.id}" data-always></span><span class="mine" data-mine="${g.id}"></span><span class="cnt" data-cnt="${g.id}"></span></span>`+
@@ -682,7 +696,7 @@ function renderStats(){
     top.forEach((x,k)=>{
       const b=document.createElement('button');b.type='button';b.className='pod r'+(k+1);b.dataset.id=x.g.id;
       b.innerHTML=`<span class="rank">${k+1}</span>${thumbHTML(x.g)}`+
-        `<span class="info"><span class="pname">${esc(x.g.title)}</span>`+
+        `<span class="info"><span class="pname">${esc(x.g.title)}${labelHTML(x.g)}</span>`+
         `<span class="pcnt"><strong data-n>${fmt(x.n)}</strong>회 플레이</span>`+`<span class="now" data-now="${x.g.id}" hidden></span>`+
         `<span class="meter"><span style="width:${Math.max(6,x.n/max*100)}%"></span></span></span>`;
       b.addEventListener('click',()=>openGame(x.g));
