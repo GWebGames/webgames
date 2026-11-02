@@ -4,15 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>게임 로비</title>
+<script>try{var __t=localStorage.getItem('lobby-theme');document.documentElement.setAttribute('data-theme',__t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
 :root{
   --ink:#0d1b24;--sea:#17323f;--panel:#1f4252;--line:#35586a;
   --foam:#e9e2cf;--cinnabar:#c8402b;--gold:#d9a441;--muted:#8fa4ad;
+  /* 테마용 추가 변수 (다크 값 = 기존 로비 디자인) */
+  --on-accent:#e9e2cf;--gold-on:#10202a;--glow:#1b3a49;--shade:rgba(13,27,36,.55);--chip:rgba(13,27,36,.85);--chip2:rgba(13,27,36,.88);
+  --dis-bg:#14252d;--dis-play-bg:#2c4652;--dis-play-fg:#6f858e;--meter-bg:rgba(255,255,255,.08);
+  --ok:#8fd6a8;--warn:#f0a89c;--foot:#5d747d;--card-shadow:none;
   --f-display:"Nanum Myeongjo","Batang",serif;
   --f-body:"Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
   color-scheme:dark;
+}
+/* ===== 라이트 모드 (기본) — 다크 모드는 위 :root 값 = 기존 디자인 ===== */
+:root[data-theme="light"]{
+  --ink:#f7f3e8;--sea:#e1ebee;--panel:#ffffff;--line:#d3dbd9;
+  --foam:#17323f;--gold:#96690f;--muted:#587079;
+  --on-accent:#ffffff;--gold-on:#ffffff;--glow:#fff0c9;--shade:rgba(23,50,63,.22);--chip:rgba(255,255,255,.92);--chip2:rgba(255,255,255,.92);
+  --dis-bg:#ece7da;--dis-play-bg:#ddd8c9;--dis-play-fg:#8a9a9f;--meter-bg:rgba(23,50,63,.1);
+  --ok:#1f8a4c;--warn:#b3392a;--foot:#7d8e94;--card-shadow:0 2px 10px -4px rgba(23,50,63,.2);
+  color-scheme:light;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -21,7 +35,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* ===== 로비 ===== */
 #lobby{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:40px 16px 32px;
-  background:radial-gradient(1200px 500px at 50% -10%,#1b3a49 0%,transparent 70%),var(--ink)}
+  background:radial-gradient(1200px 500px at 50% -10%,var(--glow) 0%,transparent 70%),var(--ink)}
 h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.8rem,5vw,2.6rem);letter-spacing:.12em;margin:0;text-wrap:balance;text-align:center}
 .sub{color:var(--gold);font-family:var(--f-display);font-weight:700;letter-spacing:.3em;font-size:.85rem;margin:8px 0 0;text-align:center}
 .grid{width:min(100%,980px);margin-top:36px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
@@ -106,6 +120,65 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 @media (max-width:760px){.podium{grid-template-columns:1fr}.pod{flex-direction:row}.pod .thumb{width:44%;flex:none;aspect-ratio:16/10}.pod .info{justify-content:center}}
 @media (prefers-reduced-motion:reduce){.live.on i,.flash,.now::before{animation:none}.pod,.card,.thumb img{transition:none}}
 
+/* ===== 테마 보정 (하드코딩 색 → 변수) ===== */
+.card,.pod{box-shadow:var(--card-shadow)}
+.card:disabled{background:var(--dis-bg)}
+.card:disabled .play{background:var(--dis-play-bg);color:var(--dis-play-fg)}
+.thumb::after{background:linear-gradient(180deg,transparent 60%,var(--shade))}
+.badge{background:var(--chip)}
+.mini{background:var(--chip2)}
+.play,.hot-head h2 b{color:var(--on-accent)}
+.pod .meter{background:var(--meter-bg)}
+.live.on{color:var(--ok)}
+.now{color:var(--ok)}
+.authbar .amsg{color:var(--warn)}
+.sortbar button:hover{color:var(--foam)}
+footer{color:var(--foot)}
+footer b{color:var(--muted);font-weight:700}
+/* 게임 플레이 화면은 항상 어두운 톤 유지 */
+#stage{--ink:#0d1b24;--panel:#1f4252;--line:#35586a;--foam:#e9e2cf;--gold:#d9a441;--muted:#8fa4ad;color:#e9e2cf}
+
+/* ===== 테마 전환 버튼 ===== */
+.themebtn{position:fixed;top:12px;right:12px;z-index:5;display:inline-flex;align-items:center;gap:7px;font-size:.8rem;padding:7px 13px;
+  border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--foam);box-shadow:var(--card-shadow);transition:border-color .15s}
+.themebtn:hover,.themebtn:focus-visible{border-color:var(--gold);outline:none}
+.themebtn svg{width:16px;height:16px;flex:none}
+
+/* ===== 공지 · 패치노트 게시판 ===== */
+.board{width:min(100%,980px);margin-top:30px}
+.board-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.board-head h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:1.3rem;letter-spacing:.06em;display:flex;align-items:center;gap:10px}
+.board-head h2 b{background:var(--gold);color:var(--gold-on);font-size:.72rem;letter-spacing:.14em;padding:3px 8px;border-radius:3px}
+.board-cnt{font-size:.78rem;color:var(--muted)}
+.notes{display:flex;flex-direction:column;gap:8px}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:var(--card-shadow);overflow:hidden;transition:border-color .15s}
+.note:hover,.note[open]{border-color:var(--gold)}
+.note summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px 10px;padding:12px 14px;flex-wrap:wrap}
+.note summary::-webkit-details-marker{display:none}
+.note summary::after{content:"▾";margin-left:auto;color:var(--muted);transition:transform .2s}
+.note[open] summary::after{transform:rotate(180deg)}
+.note summary:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.ntag{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:3px;color:#fff;background:#587079;white-space:nowrap}
+.ntag[data-t="패치"]{background:#c8402b}
+.ntag[data-t="공지"]{background:var(--gold);color:var(--gold-on)}
+.ntag[data-t="이벤트"]{background:#2f9e5f}
+.ntag[data-t="점검"]{background:#3a63f0}
+.nnew,.npin{font-size:.66rem;font-weight:700;padding:1px 6px;border-radius:3px;letter-spacing:.08em;white-space:nowrap}
+.nnew{background:var(--cinnabar);color:var(--on-accent)}
+.npin{border:1px solid var(--gold);color:var(--gold)}
+.ntitle{font-weight:700;flex:1 1 200px;min-width:0;line-height:1.4}
+.nver{font-size:.74rem;color:var(--gold);font-weight:700;white-space:nowrap}
+.ndate{font-size:.76rem;color:var(--muted);white-space:nowrap}
+.nbody{padding:4px 16px 16px;border-top:1px dashed var(--line);font-size:.9rem;line-height:1.7}
+.nbody h4{margin:14px 0 2px;font-size:.82rem;letter-spacing:.08em;color:var(--gold)}
+.nbody ul{margin:4px 0 0;padding-left:1.15em}
+.nbody li::marker{color:var(--gold)}
+.nbody p{margin:10px 0 0}
+.morebtn{display:block;margin:12px auto 0;font:inherit;font-size:.82rem;padding:7px 18px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);transition:.15s}
+.morebtn:hover{border-color:var(--gold);color:var(--foam)}
+.morebtn[hidden]{display:none}
+@media (prefers-reduced-motion:reduce){.note,.themebtn,.note summary::after{transition:none}}
+
 /* ===== 플레이 화면 ===== */
 #stage{position:fixed;inset:0;display:none;flex-direction:column;background:var(--ink);z-index:10}
 #stage.on{display:flex}
@@ -119,10 +192,17 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
 </head>
 <body>
 
+<button type="button" class="themebtn" id="themeBtn" aria-label="화면 모드 전환"></button>
+
 <main id="lobby">
   <div class="authbar" id="authbar" hidden></div>
   <h1>게임 로비</h1>
   <p class="sub">GAME LOBBY</p>
+  <section class="board" id="board" aria-label="공지 및 패치노트">
+    <div class="board-head"><h2><b>NOTICE</b>공지 · 패치노트</h2><span class="board-cnt" id="boardCnt"></span></div>
+    <div class="notes" id="notes"></div>
+    <button type="button" class="morebtn" id="noteMore" hidden></button>
+  </section>
   <section class="hot" id="hot" aria-label="실시간 인기 게임 TOP 3">
     <div class="hot-head"><h2><b>LIVE</b>지금 가장 인기 있는 게임</h2><span class="live" id="liveState"><i></i><span>연결 중…</span></span></div>
     <div class="podium" id="podium"></div>
@@ -135,7 +215,7 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
   </div>
   <div class="grid" id="grid"></div>
   <p class="last" id="last"></p>
-  <footer>게임을 추가하려면 코드 안의 GAMES 배열에 항목을 한 줄 추가하세요.</footer>
+  <footer>게임 관련 오류 제보/자기 게임 업로드 신청은 <b>dolgodora7942@gmail.com</b>으로</footer>
 </main>
 
 <section id="stage" aria-label="게임 화면">
@@ -147,6 +227,37 @@ footer{margin-top:auto;padding-top:36px;color:#5d747d;font-size:.78rem;text-alig
   </div>
   <iframe id="frame" title="게임" allow="autoplay; fullscreen; gamepad"></iframe>
 </section>
+
+<script>
+/* ============================================================
+   공지 · 패치노트 — 글을 쓰려면 아래 NOTICES 배열 "맨 위"에 객체 하나를 추가하세요. (GitHub에서 이 파일을 수정 → 저장하면 끝!)
+   date    : 'YYYY-MM-DD'  (최신 날짜가 위로 올라와요. 7일 안의 글에는 NEW 표시)
+   tag     : '패치' | '공지' | '이벤트' | '점검'  (다른 글자를 써도 회색 태그로 나와요)
+   version : (선택) 예) 'v1.2'
+   title   : 제목
+   body    : 본문. 줄마다 문자열 하나. 앞에 '## ' 를 붙이면 소제목, 나머지는 목록 한 줄이에요.
+   pin     : (선택) true 면 날짜와 상관없이 맨 위에 고정
+   ※ 따옴표(')가 들어가는 문장은 "큰따옴표"로 감싸거나 \' 로 쓰세요. 항목 사이 쉼표(,)도 잊지 마세요.
+
+   예시)
+   {date:'2026-11-05', tag:'패치', version:'v1.2', title:'테트리스 대결 모드 개선',
+    body:['## 추가','대결 모드에 상대 점수 표시','## 수정','일시정지 후 블록이 한 칸 내려가던 문제']},
+   ============================================================ */
+const NOTICES=[
+  {date:'2026-11-02', tag:'패치', title:'gwebgames 게임 모음 로비 v1.0.0 공식 오픈',
+   body:[
+     '## 추가',
+     '알파 버전 패치노트는 모두 생략되어 지금부터 올라옵니다.',
+     '공지 게시판이 생겼어요. 앞으로 패치노트와 공지가 여기에 올라와요.',
+     '## 변경',
+     '로비 기본 화면이 밝은 라이트 모드로 바뀌었어요. 예전 로비는 다크 모드에서 그대로 볼 수 있어요.',
+     '## 소개',
+     'v1.0.0 기준 총 15개의 게임이 존재합니다. 게임 인기도 실시간 집계와 구글 로그인 & 게임 자동 저장 기능을 지원합니다.'
+   ]}
+];
+const NOTICE_VISIBLE=3;  /* 처음에 보여줄 글 개수 (나머지는 "이전 공지 더보기") */
+const NOTICE_NEW_DAYS=5; /* 며칠 동안 NEW 표시를 붙일지 */
+</script>
 
 <script>
 /* ============================================================
@@ -440,6 +551,59 @@ GAMES.forEach(g=>{
 
 const lastGame=GAMES.find(g=>g.id===lastId&&g.ready);
 if(lastGame)$('last').textContent='최근 플레이: '+lastGame.title;
+
+/* ---------- 라이트 / 다크 모드 ---------- */
+const ICON_SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const ICON_MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function curTheme(){return document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';}
+function paintThemeBtn(){
+  const dark=curTheme()==='dark';
+  $('themeBtn').innerHTML=(dark?ICON_SUN:ICON_MOON)+'<span>'+(dark?'라이트 모드':'다크 모드')+'</span>';
+}
+$('themeBtn').addEventListener('click',()=>{
+  const next=curTheme()==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  try{localStorage.setItem('lobby-theme',next);}catch(e){}
+  paintThemeBtn();
+});
+paintThemeBtn();
+
+/* ---------- 공지 · 패치노트 ---------- */
+(function renderNotices(){
+  const box=$('notes'),more=$('noteMore'),now=Date.now();
+  const list=NOTICES.map((n,i)=>({n,i}))
+    .sort((a,b)=>(!!b.n.pin-!!a.n.pin)||String(b.n.date||'').localeCompare(String(a.n.date||''))||a.i-b.i).map(x=>x.n);
+  $('boardCnt').textContent=list.length?'총 '+list.length+'건':'';
+  if(!list.length){box.innerHTML='<div class="hot-empty">아직 등록된 공지가 없어요.</div>';return;}
+  const isNew=n=>{const t=Date.parse(n.date);return !isNaN(t)&&now-t>=-864e5&&now-t<(NOTICE_NEW_DAYS+1)*864e5;};
+  const bodyHTML=b=>{
+    const lines=(Array.isArray(b)?b:String(b||'').split('\n')).map(s=>String(s).trim()).filter(Boolean);
+    let out='',open=false;
+    for(const ln of lines){
+      if(ln.startsWith('## ')){if(open){out+='</ul>';open=false;}out+='<h4>'+esc(ln.slice(3))+'</h4>';}
+      else{if(!open){out+='<ul>';open=true;}out+='<li>'+esc(ln)+'</li>';}
+    }
+    return out+(open?'</ul>':'');
+  };
+  list.forEach((n,k)=>{
+    const tag=n.tag||'공지',d=document.createElement('details');
+    d.className='note';if(k===0)d.open=true;if(k>=NOTICE_VISIBLE){d.hidden=true;d.dataset.extra='1';}
+    d.innerHTML=`<summary><span class="ntag" data-t="${esc(tag)}">${esc(tag)}</span>`+
+      (n.pin?'<span class="npin">고정</span>':'')+(isNew(n)?'<span class="nnew">NEW</span>':'')+
+      `<span class="ntitle">${esc(n.title||'')}</span>`+
+      (n.version?`<span class="nver">${esc(n.version)}</span>`:'')+
+      (n.date?`<span class="ndate">${esc(n.date)}</span>`:'')+`</summary>`+
+      `<div class="nbody">${bodyHTML(n.body)}</div>`;
+    box.appendChild(d);
+  });
+  const extra=box.querySelectorAll('[data-extra]');
+  if(extra.length){
+    let expanded=false;
+    const paint=()=>{more.textContent=expanded?'접기':'이전 공지 '+extra.length+'개 더보기';};
+    more.hidden=false;paint();
+    more.addEventListener('click',()=>{expanded=!expanded;extra.forEach(e=>{e.hidden=!expanded;});paint();});
+  }
+})();
 
 /* ---------- 게임 열기 / 닫기 ---------- */
 function openGame(g){
