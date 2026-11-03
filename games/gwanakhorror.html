@@ -92,12 +92,12 @@ html,body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;ove
 #touch{display:none}
 body.touch #touch{display:block}
 body.touch #hint{display:none}
-#joyZone{position:absolute;left:0;top:25%;bottom:0;width:42%;pointer-events:auto;touch-action:none}
-#lookZone{position:absolute;right:0;top:0;bottom:0;width:58%;pointer-events:auto;touch-action:none}
+#joyZone{z-index:1;position:absolute;left:0;top:25%;bottom:0;width:42%;pointer-events:auto;touch-action:none}
+#lookZone{z-index:1;position:absolute;right:0;top:0;bottom:0;width:58%;pointer-events:auto;touch-action:none}
 #joyBase{position:absolute;width:130px;height:130px;margin:-65px 0 0 -65px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);display:none;pointer-events:none}
 #joyKnob{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;background:rgba(255,255,255,.35);border:2px solid rgba(255,255,255,.6)}
 #joyHint{position:absolute;left:34px;bottom:46px;width:110px;height:110px;border-radius:50%;border:2px dashed rgba(255,255,255,.18);pointer-events:none}
-.tb2{position:absolute;border-radius:50%;background:rgba(20,20,24,.55);border:2px solid rgba(255,255,255,.4);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.1;pointer-events:auto;touch-action:none;z-index:2}
+.tb2{position:absolute;border-radius:50%;background:rgba(20,20,24,.55);border:2px solid rgba(255,255,255,.4);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.1;pointer-events:auto;touch-action:none;z-index:3}
 .tb2:active,.tb2.dn{background:rgba(140,30,40,.7);border-color:#fff}
 #bUse{right:20px;bottom:30px;width:84px;height:84px;font-size:15px;font-weight:700}
 #bAct{right:116px;bottom:56px;width:66px;height:66px;font-size:15px;font-weight:700;border-color:#ffd86a}
@@ -110,13 +110,14 @@ body.touch #hint{display:none}
 #bSpecL{left:20px;bottom:40%;width:64px;height:64px;display:none;font-size:22px}
 #bSpecR{right:20px;bottom:40%;width:64px;height:64px;display:none;font-size:22px}
 body.touch #hot{bottom:auto;top:8px}
+body.touch #hot{z-index:4;pointer-events:auto}
 body.touch .slot{width:48px;height:48px;font-size:22px;pointer-events:auto}
 body.touch .slot span{font-size:8px}
 body.touch #loc{top:62px;left:10px;font-size:12px;padding:3px 8px}
 body.touch #bars{left:10px;top:92px;bottom:auto;width:150px}
 body.touch .bar{height:12px;margin-top:3px}body.touch .bar b{font-size:9px}
 body.touch #team{top:58px;right:60px;width:130px;font-size:11px}
-body.touch #prompt{top:auto;bottom:36%;pointer-events:auto;font-size:15px;padding:8px 16px}
+body.touch #prompt{z-index:4;top:auto;bottom:36%;pointer-events:auto;font-size:15px;padding:8px 16px}
 body.touch #sub{bottom:96px;font-size:15px}
 body.touch #toasts{top:100px;font-size:13px}
 body.touch #vault{top:44%;width:260px}
@@ -709,14 +710,44 @@ const ROLES = {
   band: { nm: '밴드부', col: 0x222222, desc: '기타 지급 · 연주로 팀 회복 (이목 ↑)' },
   council: { nm: '학생회', col: 0x244a8a, desc: '손전등 2배 · 멘탈 2배 · 지도 지급' }
 };
+function textTex(txt, color = '#fff', size = 120, w = 256, h = 128, outline) {
+  const c = mkC(w, h), x = c.getContext('2d'); x.clearRect(0, 0, w, h); x.font = `900 ${size}px 'Noto Sans KR','Malgun Gothic',sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+  if (outline) { x.lineWidth = size * .12; x.strokeStyle = outline; x.lineJoin = 'round'; x.strokeText(txt, w / 2, h / 2 + 4); } x.fillStyle = color; x.fillText(txt, w / 2, h / 2 + 4); return texFrom(c, false);
+}
+function textPlane(txt, pw, ph, z, y, color, size, outline, back, em = 0) {
+  const t = textTex(txt, color, size, 256, Math.round(256 * ph / pw), outline), m = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), new THREE.MeshStandardMaterial({ map: t, transparent: true, roughness: .6, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, emissive: em ? 0xffffff : 0, emissiveMap: em ? t : null, emissiveIntensity: em }));
+  m.position.set(0, y, z); if (back) m.rotation.y = Math.PI; return m;
+}
 function roleAvatar(role) {
-  const L = { student: { top: 0x1d2a4a, bottom: 0x4a4d55 }, athlete: { top: 0xb02a2a, bottom: 0x1c1c1c }, band: { top: 0x1b1b1f, bottom: 0x2a2f4a, hair: 0x6a2a8a }, council: { top: 0x244a8a, bottom: 0x2b2b30 } }[role] || {};
-  const a = humanoid({ top: L.top, bottom: L.bottom, hair: L.hair, scale: 1.0 });
-  const u = a.userData;
-  if (role === 'student') { const bp = bx(.34, .42, .16, cmat(0x1b3a6b, .7), 0, u.tl / 2 + .02, -.2); u.torso.add(bp); u.torso.add(bx(.3, .1, .05, cmat(0x14284a), 0, u.tl / 2 - .12, -.29)); u.torso.add(bx(.04, .5, .02, cmat(0x14284a), -.12, u.tl / 2, .115)); u.torso.add(bx(.04, .5, .02, cmat(0x14284a), .12, u.tl / 2, .115)); u.torso.add(bx(.06, .22, .02, cmat(0xaa2222), 0, u.tl - .2, .115)); }
-  if (role === 'athlete') { u.torso.add(bx(.04, .55, .225, cmat(0xffffff), -.18, u.tl / 2, 0)); u.torso.add(bx(.04, .55, .225, cmat(0xffffff), .18, u.tl / 2, 0)); }
-  if (role === 'band') { const gt = new THREE.Group(); gt.add(bx(.3, .38, .07, cmat(0xb8341c, .4), 0, 0, 0)); gt.add(bx(.05, .55, .04, cmat(0x3a2410), 0, .45, 0)); gt.position.set(.0, u.tl * .35, -.17); gt.rotation.z = .5; u.torso.add(gt); }
-  if (role === 'council') { u.armL.add(bx(.14, .08, .15, cmat(0xdd2222), 0, -.22, 0)); }
+  const L = { student: { top: 0x1d2a4a, bottom: 0x4a4d55 }, athlete: { top: 0x1f3f9a, bottom: 0x1f3f9a, hair: 0x111111 }, band: { top: 0x15151a, bottom: 0x23263a, hair: 0x6a2a8a }, council: { top: 0xf2f2f2, bottom: 0x2a2c3c, hair: 0x2a1a10 } }[role] || {};
+  const a = humanoid({ top: L.top, bottom: L.bottom, hair: L.hair, scale: 1.0, collar: role === 'student' }); const u = a.userData, tl = u.tl, al = u.al;
+  const W = cmat(0xffffff, .6), steel = cmat(0xc8ccd2, .3, { metalness: .8 });
+  if (role === 'student') { // 교복: 남색 재킷 + 흰 셔츠 + 붉은 넥타이 + 회색 바지 + 책가방
+    u.torso.add(bx(.17, .3, .012, W, 0, tl - .2, .116)); u.torso.add(bx(.05, .26, .014, cmat(0xaa1e2a), 0, tl - .24, .12)); u.torso.add(bx(.07, .035, .015, cmat(0xaa1e2a), 0, tl - .1, .12));
+    for (const sx of [-1, 1]) u.torso.add(bx(.085, .32, .012, cmat(0x141f3a), sx * .11, tl - .2, .117)); u.torso.add(bx(.03, .03, .012, cmat(0xe8c040, .3, { metalness: .6 }), -.14, tl - .3, .118)); for (const sx of [-1, 1]) u.armL.parent.children.length;
+    for (const k of [u.armL, u.armR]) k.add(bx(.125, .03, .135, W, 0, -al + .04, 0));
+    const bp = bx(.34, .42, .16, cmat(0x1b3a6b, .7), 0, tl / 2 + .02, -.2); u.torso.add(bp); u.torso.add(bx(.3, .1, .05, cmat(0x14284a), 0, tl / 2 - .12, -.29)); for (const sx of [-1, 1]) u.torso.add(bx(.04, .5, .02, cmat(0x14284a), sx * .12, tl / 2, .118));
+  }
+  if (role === 'athlete') { // 체육복: 파랑 져지 + 흰 줄 + 지퍼
+    const st = cmat(0xffffff, .6); u.torso.add(bx(.012, tl * .86, .012, steel, 0, tl / 2, .116)); u.torso.add(bx(.2, .07, .03, cmat(0x1a3585), 0, tl - .02, .08)); u.torso.add(bx(.44, .045, .224, st, 0, tl * .62, 0)); u.torso.add(bx(.44, .03, .224, st, 0, tl * .55, 0));
+    for (const k of [u.armL, u.armR]) { k.add(bx(.128, .04, .138, st, 0, -al * .25, 0)); k.add(bx(.128, .04, .138, st, 0, -al * .35, 0)); }
+    u.legL.add(bx(.012, u.ll * .88, .06, st, -.078, -u.ll / 2, 0)); u.legR.add(bx(.012, u.ll * .88, .06, st, .078, -u.ll / 2, 0)); u.torso.add(textPlane('체육', .13, .07, .119, tl * .8, '#ffffff', 90));
+  }
+  if (role === 'band') { // G 밴드부 점퍼 (블랙 + 퍼플 소매) / 등과 가슴에 G
+    const pu = cmat(0x5a2a8a, .7); for (const k of [u.armL, u.armR]) { k.add(bx(.13, al * .97, .14, pu, 0, -al / 2, 0)); k.add(bx(.135, .05, .145, cmat(0x15151a), 0, -al + .05, 0)); }
+    u.torso.add(bx(.45, .06, .235, pu, 0, .03, 0)); u.torso.add(bx(.22, .05, .24, pu, 0, tl - .02, 0)); u.torso.add(bx(.012, tl * .9, .012, steel, 0, tl / 2, .116));
+    u.torso.add(textPlane('G', .32, .30, -.119, tl * .56, '#ffffff', 190, '#5a2a8a', true, .25)); u.torso.add(textPlane('G', .1, .1, .119, tl * .76, '#ffffff', 110, '#5a2a8a', false)).position.x = -.12;
+    const gt = new THREE.Group(); gt.add(bx(.28, .36, .07, cmat(0xb8341c, .35), 0, 0, 0)); gt.add(bx(.05, .6, .04, cmat(0x3a2410), 0, .45, 0)); gt.position.set(-.3, tl * .1, .0); gt.rotation.z = .25; u.torso.add(gt);
+  }
+  if (role === 'council') { // 형광 조끼 (등에 학생회)
+    const fl = new THREE.MeshStandardMaterial({ color: 0xc8ff1a, roughness: .5, emissive: 0x6aa000, emissiveIntensity: .9 });
+    const vest = new THREE.Mesh(new THREE.BoxGeometry(.465, tl * .82, .25), fl); vest.position.y = tl * .52; u.torso.add(vest);
+    for (const sx of [-1, 1]) { const sh = new THREE.Mesh(new THREE.BoxGeometry(.1, .05, .26), fl); sh.position.set(sx * .17, tl * .96, 0); u.torso.add(sh); }
+    for (const yy of [.2, .36]) { u.torso.add(bx(.47, .035, .255, cmat(0xe8eaee, .2, { metalness: .9 }), 0, yy, 0)); }
+    u.torso.add(bx(.012, tl * .8, .012, steel, 0, tl * .52, .126));
+    u.torso.add(textPlane('학생회', .36, .17, -.131, tl * .6, '#10140a', 120, null, true)); u.torso.add(textPlane('학생회', .09, .05, .131, tl * .78, '#10140a', 110)).position.x = .12;
+    u.armL.add(bx(.14, .08, .15, cmat(0xdd2222), 0, -.2, 0));
+  }
   return a;
 }
 function animHuman(a, t, spd, wave) { const u = a.userData; const s = Math.sin(t * 7) * clamp(spd / 3, 0, 1.2); u.legL.rotation.x = s * .7; u.legR.rotation.x = -s * .7; u.armL.rotation.x = -s * .6; u.armR.rotation.x = s * .6; }
@@ -2027,7 +2058,7 @@ const UI = {
   overList() { const L = Object.values(G.players).filter(p => !p.left); $('overL').innerHTML = L.length > 1 ? L.map(p => `<div class="pl"><span>${p.name}</span><span>${p.esc ? '탈출' : p.alive ? '생존 중' : '사망'}</span></div>`).join('') : ''; }
 };
 function renderRoles(el, get, set) {
-  el.innerHTML = ''; for (const k in ROLES) { const r = ROLES[k], d = document.createElement('div'); d.className = 'card' + (get() === k ? ' on' : ''); d.innerHTML = `<h3>${r.nm}</h3><p>${{ student: '인벤토리 6칸 · 교복과 책가방 차림', athlete: '체력 ×2 · 멘탈 ×1.5 · 스태미나 ×1.5', band: '기타 지급 — 10초 연주 시 팀 체력·멘탈 +10, 이후 5초마다. 소리가 커질수록 괴물을 끌어들임. 무기로 사용 가능(내구도)', council: '손전등 ×2 · 멘탈 ×2 · 지도 지급(탐사한 곳이 기록됨)' }[k]}</p>`; d.onclick = () => { set(k); renderRoles(el, get, set); }; el.appendChild(d); }
+  el.innerHTML = ''; for (const k in ROLES) { const r = ROLES[k], d = document.createElement('div'); d.className = 'card' + (get() === k ? ' on' : ''); d.innerHTML = `<h3>${r.nm}</h3><p>${{ student: '인벤토리 6칸 · 교복 + 책가방 차림', athlete: '체육복 차림 · 체력 ×2 · 멘탈 ×1.5 · 스태미나 ×1.5', band: 'G 밴드부 점퍼 · 기타 지급 — 10초 연주 시 팀 체력·멘탈 +10, 이후 5초마다. 소리가 커질수록 괴물을 끌어들임. 무기로 사용 가능(내구도)', council: '형광 학생회 조끼 · 손전등 ×2 · 멘탈 ×2 · 지도 지급(탐사한 곳이 기록됨)' }[k]}</p>`; d.onclick = () => { set(k); renderRoles(el, get, set); }; el.appendChild(d); }
 }
 /* ---- 게임 흐름 ---- */
 const Game = {
@@ -2214,7 +2245,7 @@ function initInput() {
 /* ---- 터치 조작 ---- */
 function fireKey(code) { window.dispatchEvent(new KeyboardEvent('keydown', { code })); window.dispatchEvent(new KeyboardEvent('keyup', { code })); }
 function initTouch() {
-  $('hot').addEventListener('click', e => { const el = e.target.closest('.slot'); if (!el || !G.running || !P.alive) return; const i = +el.dataset.i; if (i < hotList().length) { P.sel = i; refreshViewmodel(); AU.click(.4); } });
+  const pickSlot = e => { const el = e.target.closest('.slot'); if (!el || !G.running || !P.alive) return; const i = +el.dataset.i; if (i < hotList().length) { P.sel = i; refreshViewmodel(); AU.click(.4); } }; $('hot').addEventListener('pointerdown', e => { e.preventDefault(); pickSlot(e); }); $('hot').addEventListener('touchstart', e => { e.stopPropagation(); }, { passive: true });
   $('prompt').addEventListener('click', () => { if (G.cur && P.alive && P.faint <= 0 && !UI.modal) { G.cur.act(); AU.click(.4); } });
   $('bFull').onclick = () => { const d = document.documentElement; (d.requestFullscreen || d.webkitRequestFullscreen || (() => { })).call(d); try { screen.orientation.lock('landscape').catch(() => { }); } catch (e) { } };
   $('clayErase').onclick = () => { Clay.erase = !Clay.erase; $('clayErase').textContent = '깎기: ' + (Clay.erase ? '켜짐' : '꺼짐'); };
