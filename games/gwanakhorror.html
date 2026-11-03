@@ -1934,7 +1934,25 @@ const Ev = {
 
 /* ---- 07_net ---- */
 /* ============ 멀티플레이 (PeerJS WebRTC, GitHub Pages 등 정적 호스팅에서 동작) ============ */
+class RelayConn {
+  constructor(peer, remote) { this.peer = peer; this.remote = remote; this.open = true; this.h = {}; this.relay = true; this.lastSeen = Date.now(); }
+  on(e, f) { (this.h[e] = this.h[e] || []).push(f); } emit(e, ...a) { (this.h[e] || []).forEach(f => f(...a)); }
+  send(d) { try { this.peer.socket.send({ type: 'CANDIDATE', dst: this.remote, payload: { connectionId: '__relay', d } }); } catch (e) { } }
+  close() { this.send({ t: 'bye' }); const was = this.open; this.open = false; if (was) this.emit('close'); }
+}
 const Net = {
+  relayConns: {},
+  relayInit(peer) {
+    if (peer.__relay) return; peer.__relay = true; const orig = peer._handleMessage.bind(peer);
+    peer._handleMessage = m => { const pl = m && m.payload; if (m && m.type === 'CANDIDATE' && pl && pl.connectionId === '__relay') { this.onRelay(m.src, pl.d); return; } orig(m); };
+  },
+  onRelay(src, d) {
+    if (!d) return;
+    if (this.isHost) {
+      let c = this.relayConns[src]; if (!c) { if (d.t !== 'hello') return; c = new RelayConn(this.peer, src); this.relayConns[src] = c; this.onConn(c); c.emit('open'); }
+      c.lastSeen = Date.now(); if (d.t === 'ka') return; if (d.t === 'bye') { c.open = false; this.dropConn(c); delete this.relayConns[src]; return; } c.emit('data', d);
+    } else if (this.hostConn && this.hostConn.relay) { this.hostConn.lastSeen = Date.now(); if (d.t === 'bye') { this.hostConn.open = false; this.hostConn.emit('close'); return; } this.hostConn.emit('data', d); }
+  },
   peer: null, conns: [], hostConn: null, online: false, code: '', isHost: true, joined: false, lobby: [], maxP: 1, ready: false, err: '', acc: 0, sacc: 0,
   makeCode() { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 5; i++)s += a[(Math.random() * a.length) | 0]; return s; },
   errMsg(e) { const t = e && e.type || String(e); const m = { 'peer-unavailable': '해당 코드의 방을 찾을 수 없습니다. 코드를 다시 확인하세요(호스트가 대기실에 있어야 합니다).', 'server-error': '연결 서버(PeerJS)에 접속하지 못했습니다. 잠시 후 다시 시도하세요.', 'socket-error': '연결 서버와의 통신이 끊겼습니다. 네트워크를 확인하고 다시 시도하세요.', 'socket-closed': '연결 서버와의 연결이 닫혔습니다. 다시 시도하세요.', 'network': '연결 서버에 닿지 않습니다. 인터넷 연결/방화벽/광고차단 확장을 확인하세요.', 'webrtc': '브라우저 WebRTC 오류입니다. 다른 브라우저로 시도하세요.', 'browser-incompatible': '이 브라우저는 P2P 연결을 지원하지 않습니다.', 'unavailable-id': '방 코드가 중복되었습니다. 다시 시도하세요.' }; return (m[t] || '연결 오류') + ' [' + t + ']'; },
@@ -1947,7 +1965,7 @@ const Net = {
     this.isHost = true; this.maxP = maxP; this.online = true; this.lobby = [{ id: 'p0', name, role, me: true }]; let tries = 0;
     const open = () => {
       this.code = this.makeCode(); const peer = new Peer('gscary26-' + this.code, this.cfg()); this.peer = peer;
-      this.watch(peer); let ok = false, ot = setTimeout(() => { if (!ok) { cb && cb('연결 서버 응답이 없습니다. 인터넷/방화벽을 확인하고 다시 시도하세요. [timeout]'); cb = null; } }, 15000);
+      this.watch(peer); this.relayInit(peer); if (!this.kaCheck) this.kaCheck = setInterval(() => { const now = Date.now(); for (const c of this.conns.slice()) if (c.relay && now - c.lastSeen > 15000) { this.dropConn(c); } }, 4000); let ok = false, ot = setTimeout(() => { if (!ok) { cb && cb('연결 서버 응답이 없습니다. 인터넷/방화벽을 확인하고 다시 시도하세요. [timeout]'); cb = null; } }, 15000);
       peer.on('open', () => { ok = true; clearTimeout(ot); cb && cb(null, this.code); cb = null; UI.lobbyUpdate(); });
       peer.on('error', e => { if (e.type === 'unavailable-id' && tries++ < 5) { peer.destroy(); open(); } else if (!ok) { clearTimeout(ot); cb && cb(this.errMsg(e)); cb = null; } else { toast(this.errMsg(e), 4000, 'bad'); } });
       peer.on('connection', c => this.onConn(c));
@@ -1959,30 +1977,39 @@ const Net = {
   },
   hostData(c, d) {
     if (d.t === 'hello') {
-      if (this.lobby.length >= this.maxP) return; let i = 1; while (this.lobby.some(p => p.id === 'p' + i)) i++; const id = 'p' + i; c.pid = id; this.conns.push(c); this.lobby.push({ id, name: (d.name || '플레이어').slice(0, 10), role: d.role || 'student' });
+      if (c.pid) return; if (this.lobby.length >= this.maxP) return; let i = 1; while (this.lobby.some(p => p.id === 'p' + i)) i++; const id = 'p' + i; c.pid = id; this.conns.push(c); this.lobby.push({ id, name: (d.name || '플레이어').slice(0, 10), role: d.role || 'student' });
       c.send({ t: 'welcome', id, mode: G.mode, diff: G.diff }); this.sendLobby(); UI.lobbyUpdate(); return;
     }
     if (d.t === 'role') { const p = this.lobby.find(p => p.id === c.pid); if (p) { p.role = d.role; this.sendLobby(); UI.lobbyUpdate(); } return; }
     Game.onHostMsg(c.pid, d, c);
   },
   dropConn(c) {
-    if (!c.pid) return; this.conns = this.conns.filter(x => x !== c); this.lobby = this.lobby.filter(p => p.id !== c.pid); const pl = G.players[c.pid]; if (pl) { pl.alive = false; pl.left = true; pl.hp = 0; if (pl.av) pl.av.visible = false; toast((pl.name || '팀원') + ' 님이 나갔습니다', 3000, 'bad'); }
+    if (c.relay) delete this.relayConns[c.remote]; if (!c.pid) return; this.conns = this.conns.filter(x => x !== c); this.lobby = this.lobby.filter(p => p.id !== c.pid); const pl = G.players[c.pid]; if (pl) { pl.alive = false; pl.left = true; pl.hp = 0; if (pl.av) pl.av.visible = false; toast((pl.name || '팀원') + ' 님이 나갔습니다', 3000, 'bad'); }
     if (!G.running) { this.sendLobby(); UI.lobbyUpdate(); } else Game.checkEnd();
   },
   sendLobby() { const m = { t: 'lobby', players: this.lobby.map(p => ({ id: p.id, name: p.name, role: p.role })), mode: G.mode, diff: G.diff, max: this.maxP }; this.bcast(m); },
   join(code, name, role, cb, st) {
     if (!this.avail()) { cb('PeerJS 라이브러리를 불러오지 못했습니다. (인터넷 연결 확인)'); return; }
-    this.isHost = false; this.online = true; const peer = new Peer(undefined, this.cfg()); this.peer = peer; let done = false; const fail = m => { if (!done) { done = true; cb(m); } }; this.watch(peer); st && st('연결 서버에 접속 중...');
-    peer.on('error', e => fail(this.errMsg(e)));
+    this.isHost = false; this.online = true; const peer = new Peer(undefined, this.cfg()); this.peer = peer; let done = false, p2p = null; this.relayTried = false;
+    const fail = m => { if (!done) { done = true; cb(m); } }; this.watch(peer); this.relayInit(peer); st && st('연결 서버에 접속 중...');
+    const hostId = 'gscary26-' + code.toUpperCase(), force = /forceRelay/.test(location.search);
+    peer.on('error', e => { if (e.type === 'peer-unavailable' || !this.relayTried) fail(this.errMsg(e)); });
     const svTimer = setTimeout(() => fail('연결 서버 응답이 없습니다. 인터넷/방화벽을 확인하세요. [timeout]'), 15000);
+    const onData = d => { if (d.t === 'welcome') { this.joined = true; P.id = d.id; G.myId = d.id; G.mode = d.mode; G.diff = d.diff; if (this.hostConn && this.hostConn.relay) toast('중계 서버 방식으로 연결되었습니다 (지연이 조금 있을 수 있어요)', 4000); if (!done) { done = true; cb(null); } } else if (d.t === 'full') fail('방이 가득 찼거나 이미 시작되었습니다.'); else Game.onMsg(d); };
+    const attach = c => { this.hostConn = c; c.on('data', onData); c.on('error', e => { if (!this.relayTried) fail(this.errMsg(e)); });
+      c.on('close', () => { if (c !== this.hostConn) return; if (G.running && !G.over) { toast('호스트와의 연결이 끊어졌습니다', 8000, 'bad'); G.hostLost = true; } else if (!G.running) { UI.screen('title'); toast('방이 닫혔습니다', 3000, 'bad'); } }); };
+    const startRelay = () => {
+      if (done || this.joined || this.relayTried) return; this.relayTried = true; try { p2p && p2p.close(); } catch (e) { } st && st('P2P가 막혀 중계 방식으로 연결합니다...');
+      const rc = new RelayConn(peer, hostId); attach(rc); let n = 0; const hello = () => { if (this.joined || done) return; rc.send({ t: 'hello', name, role }); if (++n < 6) setTimeout(hello, 2500); }; hello();
+      this.kaTimer = setInterval(() => { if (this.hostConn && this.hostConn.relay && this.hostConn.open) this.hostConn.send({ t: 'ka' }); }, 3000);
+      setTimeout(() => fail('방에 연결하지 못했습니다. 호스트가 대기실에 있는지, 같은 코드인지 확인하세요. [relay-timeout]'), 20000);
+    };
     peer.on('open', () => {
-      clearTimeout(svTimer); st && st('방에 연결하는 중... (최대 25초)');
-      const c = peer.connect('gscary26-' + code.toUpperCase(), { reliable: true }); this.hostConn = c; setTimeout(() => { if (!done && !this.joined) fail('방에 연결하지 못했습니다. 호스트가 대기실에 있는지, 같은 코드인지 확인하세요. 서로 다른 통신망(LTE↔Wi-Fi)이면 연결이 막힐 수 있습니다. [timeout]'); }, 25000);
-      c.on('iceStateChanged', s2 => { if (s2 === 'failed') fail('P2P 연결에 실패했습니다 (네트워크/방화벽). 같은 Wi-Fi로 시도하거나 VPN을 꺼보세요. [ice-failed]'); });
-      c.on('open', () => { st && st('방 접속 완료, 입장 중...'); c.send({ t: 'hello', name, role }); }); c.on('data', d => { if (d.t === 'welcome') { this.joined = true; P.id = d.id; G.myId = d.id; G.mode = d.mode; G.diff = d.diff; if (!done) { done = true; cb(null); } } else if (d.t === 'full') fail('방이 가득 찼거나 이미 시작되었습니다.'); else Game.onMsg(d); });
-      c.on('error', e => fail(this.errMsg(e)));
-      c.on('close', () => { if (G.running && !G.over) { toast('호스트와의 연결이 끊어졌습니다', 8000, 'bad'); G.hostLost = true; } else if (!G.running) { UI.screen('title'); toast('방이 닫혔습니다', 3000, 'bad'); } });
+      clearTimeout(svTimer); if (force) { startRelay(); return; } st && st('방에 연결하는 중... (P2P 시도)');
+      p2p = peer.connect(hostId, { reliable: true }); attach(p2p); setTimeout(startRelay, 7000);
+      p2p.on('iceStateChanged', s2 => { if (s2 === 'failed') startRelay(); }); p2p.on('open', () => { st && st('방 접속 완료, 입장 중...'); p2p.send({ t: 'hello', name, role }); });
     });
+    addEventListener('beforeunload', () => { try { if (this.hostConn) this.hostConn.close(); } catch (e) { } });
   },
   bcast(m, except) { if (!this.online || !this.isHost) return; for (const c of this.conns) { if (c !== except && c.open) try { c.send(m); } catch (e) { } } },
   toHost(m) { if (!this.online) return; if (this.isHost) { Game.onHostMsg(P.id, m); return; } if (this.hostConn && this.hostConn.open) try { this.hostConn.send(m); } catch (e) { } },
