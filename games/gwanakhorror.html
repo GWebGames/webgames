@@ -1934,6 +1934,38 @@ const Ev = {
 
 /* ---- 07_net ---- */
 /* ============ 멀티플레이 (PeerJS WebRTC, GitHub Pages 등 정적 호스팅에서 동작) ============ */
+/* ---- 최소 MQTT 3.1.1 over WebSocket (공개 브로커를 중계 서버로 사용) ---- */
+class MQ {
+  constructor(urls) { this.urls = urls; this.ws = null; this.buf = new Uint8Array(0); this.ok = false; this.pid = 1; this.cid = 'g' + Math.random().toString(36).slice(2, 10); this.onmsg = null; this.onclose = null; this.acks = {}; this.ping = null; }
+  static str(s) { const b = new TextEncoder().encode(s); return [b.length >> 8, b.length & 255, ...b]; }
+  static rl(n) { const o = []; do { let d = n % 128; n = Math.floor(n / 128); if (n > 0) d |= 128; o.push(d); } while (n > 0); return o; }
+  connect() {
+    return new Promise((res, rej) => {
+      let i = 0; const next = () => { if (i >= this.urls.length) return rej(new Error('mq-all-failed')); const url = this.urls[i++]; let ws, done = false; try { ws = new WebSocket(url, 'mqtt'); } catch (e) { return next(); } ws.binaryType = 'arraybuffer';
+        const to = setTimeout(() => { if (!done) { done = true; try { ws.close(); } catch (e) { } next(); } }, 6000);
+        ws.onopen = () => { const vh = [...MQ.str('MQTT'), 4, 2, 0, 45], pl = MQ.str(this.cid); ws.send(new Uint8Array([0x10, ...MQ.rl(vh.length + pl.length), ...vh, ...pl])); };
+        ws.onmessage = e => { this.feed(new Uint8Array(e.data)); if (this.ok && !done) { done = true; clearTimeout(to); this.ws = ws; this.ping = setInterval(() => { try { if (this.ok) ws.send(new Uint8Array([0xC0, 0])); } catch (e) { } }, 20000); res(this); } };
+        ws.onerror = () => { }; ws.onclose = () => { if (!done) { done = true; clearTimeout(to); next(); } else if (this.ws === ws) { this.ok = false; clearInterval(this.ping); this.onclose && this.onclose(); } };
+      }; next();
+    });
+  }
+  feed(u) {
+    const nb = new Uint8Array(this.buf.length + u.length); nb.set(this.buf); nb.set(u, this.buf.length); this.buf = nb;
+    while (this.buf.length >= 2) {
+      let mul = 1, len = 0, k = 1, b; do { if (k >= this.buf.length) return; b = this.buf[k++]; len += (b & 127) * mul; mul *= 128; } while (b & 128); if (this.buf.length < k + len) return;
+      const t = this.buf[0] >> 4, body = this.buf.slice(k, k + len); this.buf = this.buf.slice(k + len);
+      if (t === 2) this.ok = body[1] === 0; else if (t === 9) { const id = (body[0] << 8) | body[1]; if (this.acks[id]) { this.acks[id](); delete this.acks[id]; } }
+      else if (t === 3) { const tl = (body[0] << 8) | body[1], topic = new TextDecoder().decode(body.slice(2, 2 + tl)); let off = 2 + tl; const payload = new TextDecoder().decode(body.slice(off)); this.onmsg && this.onmsg(topic, payload); }
+    }
+  }
+  subscribe(topic) { return new Promise((res, rej) => { const id = this.pid++; this.acks[id] = res; const pl = [id >> 8, id & 255, ...MQ.str(topic), 0]; this.ws.send(new Uint8Array([0x82, ...MQ.rl(pl.length), ...pl])); setTimeout(() => rej(new Error('suback-timeout')), 6000); }); }
+  publish(topic, s) { if (!this.ok || !this.ws) return; const t = MQ.str(topic), p = new TextEncoder().encode(s); const out = new Uint8Array(1 + MQ.rl(t.length + p.length).length + t.length + p.length); let o = 0; out[o++] = 0x30; for (const x of MQ.rl(t.length + p.length)) out[o++] = x; out.set(t, o); o += t.length; out.set(p, o); try { this.ws.send(out); } catch (e) { } }
+}
+class MqConn {
+  constructor(sendFn, remote) { this.sendFn = sendFn; this.remote = remote; this.open = true; this.h = {}; this.relay = true; this.lastSeen = Date.now(); }
+  on(e, f) { (this.h[e] = this.h[e] || []).push(f); } emit(e, ...a) { (this.h[e] || []).forEach(f => f(...a)); }
+  send(d) { this.sendFn(d); } close() { this.send({ t: 'bye' }); const was = this.open; this.open = false; if (was) this.emit('close'); }
+}
 class RelayConn {
   constructor(peer, remote) { this.peer = peer; this.remote = remote; this.open = true; this.h = {}; this.relay = true; this.lastSeen = Date.now(); }
   on(e, f) { (this.h[e] = this.h[e] || []).push(f); } emit(e, ...a) { (this.h[e] || []).forEach(f => f(...a)); }
@@ -1941,7 +1973,20 @@ class RelayConn {
   close() { this.send({ t: 'bye' }); const was = this.open; this.open = false; if (was) this.emit('close'); }
 }
 const Net = {
-  relayConns: {},
+  relayConns: {}, mqConns: {}, mq: null,
+  mqUrls() { const q = new URLSearchParams(location.search).get('mqtt'); return q ? [q] : ['wss://broker.emqx.io:8084/mqtt', 'wss://broker.hivemq.com:8884/mqtt', 'wss://test.mosquitto.org:8081']; },
+  async mqInit() { if (this.mq && this.mq.ok) return this.mq; const m = new MQ(this.mqUrls()); await m.connect(); this.mq = m; m.onmsg = (t, s) => this.onMqMsg(t, s); m.onclose = () => { this.mq = null; }; return m; },
+  async mqHostSub() { const m = await this.mqInit(); await m.subscribe('gsc26/' + this.code + '/h'); },
+  onMqMsg(topic, s) {
+    let m; try { m = JSON.parse(s); } catch (e) { return; }
+    if (this.isHost) { if (topic === 'gsc26/' + this.code + '/h') this.onMq(m.f, m.d); }
+    else if (this.relayConn && this.relayConn.mqc && m) { const rc = this.relayConn; rc.lastSeen = Date.now(); if (m.d && m.d.t === 'bye') { rc.open = false; rc.emit('close'); return; } rc.emit('data', m.d); }
+  },
+  onMq(f, d) {
+    if (!d) return; let c = this.mqConns[f];
+    if (!c) { if (d.t !== 'hello') return; c = new MqConn(x => { if (this.mq) this.mq.publish('gsc26/' + this.code + '/c/' + f, JSON.stringify({ d: x })); }, f); this.mqConns[f] = c; this.onConn(c); c.emit('open'); }
+    c.lastSeen = Date.now(); if (d.t === 'ka') return; if (d.t === 'bye') { c.open = false; this.dropConn(c); delete this.mqConns[f]; return; } c.emit('data', d);
+  },
   relayInit(peer) {
     if (peer.__relay) return; peer.__relay = true; const orig = peer._handleMessage.bind(peer);
     peer._handleMessage = m => { const pl = m && m.payload; if (m && m.type === 'CANDIDATE' && pl && pl.connectionId === '__relay') { this.onRelay(m.src, pl.d); return; } orig(m); };
@@ -1961,15 +2006,17 @@ const Net = {
   cfg() { const q = new URLSearchParams(location.search), o = this.cfg0(); if (q.get('peerHost')) { o.host = q.get('peerHost'); o.port = +q.get('peerPort') || 9000; o.path = q.get('peerPath') || '/'; o.secure = q.get('peerSecure') === '1'; } return o; },
   cfg0() { return { debug: 0, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turns:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }] } }; },
   host(name, role, maxP, cb) {
-    if (!this.avail()) { cb && cb('PeerJS 라이브러리를 불러오지 못했습니다. (인터넷 연결 확인)'); return; }
-    this.isHost = true; this.maxP = maxP; this.online = true; this.lobby = [{ id: 'p0', name, role, me: true }]; let tries = 0;
-    const open = () => {
-      this.code = this.makeCode(); const peer = new Peer('gscary26-' + this.code, this.cfg()); this.peer = peer;
-      this.watch(peer); this.relayInit(peer); if (!this.kaCheck) this.kaCheck = setInterval(() => { const now = Date.now(); for (const c of this.conns.slice()) if (c.relay && now - c.lastSeen > 15000) { this.dropConn(c); } }, 4000); let ok = false, ot = setTimeout(() => { if (!ok) { cb && cb('연결 서버 응답이 없습니다. 인터넷/방화벽을 확인하고 다시 시도하세요. [timeout]'); cb = null; } }, 15000);
-      peer.on('open', () => { ok = true; clearTimeout(ot); cb && cb(null, this.code); cb = null; UI.lobbyUpdate(); });
-      peer.on('error', e => { if (e.type === 'unavailable-id' && tries++ < 5) { peer.destroy(); open(); } else if (!ok) { clearTimeout(ot); cb && cb(this.errMsg(e)); cb = null; } else { toast(this.errMsg(e), 4000, 'bad'); } });
-      peer.on('connection', c => this.onConn(c));
-    }; open();
+    this.isHost = true; this.maxP = maxP; this.online = true; this.lobby = [{ id: 'p0', name, role, me: true }]; this.code = this.makeCode(); let tries = 0, called = false, peerOK = null, mqOK = null, lastErr = '';
+    const check = () => { if (called) return; if (peerOK || mqOK) { called = true; if (!peerOK) toast('P2P 서버에 연결하지 못해 중계 서버 방식으로 방을 열었습니다', 5000); cb(null, this.code); UI.lobbyUpdate(); } else if (peerOK === false && mqOK === false) { called = true; cb(lastErr || '연결 서버에 접속하지 못했습니다. [host-fail]'); } };
+    if (!this.kaCheck) this.kaCheck = setInterval(() => { const now = Date.now(); for (const c of this.conns.slice()) if (c.relay && now - c.lastSeen > 15000) { this.dropConn(c); } }, 4000);
+    this.mqHostSub().then(() => { mqOK = true; check(); }).catch(e => { mqOK = false; lastErr = lastErr || '중계 서버(MQTT)에 접속하지 못했습니다.'; check(); });
+    if (!this.avail()) { peerOK = false; lastErr = 'PeerJS 라이브러리를 불러오지 못했습니다.'; check(); return; }
+    const openP = () => {
+      const peer = new Peer('gscary26-' + this.code, this.cfg()); this.peer = peer; this.watch(peer); this.relayInit(peer);
+      peer.on('open', () => { if (peerOK === null) { peerOK = true; check(); } UI.lobbyUpdate(); });
+      peer.on('error', e => { if (e.type === 'unavailable-id' && tries++ < 5) { peer.destroy(); this.code = this.makeCode(); this.mqHostSub().catch(() => { }); openP(); } else if (peerOK === null) { peerOK = false; lastErr = this.errMsg(e); check(); } else if (e.type !== 'peer-unavailable') toast(this.errMsg(e), 4000, 'bad'); });
+      peer.on('connection', c => this.onConn(c)); setTimeout(() => { if (peerOK === null) { peerOK = false; lastErr = lastErr || '연결 서버(PeerJS) 응답이 없습니다. [timeout]'; check(); } }, 9000);
+    }; openP();
   },
   onConn(c) {
     c.on('open', () => { if (this.lobby.length >= this.maxP || G.running) { c.send({ t: 'full' }); setTimeout(() => c.close(), 300); return; } });
@@ -1984,31 +2031,38 @@ const Net = {
     Game.onHostMsg(c.pid, d, c);
   },
   dropConn(c) {
-    if (c.relay) delete this.relayConns[c.remote]; if (!c.pid) return; this.conns = this.conns.filter(x => x !== c); this.lobby = this.lobby.filter(p => p.id !== c.pid); const pl = G.players[c.pid]; if (pl) { pl.alive = false; pl.left = true; pl.hp = 0; if (pl.av) pl.av.visible = false; toast((pl.name || '팀원') + ' 님이 나갔습니다', 3000, 'bad'); }
+    if (c.relay) { delete this.relayConns[c.remote]; delete this.mqConns[c.remote]; } if (!c.pid) return; this.conns = this.conns.filter(x => x !== c); this.lobby = this.lobby.filter(p => p.id !== c.pid); const pl = G.players[c.pid]; if (pl) { pl.alive = false; pl.left = true; pl.hp = 0; if (pl.av) pl.av.visible = false; toast((pl.name || '팀원') + ' 님이 나갔습니다', 3000, 'bad'); }
     if (!G.running) { this.sendLobby(); UI.lobbyUpdate(); } else Game.checkEnd();
   },
   sendLobby() { const m = { t: 'lobby', players: this.lobby.map(p => ({ id: p.id, name: p.name, role: p.role })), mode: G.mode, diff: G.diff, max: this.maxP }; this.bcast(m); },
   join(code, name, role, cb, st) {
-    if (!this.avail()) { cb('PeerJS 라이브러리를 불러오지 못했습니다. (인터넷 연결 확인)'); return; }
-    this.isHost = false; this.online = true; const peer = new Peer(undefined, this.cfg()); this.peer = peer; let done = false, p2p = null, opened = false; this.relayTried = false;
-    const fail = m => { if (!done) { done = true; cb(m); } }; this.watch(peer); this.relayInit(peer); st && st('연결 서버에 접속 중...');
-    const hostId = 'gscary26-' + code.toUpperCase(), force = /forceRelay/.test(location.search);
-    let lastErr = ''; peer.on('error', e => { lastErr = this.errMsg(e); if (e.type === 'peer-unavailable' && !this.relayTried) fail(lastErr); else if (!opened && ['network', 'browser-incompatible', 'invalid-id'].includes(e.type)) fail(lastErr); });
-    const svTimer = setTimeout(() => fail('연결 서버 응답이 없습니다. 인터넷/방화벽을 확인하세요. [timeout]'), 15000);
+    this.isHost = false; this.online = true; code = code.toUpperCase(); this.joinCode = code; let done = false, p2p = null, opened = false, lastErr = ''; this.relayTried = false; this.relayConn = null; let peer = null;
+    const fail = m => { if (!done) { done = true; cb(m); } };
+    const hostId = 'gscary26-' + code, hostTopic = 'gsc26/' + code + '/h';
     const onData = d => { if (d.t === 'welcome') { this.joined = true; P.id = d.id; G.myId = d.id; G.mode = d.mode; G.diff = d.diff; if (this.relayConn && this.hostConn === this.relayConn) toast('중계 서버 방식으로 연결되었습니다 (지연이 조금 있을 수 있어요)', 4000); if (!done) { done = true; cb(null); } } else if (d.t === 'full') fail('방이 가득 찼거나 이미 시작되었습니다.'); else Game.onMsg(d); };
     const attach = c => { this.hostConn = c; c.on('data', onData); c.on('error', e => { lastErr = this.errMsg(e); });
       c.on('close', () => { if (c.__x || c !== this.hostConn) return; if (G.running && !G.over) { toast('호스트와의 연결이 끊어졌습니다', 8000, 'bad'); G.hostLost = true; } else if (!G.running) { UI.screen('title'); toast('방이 닫혔습니다', 3000, 'bad'); } }); };
-    const startRelay = () => {
-      if (done || this.joined || this.relayTried) return; this.relayTried = true; if (p2p) { p2p.__x = true; } st && st('P2P가 막혀 중계 방식으로 연결합니다...');
-      const rc = new RelayConn(peer, hostId); this.relayConn = rc; attach(rc); try { p2p && p2p.close(); } catch (e) { } let n = 0; const hello = () => { if (this.joined || done) return; rc.send({ t: 'hello', name, role }); if (++n < 6) setTimeout(hello, 2500); }; hello();
+    const startRelay = async () => {
+      if (done || this.joined || this.relayTried) return; this.relayTried = true; if (p2p) p2p.__x = true; st && st('중계 서버 방식으로 연결하는 중...');
+      let rc = null; try { const mq = await this.mqInit(); await mq.subscribe('gsc26/' + code + '/c/' + mq.cid); rc = new MqConn(d => mq.publish(hostTopic, JSON.stringify({ f: mq.cid, d })), 'host'); rc.mqc = true; }
+      catch (e) { lastErr = (lastErr ? lastErr + ' / ' : '') + '중계 서버(MQTT) 접속 실패'; if (peer && !peer.disconnected && !peer.destroyed) rc = new RelayConn(peer, hostId); }
+      if (!rc) { fail('중계 서버에 접속하지 못했습니다. 네트워크/방화벽을 확인하세요. [' + lastErr + ']'); return; }
+      this.relayConn = rc; attach(rc); try { p2p && p2p.close(); } catch (e) { }
+      let n = 0; const hello = () => { if (this.joined || done) return; rc.send({ t: 'hello', name, role }); if (++n < 7) setTimeout(hello, 2500); }; hello();
       this.kaTimer = setInterval(() => { if (this.relayConn && this.relayConn.open) this.relayConn.send({ t: 'ka' }); }, 3000);
-      setTimeout(() => fail('방에 연결하지 못했습니다. 호스트가 대기실에 있는지, 같은 코드인지 확인하세요. [relay-timeout / 서버 ' + (peer.disconnected ? '끊김' : '연결됨') + (lastErr ? ' / ' + lastErr : '') + ']'), 22000);
+      setTimeout(() => fail('방에 응답이 없습니다. 호스트가 대기실 화면에 있는지, 코드가 같은지 확인하세요. [relay-timeout' + (lastErr ? ' / ' + lastErr : '') + ']'), 20000);
     };
-    peer.on('open', () => {
-      if (opened) return; opened = true; clearTimeout(svTimer); if (force) { startRelay(); return; } st && st('방에 연결하는 중... (P2P 시도)');
-      p2p = peer.connect(hostId, { reliable: true }); attach(p2p); setTimeout(startRelay, 6000);
-      p2p.on('iceStateChanged', s2 => { if (s2 === 'failed') startRelay(); }); p2p.on('open', () => { st && st('방 접속 완료, 입장 중...'); p2p.send({ t: 'hello', name, role }); });
-    });
+    if (!this.avail() || /force(Relay|Mqtt)/.test(location.search)) { startRelay(); }
+    else {
+      peer = new Peer(undefined, this.cfg()); this.peer = peer; this.watch(peer); this.relayInit(peer); st && st('연결 서버에 접속 중...');
+      peer.on('error', e => { lastErr = this.errMsg(e); if (!this.relayTried) startRelay(); });
+      const svTimer = setTimeout(() => { if (!opened) { lastErr = lastErr || '연결 서버(PeerJS) 응답 없음'; startRelay(); } }, 7000);
+      peer.on('open', () => {
+        if (opened) return; opened = true; clearTimeout(svTimer); st && st('방에 연결하는 중... (P2P 시도)');
+        p2p = peer.connect(hostId, { reliable: true }); attach(p2p); setTimeout(startRelay, 6000);
+        p2p.on('iceStateChanged', s2 => { if (s2 === 'failed') startRelay(); }); p2p.on('open', () => { st && st('방 접속 완료, 입장 중...'); p2p.send({ t: 'hello', name, role }); });
+      });
+    }
     addEventListener('beforeunload', () => { try { if (this.hostConn) this.hostConn.close(); } catch (e) { } });
   },
   bcast(m, except) { if (!this.online || !this.isHost) return; for (const c of this.conns) { if (c !== except && c.open) try { c.send(m); } catch (e) { } } },
