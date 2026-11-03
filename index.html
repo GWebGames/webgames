@@ -153,6 +153,7 @@ footer b{color:var(--muted);font-weight:700}
 .notes{display:flex;flex-direction:column;gap:8px}
 .note{background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:var(--card-shadow);overflow:hidden;transition:border-color .15s}
 .note:hover,.note[open]{border-color:var(--gold)}
+.note.pinned{border-left:4px solid var(--gold)}
 .note summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px 10px;padding:12px 14px;flex-wrap:wrap}
 .note summary::-webkit-details-marker{display:none}
 .note summary::after{content:"▾";margin-left:auto;color:var(--muted);transition:transform .2s}
@@ -221,6 +222,7 @@ footer b{color:var(--muted);font-weight:700}
   line-height:1;padding:4px 7px;border-radius:3px;color:#fff;white-space:nowrap;text-transform:uppercase}
 .glabel[data-l="new"]{background:#2f9e5f}
 .glabel[data-l="update"]{background:#3a63f0}
+.glabel[data-l="beta"],.glabel[data-l="beta_test"]{background:#7c3aed;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
 .glabel[data-l="big_update"]{background:linear-gradient(135deg,#c8402b,#e0791f);box-shadow:0 0 0 1px rgba(217,164,65,.7),0 0 12px -2px rgba(224,121,31,.7);animation:glow 1.8s ease-in-out infinite}
 @keyframes glow{50%{box-shadow:0 0 0 1px rgba(217,164,65,.9),0 0 18px 0 rgba(224,121,31,.95)}}
 @media (prefers-reduced-motion:reduce){.glabel{animation:none!important}}
@@ -300,7 +302,7 @@ footer b{color:var(--muted);font-weight:700}
    version : (선택) 예) 'v1.2'
    title   : 제목
    body    : 본문. 줄마다 문자열 하나. 앞에 '## ' 를 붙이면 소제목, 나머지는 목록 한 줄이에요.
-   pin     : (선택) true 면 날짜와 상관없이 맨 위에 고정
+   pin     : (선택) pin:true 를 쓰면 날짜와 상관없이 맨 위에 고정돼요 ("고정" 표시가 붙어요). 여러 개면 그 안에서 최신 날짜순. 풀려면 이 줄을 지우세요.
    ※ 따옴표(')가 들어가는 문장은 "큰따옴표"로 감싸거나 \' 로 쓰세요. 항목 사이 쉼표(,)도 잊지 마세요.
 
    예시)
@@ -308,6 +310,13 @@ footer b{color:var(--muted);font-weight:700}
     body:['## 추가','대결 모드에 상대 점수 표시','## 수정','일시정지 후 블록이 한 칸 내려가던 문제']},
    ============================================================ */
 const NOTICES=[
+  {date:'2026-11-03', tag:'공지', title:'신규 게임 2종 추가',
+   body:[
+     '## 추가',
+     '2인용 아케이드 파이터 (made by 조승희) — 둘이서 하는 대전 격투 게임',
+     '관악중학교 괴담 [베타 테스트] — 3D 호러 서바이벌, 최대 4인 협동',
+     '게임 이름 옆에 NEW · UPDATE · BIG UPDATE · BETA TEST 라벨이 표시돼요. NEW와 UPDATE는 3일 뒤 자동으로 사라지고, BETA TEST는 베타가 끝날 때까지 유지돼요.'
+   ]},
   {date:'2026-11-02', tag:'패치', version: 'v1.0.0', title:'공식 버전 v1.0.0 배포',
    body:[
      '## 추가',
@@ -326,9 +335,9 @@ const NOTICE_NEW_DAYS=7; /* 며칠 동안 NEW 표시를 붙일지 */
    게임 목록 — 새 게임은 여기에 객체 하나만 추가하면 됩니다.
    src   : 게임 HTML 파일 경로 (이 로비 파일 기준 상대경로)
    ready : false 면 "준비 중" 카드로 표시 (코드 받으면 true + src 채우기)
-   label : (선택) 게임 이름 옆에 띄울 라벨. 'new' | 'update' | 'big_update' | 'none'(기본값 = 라벨 없음, 줄을 안 써도 같아요)
+   label : (선택) 게임 이름 옆에 띄울 라벨. 'new' | 'update' | 'big_update' | 'beta'(베타 테스트) | 'none'(기본값 = 라벨 없음, 줄을 안 써도 같아요)
            여러 개도 돼요: label:'new,update'  또는  label:['new','update']  (날짜 labelDate 는 모두 공통)
-   labelDate : (선택) 라벨을 단 날짜 'YYYY-MM-DD'. 이 날부터 LABEL_DAYS(3)일이 지나면 라벨이 저절로 사라져요.
+   labelDate : (선택) 라벨을 단 날짜 'YYYY-MM-DD'. 이 날부터 LABEL_DAYS(3)일이 지나면 라벨이 저절로 사라져요. (단 'beta' 는 안 사라져요)
            날짜를 안 쓰면 사라지지 않고 계속 떠요. ※ label 줄 끝의 쉼표(,)를 꼭 붙이세요!
            예) {id:'tetris', title:'테트리스', label:'update', labelDate:'2026-11-05', ...}
    thumb : 대체용 SVG 그림. 실제 대표 이미지는 thumbs/<id>.jpg (16:9, 800x450 권장)를 넣으면 자동으로 사용돼요
@@ -586,6 +595,55 @@ const GAMES=[
     src:'games/chess.html',
     ready:true,
     thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="320" height="180" fill="#0f172a"/><g><rect x="80" y="10" width="40" height="40" fill="#fef3c7"/><rect x="120" y="10" width="40" height="40" fill="#92400e"/><rect x="160" y="10" width="40" height="40" fill="#fef3c7"/><rect x="200" y="10" width="40" height="40" fill="#92400e"/><rect x="80" y="50" width="40" height="40" fill="#92400e"/><rect x="120" y="50" width="40" height="40" fill="#fef3c7"/><rect x="160" y="50" width="40" height="40" fill="#92400e"/><rect x="200" y="50" width="40" height="40" fill="#fef3c7"/></g><text x="140" y="42" font-size="34" text-anchor="middle" fill="#0f172a">♞</text><text x="180" y="82" font-size="34" text-anchor="middle" fill="#fff">♕</text></svg>`
+  },
+  {
+    id:'arcadefighter',
+    label:'new', labelDate:'2026-11-03',
+    title:'2인용 아케이드 파이터', hanja:'',
+    desc:'둘이서 하는 철권 게임, 다양하고 개성있는 캐릭터들을 체험해 보세요! made by 조승희',
+    keys:'P1: A D W 이동 · F 공격 · G 스킬  /  P2: ← → ↑ 이동 · L 공격 · K 스킬',
+    src:'games/arcadefighter.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="afsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b1026"/><stop offset="1" stop-color="#3b2a63"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#afsky)"/>
+      <circle cx="160" cy="70" r="34" fill="#f06a4a" opacity=".16"/>
+      <path d="M0 126L50 96 96 118 150 84 204 116 260 92 320 120V180H0Z" fill="#1a1740"/>
+      <rect y="140" width="320" height="40" fill="#241d4d"/><path d="M0 141H320" stroke="#a78bfa" stroke-width="2" opacity=".6"/>
+      <rect x="16" y="12" width="118" height="10" rx="3" fill="#0b1026" stroke="#7b86e6"/><rect x="18" y="14" width="92" height="6" rx="2" fill="#3cc4ff"/>
+      <rect x="186" y="12" width="118" height="10" rx="3" fill="#0b1026" stroke="#7b86e6"/><rect x="222" y="14" width="80" height="6" rx="2" fill="#ff5d4a"/>
+      <text x="160" y="22" text-anchor="middle" font-size="12" font-weight="800" fill="#ffd166" font-family="sans-serif">VS</text>
+      <g stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
+        <g stroke="#3cc4ff"><circle cx="108" cy="84" r="9" fill="#3cc4ff"/><path d="M108 94V116M108 116L94 140M108 116L124 140M108 100L132 92L150 96"/></g>
+        <g stroke="#ff5d4a"><circle cx="212" cy="84" r="9" fill="#ff5d4a"/><path d="M212 94V116M212 116L198 140M212 116L228 140M212 100L192 108L176 96"/></g>
+      </g>
+      <g stroke="#ffd166" stroke-width="3" stroke-linecap="round"><path d="M160 80V66M147 86L137 76M173 86L183 76M150 98H136M170 98H184"/></g>
+    </svg>`
+  },
+  {
+    id:'gwanakhorror',
+    label:['new','beta'], labelDate:'2026-11-03',
+    title:'관악중학교 괴담', hanja:'',
+    desc:'새벽의 학교, 아무도 없어야 할 복도에서 무언가 걸어 다닌다. 손전등 하나로 교문 열쇠를 찾아 괴물들을 피해 탈출하는 3D 호러 서바이벌. 학생회·밴드부 등 역할을 고르고 최대 4인 협동으로 도전하세요. (베타 테스트 중)',
+    keys:'WASD 이동 · Shift 달리기 · F 손전등 · E 상호작용 · 1~9 아이템 · M 지도',
+    src:'games/gwanakhorror.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ghwall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05070a"/><stop offset="1" stop-color="#171d22"/></linearGradient>
+        <radialGradient id="ghbeam" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#f4e6b0" stop-opacity=".55"/><stop offset="1" stop-color="#f4e6b0" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="320" height="180" fill="url(#ghwall)"/>
+      <path d="M0 0L120 62H200L320 0V180L200 118H120L0 180Z" fill="#0c1115"/>
+      <rect x="120" y="62" width="80" height="56" fill="#030405"/>
+      <g stroke="#26323a" stroke-width="2" fill="none"><path d="M0 0L120 62M320 0L200 62M0 180L120 118M320 180L200 118M120 62H200V118H120Z"/></g>
+      <g fill="#1b2329"><rect x="20" y="52" width="12" height="52" transform="skewY(14)"/><rect x="288" y="52" width="12" height="52" transform="skewY(-14)"/></g>
+      <path d="M160 150L88 20H232Z" fill="url(#ghbeam)"/>
+      <ellipse cx="160" cy="150" rx="70" ry="9" fill="#f4e6b0" opacity=".1"/>
+      <g fill="#cfd6d2" opacity=".9"><path d="M150 76q10-12 20 0v26q-4-4-6 0t-4 0-4 0-6 0z"/></g>
+      <g fill="#05070a"><circle cx="155" cy="84" r="2.4"/><circle cx="165" cy="84" r="2.4"/><ellipse cx="160" cy="92" rx="2.2" ry="3.2"/></g>
+      <g fill="#c8402b"><circle cx="40" cy="30" r="2.5"/></g>
+    </svg>`
   }
 ];
 
@@ -600,7 +658,8 @@ const defaultThumb=`<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg
   <g stroke="#35586a" stroke-width="2" fill="none" stroke-dasharray="6 6"><rect x="110" y="50" width="100" height="80" rx="6"/></g>
   <text x="160" y="102" text-anchor="middle" font-size="30" fill="#6f858e" font-family="serif">?</text></svg>`;
 
-const LABELS={new:'NEW',update:'UPDATE',big_update:'BIG UPDATE'}; /* 'none' 은 여기에 없으므로 라벨 없음 */
+const LABELS={new:'NEW',update:'UPDATE',big_update:'BIG UPDATE',beta:'BETA TEST',beta_test:'BETA TEST'};
+const LABEL_KEEP={beta:1,beta_test:1}; /* 이 라벨들은 labelDate 와 상관없이 사라지지 않아요 (베타가 끝나면 label 에서 직접 지우세요) */ /* 'none' 은 여기에 없으므로 라벨 없음 */
 const LABEL_DAYS=3; /* 라벨을 단 날(labelDate)부터 며칠 동안 보여줄지 */
 function labelAlive(g){
   const m=/^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(g.labelDate||'').trim());
@@ -609,10 +668,10 @@ function labelAlive(g){
   return Date.now()<start+LABEL_DAYS*864e5;
 }
 function labelHTML(g){
-  if(!labelAlive(g))return '';
+  const alive=labelAlive(g);
   const raw=Array.isArray(g.label)?g.label:String(g.label||'').split(/[,|+]/); /* 'new,update' 또는 ['new','update'] */
   const seen={};
-  return raw.map(x=>String(x).trim().toLowerCase().replace(/[\s-]+/g,'_')).filter(k=>LABELS[k]&&!seen[k]&&(seen[k]=1))
+  return raw.map(x=>String(x).trim().toLowerCase().replace(/[\s-]+/g,'_')).filter(k=>LABELS[k]&&(alive||LABEL_KEEP[k])&&!seen[k]&&(seen[k]=1))
     .map(k=>`<span class="glabel" data-l="${k}">${LABELS[k]}</span>`).join('');
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -672,7 +731,7 @@ paintThemeBtn();
   };
   list.forEach((n,k)=>{
     const tag=n.tag||'공지',d=document.createElement('details');
-    d.className='note';if(k===0)d.open=true;if(k>=NOTICE_VISIBLE){d.hidden=true;d.dataset.extra='1';}
+    d.className='note'+(n.pin?' pinned':'');if(k===0)d.open=true;if(k>=NOTICE_VISIBLE){d.hidden=true;d.dataset.extra='1';}
     d.innerHTML=`<summary><span class="ntag" data-t="${esc(tag)}">${esc(tag)}</span>`+
       (n.pin?'<span class="npin">고정</span>':'')+(isNew(n)?'<span class="nnew">NEW</span>':'')+
       `<span class="ntitle">${esc(n.title||'')}</span>`+
