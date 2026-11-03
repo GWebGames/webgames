@@ -736,7 +736,7 @@ function roleAvatar(role) {
   if (role === 'band') { // G 밴드부 점퍼 (블랙 + 퍼플 소매) / 등과 가슴에 G
     const pu = cmat(0x5a2a8a, .7); for (const k of [u.armL, u.armR]) { k.add(bx(.13, al * .97, .14, pu, 0, -al / 2, 0)); k.add(bx(.135, .05, .145, cmat(0x15151a), 0, -al + .05, 0)); }
     u.torso.add(bx(.45, .06, .235, pu, 0, .03, 0)); u.torso.add(bx(.22, .05, .24, pu, 0, tl - .02, 0)); u.torso.add(bx(.012, tl * .9, .012, steel, 0, tl / 2, .116));
-    u.torso.add(textPlane('G', .32, .30, -.119, tl * .56, '#ffffff', 190, '#5a2a8a', true, .25)); u.torso.add(textPlane('G', .1, .1, .119, tl * .76, '#ffffff', 110, '#5a2a8a', false)).position.x = -.12;
+    u.torso.add(textPlane('G', .32, .30, -.119, tl * .56, '#ffffff', 190, '#5a2a8a', true, .25)); { const g2 = textPlane('G', .1, .1, .119, tl * .76, '#ffffff', 110, '#5a2a8a', false); g2.position.x = -.12; u.torso.add(g2); }
     const gt = new THREE.Group(); gt.add(bx(.28, .36, .07, cmat(0xb8341c, .35), 0, 0, 0)); gt.add(bx(.05, .6, .04, cmat(0x3a2410), 0, .45, 0)); gt.position.set(-.3, tl * .1, .0); gt.rotation.z = .25; u.torso.add(gt);
   }
   if (role === 'council') { // 형광 조끼 (등에 학생회)
@@ -745,7 +745,7 @@ function roleAvatar(role) {
     for (const sx of [-1, 1]) { const sh = new THREE.Mesh(new THREE.BoxGeometry(.1, .05, .26), fl); sh.position.set(sx * .17, tl * .96, 0); u.torso.add(sh); }
     for (const yy of [.2, .36]) { u.torso.add(bx(.47, .035, .255, cmat(0xe8eaee, .2, { metalness: .9 }), 0, yy, 0)); }
     u.torso.add(bx(.012, tl * .8, .012, steel, 0, tl * .52, .126));
-    u.torso.add(textPlane('학생회', .36, .17, -.131, tl * .6, '#10140a', 120, null, true)); u.torso.add(textPlane('학생회', .09, .05, .131, tl * .78, '#10140a', 110)).position.x = .12;
+    u.torso.add(textPlane('학생회', .36, .17, -.131, tl * .6, '#10140a', 120, null, true)); { const g2 = textPlane('학생회', .09, .05, .131, tl * .78, '#10140a', 110); g2.position.x = .12; u.torso.add(g2); }
     u.armL.add(bx(.14, .08, .15, cmat(0xdd2222), 0, -.2, 0));
   }
   return a;
@@ -1937,21 +1937,25 @@ const Ev = {
 const Net = {
   peer: null, conns: [], hostConn: null, online: false, code: '', isHost: true, joined: false, lobby: [], maxP: 1, ready: false, err: '', acc: 0, sacc: 0,
   makeCode() { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 5; i++)s += a[(Math.random() * a.length) | 0]; return s; },
+  errMsg(e) { const t = e && e.type || String(e); const m = { 'peer-unavailable': '해당 코드의 방을 찾을 수 없습니다. 코드를 다시 확인하세요(호스트가 대기실에 있어야 합니다).', 'server-error': '연결 서버(PeerJS)에 접속하지 못했습니다. 잠시 후 다시 시도하세요.', 'socket-error': '연결 서버와의 통신이 끊겼습니다. 네트워크를 확인하고 다시 시도하세요.', 'socket-closed': '연결 서버와의 연결이 닫혔습니다. 다시 시도하세요.', 'network': '연결 서버에 닿지 않습니다. 인터넷 연결/방화벽/광고차단 확장을 확인하세요.', 'webrtc': '브라우저 WebRTC 오류입니다. 다른 브라우저로 시도하세요.', 'browser-incompatible': '이 브라우저는 P2P 연결을 지원하지 않습니다.', 'unavailable-id': '방 코드가 중복되었습니다. 다시 시도하세요.' }; return (m[t] || '연결 오류') + ' [' + t + ']'; },
+  watch(peer) { peer.on('disconnected', () => { setTimeout(() => { try { if (!peer.destroyed) peer.reconnect(); } catch (e) { } }, 1500); }); },
   avail() { return typeof Peer !== 'undefined'; },
-  cfg() { return { debug: 0, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' }, { urls: 'stun:stun1.l.google.com:19302' }] } }; },
+  cfg() { const q = new URLSearchParams(location.search), o = this.cfg0(); if (q.get('peerHost')) { o.host = q.get('peerHost'); o.port = +q.get('peerPort') || 9000; o.path = q.get('peerPath') || '/'; o.secure = q.get('peerSecure') === '1'; } return o; },
+  cfg0() { return { debug: 0, config: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turns:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }] } }; },
   host(name, role, maxP, cb) {
     if (!this.avail()) { cb && cb('PeerJS 라이브러리를 불러오지 못했습니다. (인터넷 연결 확인)'); return; }
     this.isHost = true; this.maxP = maxP; this.online = true; this.lobby = [{ id: 'p0', name, role, me: true }]; let tries = 0;
     const open = () => {
       this.code = this.makeCode(); const peer = new Peer('gscary26-' + this.code, this.cfg()); this.peer = peer;
-      peer.on('open', () => { cb && cb(null, this.code); UI.lobbyUpdate(); });
-      peer.on('error', e => { if (e.type === 'unavailable-id' && tries++ < 5) { peer.destroy(); open(); } else { cb && cb('연결 오류: ' + e.type); } });
+      this.watch(peer); let ok = false, ot = setTimeout(() => { if (!ok) { cb && cb('연결 서버 응답이 없습니다. 인터넷/방화벽을 확인하고 다시 시도하세요. [timeout]'); cb = null; } }, 15000);
+      peer.on('open', () => { ok = true; clearTimeout(ot); cb && cb(null, this.code); cb = null; UI.lobbyUpdate(); });
+      peer.on('error', e => { if (e.type === 'unavailable-id' && tries++ < 5) { peer.destroy(); open(); } else if (!ok) { clearTimeout(ot); cb && cb(this.errMsg(e)); cb = null; } else { toast(this.errMsg(e), 4000, 'bad'); } });
       peer.on('connection', c => this.onConn(c));
     }; open();
   },
   onConn(c) {
     c.on('open', () => { if (this.lobby.length >= this.maxP || G.running) { c.send({ t: 'full' }); setTimeout(() => c.close(), 300); return; } });
-    c.on('data', d => this.hostData(c, d)); c.on('close', () => this.dropConn(c)); c.on('error', () => this.dropConn(c));
+    c.on('data', d => this.hostData(c, d)); c.on('close', () => this.dropConn(c)); c.on('error', () => this.dropConn(c)); c.on('iceStateChanged', st => { if (st === 'failed') { toast('참가자와의 P2P 연결에 실패했습니다 (네트워크/방화벽)', 5000, 'bad'); this.dropConn(c); } });
   },
   hostData(c, d) {
     if (d.t === 'hello') {
@@ -1966,13 +1970,17 @@ const Net = {
     if (!G.running) { this.sendLobby(); UI.lobbyUpdate(); } else Game.checkEnd();
   },
   sendLobby() { const m = { t: 'lobby', players: this.lobby.map(p => ({ id: p.id, name: p.name, role: p.role })), mode: G.mode, diff: G.diff, max: this.maxP }; this.bcast(m); },
-  join(code, name, role, cb) {
+  join(code, name, role, cb, st) {
     if (!this.avail()) { cb('PeerJS 라이브러리를 불러오지 못했습니다. (인터넷 연결 확인)'); return; }
-    this.isHost = false; this.online = true; const peer = new Peer(undefined, this.cfg()); this.peer = peer; let done = false;
-    peer.on('error', e => { if (!done) { done = true; cb(e.type === 'peer-unavailable' ? '해당 코드의 방을 찾을 수 없습니다.' : '연결 오류: ' + e.type); } });
+    this.isHost = false; this.online = true; const peer = new Peer(undefined, this.cfg()); this.peer = peer; let done = false; const fail = m => { if (!done) { done = true; cb(m); } }; this.watch(peer); st && st('연결 서버에 접속 중...');
+    peer.on('error', e => fail(this.errMsg(e)));
+    const svTimer = setTimeout(() => fail('연결 서버 응답이 없습니다. 인터넷/방화벽을 확인하세요. [timeout]'), 15000);
     peer.on('open', () => {
-      const c = peer.connect('gscary26-' + code.toUpperCase(), { reliable: true }); this.hostConn = c; setTimeout(() => { if (!done && !this.joined) { done = true; cb('연결 시간이 초과되었습니다.'); } }, 12000);
-      c.on('open', () => c.send({ t: 'hello', name, role })); c.on('data', d => { if (d.t === 'welcome') { this.joined = true; P.id = d.id; G.myId = d.id; G.mode = d.mode; G.diff = d.diff; if (!done) { done = true; cb(null); } } else if (d.t === 'full') { if (!done) { done = true; cb('방이 가득 찼거나 이미 시작되었습니다.'); } } else Game.onMsg(d); });
+      clearTimeout(svTimer); st && st('방에 연결하는 중... (최대 25초)');
+      const c = peer.connect('gscary26-' + code.toUpperCase(), { reliable: true }); this.hostConn = c; setTimeout(() => { if (!done && !this.joined) fail('방에 연결하지 못했습니다. 호스트가 대기실에 있는지, 같은 코드인지 확인하세요. 서로 다른 통신망(LTE↔Wi-Fi)이면 연결이 막힐 수 있습니다. [timeout]'); }, 25000);
+      c.on('iceStateChanged', s2 => { if (s2 === 'failed') fail('P2P 연결에 실패했습니다 (네트워크/방화벽). 같은 Wi-Fi로 시도하거나 VPN을 꺼보세요. [ice-failed]'); });
+      c.on('open', () => { st && st('방 접속 완료, 입장 중...'); c.send({ t: 'hello', name, role }); }); c.on('data', d => { if (d.t === 'welcome') { this.joined = true; P.id = d.id; G.myId = d.id; G.mode = d.mode; G.diff = d.diff; if (!done) { done = true; cb(null); } } else if (d.t === 'full') fail('방이 가득 찼거나 이미 시작되었습니다.'); else Game.onMsg(d); });
+      c.on('error', e => fail(this.errMsg(e)));
       c.on('close', () => { if (G.running && !G.over) { toast('호스트와의 연결이 끊어졌습니다', 8000, 'bad'); G.hostLost = true; } else if (!G.running) { UI.screen('title'); toast('방이 닫혔습니다', 3000, 'bad'); } });
     });
   },
@@ -2074,8 +2082,8 @@ const Game = {
     $('bBack3').onclick = () => location.reload();
     $('bGo').onclick = () => { S.name = $('nameIn').value.trim() || '학생'; G.mode = S.mode; G.diff = S.diff; if (S.mode === 'solo') { this.start({ seed: (Math.random() * 1e9) | 0, diff: S.diff, mode: 'solo', players: [{ id: 'p0', name: S.name, role: S.role }], myId: 'p0' }); return; }
       $('setupMsg').textContent = '방을 만드는 중...'; Net.host(S.name, S.role, { duo: 2, trio: 3, squad: 4 }[S.mode], (err, code) => { if (err) { $('setupMsg').textContent = err; return; } $('setupMsg').textContent = ''; P.id = 'p0'; G.myId = 'p0'; UI.screen('lobby'); renderRoles($('roleRow3'), () => Net.lobby.find(p => p.id === P.id).role, k => this.setRole(k)); UI.lobbyUpdate(); }); };
-    $('bJoinGo').onclick = () => { S.name = $('nameIn2').value.trim() || '학생'; const code = $('codeIn').value.trim().toUpperCase(); if (code.length < 4) { $('joinMsg').textContent = '방 코드를 입력하세요'; return; } $('joinMsg').textContent = '접속 중...'; Net.joinCode = code;
-      Net.join(code, S.name, S.role, err => { if (err) { $('joinMsg').textContent = err; return; } $('joinMsg').textContent = ''; UI.screen('lobby'); renderRoles($('roleRow3'), () => (Net.lobby.find(p => p.id === P.id) || { role: S.role }).role, k => this.setRole(k)); UI.lobbyUpdate(); }); };
+    $('bJoinGo').onclick = () => { S.name = $('nameIn2').value.trim() || '학생'; const code = $('codeIn').value.trim().toUpperCase(); if (code.length < 4) { $('joinMsg').textContent = '방 코드를 입력하세요'; return; } $('joinMsg').style.color = '#e88'; $('joinMsg').textContent = '접속 중...'; Net.joinCode = code;
+      Net.join(code, S.name, S.role, err => { if (err) { $('joinMsg').textContent = err; return; } $('joinMsg').textContent = ''; UI.screen('lobby'); renderRoles($('roleRow3'), () => (Net.lobby.find(p => p.id === P.id) || { role: S.role }).role, k => this.setRole(k)); UI.lobbyUpdate(); }, m => { $('joinMsg').style.color = '#aaa'; $('joinMsg').textContent = m; }); };
     $('bLobbyGo').onclick = () => { const info = { seed: (Math.random() * 1e9) | 0, diff: G.diff, mode: G.mode, players: Net.lobby.map(p => ({ id: p.id, name: p.name, role: p.role })) }; Net.bcast({ t: 'start', info }); this.start(Object.assign({}, info, { myId: 'p0' })); };
     $('bResume').onclick = () => { $('pause').classList.remove('on'); lockPtr(); }; $('bQuit').onclick = () => location.reload(); $('bAgain').onclick = () => location.reload();
     $('bSpec').onclick = () => { $('over').classList.remove('on'); this.spectate(); };
