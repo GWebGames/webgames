@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>태그 게임</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<style>
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+body,html{margin:0;padding:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#030712;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.char-scroll-box::-webkit-scrollbar{height:8px}
+.char-scroll-box::-webkit-scrollbar-track{background:rgba(15,23,42,.9);border-radius:8px}
+.char-scroll-box::-webkit-scrollbar-thumb{background:#3b82f6;border-radius:8px}
+.touch-control-btn{background:rgba(255,255,255,.12);backdrop-filter:blur(6px);border:2px solid rgba(255,255,255,.25);transition:transform .05s,background .05s}
+.touch-control-btn:active{background:rgba(255,255,255,.4);transform:scale(.92)}
+@keyframes pulseGlow{0%,100%{opacity:.6}50%{opacity:1}}
+.turn-active{animation:pulseGlow 1.5s infinite}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+</head>
+<body class="flex items-center justify-center h-screen w-screen bg-slate-950 text-white">
+<div id="home-screen" class="hidden"></div>
+<div id="tag-screen" class="hidden absolute inset-0 z-[75] bg-slate-900 text-white select-none" style="touch-action:none">
+  <canvas id="tg-cv" class="absolute inset-0"></canvas>
+  <canvas id="tg-names" class="absolute inset-0" style="pointer-events:none"></canvas>
+  <button id="tg-spec" class="hidden absolute px-4 py-2 rounded-xl font-black" style="left:50%;bottom:24px;transform:translateX(-50%);background:rgba(15,23,42,.85);border:1px solid #64748b">다음 관전 ▶</button>
+  <div id="tg-danger" class="absolute inset-0" style="opacity:0;pointer-events:none;background:radial-gradient(transparent 45%, rgba(239,68,68,.6))"></div>
+  <div id="tg-xh" class="absolute" style="left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border:2px solid rgba(255,255,255,.85);border-radius:9999px;pointer-events:none"></div>
+  <div id="tg-jr" class="hidden absolute rounded-full" style="width:100px;height:100px;border:3px solid rgba(255,255,255,.5);pointer-events:none"></div>
+  <div id="tg-jk" class="hidden absolute rounded-full" style="width:40px;height:40px;background:rgba(255,255,255,.5);pointer-events:none"></div>
+  <div class="absolute left-0 right-0 top-0 flex items-start justify-between px-3 pb-2" style="padding-top:max(12px,env(safe-area-inset-top));pointer-events:none">
+    <button onclick="leaveTag()" class="px-3 py-1.5 rounded-lg bg-slate-800/90 border border-slate-600 text-xs font-bold active:scale-95" style="pointer-events:auto">← 처음으로</button>
+    <div class="text-center text-xs font-bold leading-tight"><div id="tg-cnt" class="text-base">생존자 50 / 50</div><div id="tg-zone" class="text-amber-300"></div><div class="mt-1 mx-auto w-36 h-2.5 rounded-full bg-slate-800 overflow-hidden"><div id="tg-hp" class="h-full bg-emerald-400" style="width:100%"></div></div><div class="mt-1 mx-auto w-36 h-2 rounded-full bg-slate-800 overflow-hidden"><div id="tg-st" class="h-full" style="width:100%;background:#facc15"></div></div></div>
+    <div class="w-[90px]"></div>
+  </div>
+  <div id="tg-role" class="absolute left-3 px-2 py-1 rounded-lg text-sm font-black" style="top:max(54px,calc(env(safe-area-inset-top) + 46px));background:rgba(0,0,0,.55);pointer-events:none">🐰 토끼<div id="tg-rt2" class="text-xs font-bold text-slate-300">역할 변경 1:00</div></div>
+  <div id="tg-toast" class="hidden absolute px-4 py-2 rounded-xl text-lg font-black text-center" style="left:50%;top:28%;transform:translateX(-50%);background:rgba(0,0,0,.72);pointer-events:none"></div>
+  <button id="tg-tag" class="absolute rounded-full font-black text-white" style="right:14px;bottom:34px;width:78px;height:78px;background:#ef4444;border:3px solid #fecaca">태그</button>
+  <button id="tg-jump" class="absolute rounded-full font-black" style="right:24px;bottom:122px;width:58px;height:58px;background:#38bdf8;color:#0c4a6e;font-size:12px">점프</button>
+  <button id="tg-run" class="absolute rounded-full font-black" style="right:92px;bottom:112px;width:62px;height:62px;background:#f59e0b;color:#451a03;font-size:12px;padding:0;white-space:nowrap">달리기</button>
+  <button id="tg-slide" class="absolute rounded-full font-black" style="right:104px;bottom:40px;width:58px;height:58px;background:#a78bfa;color:#2e1065;font-size:11px;padding:0;white-space:nowrap">슬라이딩</button>
+  <button id="tg-act" class="absolute rounded-full font-black" style="right:172px;bottom:80px;width:58px;height:58px;background:#34d399;color:#064e3b;font-size:11px;padding:0;white-space:nowrap">상호작용</button>
+  <div id="tg-result" class="hidden absolute inset-0 bg-black/75 flex-col items-center justify-center gap-4 text-center p-6">
+    <div id="tg-rt" class="text-3xl font-black"></div>
+    <div id="tg-rd" class="text-slate-300"></div>
+    <button id="tg-specbtn" class="hidden px-6 py-3 rounded-xl bg-sky-500 text-slate-900 font-black">관전하기</button>
+    <button onclick="startTag()" id="tg-retry" class="px-6 py-3 rounded-xl bg-amber-500 text-slate-900 font-black">다시 하기</button>
+    <button onclick="leaveTag()" class="px-6 py-2 rounded-xl bg-slate-700 font-bold text-sm">처음으로</button>
+  </div>
+</div>
+<script>
+
+const TG = {run: false, W: 3200, ag: [], obs: [], zone: {}, t: 0, raf: 0, last: 0, joy: null, cam: null, keys: {}, me: null, dpr: 1, vw: 0, vh: 0, map: null, G: null, yaw: 0, pitch: 0, sprint: false, roleT: 60, toastT: 0, mp: null, myIdx: 0, spec: false, specT: null, over: false, rank: 0, snT: 0, stT: 0, dieShown: false, vp: null, eye: null};
+const TG_RAD = [1500, 1000, 650, 380, 200, 80];
+const TG_PAL = [[96,165,250],[52,211,153],[244,114,182],[167,139,250],[251,191,36],[45,212,191],[251,146,60],[132,204,22],[56,189,248],[232,121,249],[148,163,184],[250,204,21]];
+const ROLE = {rabbit: {n: '토끼', e: '🐰', mul: 1, col: [0.98, 0.84, 0.9]}, wolf: {n: '늑대', e: '🐺', mul: 1.5, col: [0.5, 0.53, 0.6]}, hunter: {n: '사냥꾼', e: '🏹', mul: 2, col: [0.92, 0.5, 0.12]}};
+const canTag = (a, b) => a.role === 'hunter' ? (b.role === 'rabbit' || b.role === 'wolf') : a.role === 'wolf' ? b.role === 'rabbit' : false;
+const $tg = id => document.getElementById(id);
+const tgR = (a, b) => a + Math.random() * (b - a);
+function tgResize(){
+  const r = $tg('tag-screen').getBoundingClientRect(), cv = $tg('tg-cv');
+  TG.dpr = Math.min(2, window.devicePixelRatio || 1); TG.vw = r.width; TG.vh = r.height;
+  cv.width = r.width * TG.dpr; cv.height = r.height * TG.dpr; cv.style.width = r.width + 'px'; cv.style.height = r.height + 'px';
+}
+function tgFull(){
+  try { const el = document.documentElement; if (!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(() => {}); if (screen.orientation && screen.orientation.lock) screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
+}
+function tgToast(txt, ms){ const el = $tg('tg-toast'); el.textContent = txt; el.classList.remove('hidden'); TG.toastT = ms / 1000; }
+function tgRng(s){ return function(){ s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function gTexAll(R){
+  const T = {};
+  const mk = (key, w, h, fn) => { const c = document.createElement('canvas'); c.width = w; c.height = h; fn(c.getContext('2d'), w, h); T[key] = c; };
+  const speck = (x, w, h, n, cols, a, sz) => { for (let i = 0; i < n; i++) { x.globalAlpha = a * (0.4 + R() * 0.6); x.fillStyle = cols[(R() * cols.length) | 0]; const s = 1 + R() * sz; x.fillRect(R() * w, R() * h, s, s); } x.globalAlpha = 1; };
+  const streaks = (x, w, h, n) => { for (let i = 0; i < n; i++) { const sw = 4 + R() * 12, sl = 30 + R() * h * 0.6, g = x.createLinearGradient(0, 0, 0, sl); g.addColorStop(0, 'rgba(20,18,15,0.28)'); g.addColorStop(1, 'rgba(20,18,15,0)'); x.save(); x.translate(R() * w, R() * h * 0.3); x.fillStyle = g; x.fillRect(0, 0, sw, sl); x.restore(); } };
+  for (let st = 0; st < 3; st++) mk('wb' + st, 128, 128, (x, w, h) => {
+    x.fillStyle = ['#8b8d88', '#8a4b3b', '#b8a88a'][st]; x.fillRect(0, 0, w, h);
+    if (st === 1) for (let y = 0; y < h; y += 10) { x.fillStyle = 'rgba(40,18,12,0.55)'; x.fillRect(0, y, w, 1.5); for (let bx = (y / 10 % 2) * 12; bx < w; bx += 24) x.fillRect(bx, y, 1.5, 10); if (R() < 0.4) { x.fillStyle = 'rgba(255,200,170,0.08)'; x.fillRect(R() * w, y, 24, 10); } }
+    speck(x, w, h, 500, ['#000', '#fff', '#6b5d4a'], 0.12, 2); streaks(x, w, h, 6);
+    for (let i = 0, n = R() < 0.6 ? 2 + (R() * 3 | 0) : 0; i < n; i++) { const hx = 10 + R() * 108, hy = 10 + R() * 108; x.fillStyle = '#1a1a1a'; x.beginPath(); x.arc(hx, hy, 2 + R() * 2, 0, 6.283); x.fill(); x.strokeStyle = 'rgba(0,0,0,0.5)'; for (let k = 0; k < 4; k++) { x.beginPath(); x.moveTo(hx, hy); x.lineTo(hx + (R() - 0.5) * 14, hy + (R() - 0.5) * 14); x.stroke(); } }
+    if (R() < 0.35) { x.globalAlpha = 0.7; x.strokeStyle = ['#ef4444', '#22c55e', '#38bdf8', '#facc15'][(R() * 4) | 0]; x.lineWidth = 4; x.beginPath(); x.moveTo(15, 60 + R() * 40); x.bezierCurveTo(40, 30, 80, 100, 115, 50 + R() * 40); x.stroke(); x.globalAlpha = 1; }
+  });
+  mk('plaster', 128, 128, (x, w, h) => { x.fillStyle = '#b9b3a6'; x.fillRect(0, 0, w, h); speck(x, w, h, 700, ['#000', '#fff', '#7a6a50'], 0.14, 2); streaks(x, w, h, 8); for (let i = 0; i < 4; i++) { x.fillStyle = 'rgba(70,60,50,0.2)'; x.beginPath(); x.ellipse(R() * w, R() * h, 6 + R() * 16, 4 + R() * 10, R() * 3, 0, 6.283); x.fill(); } x.fillStyle = 'rgba(60,45,35,0.55)'; x.fillRect(0, h - 14, w, 14); });
+  mk('floor', 128, 128, (x, w, h) => { x.fillStyle = '#6b5236'; x.fillRect(0, 0, w, h); for (let i = 0; i < w; i += 21) { x.fillStyle = 'rgba(0,0,0,0.4)'; x.fillRect(i, 0, 2, h); } for (let i = 0; i < 6; i++) { x.fillStyle = 'rgba(0,0,0,0.25)'; x.fillRect(i * 21 + 2, (R() * h) | 0, 19, 2); } speck(x, w, h, 600, ['#2a1c0e', '#9a7a52'], 0.3, 2); });
+  mk('ceil', 128, 128, (x, w, h) => { x.fillStyle = '#9d988c'; x.fillRect(0, 0, w, h); speck(x, w, h, 600, ['#000', '#fff'], 0.1, 2); x.fillStyle = 'rgba(50,40,30,0.25)'; for (let i = 0; i < 3; i++) { x.beginPath(); x.arc(R() * w, R() * h, 10 + R() * 20, 0, 6.283); x.fill(); } });
+  mk('gok', 128, 128, (x, w, h) => { const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#8fb2c4'); g.addColorStop(1, '#2f4b5b'); x.fillStyle = g; x.fillRect(0, 0, w, h); x.fillStyle = 'rgba(255,255,255,0.25)'; x.beginPath(); x.moveTo(10, h); x.lineTo(60, 0); x.lineTo(84, 0); x.lineTo(34, h); x.closePath(); x.fill(); x.fillStyle = '#2d3035'; x.fillRect(w / 2 - 3, 0, 6, h); x.fillRect(0, h * 0.5 - 3, w, 6); x.fillRect(0, 0, w, 5); x.fillRect(0, h - 5, w, 5); x.fillRect(0, 0, 5, h); x.fillRect(w - 5, 0, 5, h); });
+  mk('bglass', 128, 128, (x, w, h) => {
+    x.clearRect(0, 0, w, h); x.fillStyle = '#2d3035'; x.fillRect(0, 0, w, 6); x.fillRect(0, h - 6, w, 6); x.fillRect(0, 0, 6, h); x.fillRect(w - 6, 0, 6, h);
+    const shard = (ax, ay, bx, by, cx, cy) => { x.beginPath(); x.moveTo(ax, ay); x.lineTo(bx, by); x.lineTo(cx, cy); x.closePath(); x.fillStyle = 'rgba(170,205,225,0.9)'; x.fill(); x.strokeStyle = 'rgba(255,255,255,0.95)'; x.lineWidth = 1.5; x.stroke(); };
+    for (let i = 0; i < 4; i++) { const t = (i + R()) / 4; shard(6 + t * 116, 6, 6 + t * 116 + 14 + R() * 12, 6, 6 + t * 116 + 7, 6 + 12 + R() * 22); shard(6 + t * 116, h - 6, 6 + t * 116 + 14 + R() * 12, h - 6, 6 + t * 116 + 7, h - 6 - 12 - R() * 22); }
+    for (let i = 0; i < 3; i++) { const t = (i + R()) / 3; shard(6, 6 + t * 116, 6, 6 + t * 116 + 14 + R() * 12, 6 + 12 + R() * 22, 6 + t * 116 + 7); shard(w - 6, 6 + t * 116, w - 6, 6 + t * 116 + 14 + R() * 12, w - 6 - 12 - R() * 22, 6 + t * 116 + 7); }
+    x.strokeStyle = 'rgba(255,255,255,0.9)'; x.lineWidth = 1.5; for (let i = 0; i < 6; i++) { x.beginPath(); const a = R() * 6.283, sx = 64 + Math.cos(a) * 22, sy = 64 + Math.sin(a) * 22; x.moveTo(sx, sy); x.lineTo(sx + Math.cos(a) * 26, sy + Math.sin(a) * 26); x.stroke(); }
+  });
+  mk('roof', 128, 128, (x, w, h) => { x.fillStyle = '#4a4d50'; x.fillRect(0, 0, w, h); speck(x, w, h, 900, ['#000', '#9a9a9a', '#2a2a2a'], 0.25, 2); for (let i = 0; i < 5; i++) { x.fillStyle = 'rgba(20,20,20,0.3)'; x.beginPath(); x.arc(R() * w, R() * h, 8 + R() * 18, 0, 6.283); x.fill(); } });
+  mk('conc', 128, 128, (x, w, h) => { x.fillStyle = '#9a9c98'; x.fillRect(0, 0, w, h); speck(x, w, h, 900, ['#000', '#fff', '#555'], 0.18, 2); x.strokeStyle = 'rgba(0,0,0,0.25)'; x.lineWidth = 1; x.beginPath(); x.moveTo(0, 64); x.lineTo(128, 64); x.moveTo(64, 0); x.lineTo(64, 128); x.stroke(); });
+  mk('road', 256, 256, (x, w, h) => { x.fillStyle = '#2c2e31'; x.fillRect(0, 0, w, h); speck(x, w, h, 2500, ['#000', '#777', '#444'], 0.2, 2); x.fillStyle = 'rgba(217,184,58,0.9)'; for (let y = 0; y < h; y += 80) x.fillRect(125, y, 6, 44); x.fillStyle = 'rgba(255,255,255,0.45)'; x.fillRect(10, 0, 3, h); x.fillRect(243, 0, 3, h); x.strokeStyle = 'rgba(0,0,0,0.5)'; for (let i = 0; i < 6; i++) { x.beginPath(); x.moveTo(R() * w, R() * h); x.lineTo(R() * w, R() * h); x.stroke(); } });
+  mk('grass', 256, 256, (x, w, h) => { x.fillStyle = '#4b7a22'; x.fillRect(0, 0, w, h); speck(x, w, h, 4000, ['#2f5a14', '#6a9a2e', '#3b6a1a', '#7a6a3a'], 0.4, 3); for (let i = 0; i < 6; i++) { x.fillStyle = 'rgba(100,80,40,0.18)'; x.beginPath(); x.arc(R() * w, R() * h, 14 + R() * 30, 0, 6.283); x.fill(); } });
+  mk('plaza', 256, 256, (x, w, h) => { x.fillStyle = '#8e9092'; x.fillRect(0, 0, w, h); speck(x, w, h, 2500, ['#000', '#fff', '#555'], 0.15, 2); x.strokeStyle = 'rgba(0,0,0,0.3)'; x.lineWidth = 2; for (let i = 0; i <= 256; i += 64) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 256); x.moveTo(0, i); x.lineTo(256, i); x.stroke(); } });
+  mk('crate', 128, 128, (x, w, h) => { x.fillStyle = '#8a6a3b'; x.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 21) { x.fillStyle = 'rgba(0,0,0,0.35)'; x.fillRect(0, y, w, 2); } speck(x, w, h, 700, ['#3a2a14', '#b08a52'], 0.3, 2); x.strokeStyle = '#4a3a1e'; x.lineWidth = 8; x.strokeRect(4, 4, 120, 120); x.beginPath(); x.moveTo(4, 4); x.lineTo(124, 124); x.stroke(); });
+  mk('cont', 256, 128, (x, w, h) => { x.fillStyle = '#b8b8b8'; x.fillRect(0, 0, w, h); for (let i = 0; i < w; i += 8) { x.fillStyle = 'rgba(0,0,0,0.22)'; x.fillRect(i, 0, 3, h); x.fillStyle = 'rgba(255,255,255,0.18)'; x.fillRect(i + 4, 0, 2, h); } speck(x, w, h, 1200, ['#7a3a1a', '#4a2a10', '#000'], 0.35, 4); x.fillStyle = 'rgba(0,0,0,0.35)'; x.fillRect(0, 0, w, 6); x.fillRect(0, h - 6, w, 6); });
+  mk('metal', 128, 128, (x, w, h) => { x.fillStyle = '#7b8086'; x.fillRect(0, 0, w, h); speck(x, w, h, 1500, ['#3a3a3a', '#b5b5b5', '#8a4a20'], 0.3, 3); x.strokeStyle = 'rgba(255,255,255,0.25)'; for (let i = 0; i < 12; i++) { x.beginPath(); x.moveTo(R() * w, R() * h); x.lineTo(R() * w, R() * h); x.stroke(); } });
+  mk('glass', 128, 128, (x, w, h) => { x.fillStyle = '#0c1118'; x.fillRect(0, 0, w, h); const g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, 'rgba(150,190,210,0.6)'); g.addColorStop(1, 'rgba(70,110,130,0.5)'); x.fillStyle = g; x.fillRect(6, 20, 116, 88); x.fillStyle = '#06080b'; x.beginPath(); for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283, r = 26 * (i % 2 ? 1.3 : 0.7) * (0.8 + R() * 0.5), px = 64 + Math.cos(a) * r * 1.4, py = 64 + Math.sin(a) * r; i ? x.lineTo(px, py) : x.moveTo(px, py); } x.closePath(); x.fill(); x.strokeStyle = 'rgba(255,255,255,0.8)'; for (let i = 0; i < 9; i++) { const a = R() * 6.283; x.beginPath(); x.moveTo(64, 64); x.lineTo(64 + Math.cos(a) * 60, 64 + Math.sin(a) * 40); x.stroke(); } });
+  mk('barrel', 128, 128, (x, w, h) => { x.fillStyle = '#a43a2a'; x.fillRect(0, 0, w, h); for (const y of [14, 64, 114]) { x.fillStyle = 'rgba(0,0,0,0.4)'; x.fillRect(0, y, w, 8); } for (let i = 0; i < w; i += 32) { x.fillStyle = 'rgba(255,255,255,0.12)'; x.fillRect(i + 6, 0, 6, h); } speck(x, w, h, 700, ['#5a2a10', '#000', '#c0703a'], 0.35, 4); });
+  mk('sand', 128, 128, (x, w, h) => { x.fillStyle = '#b79d68'; x.fillRect(0, 0, w, h); for (let y = 0; y < h; y += 32) for (let c = 0; c < w; c += 42) { x.fillStyle = 'rgba(0,0,0,0.28)'; x.beginPath(); x.ellipse(c + 21 + (y / 32 % 2) * 20, y + 16, 20, 14, 0, 0, 6.283); x.stroke(); x.fillStyle = 'rgba(255,255,255,0.08)'; x.fill(); } speck(x, w, h, 600, ['#7a6a40', '#d8c490'], 0.3, 2); });
+  mk('bark', 64, 64, (x, w, h) => { x.fillStyle = '#4a3524'; x.fillRect(0, 0, w, h); for (let i = 0; i < w; i += 6) { x.fillStyle = 'rgba(0,0,0,0.3)'; x.fillRect(i, 0, 2, h); } });
+  mk('leaf', 128, 128, (x, w, h) => { x.fillStyle = '#1f5a2a'; x.fillRect(0, 0, w, h); speck(x, w, h, 1600, ['#14401e', '#2f7a3a', '#0f2f16'], 0.5, 3); });
+  mk('white', 4, 4, (x, w, h) => { x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); });
+  return T;
+}
+function gB(){ return {v: [], i: []}; }
+function gQuad(b, p, n, uv, c){ const o = b.v.length / 11; for (let k = 0; k < 4; k++) b.v.push(p[k][0], p[k][1], p[k][2], n[0], n[1], n[2], uv[k][0], uv[k][1], c[0], c[1], c[2]); b.i.push(o, o + 1, o + 2, o, o + 2, o + 3); }
+function gBox(b, x0, y0, z0, w, h, d, c, ts, noTop){
+  const x1 = x0 + w, y1 = y0 + h, z1 = z0 + d, vb = 1, vt = 1 - h / ts;
+  gQuad(b, [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0]], [0, 0, -1], [[0, vb], [w / ts, vb], [w / ts, vt], [0, vt]], c);
+  gQuad(b, [[x1, y0, z1], [x0, y0, z1], [x0, y1, z1], [x1, y1, z1]], [0, 0, 1], [[0, vb], [w / ts, vb], [w / ts, vt], [0, vt]], c);
+  gQuad(b, [[x1, y0, z0], [x1, y0, z1], [x1, y1, z1], [x1, y1, z0]], [1, 0, 0], [[0, vb], [d / ts, vb], [d / ts, vt], [0, vt]], c);
+  gQuad(b, [[x0, y0, z1], [x0, y0, z0], [x0, y1, z0], [x0, y1, z1]], [-1, 0, 0], [[0, vb], [d / ts, vb], [d / ts, vt], [0, vt]], c);
+  if (!noTop) gQuad(b, [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]], [0, 1, 0], [[0, 0], [w / ts, 0], [w / ts, d / ts], [0, d / ts]], c);
+}
+function gSlab(bo, bi, bt, x0, y0, z0, x1, y1, z1, on, to, ti){
+  const vb = 1 - y0 / 85, vt = 1 - y1 / 85, opp = {E: 'W', W: 'E', N: 'S', S: 'N'};
+  for (const dir of ['E', 'W', 'N', 'S']) {
+    const isOut = on === dir, b = isOut ? bo : bi, t = isOut ? to : ti;
+    if (dir === 'E') gQuad(b, [[x1, y0, z1], [x1, y0, z0], [x1, y1, z0], [x1, y1, z1]], [1, 0, 0], [[z1 / 85, vb], [z0 / 85, vb], [z0 / 85, vt], [z1 / 85, vt]], t);
+    if (dir === 'W') gQuad(b, [[x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [x0, y1, z0]], [-1, 0, 0], [[z0 / 85, vb], [z1 / 85, vb], [z1 / 85, vt], [z0 / 85, vt]], t);
+    if (dir === 'N') gQuad(b, [[x1, y0, z0], [x0, y0, z0], [x0, y1, z0], [x1, y1, z0]], [0, 0, -1], [[x1 / 85, vb], [x0 / 85, vb], [x0 / 85, vt], [x1 / 85, vt]], t);
+    if (dir === 'S') gQuad(b, [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], [0, 0, 1], [[x0 / 85, vb], [x1 / 85, vb], [x1 / 85, vt], [x0 / 85, vt]], t);
+  }
+  gQuad(bt, [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]], [0, 1, 0], [[x0 / 85, z0 / 85], [x1 / 85, z0 / 85], [x1 / 85, z1 / 85], [x0 / 85, z1 / 85]], ti);
+}
+function gCyl(b, cx, y0, cz, r, h, N, c, ts){
+  for (let i = 0; i < N; i++) { const a0 = i / N * 6.2832, a1 = (i + 1) / N * 6.2832, am = (a0 + a1) / 2; gQuad(b, [[cx + Math.cos(a0) * r, y0, cz + Math.sin(a0) * r], [cx + Math.cos(a1) * r, y0, cz + Math.sin(a1) * r], [cx + Math.cos(a1) * r, y0 + h, cz + Math.sin(a1) * r], [cx + Math.cos(a0) * r, y0 + h, cz + Math.sin(a0) * r]], [Math.cos(am), 0, Math.sin(am)], [[i / N * 3, 1], [(i + 1) / N * 3, 1], [(i + 1) / N * 3, 1 - h / ts], [i / N * 3, 1 - h / ts]], c); }
+  const t = b.v.length / 11; b.v.push(cx, y0 + h, cz, 0, 1, 0, 0.5, 0.5, c[0], c[1], c[2]);
+  for (let i = 0; i <= N; i++) { const a = i / N * 6.2832; b.v.push(cx + Math.cos(a) * r, y0 + h, cz + Math.sin(a) * r, 0, 1, 0, 0.5 + Math.cos(a) * 0.5, 0.5 + Math.sin(a) * 0.5, c[0], c[1], c[2]); if (i > 0) b.i.push(t, t + i, t + i + 1); }
+}
+function gCone(b, cx, y0, cz, r, h, N, c){
+  for (let i = 0; i < N; i++) { const a0 = i / N * 6.2832, a1 = (i + 1) / N * 6.2832, am = (a0 + a1) / 2, nl = Math.hypot(0.85, 0.5);
+    gQuad(b, [[cx + Math.cos(a0) * r, y0, cz + Math.sin(a0) * r], [cx + Math.cos(a1) * r, y0, cz + Math.sin(a1) * r], [cx, y0 + h, cz], [cx, y0 + h, cz]], [Math.cos(am) * 0.85 / nl, 0.5 / nl, Math.sin(am) * 0.85 / nl], [[i / N * 4, 1], [(i + 1) / N * 4, 1], [(i + 0.5) / N * 4, 0], [(i + 0.5) / N * 4, 0]], c); }
+}
+function gSphere(b, N, M, c){
+  for (let j = 0; j < M; j++) for (let i = 0; i < N; i++) {
+    const p = (ii, jj) => { const th = jj / M * Math.PI, ph = ii / N * 6.2832; return [Math.sin(th) * Math.cos(ph) * 0.5, Math.cos(th) * 0.5, Math.sin(th) * Math.sin(ph) * 0.5]; };
+    const A = p(i, j), B = p(i + 1, j), C = p(i + 1, j + 1), D = p(i, j + 1), o = b.v.length / 11;
+    for (const q of [A, B, C, D]) b.v.push(q[0], q[1], q[2], q[0] * 2, q[1] * 2, q[2] * 2, 0, 0, c[0], c[1], c[2]); b.i.push(o, o + 1, o + 2, o, o + 2, o + 3);
+  }
+}
+function tgBuildMap(){
+  const R = tgRng(20240607), W = TG.W, obs = [], B = {}, vaults = [], foots = [];
+  ['grass', 'plaza', 'road', 'walk', 'wb0', 'wb1', 'wb2', 'plaster', 'floor', 'ceil', 'roof', 'conc', 'crate', 'cont', 'metal', 'glass', 'gok', 'bglass', 'barrel', 'sand', 'bark', 'leaf'].forEach(k => B[k] = gB());
+  const RW = 110, roads = [{x: 1600 - RW / 2, z: 0, w: RW, d: W, v: true}, {x: 0, z: 1600 - RW / 2, w: W, d: RW, v: false}];
+  const hit = (a, b, m) => a.x < b.x + b.w + m && a.x + a.w + m > b.x && a.z < b.z + b.d + m && a.z + a.d + m > b.z;
+  const onRoad = (r, m) => roads.some(q => hit(r, q, m));
+  const free = (r, m) => !foots.some(f => hit(r, f, m)) && !obs.some(o => hit(r, {x: o.k === 'r' ? o.x : o.x - o.r, z: o.k === 'r' ? o.y : o.y - o.r, w: o.k === 'r' ? o.w : o.r * 2, d: o.k === 'r' ? o.h : o.r * 2}, m));
+  const place = (w, d, lo, hi, rm, om) => { for (let t = 0; t < 80; t++) { const r = {x: lo + R() * (hi - lo - w), z: lo + R() * (hi - lo - d), w, d}; if ((rm < 0 || !onRoad(r, rm)) && free(r, om)) return r; } return null; };
+  const addRect = (r, hgt) => obs.push({k: 'r', x: r.x, y: r.z, w: r.w, h: r.d, hgt});
+  gQuad(B.grass, [[-3000, -0.3, -3000], [6200, -0.3, -3000], [6200, -0.3, 6200], [-3000, -0.3, 6200]], [0, 1, 0], [[0, 0], [36, 0], [36, 36], [0, 36]], [0.55, 0.6, 0.55]);
+  gQuad(B.grass, [[0, 0, 0], [W, 0, 0], [W, 0, W], [0, 0, W]], [0, 1, 0], [[0, 0], [W / 256, 0], [W / 256, W / 256], [0, W / 256]], [1, 1, 1]);
+  gQuad(B.plaza, [[650, 0.15, 650], [2550, 0.15, 650], [2550, 0.15, 2550], [650, 0.15, 2550]], [0, 1, 0], [[0, 0], [1900 / 256, 0], [1900 / 256, 1900 / 256], [0, 1900 / 256]], [1, 1, 1]);
+  for (const r of roads) {
+    const L = r.v ? r.d : r.w, X0 = r.x, X1 = r.x + r.w, Z0 = r.z, Z1 = r.z + r.d, y = 0.3;
+    if (r.v) gQuad(B.road, [[X0, y, Z0], [X1, y, Z0], [X1, y, Z1], [X0, y, Z1]], [0, 1, 0], [[0, 0], [1, 0], [1, L / 256], [0, L / 256]], [1, 1, 1]);
+    else gQuad(B.road, [[X0, y, Z0], [X0, y, Z1], [X1, y, Z1], [X1, y, Z0]], [0, 1, 0], [[0, 0], [1, 0], [1, L / 256], [0, L / 256]], [1, 1, 1]);
+    for (const o of [-28, r.v ? r.w : r.d]) {
+      if (r.v) gQuad(B.walk, [[X0 + o, 0.5, 650], [X0 + o + 28, 0.5, 650], [X0 + o + 28, 0.5, 2550], [X0 + o, 0.5, 2550]], [0, 1, 0], [[0, 0], [28 / 128, 0], [28 / 128, 1900 / 128], [0, 1900 / 128]], [1, 1, 1]);
+      else gQuad(B.walk, [[650, 0.5, Z0 + o], [2550, 0.5, Z0 + o], [2550, 0.5, Z0 + o + 28], [650, 0.5, Z0 + o + 28]], [0, 1, 0], [[0, 0], [1900 / 128, 0], [1900 / 128, 28 / 128], [0, 28 / 128]], [1, 1, 1]);
+    }
+  }
+  const H = 100, T = 12, SILL = 28, HEAD = 72, plat = [], stairs = [];
+  const mega = (x0, z0, w, d, hv, st, floors) => {
+    const L = hv ? w : d, Sh = hv ? d : w, nL = L / 85, nS = Sh / 85, c = (nS - 1) / 2, hv0 = c * 85, hv1 = hv0 + 85, TOP = floors * H;
+    const out = B['wb' + st], pl = B.plaster, cc = B.conc, tOut = [1, 1, 1], tIn = [0.72, 0.72, 0.74];
+    let YO = 0;
+    foots.push({x: x0, z: z0, w, d});
+    const box = (u0, v0, u1, v1) => hv ? [x0 + u0, z0 + v0, x0 + u1, z0 + v1] : [x0 + v0, z0 + u0, x0 + v1, z0 + u1];
+    const P = (u, v) => hv ? [x0 + u, z0 + v] : [x0 + v, z0 + u];
+    const dirOf = {u0: hv ? 'W' : 'N', u1: hv ? 'E' : 'S', v0: hv ? 'N' : 'W', v1: hv ? 'S' : 'E'};
+    const slab = (u0, v0, u1, v1, y0, y1, side, coll) => {
+      const q = box(u0, v0, u1, v1);
+      gSlab(out, pl, cc, q[0], y0 + YO, q[1], q[2], y1 + YO, q[3], side ? dirOf[side] : null, side ? tOut : tIn, tIn);
+      if (coll) obs.push({k: 'r', x: q[0], y: q[1], w: q[2] - q[0], h: q[3] - q[1], hgt: YO + H, y0: YO});
+    };
+    const sideRect = (name, p0, p1) => name === 'v0' ? [p0, 0, p1, T] : name === 'v1' ? [p0, Sh - T, p1, Sh] : name === 'u0' ? [0, p0, T, p1] : [L - T, p0, L, p1];
+    const outN = {v0: hv ? [0, -1] : [-1, 0], v1: hv ? [0, 1] : [1, 0], u0: hv ? [-1, 0] : [0, -1], u1: hv ? [1, 0] : [0, 1]};
+    const pickWin = () => { const q = R(); return q < 0.55 ? 'broken' : q < 0.65 ? 'open' : q < 0.8 ? 'ok' : 'board'; };
+    const cells = (name, n, kinds) => {
+      const short = name === 'u0' || name === 'u1', lo = short ? T : 0, hi = short ? Sh - T : L;
+      for (let i = 0; i < n; i++) {
+        const kind = kinds[i], a0 = i * 85, sc = a0 + 42.5, s0 = Math.max(a0, lo), s1 = Math.min(a0 + 85, hi);
+        const part = (p0, p1, y0, y1, coll) => { p0 = Math.max(p0, s0); p1 = Math.min(p1, s1); if (p1 - p0 < 0.5) return; const q = sideRect(name, p0, p1); slab(q[0], q[1], q[2], q[3], y0, y1, name, coll); };
+        if (kind === 'wall') { part(s0, s1, 0, H, true); continue; }
+        const hw = kind === 'door' ? 26 : 30;
+        part(s0, sc - hw, 0, H, true); part(sc + hw, s1, 0, H, true);
+        part(sc - hw, sc + hw, HEAD, H, false);
+        if (kind === 'door') continue;
+        part(sc - hw, sc + hw, 0, SILL, true);
+        const n2 = outN[name], cm = (name === 'v0' || name === 'v1') ? P(sc, name === 'v0' ? T / 2 : Sh - T / 2) : P(name === 'u0' ? T / 2 : L - T / 2, sc);
+        const along = (name === 'v0' || name === 'v1') ? (hv ? [1, 0] : [0, 1]) : (hv ? [0, 1] : [1, 0]);
+        const pts = [[cm[0] - along[0] * hw, SILL + YO, cm[1] - along[1] * hw], [cm[0] + along[0] * hw, SILL + YO, cm[1] + along[1] * hw], [cm[0] + along[0] * hw, HEAD + YO, cm[1] + along[1] * hw], [cm[0] - along[0] * hw, HEAD + YO, cm[1] - along[1] * hw]];
+        if (kind === 'broken') gQuad(B.bglass, pts, [n2[0], 0, n2[1]], [[0, 1], [1, 1], [1, 0], [0, 0]], [1, 1, 1]);
+        if (kind === 'ok') gQuad(B.gok, pts, [n2[0], 0, n2[1]], [[0, 1], [1, 1], [1, 0], [0, 0]], [1, 1, 1]);
+        if (kind === 'board') for (let k = 0; k < 3; k++) { const o2 = sideRect(name, sc - hw - 4, sc + hw + 4); const bb = (name === 'v0' ? [o2[0], -3, o2[2], 0] : name === 'v1' ? [o2[0], Sh, o2[2], Sh + 3] : name === 'u0' ? [-3, o2[1], 0, o2[3]] : [L, o2[1], L + 3, o2[3]]); const bw = box(bb[0], bb[1], bb[2], bb[3]); gBox(B.crate, bw[0], SILL + 2 + k * 14 + YO, bw[1], bw[2] - bw[0], 12, bw[3] - bw[1], [0.9, 0.9, 0.9], 40); }
+        if (kind === 'broken' || kind === 'open') vaults.push({x: cm[0], z: cm[1], nx: n2[0], nz: n2[1], y: YO});
+        const lg = (name === 'v0' ? [sc - 35, -5, sc + 35, 0] : name === 'v1' ? [sc - 35, Sh, sc + 35, Sh + 5] : name === 'u0' ? [-5, sc - 35, 0, sc + 35] : [L, sc - 35, L + 5, sc + 35]);
+        const lq = box(lg[0], lg[1], lg[2], lg[3]);
+        gBox(B.conc, lq[0], 24 + YO, lq[1], lq[2] - lq[0], 5, lq[3] - lq[1], [0.9, 0.9, 0.9], 60);
+      }
+    };
+    const split = n => { const a = []; let r = n; while (r > 0) { let k = r <= 3 ? r : (R() < 0.5 ? 2 : 3); if (r - k === 1) k++; a.push(k); r -= k; } return a; };
+    const rs0 = split(nL), rs1 = split(nL);
+    let stair = null;
+    if (floors > 1) { let best = -1; [rs0, rs1].forEach((rs, side) => { let acc = 0; rs.forEach(rc => { if (rc > best) { best = rc; stair = {side, acc, rc}; } acc += rc; }); }); }
+    const hallWall = (vc, rs) => { const gaps = []; let acc = 0; rs.forEach(rc => { const uc = (acc + rc / 2) * 85; gaps.push([uc - 26, uc + 26]); acc += rc; }); let p = T; gaps.forEach(g => { slab(p, vc - 4, g[0], vc + 4, 0, H, null, true); slab(g[0], vc - 4, g[1], vc + 4, HEAD, H, null, false); p = g[1]; }); slab(p, vc - 4, L - T, vc + 4, 0, H, null, true); };
+    const parts = (rs, va, vb) => { let acc = 0; rs.forEach((rc, i) => { acc += rc; if (i === rs.length - 1) return; const ub = acc * 85, vm = (va + vb) / 2; if (R() < 0.35) { slab(ub - 4, va, ub + 4, vm - 26, 0, H, null, true); slab(ub - 4, vm + 26, ub + 4, vb, 0, H, null, true); slab(ub - 4, vm - 26, ub + 4, vm + 26, HEAD, H, null, false); } else slab(ub - 4, va, ub + 4, vb, 0, H, null, true); }); };
+    const props = (rs, va, side) => { let acc = 0; rs.forEach(rc => { if (!(stair && stair.side === side && stair.acc === acc) && R() < 0.6) { const q = box(acc * 85 + 12, va, acc * 85 + 46, va + 34); gBox(R() < 0.5 ? B.crate : B.metal, q[0], 0, q[1], q[2] - q[0], 38, q[3] - q[1], [1, 1, 1], 40); obs.push({k: 'r', x: q[0], y: q[1], w: q[2] - q[0], h: q[3] - q[1], hgt: 38}); } acc += rc; }); };
+    for (let lv = 0; lv < floors; lv++) {
+      YO = lv * H; const nodoor = lv > 0;
+      const lk = rs => { const kinds = []; const dr = (!nodoor && R() < 0.5) ? Math.floor(R() * rs.length) : -1; rs.forEach((rc, ri) => { for (let j = 0; j < rc; j++) { let k = j === 0 || R() < 0.55 ? pickWin() : 'wall'; if (ri === dr && j === (rc >> 1)) k = 'door'; kinds.push(k); } }); return kinds; };
+      cells('v0', nL, lk(rs0)); cells('v1', nL, lk(rs1));
+      const sk = []; for (let i = 0; i < nS; i++) sk.push(i === c && !nodoor ? 'door' : (R() < 0.5 ? pickWin() : 'wall'));
+      cells('u0', nS, sk); cells('u1', nS, sk.map(k => k === 'door' ? 'door' : (R() < 0.5 ? pickWin() : 'wall')));
+      hallWall(hv0, rs0); hallWall(hv1, rs1); parts(rs0, T, hv0 - 4); parts(rs1, hv1 + 4, Sh - T);
+      if (lv === 0) { props(rs0, hv0 - 4 - 8 - 34, 0); props(rs1, hv1 + 4 + 8, 1); }
+    }
+    YO = 0;
+    const inner = [T, T, L - T, Sh - T];
+    const wq = (r, y, tex, n, tint) => { const q = box(r[0], r[1], r[2], r[3]); gQuad(tex, [[q[0], y, q[1]], [q[2], y, q[1]], [q[2], y, q[3]], [q[0], y, q[3]]], n, [[q[0] / 85, q[1] / 85], [q[2] / 85, q[1] / 85], [q[2] / 85, q[3] / 85], [q[0] / 85, q[3] / 85]], tint); };
+    wq(inner, 0.5, B.floor, [0, 1, 0], [0.8, 0.8, 0.8]);
+    if (floors === 1) wq(inner, H - 0.2, B.ceil, [0, -1, 0], [0.6, 0.6, 0.6]);
+    else {
+      const RL = Math.min(204, stair.rc * 85 - 56), ua = stair.acc * 85 + 42, ub = ua + RL, va = stair.side === 0 ? T + 8 : Sh - T - 8 - 64, vb = va + 64, n = 17;
+      for (let i = 0; i < n; i++) { const u0 = ua + i * RL / n, u1 = ua + (i + 1) * RL / n, top = (i + 1) * H / n, q = box(u0, va, u1, vb); gBox(cc, q[0], 0, q[1], q[2] - q[0], top, q[3] - q[1], [0.85, 0.85, 0.85], 60); const o = {k: 'r', x: q[0], y: q[1], w: q[2] - q[0], h: q[3] - q[1], hgt: top, y0: 0, step: true}; obs.push(o); plat.push(o); }
+      const bm = P(ua, (va + vb) / 2), tm = P(ub, (va + vb) / 2); stairs.push({bx: bm[0], bz: bm[1], tx: tm[0], tz: tm[1]});
+      const rects = [[inner[0], inner[1], ua, inner[3]], [ub, inner[1], inner[2], inner[3]], [ua, inner[1], ub, va], [ua, vb, ub, inner[3]]];
+      for (const r of rects) { if (r[2] - r[0] < 1 || r[3] - r[1] < 1) continue; wq(r, H - 0.2, B.ceil, [0, -1, 0], [0.6, 0.6, 0.6]); wq(r, H + 0.3, B.floor, [0, 1, 0], [0.8, 0.8, 0.8]); const q = box(r[0], r[1], r[2], r[3]); plat.push({k: 'r', x: q[0], y: q[1], w: q[2] - q[0], h: q[3] - q[1], hgt: H}); }
+      wq(inner, TOP - 0.2, B.ceil, [0, -1, 0], [0.6, 0.6, 0.6]);
+    }
+    gQuad(B.roof, [[x0, TOP + 0.2, z0], [x0 + w, TOP + 0.2, z0], [x0 + w, TOP + 0.2, z0 + d], [x0, TOP + 0.2, z0 + d]], [0, 1, 0], [[0, 0], [w / 128, 0], [w / 128, d / 128], [0, d / 128]], [1, 1, 1]);
+    const pc = [0.8, 0.8, 0.8];
+    gBox(B.conc, x0 - 3, TOP, z0 - 3, w + 6, 14, 6, pc, 60, true); gBox(B.conc, x0 - 3, TOP, z0 + d - 3, w + 6, 14, 6, pc, 60, true);
+    gBox(B.conc, x0 - 3, TOP, z0 + 3, 6, 14, d - 6, pc, 60, true); gBox(B.conc, x0 + w - 3, TOP, z0 + 3, 6, 14, d - 6, pc, 60, true);
+    for (let i = 0, n = 3 + Math.floor(R() * 4); i < n; i++) gBox(B.metal, x0 + 30 + R() * (w - 90), TOP, z0 + 30 + R() * (d - 90), 24 + R() * 24, 16 + R() * 16, 24 + R() * 24, [0.85, 0.85, 0.9], 40);
+  };
+  const addB = (nL, nS, lo, hi, om, floors) => { for (let t = 0; t < 60; t++) { const hv = R() < 0.5, w = (hv ? nL : nS) * 85, d = (hv ? nS : nL) * 85, r = place(w, d, lo, hi, om, om); if (r) { mega(r.x, r.z, w, d, hv, Math.floor(R() * 3), floors); return true; } } return false; };
+  for (let i = 0; i < 4; i++) addB(8 + Math.floor(R() * 2), R() < 0.5 ? 5 : 7, 620, 2580, 55, i % 2 === 0 ? 2 : 1);
+  for (let i = 0; i < 18; i++) addB(5 + Math.floor(R() * 3), 5, i < 9 ? 620 : 150, i < 9 ? 2580 : 3050, 45, i % 2 === 0 ? 2 : 1);
+  for (let t = 0, n = 0; t < 400 && n < 12; t++) { const hv = R() < 0.5, w = hv ? 200 : 60, d = hv ? 60 : 200, r = place(w, d, 300, W - 300, 20, 30); if (r) { const c = [[0.85, 0.3, 0.2], [0.2, 0.4, 0.75], [0.25, 0.6, 0.3], [0.8, 0.6, 0.2]][n % 4]; gBox(B.cont, r.x, 0, r.z, w, 55, d, c, 128); addRect(r, 55); n++; } }
+  for (let t = 0, n = 0; t < 500 && n < 34; t++) { const r = place(40, 40, 300, W - 300, 20, 25); if (r) { const lv = 1 + Math.floor(R() * 3), cc = [0.9 + R() * 0.2, 0.9 + R() * 0.2, 0.9 + R() * 0.2]; for (let k = 0; k < lv; k++) gBox(B.crate, r.x + (k ? 6 : 0), k * 40, r.z + (k ? 4 : 0), 40, 40, 40, cc, 40); addRect(r, lv * 40); n++; } }
+  for (let t = 0, n = 0; t < 300 && n < 10; t++) { const hv = R() < 0.5, w = hv ? 100 : 26, d = hv ? 26 : 100, r = place(w, d, 300, W - 300, 20, 25); if (r) { gBox(B.sand, r.x, 0, r.z, w, 24, d, [1, 1, 1], 48); addRect(r, 24); n++; } }
+  for (let t = 0, n = 0; t < 400 && n < 30; t++) { const p = place(20, 20, 300, W - 300, 10, 14); if (p) { const c = [[1, 1, 1], [0.6, 0.7, 1.1], [0.9, 1, 0.6]][n % 3]; gCyl(B.barrel, p.x + 10, 0, p.z + 10, 10, 28, 12, c, 28); obs.push({k: 'c', x: p.x + 10, y: p.z + 10, r: 10, hgt: 28}); n++; } }
+  for (const rd of roads) for (let k = 0; k < 4; k++) { const lx = rd.v ? rd.x - 6 : 760 + k * 480, lz = rd.v ? 760 + k * 480 : rd.z - 6; gCyl(B.metal, lx, 0, lz, 3, 130, 8, [0.5, 0.5, 0.55], 40); gBox(B.metal, lx - 2, 128, lz - 2, rd.v ? 22 : 4, 5, rd.v ? 4 : 22, [0.5, 0.5, 0.55], 20); }
+  for (let t = 0, n = 0; t < 900 && n < 70; t++) { const x = 60 + R() * (W - 120), z = 60 + R() * (W - 120); if (Math.hypot(x - 1600, z - 1600) < 1050) continue; const r = {x: x - 30, z: z - 30, w: 60, d: 60}; if (onRoad(r, 10) || !free(r, 6)) continue;
+    const rad = 20 + R() * 14, th = 36 + rad; gCyl(B.bark, x, 0, z, 6, th, 8, [1, 1, 1], 64); gCone(B.leaf, x, th * 0.45, z, rad * 2.0, rad * 3.2, 10, [0.9 + R() * 0.2, 1, 0.9]); gCone(B.leaf, x, th * 0.45 + rad * 1.9, z, rad * 1.4, rad * 2.6, 10, [1, 1.05, 1]);
+    obs.push({k: 'c', x, y: z, r: Math.min(rad, 26), hgt: 160}); n++; }
+  obs.forEach(o => { if (o.hgt <= 44 && !o.step) plat.push(o); });
+  return {obs, B, vaults, foots, plat, stairs};
+}
+const GL_V = 'attribute vec3 aPos;attribute vec3 aNor;attribute vec2 aUV;attribute vec3 aCol;uniform mat4 uVP;uniform mat4 uM;varying vec3 vN;varying vec3 vW;varying vec2 vUV;varying vec3 vC;void main(){vec4 w=uM*vec4(aPos,1.0);vW=w.xyz;vN=(uM*vec4(aNor,0.0)).xyz;vUV=aUV;vC=aCol;gl_Position=uVP*w;}';
+const GL_F = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+varying vec3 vN;varying vec3 vW;varying vec2 vUV;varying vec3 vC;
+uniform sampler2D uTex;uniform vec3 uCol;uniform vec3 uCam;uniform vec3 uFog;uniform vec3 uZone;uniform vec4 uNext;uniform float uType;uniform float uTime;
+void main(){
+  vec3 n = normalize(vN);
+  vec3 sun = normalize(vec3(0.45, 0.85, 0.3));
+  if (uType > 4.5) {
+    vec3 d = normalize(vW - uCam); float t = clamp(d.y, 0.0, 1.0);
+    vec3 col = mix(vec3(0.80, 0.90, 0.97), vec3(0.20, 0.45, 0.78), pow(t, 0.55));
+    float s = max(dot(d, sun), 0.0);
+    col += vec3(1.0, 0.85, 0.55) * (pow(s, 220.0) * 1.5 + pow(s, 8.0) * 0.15);
+    gl_FragColor = vec4(col, 1.0); return;
+  }
+  if (uType > 3.5) { gl_FragColor = vec4(0.0, 0.0, 0.0, 0.34); return; }
+  if (uType > 2.5) { float p = 0.15 + 0.08 * sin(vW.y * 0.04 + uTime * 2.0); gl_FragColor = vec4(0.22, 0.74, 0.97, p); return; }
+  vec4 tx = texture2D(uTex, vUV);
+  if (tx.a < 0.5) discard;
+  vec3 col = tx.rgb * vC * uCol;
+  if (uType > 0.5 && uType < 1.5) {
+    float d = distance(vW.xz, uZone.xy);
+    if (d > uZone.z) col = mix(col, vec3(0.85, 0.22, 0.12), 0.45);
+    col += vec3(0.1, 0.45, 0.9) * smoothstep(7.0, 0.0, abs(d - uZone.z));
+    if (uNext.w > 0.5) col = mix(col, vec3(1.0), smoothstep(5.0, 0.0, abs(distance(vW.xz, uNext.xy) - uNext.z)));
+  }
+  float dif = max(dot(n, sun), 0.0);
+  float ao = uType < 0.5 ? mix(0.7, 1.0, smoothstep(0.0, 45.0, vW.y)) : 1.0;
+  vec3 c = col * (0.46 + 0.14 * n.y + 0.62 * dif) * ao;
+  float fog = clamp((distance(vW, uCam) - 700.0) / 2200.0, 0.0, 1.0);
+  gl_FragColor = vec4(mix(c, vec3(0.80, 0.90, 0.97), fog), 1.0);
+}`;
+const MX = {
+  mul(a, b){ const o = new Array(16); for (let c = 0; c < 4; c++) for (let r = 0; r < 4; r++) { let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + r] * b[c * 4 + k]; o[c * 4 + r] = s; } return o; },
+  T: (x, y, z) => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1],
+  S: (x, y, z) => [x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1],
+  RY(a){ const c = Math.cos(a), s = Math.sin(a); return [c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]; },
+  RX(a){ const c = Math.cos(a), s = Math.sin(a); return [1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]; },
+  persp(f, as, n, fa){ const t = 1 / Math.tan(f / 2); return [t / as, 0, 0, 0, 0, t, 0, 0, 0, 0, (fa + n) / (n - fa), -1, 0, 0, 2 * fa * n / (n - fa), 0]; },
+  look(e, c){
+    let fx = c[0] - e[0], fy = c[1] - e[1], fz = c[2] - e[2]; const fl = Math.hypot(fx, fy, fz); fx /= fl; fy /= fl; fz /= fl;
+    let sx = -fz, sz = fx; const sl = Math.hypot(sx, sz); sx /= sl; sz /= sl;
+    const ux = -sz * fy, uy = sz * fx - sx * fz, uz = sx * fy;
+    return [sx, ux, -fx, 0, 0, uy, -fy, 0, sz, uz, -fz, 0, -(sx * e[0] + sz * e[2]), -(ux * e[0] + uy * e[1] + uz * e[2]), fx * e[0] + fy * e[1] + fz * e[2], 1];
+  }
+};
+function gInit(){
+  const cv = $tg('tg-cv'); let gl = null;
+  try { gl = cv.getContext('webgl', {antialias: true, alpha: false}) || cv.getContext('experimental-webgl'); } catch (e) {}
+  if (!gl) return null;
+  const sh = (t, src) => { const s = gl.createShader(t); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); return null; } return s; };
+  const pr = gl.createProgram(), vs = sh(gl.VERTEX_SHADER, GL_V), fs = sh(gl.FRAGMENT_SHADER, GL_F);
+  if (!vs || !fs) return null;
+  gl.attachShader(pr, vs); gl.attachShader(pr, fs);
+  ['aPos', 'aNor', 'aUV', 'aCol'].forEach((n, i) => gl.bindAttribLocation(pr, i, n));
+  gl.linkProgram(pr); if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(pr)); return null; }
+  gl.useProgram(pr);
+  const U = {}; ['uVP', 'uM', 'uCol', 'uCam', 'uFog', 'uZone', 'uNext', 'uType', 'uTime', 'uTex'].forEach(n => U[n] = gl.getUniformLocation(pr, n));
+  for (let k = 0; k < 4; k++) gl.enableVertexAttribArray(k);
+  gl.uniform1i(U.uTex, 0);
+  const an = gl.getExtension('EXT_texture_filter_anisotropic'), cans = gTexAll(tgRng(777)), tex = {};
+  for (const k in cans) {
+    const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cans[k]);
+    gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    if (an) gl.texParameterf(gl.TEXTURE_2D, an.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(an.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+    tex[k] = t;
+  }
+  const mesh = b => { const vb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, vb); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(b.v), gl.STATIC_DRAW); const ib = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(b.i), gl.STATIC_DRAW); return {vb, ib, n: b.i.length}; };
+  const G = {gl, U, tex, cur: null, curTex: null, mesh: {}, unit: {}, I: MX.T(0, 0, 0)};
+  const chunk = b => { const res = []; let cur = {v: [], i: []}, map = new Map();
+    for (let t = 0; t < b.i.length; t += 3) {
+      if (cur.v.length / 11 > 64000) { res.push(cur); cur = {v: [], i: []}; map = new Map(); }
+      for (let k = 0; k < 3; k++) { const o = b.i[t + k]; let nv = map.get(o); if (nv === undefined) { nv = cur.v.length / 11; map.set(o, nv); for (let q = 0; q < 11; q++) cur.v.push(b.v[o * 11 + q]); } cur.i.push(nv); } }
+    res.push(cur); return res; };
+  for (const k in TG.map.B) { const b = TG.map.B[k]; if (b.i.length) G.mesh[k] = chunk(b).map(mesh); }
+  const ub = gB(); gBox(ub, -0.5, -0.5, -0.5, 1, 1, 1, [1, 1, 1], 1); G.unit.cube = mesh(ub);
+  const us = gB(); gSphere(us, 14, 10, [1, 1, 1]); G.unit.sph = mesh(us);
+  const uc = gB(); gCone(uc, 0, 0, 0, 0.5, 1, 10, [1, 1, 1]); G.unit.cone = mesh(uc);
+  const uy = gB(); gCyl(uy, 0, 0, 0, 0.5, 1, 18, [1, 1, 1], 1); G.unit.cyl = mesh(uy);
+  return G;
+}
+function gDraw(G, m, tex, M, col, type){
+  const gl = G.gl;
+  if (G.cur !== m) { gl.bindBuffer(gl.ARRAY_BUFFER, m.vb); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 44, 0); gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 44, 12); gl.vertexAttribPointer(2, 2, gl.FLOAT, false, 44, 24); gl.vertexAttribPointer(3, 3, gl.FLOAT, false, 44, 32); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, m.ib); G.cur = m; }
+  if (G.curTex !== tex) { gl.bindTexture(gl.TEXTURE_2D, tex); G.curTex = tex; }
+  gl.uniformMatrix4fv(G.U.uM, false, M); gl.uniform3f(G.U.uCol, col[0], col[1], col[2]); gl.uniform1f(G.U.uType, type);
+  gl.drawElements(gl.TRIANGLES, m.n, gl.UNSIGNED_SHORT, 0);
+}
+function tgFree(x, y){
+  for (const o of TG.obs) {
+    if (o.k === 'c') { if (Math.hypot(x - o.x, y - o.y) < o.r + 24) return false; }
+    else if (x > o.x - 24 && x < o.x + o.w + 24 && y > o.y - 24 && y < o.y + o.h + 24) return false;
+  }
+  return true;
+}
+function tgNextTarget(){
+  const z = TG.zone, nr = TG_RAD[Math.min(z.ph + 1, TG_RAD.length - 1)];
+  const g = tgR(0, Math.PI * 2), d = tgR(0, Math.max(0, z.r - nr));
+  z.tx = z.cx + Math.cos(g) * d; z.ty = z.cy + Math.sin(g) * d; z.tr = nr;
+}
+function startTag(opts){
+  $tg('home-screen').classList.add('hidden');
+  $tg('tag-screen').classList.remove('hidden');
+  $tg('tg-result').classList.add('hidden'); $tg('tg-result').classList.remove('flex');
+  tgFull(); cancelAnimationFrame(TG.raf); tgResize(); $tg('tg-spec').classList.add('hidden'); $tg('tg-specbtn').classList.add('hidden'); $tg('tg-retry').classList.remove('hidden');
+  if (!TG.map) TG.map = tgBuildMap();
+  TG.obs = TG.map.obs;
+  if (!TG.G) TG.G = gInit();
+  if (!TG.G) {
+    TG.run = false; $tg('tg-rt').textContent = '😢 3D를 쓸 수 없어요'; $tg('tg-rd').textContent = '이 브라우저는 WebGL을 지원하지 않아요';
+    $tg('tg-result').classList.remove('hidden'); $tg('tg-result').classList.add('flex'); return;
+  }
+  TG.ag = [];
+  for (let i = 0; i < 50; i++) {
+    let x, y, n = 0;
+    if (opts) { x = opts.pos[i][0]; y = opts.pos[i][1]; } else do { const g = tgR(0, 6.283), d = tgR(0, 1400); x = TG.W / 2 + Math.cos(g) * d; y = TG.W / 2 + Math.sin(g) * d; n++; } while (!tgFree(x, y) && n < 40);
+    const hu = opts && opts.humans.find(q => q.idx === i);
+    TG.ag.push({x, y, h: 0, vy: 0, role: 'rabbit', dead: false, hp: 100, cd: 0, stam: 3, stDelay: 0, exh: false, slideT: 0, slideCd: 0, sdx: 0, sdy: 0, vault: null, vcd: 0, sprinting: false, wa: tgR(0, 6.28), fx: 0, fz: 1, ph: tgR(0, 6.28), mv: false, me: i === (opts ? opts.myIdx : 0), idx: i, human: !!hu, name: hu ? hu.name : '', rgb: TG_PAL[i % 12], px: x, py: y, stuck: 0, rnd: 0});
+  }
+  const m = TG.me = TG.ag[opts ? opts.myIdx : 0];
+  TG.myIdx = opts ? opts.myIdx : 0; TG.mp = opts ? opts.mp : null; TG.spec = false; TG.specT = null; TG.over = false; TG.rank = 0; TG.dieShown = false; TG.snT = 0; TG.stT = 0;
+  Object.assign(m, {stam: 3, stDelay: 0, exh: false, slideT: 0, slideCd: 0, sdx: 0, sdy: -1, vault: null, eyeY: 56, gy: 0, sprinting: false, arm: 0, ldx: 0, ldy: -1});
+  TG.zone = {cx: TG.W / 2, cy: TG.W / 2, r: 1e7, ph: 99, st: 'wait', t: 1e9, dur: 1};
+  TG.t = 0; TG.roleT = 20; TG.searched = []; if (!NAV.ready && TG.mp !== 'client') navBuild(); tgaUnlock(); TG.joy = null; TG.cam = null; TG.keys = {}; TG.yaw = 0; TG.pitch = 0; TG.sprint = false;
+  $tg('tg-jr').classList.add('hidden'); $tg('tg-jk').classList.add('hidden');
+  tgToast('🐰 토끼로 시작! 20초 뒤 역할이 바뀌어요', 3200);
+  TG.run = true; TG.last = performance.now();
+  TG.raf = requestAnimationFrame(tgLoop);
+}
+function leaveTag(){
+  TG.run = false; cancelAnimationFrame(TG.raf);
+  try { if (document.fullscreenElement) document.exitFullscreen(); if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); if (document.pointerLockElement) document.exitPointerLock(); } catch (e) {}
+  try { if (typeof NET !== 'undefined' && NET.peer) NET.peer.destroy(); } catch (e) {}
+  $tg('tag-screen').classList.add('hidden'); showHome();
+}
+function tgOver(win, why){
+  TG.run = false; tgDraw(); if (win) tgaWin(); else tgaHurt();
+  const left = TG.ag.filter(a => !a.dead).length + (win ? 0 : 1);
+  $tg('tg-rt').textContent = win ? '🏆 승리!' : (why === 'zone' ? '☠️ 자기장에 쓰러졌다!' : '😵 태그당했다!');
+  $tg('tg-rd').textContent = win ? '마지막 생존자예요 · ' + TG.t.toFixed(0) + '초' : '순위 ' + left + '위 / 50 · ' + TG.t.toFixed(0) + '초 생존';
+  $tg('tg-result').classList.remove('hidden'); $tg('tg-result').classList.add('flex');
+  try { if (document.pointerLockElement) document.exitPointerLock(); } catch (e) {}
+}
+function tgAssign(){
+  const alive = TG.ag.filter(a => !a.dead), n = alive.length;
+  const nh = Math.max(1, Math.round(n * 0.1)), nw = Math.max(1, Math.round(n * 0.25));
+  const taken = new Set();
+  const pick = (cnt, role) => { const pool = alive.slice().sort(() => Math.random() - 0.5).filter(a => !taken.has(a)); const chosen = pool.filter(a => a.role !== role).concat(pool.filter(a => a.role === role)).slice(0, cnt); chosen.forEach(a => taken.add(a)); return chosen; };
+  const hs = pick(nh, 'hunter'), ws = pick(nw, 'wolf');
+  alive.forEach(a => { a.role = hs.includes(a) ? 'hunter' : ws.includes(a) ? 'wolf' : 'rabbit'; a.goal = null; a.path = null; a.mem = null; a.mode = ''; a.pr = null; a.th = null; a.idle = 0; a.look = 0; });
+  tgaRole(TG.me.role);
+  for (const a of alive) a.stam = Math.min(a.stam, 3 * ROLE[a.role].mul);
+  const m = TG.me, r = ROLE[m.role];
+  tgToast(r.e + ' ' + r.n + '(으)로 바뀌었어요!', 2800);
+}
+function tgKill(t, by){
+  t.dead = true;
+  if (TG.mp === 'host') {
+    if (t.human && !t.me) netToIdx(t.idx, {t: 'dead', rank: TG.ag.filter(a => !a.dead).length + 1});
+    if (by && by.human && !by.me) netToIdx(by.idx, {t: 'tagok'});
+  }
+  if (t.me) { if (TG.mp) { TG.rank = TG.ag.filter(a => !a.dead).length + 1; tgDie('tag'); tgCheckEnd(); } else tgOver(false, 'tag'); return; }
+  if (by && by.me) { tgToast('태그 성공! 🎯', 1200); tgaHit(); }
+  if (TG.mp) tgCheckEnd();
+}
+function tgGround(a){
+  let g = 0; const P = TG.map.plat;
+  for (let i = 0; i < P.length; i++) {
+    const o = P[i];
+    if (o.hgt > a.h + 8 || o.hgt <= g) continue;
+    if (o.k === 'c') { if (Math.hypot(a.x - o.x, a.y - o.y) < o.r + 8) g = o.hgt; }
+    else if (a.x > o.x - 8 && a.x < o.x + o.w + 8 && a.y > o.y - 8 && a.y < o.y + o.h + 8) g = o.hgt;
+  }
+  return g;
+}
+function tgCollide(a){
+  const R = 16;
+  for (const o of TG.obs) {
+    if (a.h >= o.hgt - 8) continue;
+    if (o.y0 && a.h + 62 <= o.y0) continue;
+    if (o.k === 'c') {
+      const dx = a.x - o.x, dy = a.y - o.y, d = Math.hypot(dx, dy), m = R + o.r;
+      if (d < m && d > 0) { a.x = o.x + dx / d * m; a.y = o.y + dy / d * m; }
+    } else {
+      if (a.x < o.x - R || a.x > o.x + o.w + R || a.y < o.y - R || a.y > o.y + o.h + R) continue;
+      const cx = Math.max(o.x, Math.min(a.x, o.x + o.w)), cy = Math.max(o.y, Math.min(a.y, o.y + o.h));
+      const dx = a.x - cx, dy = a.y - cy, d = Math.hypot(dx, dy);
+      if (d < R) {
+        if (d > 0) { a.x = cx + dx / d * R; a.y = cy + dy / d * R; }
+        else { const l = a.x - o.x, r = o.x + o.w - a.x, t = a.y - o.y, b = o.y + o.h - a.y, m = Math.min(l, r, t, b); if (m === l) a.x = o.x - R; else if (m === r) a.x = o.x + o.w + R; else if (m === t) a.y = o.y - R; else a.y = o.y + o.h + R; }
+      }
+    }
+  }
+  a.x = Math.max(R, Math.min(TG.W - R, a.x)); a.y = Math.max(R, Math.min(TG.W - R, a.y));
+}
+function tgZoneUpdate(dt){
+  const z = TG.zone; z.t -= dt;
+  if (z.st === 'wait') {
+    if (z.t <= 0 && z.ph < TG_RAD.length - 1) { z.st = 'shrink'; z.t = 20; z.dur = 20; z.fx = z.cx; z.fy = z.cy; z.fr = z.r; }
+  } else {
+    const k = 1 - Math.max(0, z.t) / z.dur;
+    z.cx = z.fx + (z.tx - z.fx) * k; z.cy = z.fy + (z.ty - z.fy) * k; z.r = z.fr + (z.tr - z.fr) * k;
+    if (z.t <= 0) { z.ph++; z.st = 'wait'; z.t = 15; z.dur = 15; tgNextTarget(); }
+  }
+}
+function tgVaultNear(who, dfx, dfz){
+  const m = who || TG.me; if (!m || m.vault || !TG.map) return null;
+  const fx = dfx === undefined ? -Math.sin(TG.yaw) : dfx, fz = dfz === undefined ? -Math.cos(TG.yaw) : dfz; let best = null, bd = 1e9;
+  for (const v of TG.map.vaults) {
+    if (Math.abs(m.h - (v.y || 0)) > 24) continue;
+    const rx = m.x - v.x, rz = m.y - v.z, nd = rx * v.nx + rz * v.nz, td = rx * -v.nz + rz * v.nx;
+    if (Math.abs(nd) > 62 || Math.abs(td) > 40) continue;
+    const s = nd >= 0 ? 1 : -1;
+    if (-(fx * v.nx + fz * v.nz) * s < 0.25) continue;
+    const d = Math.hypot(nd, td); if (d < bd) { bd = d; best = v; }
+  }
+  return best;
+}
+function tgVaultStart(m, v){
+  const s = ((m.x - v.x) * v.nx + (m.y - v.z) * v.nz) >= 0 ? 1 : -1;
+  m.vault = {t: 0, T: 0.6, base: m.h, sx: m.x, sy: m.y, dx: v.x - s * v.nx * 34, dy: v.z - s * v.nz * 34};
+  m.slideT = 0; m.vcd = 3; tgaVault(m.me ? null : m);
+}
+function tgInteract(){
+  const m = TG.me; if (!TG.run || !m) return;
+  const v = tgVaultNear(); if (!v) { tgToast('근처에 넘을 창문이 없어요', 900); return; }
+  tgVaultStart(m, v);
+}
+function tgJump(){ const m = TG.me; if (!TG.run || !m || m.vault) return; if (m.h <= m.gy + 0.6) { m.vy = 258; tgaJump(); } }
+function tgSlide(){ const m = TG.me; if (!TG.run || !m || m.vault || m.slideCd > 0 || m.h > m.gy + 1) return; m.slideT = 0.65; m.slideCd = 1.3; m.sdx = m.ldx; m.sdy = m.ldy; tgaSlide(); }
+function tgTag(){
+  const m = TG.me; if (!TG.run || !m || m.dead || m.vault || m.cd > 0) return;
+  m.cd = 0.8; m.arm = 0.3; tgaSwing();
+  if (TG.mp === 'client') { if (m.role === 'rabbit') { tgToast('토끼는 태그할 수 없어요', 900); m.cd = 0.4; return; } netToHost({t: 'tag', x: m.x, y: m.y, h: m.h, yaw: TG.yaw}); return; }
+  const fx = -Math.sin(TG.yaw), fz = -Math.cos(TG.yaw); let best = null, bd = 1e9;
+  for (const a of TG.ag) {
+    if (a.dead || a.me || !canTag(m, a)) continue;
+    const dx = a.x - m.x, dy = a.y - m.y, d = Math.hypot(dx, dy);
+    if (d > 66 || (dx * fx + dy * fz) / (d || 1) < 0.5 || Math.abs(a.h - m.h) > 40) continue;
+    if (d < bd) { bd = d; best = a; }
+  }
+  const xh = $tg('tg-xh');
+  if (best) { tgKill(best, m); xh.style.borderColor = '#ef4444'; } else { m.cd = 0.4; xh.style.borderColor = '#94a3b8'; if (m.role === 'rabbit') tgToast('토끼는 태그할 수 없어요', 900); }
+  setTimeout(() => { xh.style.borderColor = 'rgba(255,255,255,.85)'; }, 160);
+}
+function tgPlayer(dt){
+  const m = TG.me, k = TG.keys;
+  m.cd = Math.max(0, m.cd - dt); m.slideCd = Math.max(0, m.slideCd - dt); m.arm = Math.max(0, m.arm - dt);
+  if (m.vault) {
+    const v = m.vault; v.t += dt; const u = Math.min(1, v.t / v.T), e = u * u * (3 - 2 * u);
+    m.x = v.sx + (v.dx - v.sx) * e; m.y = v.sy + (v.dy - v.sy) * e; m.h = v.base + 38 * Math.sin(Math.PI * u); m.mv = true;
+    if (u >= 1) { m.vault = null; m.h = v.base; m.vy = 0; }
+    return;
+  }
+  let ix = (k.KeyD ? 1 : 0) - (k.KeyA ? 1 : 0), iy = (k.KeyS ? 1 : 0) - (k.KeyW ? 1 : 0);
+  if (TG.joy) { ix = TG.joy.dx; iy = TG.joy.dy; }
+  const l = Math.hypot(ix, iy); let mag = Math.min(1, l), dx = 0, dy = 0;
+  if (l > 0.001) { ix /= l; iy /= l; const sy = Math.sin(TG.yaw), cy = Math.cos(TG.yaw); dx = cy * ix + sy * iy; dy = -sy * ix + cy * iy; }
+  if (mag > 0.1) { m.ldx = dx; m.ldy = dy; }
+  const smax = 3 * ROLE[m.role].mul; if (m.stam > smax) m.stam = smax;
+  const want = (TG.sprint || k.ShiftLeft || k.ShiftRight) && mag > 0.1 && m.slideT <= 0;
+  let sp = 150; m.sprinting = false;
+  if (want && !m.exh && m.stam > 0) { sp *= 1.5; m.sprinting = true; m.stam = Math.max(0, m.stam - dt); m.stDelay = 0.6; if (m.stam <= 0) m.exh = true; }
+  else { m.stDelay = Math.max(0, m.stDelay - dt); if (m.stDelay <= 0) m.stam = Math.min(smax, m.stam + 0.9 * dt); if (m.exh && m.stam >= smax * 0.25) m.exh = false; }
+  if (m.slideT > 0) { dx = m.sdx; dy = m.sdy; mag = 1; sp = 150 * (1 + 0.9 * m.slideT / 0.65); m.slideT -= dt; }
+  m.x += dx * sp * mag * dt; m.y += dy * sp * mag * dt;
+  m.mv = mag > 0.1; if (m.mv) { m.fx = dx; m.fz = dy; }
+  m.vy -= 900 * dt; m.h += m.vy * dt;
+  const g = tgGround(m); m.gy = g; if (m.h <= g) { m.h = g; if (m.vy < 0) m.vy = 0; }
+  tgCollide(m);
+  m.eyeY += ((m.slideT > 0 ? 32 : 56) - m.eyeY) * Math.min(1, dt * 14);
+}
+function tgStep(dt){
+  TG.navBudget = 3;
+  const z = TG.zone, ag = TG.ag, me = TG.me, k = TG.keys;
+  if (k.ArrowLeft) TG.yaw += 1.8 * dt; if (k.ArrowRight) TG.yaw -= 1.8 * dt; if (k.ArrowUp) TG.pitch = Math.max(-1.3, TG.pitch - 1.2 * dt); if (k.ArrowDown) TG.pitch = Math.min(1.3, TG.pitch + 1.2 * dt);
+  tgZoneUpdate(dt);
+  TG.roleT -= dt; if (TG.roleT <= 0) { tgAssign(); TG.roleT = 60; }
+  if (!me.dead) tgPlayer(dt);
+  const alive = ag.filter(a => !a.dead), wolves = alive.filter(a => a.role === 'wolf'), hunters = alive.filter(a => a.role === 'hunter'), rabbits = alive.filter(a => a.role === 'rabbit');
+  const dmg = 4 + z.ph * 4;
+  for (const a of alive) {
+    if (a.dead) continue;
+    if (a.human && !a.me) a.cd = Math.max(0, a.cd - dt);
+    if (!a.me && !a.human) {
+      a.cd = Math.max(0, a.cd - dt); a.slideCd = Math.max(0, a.slideCd - dt); a.vcd = Math.max(0, a.vcd - dt);
+      if (a.vault) {
+        const v = a.vault; v.t += dt; const u = Math.min(1, v.t / v.T), e = u * u * (3 - 2 * u);
+        a.x = v.sx + (v.dx - v.sx) * e; a.y = v.sy + (v.dy - v.sy) * e; a.h = v.base + 38 * Math.sin(Math.PI * u); a.mv = true; a.sprinting = false;
+        if (u >= 1) { a.vault = null; a.h = v.base; a.vy = 0; }
+      } else {
+        let dx = 0, dy = 0, engage = false, gap = 1e9;
+        const br = aiBrain(a, dt, wolves, hunters, rabbits); if (!br) return;
+        dx = br.dx; dy = br.dy; engage = br.engage; gap = br.gap;
+        const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
+        const smax = 3 * ROLE[a.role].mul; if (a.stam > smax) a.stam = smax;
+        let sp = 150; a.sprinting = false;
+        if (engage && !a.exh && a.stam > 0 && a.slideT <= 0) { sp *= 1.5; a.sprinting = true; a.stam = Math.max(0, a.stam - dt); a.stDelay = 0.6; if (a.stam <= 0) a.exh = true; }
+        else { a.stDelay = Math.max(0, a.stDelay - dt); if (a.stDelay <= 0) a.stam = Math.min(smax, a.stam + 0.9 * dt); if (a.exh && a.stam >= smax * 0.25) a.exh = false; }
+        if (a.slideT <= 0 && a.slideCd <= 0 && a.sprinting && gap < 130 && Math.random() < 0.04) { a.slideT = 0.65; a.slideCd = 1.3; a.sdx = dx; a.sdy = dy; }
+        if (a.slideT > 0) { dx = a.sdx; dy = a.sdy; sp = 150 * (1 + 0.9 * a.slideT / 0.65); a.slideT -= dt; }
+        else if (a.vcd <= 0) { const wv = tgVaultNear(a, dx, dy); if (wv && Math.random() < (engage || a.rnd > 0 ? 0.35 : 0.02)) tgVaultStart(a, wv); }
+        if (!a.vault) { a.x += dx * sp * dt; a.y += dy * sp * dt; if (br.dx !== 0 || br.dy !== 0) { a.fx = dx; a.fz = dy; a.mv = true; } else a.mv = false; tgCollide(a); a.vy -= 900 * dt; a.h += a.vy * dt; const gg = tgGround(a); if (a.h <= gg) { a.h = gg; if (a.vy < 0) a.vy = 0; } }
+      }
+    }
+    if (Math.hypot(a.x - z.cx, a.y - z.cy) > z.r) {
+      a.hp -= dmg * dt;
+      if (a.hp <= 0) { if (a.me) { tgOver(false, 'zone'); return; } a.dead = true; }
+    }
+  }
+  if (TG.mp) tgCheckEnd(); else if (ag.filter(a => !a.dead).length === 1 && !me.dead) tgOver(true);
+}
+function tgMini(){
+  const m = $tg('tg-mm'), c = m.getContext('2d'), S = m.width, k = S / TG.W, z = TG.zone, me = TG.me;
+  c.clearRect(0, 0, S, S); c.fillStyle = 'rgba(0,0,0,0.55)'; c.fillRect(0, 0, S, S);
+  c.fillStyle = 'rgba(190,190,190,0.55)'; for (const f of TG.map.foots) c.fillRect(f.x * k, f.z * k, f.w * k, f.d * k);
+  for (const a of TG.ag) { if (a.me || a.dead) continue; c.fillStyle = a.role === 'hunter' ? '#fb923c' : a.role === 'wolf' ? '#94a3b8' : '#f9a8d4'; c.fillRect(a.x * k - 1.5, a.y * k - 1.5, 3, 3); }
+  c.fillStyle = '#fde047'; c.fillRect(me.x * k - 3, me.y * k - 3, 6, 6);
+  c.strokeStyle = '#fde047'; c.lineWidth = 2; c.beginPath(); c.moveTo(me.x * k, me.y * k); c.lineTo(me.x * k - Math.sin(TG.yaw) * 20, me.y * k - Math.cos(TG.yaw) * 20); c.stroke();
+}
+function tgDraw(){
+  const G = TG.G; if (!G) return;
+  const gl = G.gl, U = G.U, me = TG.me, z = TG.zone;
+  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  const asp = TG.vw / TG.vh, fovY = Math.max(1.0, Math.min(1.75, 2 * Math.atan(1.25 / asp))) + (me.sprinting ? 0.07 : 0);
+  const p = TG.pitch, cp = Math.cos(p), ox = Math.sin(TG.yaw) * cp, oy = Math.sin(p), oz = Math.cos(TG.yaw) * cp;
+  const cm = (TG.spec && TG.specT && !TG.specT.dead) ? TG.specT : me;
+  const eye = [cm.x, (cm.me ? cm.eyeY : 56) + cm.h, cm.y], ctr = [eye[0] - ox, eye[1] - oy, eye[2] - oz];
+  const VP = MX.mul(MX.persp(fovY, asp, 8, 5500), MX.look(eye, ctr)); TG.vp = VP; TG.eye = eye;
+  gl.clearColor(0.8, 0.9, 0.97, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  gl.uniformMatrix4fv(U.uVP, false, VP); gl.uniform3f(U.uCam, eye[0], eye[1], eye[2]); gl.uniform3f(U.uZone, z.cx, z.cy, z.r);
+  gl.uniform4f(U.uNext, z.tx || 0, z.ty || 0, z.tr || 0, z.st === 'wait' && z.ph < TG_RAD.length - 1 ? 1 : 0); gl.uniform1f(U.uTime, TG.t);
+  gl.disable(gl.CULL_FACE); gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.disable(gl.BLEND);
+  G.cur = null; G.curTex = null;
+  gl.disable(gl.DEPTH_TEST); gDraw(G, G.unit.sph, G.tex.white, MX.mul(MX.T(eye[0], eye[1], eye[2]), MX.S(8000, 8000, 8000)), [1, 1, 1], 5); gl.enable(gl.DEPTH_TEST);
+  for (const k of ['grass', 'plaza', 'road', 'walk']) if (G.mesh[k]) for (const mm of G.mesh[k]) gDraw(G, mm, G.tex[k === 'walk' ? 'conc' : k], G.I, [1, 1, 1], 1);
+  for (const k of ['wb0', 'wb1', 'wb2', 'plaster', 'floor', 'ceil', 'roof', 'conc', 'crate', 'cont', 'metal', 'glass', 'gok', 'bglass', 'barrel', 'sand', 'bark', 'leaf']) if (G.mesh[k]) for (const mm of G.mesh[k]) gDraw(G, mm, G.tex[k], G.I, [1, 1, 1], 0);
+  const U1 = G.unit, W1 = G.tex.white, SKIN = [0.99, 0.85, 0.71], LEG = [0.12, 0.16, 0.22], DARK = [0.05, 0.05, 0.06], HAIR = [[0.07, 0.07, 0.1], [0.35, 0.2, 0.1], [0.9, 0.7, 0.2], [0.3, 0.3, 0.35]];
+  const near = [];
+  for (const a of TG.ag) {
+    if (a.dead || a.me || a === cm || Math.hypot(a.x - eye[0], a.y - eye[2]) > 1800) continue; near.push(a);
+    const tgt = Math.atan2(a.fx, a.fz); if (a.ry === undefined) a.ry = tgt; let df = tgt - a.ry; df = ((df + Math.PI * 3) % (Math.PI * 2)) - Math.PI; a.ry += df * 0.3;
+    const P0 = MX.mul(MX.T(a.x, a.h, a.y), MX.RY(a.ry)), P = a.slideT > 0 ? MX.mul(P0, MX.mul(MX.T(0, 12, 0), MX.RX(-1.15))) : P0, ph = a.mv ? TG.t * (a.sprinting ? 17 : 12) + a.ph : 0, sw = a.mv ? 0.8 : 0, rc = ROLE[a.role].col;
+    const part = (m, loc, col) => gDraw(G, m, W1, MX.mul(P, loc), col, 0);
+    for (const sd of [-1, 1]) { const s1 = Math.sin(ph) * sw * sd;
+      part(U1.cube, MX.mul(MX.T(sd * 5.5, 26, 0), MX.mul(MX.RX(s1), MX.mul(MX.T(0, -13, 0), MX.S(8, 26, 8)))), LEG);
+      part(U1.cube, MX.mul(MX.T(sd * 13.5, 47, 0), MX.mul(MX.RX(-s1), MX.mul(MX.T(0, -9, 0), MX.S(6, 18, 6)))), rc);
+      part(U1.cube, MX.mul(MX.T(sd * 3.6, 59.5, 8.4), MX.S(3, 3, 2)), DARK); }
+    part(U1.cube, MX.mul(MX.T(0, 37, 0), MX.S(21, 22, 12)), rc);
+    part(U1.sph, MX.mul(MX.T(0, 58, 0), MX.S(18, 18, 18)), a.role === 'wolf' ? [0.55, 0.58, 0.64] : SKIN);
+    if (a.role === 'rabbit') { for (const sd of [-1, 1]) part(U1.cube, MX.mul(MX.T(sd * 4, 77, -1), MX.mul(MX.RX(-0.15), MX.S(4, 20, 3))), [1, 0.78, 0.86]); part(U1.sph, MX.mul(MX.T(0, 32, -8), MX.S(9, 9, 9)), [1, 1, 1]); }
+    else if (a.role === 'wolf') { for (const sd of [-1, 1]) part(U1.cone, MX.mul(MX.T(sd * 6, 64, -1), MX.S(6, 11, 6)), [0.4, 0.42, 0.48]); part(U1.cube, MX.mul(MX.T(0, 55, 10), MX.S(7, 6, 8)), [0.3, 0.32, 0.36]); part(U1.cone, MX.mul(MX.T(0, 30, -7), MX.mul(MX.RX(-1.3), MX.S(5, 16, 5))), [0.4, 0.42, 0.48]); }
+    else { part(U1.cube, MX.mul(MX.T(0, 65, -1), MX.S(18, 6, 17)), [0.2, 0.45, 0.2]); part(U1.cube, MX.mul(MX.T(0, 62, 6), MX.S(18, 2, 8)), [0.15, 0.35, 0.15]); part(U1.cube, MX.mul(MX.T(0, 37, -8), MX.S(16, 18, 5)), [0.35, 0.25, 0.15]); }
+    if (a.role !== 'hunter') part(U1.cube, MX.mul(MX.T(0, 65, -1), MX.S(17, 5, 16)), a.role === 'rabbit' ? [1, 0.9, 0.93] : HAIR[Math.floor(a.ph * 3) % 4]);
+  }
+  gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+  for (const a of near) gDraw(G, U1.cyl, W1, MX.mul(MX.T(a.x, 0.7 + a.h, a.y), MX.S(36, 0.5, 36)), [1, 1, 1], 4);
+  gl.depthMask(true); gl.disable(gl.BLEND);
+  gl.clear(gl.DEPTH_BUFFER_BIT);
+  if (!TG.spec) {
+  const fw = [-ox, -oy, -oz], rg = [Math.cos(TG.yaw), 0, -Math.sin(TG.yaw)], up = [rg[1] * fw[2] - rg[2] * fw[1], rg[2] * fw[0] - rg[0] * fw[2], rg[0] * fw[1] - rg[1] * fw[0]];
+  const CM = [rg[0], rg[1], rg[2], 0, up[0], up[1], up[2], 0, -fw[0], -fw[1], -fw[2], 0, eye[0], eye[1], eye[2], 1];
+  const bob = me.mv && !me.vault ? Math.sin(TG.t * (me.sprinting ? 14 : 9)) : 0, swing = me.arm > 0 ? Math.sin(me.arm / 0.3 * Math.PI) : 0, sl = ROLE[me.role].col;
+  for (const sd of [-1, 1]) {
+    const f = sd > 0 ? swing : 0, loc = MX.mul(MX.T(sd * 8, -10 + bob * 0.4 * sd, -13 - f * 14), MX.mul(MX.RX(-f * 0.7), MX.S(3.6, 3.6, 18)));
+    gDraw(G, U1.cube, W1, MX.mul(CM, loc), sl, 0);
+    gDraw(G, U1.cube, W1, MX.mul(CM, MX.mul(MX.T(sd * 8, -10 + bob * 0.4 * sd, -23 - f * 18), MX.mul(MX.RX(-f * 0.7), MX.S(4.2, 4.2, 4.2)))), SKIN, 0);
+  }
+  }
+  tgNames();
+}
+function tgHud(){
+  const z = TG.zone, me = TG.me, r = ROLE[me.role];
+  $tg('tg-cnt').textContent = '생존자 ' + TG.ag.filter(a => !a.dead).length + ' / 50';
+  $tg('tg-zone').textContent = '';
+  $tg('tg-hp').style.width = Math.max(0, me.hp) + '%';
+  $tg('tg-st').style.width = Math.max(0, me.stam / (3 * r.mul) * 100) + '%'; $tg('tg-st').style.background = me.exh ? '#ef4444' : '#facc15';
+  const rb = $tg('tg-role'), t = Math.max(0, Math.ceil(TG.roleT));
+  rb.firstChild.nodeValue = r.e + ' ' + r.n + ' · ' + (me.role === 'rabbit' ? '태그 불가' : me.role === 'wolf' ? '토끼만 태그' : '토끼·늑대 태그');
+  $tg('tg-rt2').textContent = '역할 변경 ' + Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+  $tg('tg-danger').style.opacity = Math.hypot(me.x - z.cx, me.y - z.cy) > z.r ? 0.55 + 0.35 * Math.sin(TG.t * 8) : 0;
+  $tg('tg-act').style.boxShadow = tgVaultNear() ? '0 0 0 4px #fde047' : 'none';
+  $tg('tg-tag').style.opacity = me.cd > 0 ? 0.55 : 1;
+}
+function tgLoop(now){
+  if (!TG.run) return;
+  const dt = Math.min(0.05, (now - TG.last) / 1000); TG.last = now; TG.t += dt;
+  if (TG.toastT > 0) { TG.toastT -= dt; if (TG.toastT <= 0) $tg('tg-toast').classList.add('hidden'); }
+  if (TG.mp === 'client') tgClientStep(dt); else { tgStep(dt); if (TG.mp === 'host' && TG.run) tgHostSend(dt); }
+  if (!TG.run) return;
+  tgaTick(dt);
+  tgDraw(); tgHud();
+  TG.raf = requestAnimationFrame(tgLoop);
+}
+(function(){
+  const sc = $tg('tag-screen'), jr = $tg('tg-jr'), jk = $tg('tg-jk');
+  const pos = e => { const r = sc.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  const place = (el, x, y) => { el.style.left = (x - el.offsetWidth / 2) + 'px'; el.style.top = (y - el.offsetHeight / 2) + 'px'; };
+  sc.addEventListener('pointerdown', e => {
+    if (!TG.run || e.target.closest('button')) return;
+    const p = pos(e);
+    if (p[0] < TG.vw * 0.5) {
+      if (TG.joy) return;
+      TG.joy = {id: e.pointerId, ox: p[0], oy: p[1], dx: 0, dy: 0};
+      jr.classList.remove('hidden'); jk.classList.remove('hidden'); place(jr, p[0], p[1]); place(jk, p[0], p[1]);
+    } else if (!TG.cam) TG.cam = {id: e.pointerId, x: p[0], y: p[1]};
+  });
+  sc.addEventListener('pointermove', e => {
+    const p = pos(e), j = TG.joy, ca = TG.cam;
+    if (j && j.id === e.pointerId) { let dx = (p[0] - j.ox) / 50, dy = (p[1] - j.oy) / 50; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } j.dx = dx; j.dy = dy; place(jk, j.ox + dx * 50, j.oy + dy * 50); }
+    if (ca && ca.id === e.pointerId) { TG.yaw -= (p[0] - ca.x) * 0.008; TG.pitch = Math.max(-1.3, Math.min(1.3, TG.pitch + (p[1] - ca.y) * 0.004)); ca.x = p[0]; ca.y = p[1]; }
+  });
+  ['pointerup', 'pointercancel'].forEach(t => sc.addEventListener(t, e => {
+    if (TG.joy && TG.joy.id === e.pointerId) { TG.joy = null; jr.classList.add('hidden'); jk.classList.add('hidden'); }
+    if (TG.cam && TG.cam.id === e.pointerId) TG.cam = null;
+  }));
+  const btn = (id, on, off) => { const b = $tg(id); b.addEventListener('pointerdown', e => { e.stopPropagation(); e.preventDefault(); on(); }); if (off) ['pointerup', 'pointerleave', 'pointercancel'].forEach(t => b.addEventListener(t, off)); };
+  btn('tg-tag', tgTag); btn('tg-jump', tgJump); btn('tg-slide', tgSlide); btn('tg-act', tgInteract); btn('tg-run', () => { TG.sprint = true; }, () => { TG.sprint = false; });
+  sc.addEventListener('click', e => { if (!TG.run || e.target.closest('button')) return; if (document.pointerLockElement === sc) tgTag(); else if (e.pointerType === 'mouse') { try { sc.requestPointerLock(); } catch (er) {} } });
+  document.addEventListener('mousemove', e => { if (TG.run && document.pointerLockElement === sc) { TG.yaw -= e.movementX * 0.0025; TG.pitch = Math.max(-1.3, Math.min(1.3, TG.pitch + e.movementY * 0.0025)); } });
+  document.addEventListener('keydown', e => { if (!TG.run) return; TG.keys[e.code] = true; if (e.code === 'Space') { e.preventDefault(); tgJump(); } if (e.code === 'KeyC') tgSlide(); if (e.code === 'KeyE') tgInteract(); if (e.code === 'KeyF') tgTag(); });
+  document.addEventListener('keyup', e => { TG.keys[e.code] = false; });
+  window.addEventListener('resize', () => { if (TG.run) tgResize(); });
+})();
+</script>
+<script>
+const NAV = {cs: 20, n: 160, blk: null, wall: null, g: null, came: null, vis: null, cl: null, stamp: 0, ready: false};
+function navBuild(){
+  const n = NAV.n, cs = NAV.cs, blk = new Uint8Array(n * n), wall = new Uint8Array(n * n);
+  const mark = (arr, x0, y0, x1, y1) => { const a = Math.max(0, Math.floor(x0 / cs)), b = Math.min(n - 1, Math.floor(x1 / cs)), c = Math.max(0, Math.floor(y0 / cs)), d = Math.min(n - 1, Math.floor(y1 / cs)); for (let iy = c; iy <= d; iy++) for (let ix = a; ix <= b; ix++) arr[iy * n + ix] = 1; };
+  for (const o of TG.obs) {
+    if (o.step || o.hgt <= 8 || (o.y0 && o.y0 > 0)) continue;
+    const r = o.k === 'r' ? [o.x, o.y, o.x + o.w, o.y + o.h] : [o.x - o.r, o.y - o.r, o.x + o.r, o.y + o.r];
+    mark(blk, r[0] - 6, r[1] - 6, r[2] + 6, r[3] + 6); if (o.hgt >= 50) mark(wall, r[0], r[1], r[2], r[3]);
+  }
+  for (let i = 0; i < n; i++) { blk[i] = blk[(n - 1) * n + i] = blk[i * n] = blk[i * n + n - 1] = 1; }
+  NAV.blk = blk; NAV.wall = wall; NAV.g = new Float32Array(n * n); NAV.came = new Int32Array(n * n); NAV.vis = new Int32Array(n * n); NAV.cl = new Int32Array(n * n); NAV.ready = true;
+}
+function navCell(x, y){ const ix = Math.floor(x / NAV.cs), iy = Math.floor(y / NAV.cs); return (ix < 0 || iy < 0 || ix >= NAV.n || iy >= NAV.n) ? -1 : iy * NAV.n + ix; }
+function navNearFree(c){
+  if (c < 0) return -1; const n = NAV.n; if (!NAV.blk[c]) return c; const cx = c % n, cy = (c / n) | 0;
+  for (let r = 1; r < 6; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue; const x = cx + dx, y = cy + dy; if (x < 0 || y < 0 || x >= n || y >= n) continue; if (!NAV.blk[y * n + x]) return y * n + x; }
+  return -1;
+}
+function navClear(a, b){ const d = Math.hypot(b[0] - a[0], b[1] - a[1]), st = Math.max(1, Math.ceil(d / 8)); for (let k = 1; k < st; k++) { const c = navCell(a[0] + (b[0] - a[0]) * k / st, a[1] + (b[1] - a[1]) * k / st); if (c < 0 || NAV.blk[c]) return false; } return true; }
+function navLOS(x0, y0, x1, y1){ const d = Math.hypot(x1 - x0, y1 - y0), st = Math.max(1, Math.ceil(d / 10)), n = NAV.n, w = NAV.wall; for (let k = 1; k < st; k++) { const ix = Math.floor((x0 + (x1 - x0) * k / st) / NAV.cs), iy = Math.floor((y0 + (y1 - y0) * k / st) / NAV.cs); if (ix >= 0 && iy >= 0 && ix < n && iy < n && w[iy * n + ix]) return false; } return true; }
+function navSmooth(p){ const out = [p[0]]; let i = 0; while (i < p.length - 1) { let j = p.length - 1; while (j > i + 1 && !navClear(p[i], p[j])) j--; out.push(p[j]); i = j; } return out; }
+function navPath(sx, sy, gx, gy){
+  const s = navNearFree(navCell(sx, sy)), g = navNearFree(navCell(gx, gy)); if (s < 0 || g < 0) return null;
+  const n = NAV.n, blk = NAV.blk, G = NAV.g, came = NAV.came, vis = NAV.vis, cl = NAV.cl, st = ++NAV.stamp, gx0 = g % n, gy0 = (g / n) | 0, hp = [], hf = [];
+  const push = (i, f) => { let k = hp.length; hp.push(i); hf.push(f); while (k > 0) { const p = (k - 1) >> 1; if (hf[p] <= hf[k]) break; const ti = hp[p], tf = hf[p]; hp[p] = hp[k]; hf[p] = hf[k]; hp[k] = ti; hf[k] = tf; k = p; } };
+  const pop = () => { const top = hp[0], li = hp.pop(), lf = hf.pop(); if (hp.length) { hp[0] = li; hf[0] = lf; let k = 0; for (;;) { const l = 2 * k + 1, r = l + 1; let m = k; if (l < hp.length && hf[l] < hf[m]) m = l; if (r < hp.length && hf[r] < hf[m]) m = r; if (m === k) break; const ti = hp[m], tf = hf[m]; hp[m] = hp[k]; hf[m] = hf[k]; hp[k] = ti; hf[k] = tf; k = m; } } return top; };
+  const hh = i => { const dx = Math.abs((i % n) - gx0), dy = Math.abs(((i / n) | 0) - gy0); return dx + dy - 0.586 * Math.min(dx, dy); };
+  G[s] = 0; came[s] = -1; vis[s] = st; push(s, hh(s)); let cnt = 0, found = false;
+  while (hp.length && cnt < 9000) {
+    const cur = pop(); if (cl[cur] === st) continue; cl[cur] = st; cnt++; if (cur === g) { found = true; break; }
+    const cx = cur % n, cy = (cur / n) | 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      if (!dx && !dy) continue; const nx = cx + dx, ny = cy + dy; if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue; const ni = ny * n + nx; if (blk[ni] || cl[ni] === st) continue;
+      if (dx && dy && (blk[cy * n + nx] || blk[ny * n + cx])) continue;
+      const ng = G[cur] + (dx && dy ? 1.414 : 1); if (vis[ni] !== st || ng < G[ni]) { vis[ni] = st; G[ni] = ng; came[ni] = cur; push(ni, ng + hh(ni)); }
+    }
+  }
+  if (!found) return null;
+  const pts = []; for (let c = g; c !== -1; c = came[c]) pts.push([(c % n) * NAV.cs + NAV.cs / 2, ((c / n) | 0) * NAV.cs + NAV.cs / 2]); pts.reverse();
+  return navSmooth(pts);
+}
+function aiInFootXY(x, y){ const F = TG.map.foots; for (let i = 0; i < F.length; i++) { const f = F[i]; if (x > f.x && x < f.x + f.w && y > f.z && y < f.z + f.d) return i; } return -1; }
+function aiRoomGoal(bi){ const f = TG.map.foots[bi]; for (let t = 0; t < 50; t++) { const x = f.x + 24 + Math.random() * (f.w - 48), y = f.z + 24 + Math.random() * (f.d - 48), c = navCell(x, y); if (c >= 0 && !NAV.blk[c]) return [x, y]; } return null; }
+function aiRandomFar(a, r0, r1){ for (let t = 0; t < 30; t++) { const g = Math.random() * 6.283, r = r0 + Math.random() * (r1 - r0), x = a.x + Math.cos(g) * r, y = a.y + Math.sin(g) * r, c = navCell(x, y); if (c >= 0 && !NAV.blk[c]) return [x, y]; } return null; }
+function aiPickSearch(a){
+  const F = TG.map.foots; let best = -1, bs = -1e9;
+  for (let i = 0; i < F.length; i++) { const f = F[i], d = Math.hypot(f.x + f.w / 2 - a.x, f.z + f.d / 2 - a.y), age = Math.min(150, TG.t - (TG.searched[i] === undefined ? -90 : TG.searched[i])), sc = age - d * 0.04 + Math.random() * 30; if (sc > bs) { bs = sc; best = i; } }
+  a.sb = best; a.sbN = 3 + ((Math.random() * 3) | 0); return best >= 0 ? aiRoomGoal(best) : null;
+}
+function aiHideGoal(a){
+  const F = TG.map.foots; let best = -1, bs = -1e9;
+  for (let i = 0; i < F.length; i++) { const f = F[i], cx = f.x + f.w / 2, cy = f.z + f.d / 2; let sc = -Math.hypot(cx - a.x, cy - a.y) * 0.05 + Math.random() * 40; if (a.thr) sc += Math.min(700, Math.hypot(cx - a.thr.x, cy - a.thr.y)) * 0.08; if (a.hb === i) sc += 15; if (sc > bs) { bs = sc; best = i; } }
+  a.hb = best; return best >= 0 ? aiRoomGoal(best) : aiRandomFar(a, 200, 600);
+}
+function aiFleeGoal(a, th){
+  let best = null, bs = -1e9; const d0 = Math.hypot(a.x - th.x, a.y - th.y);
+  for (let k = 0; k < 12; k++) {
+    const g = Math.random() * 6.283, r = 250 + Math.random() * 350, x = a.x + Math.cos(g) * r, y = a.y + Math.sin(g) * r, c = navCell(x, y); if (c < 0 || NAV.blk[c]) continue;
+    const dt = Math.hypot(x - th.x, y - th.y); let sc = dt - r * 0.25; if (!navLOS(th.x, th.y, x, y)) sc += 140; if (aiInFootXY(x, y) >= 0) sc += 60; if (dt < d0) sc -= 400;
+    if (sc > bs) { bs = sc; best = [x, y]; }
+  }
+  return best;
+}
+function aiPerceive(a, list){
+  let best = null, bd = 1e9;
+  for (const p of list) { if (p.dead || p === a) continue; const d = Math.hypot(p.x - a.x, p.y - a.y); if (d > 560 || d >= bd) continue; const hear = p.mv ? (p.sprinting ? 300 : 150) : 55; if (d < hear || (Math.abs(p.h - a.h) < 60 && navLOS(a.x, a.y, p.x, p.y))) { best = p; bd = d; } }
+  return [best, bd];
+}
+function aiGoto(a, x, y){ a.goal = [x, y]; a.path = null; a.pi = 0; a.pend = true; a.pfail = false; a.gt = TG.t; }
+function aiThink(a, wolves, hunters, rabbits, dtk){
+  const preds = a.role === 'rabbit' ? wolves.concat(hunters) : a.role === 'wolf' ? hunters : [], prey = a.role === 'wolf' ? rabbits : a.role === 'hunter' ? rabbits.concat(wolves) : [];
+  const [th, thd] = aiPerceive(a, preds), [pr, prd] = aiPerceive(a, prey), prev = a.mode;
+  a.th = th; a.thd = thd; a.pr = pr; a.prd = prd; if (th) a.thr = {x: th.x, y: th.y}; if (pr) a.mem = {x: pr.x, y: pr.y, t: TG.t, h: pr.h};
+  const at = a.goal && Math.hypot(a.goal[0] - a.x, a.goal[1] - a.y) < 36;
+  if (th && thd < 450) {
+    a.mode = 'flee'; a.idle = 0; a.look = 0;
+    if (prev !== 'flee' || !a.goal || at || TG.t - a.gt > 1.2) { const g = aiFleeGoal(a, th); if (g) aiGoto(a, g[0], g[1]); }
+  } else if (a.role !== 'rabbit' && (pr || (a.mem && TG.t - a.mem.t < 7))) {
+    a.mode = 'chase'; const tx = pr ? pr.x : a.mem.x, ty = pr ? pr.y : a.mem.y, thh = pr ? pr.h : a.mem.h; let gx = tx, gy = ty;
+    if (Math.abs(thh - a.h) > 50 && TG.map.stairs.length) {
+      const up = thh > a.h; let bs = null, bd = 1e9; for (const sr of TG.map.stairs) { const px = up ? sr.bx : sr.tx, pz = up ? sr.bz : sr.tz, dd = Math.hypot(px - a.x, pz - a.y); if (dd < bd) { bd = dd; bs = sr; } }
+      const nearB = Math.hypot(bs.bx - a.x, bs.bz - a.y) < 45, nearT = Math.hypot(bs.tx - a.x, bs.tz - a.y) < 45, goTop = up ? (a.h > 8 || nearB) : (a.h > 90 && !nearT); gx = goTop ? bs.tx : bs.bx; gy = goTop ? bs.tz : bs.bz;
+    }
+    if (prev !== 'chase' || !a.goal || Math.hypot(a.goal[0] - gx, a.goal[1] - gy) > 70 || TG.t - a.gt > 1.5) aiGoto(a, gx, gy);
+    if (!pr && Math.hypot(a.x - tx, a.y - ty) < 50) a.mem = null;
+  } else if (a.role !== 'rabbit') {
+    a.mode = 'search';
+    if (prev !== 'search' || !a.goal || at || TG.t - a.gt > 22) {
+      if (at && prev === 'search' && a.sb >= 0) { TG.searched[a.sb] = TG.t; a.look = 1 + Math.random() * 0.8; a.sbN--; }
+      let g = null; if (a.sb >= 0 && a.sbN > 0 && prev === 'search') g = aiRoomGoal(a.sb);
+      if (!g) { if (Math.random() < 0.82) g = aiPickSearch(a); else { a.sb = -1; g = aiRandomFar(a, 300, 900); } }
+      if (g) aiGoto(a, g[0], g[1]);
+    }
+  } else {
+    a.mode = 'hide';
+    if (at && !(a.idle > 0) && prev === 'hide') a.idle = 5 + Math.random() * 9;
+    if (a.idle > 0) { a.idle -= dtk; if (a.idle <= 0) a.goal = null; }
+    if (prev !== 'hide' || !a.goal) { const g = aiHideGoal(a); if (g) { aiGoto(a, g[0], g[1]); a.idle = 0; } }
+  }
+}
+function aiBrain(a, dt, wolves, hunters, rabbits){
+  a.dtk = (a.dtk || 0) + dt; a.tk = (a.tk || 0) - dt;
+  if (a.tk <= 0) { aiThink(a, wolves, hunters, rabbits, a.dtk); a.dtk = 0; a.tk = 0.22 + Math.random() * 0.1; }
+  const pr = a.pr;
+  if (a.role !== 'rabbit' && pr && !pr.dead && a.cd <= 0 && canTag(a, pr) && Math.hypot(pr.x - a.x, pr.y - a.y) < 40 && Math.abs(pr.h - a.h) < 40) { a.cd = 0.9; tgKill(pr, a); a.pr = null; if (!TG.run) return null; }
+  a.stuck = (a.stuck || 0) + dt;
+  if (a.stuck > 1.2) { a.stuck = 0; if (!(a.look > 0) && !(a.idle > 0) && Math.hypot(a.x - a.px, a.y - a.py) < 12 && a.goal) { a.pend = true; a.rnd = 0.6; a.wa = tgR(0, 6.28); } a.px = a.x; a.py = a.y; }
+  if (a.pend && TG.navBudget > 0 && a.goal) { TG.navBudget--; a.pend = false; const p = navPath(a.x, a.y, a.goal[0], a.goal[1]); a.path = p && p.length > 1 ? p : null; a.pi = 1; a.pfail = !p; }
+  let dx = 0, dy = 0;
+  if (a.look > 0) a.look -= dt;
+  else if (a.rnd > 0) { a.rnd -= dt; dx = Math.cos(a.wa); dy = Math.sin(a.wa); }
+  else if (a.mode === 'hide' && a.idle > 0 && a.goal && Math.hypot(a.goal[0] - a.x, a.goal[1] - a.y) < 40) { }
+  else if (a.path && a.pi < a.path.length) { let wp = a.path[a.pi]; while (wp && Math.hypot(wp[0] - a.x, wp[1] - a.y) < 22) { a.pi++; wp = a.path[a.pi]; } if (wp) { const d = Math.hypot(wp[0] - a.x, wp[1] - a.y) || 1; dx = (wp[0] - a.x) / d; dy = (wp[1] - a.y) / d; } }
+  else if (a.goal && a.pfail) { const d = Math.hypot(a.goal[0] - a.x, a.goal[1] - a.y); if (d > 30) { dx = (a.goal[0] - a.x) / d; dy = (a.goal[1] - a.y) / d; } }
+  return {dx, dy, engage: (a.mode === 'chase' && a.prd < 320) || (a.mode === 'flee' && a.thd < 260), gap: a.mode === 'flee' ? a.thd : (a.prd || 1e9)};
+}
+const TGA = {c: null, m: null, nb: null, wind: null, stT: 0, hbT: 0, air: false, ag: new Map()};
+function tgaCtx(){
+  if (TGA.c) return TGA.c;
+  try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; const c = new C(), m = c.createGain(); m.gain.value = 0.9; m.connect(c.destination); TGA.c = c; TGA.m = m;
+    const len = c.sampleRate * 2, b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; TGA.nb = b;
+    const ws = c.createBufferSource(); ws.buffer = b; ws.loop = true; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 420; const g = c.createGain(); g.gain.value = 0.015; ws.connect(f); f.connect(g); g.connect(m); ws.start(); TGA.wind = g;
+  } catch (e) { TGA.c = null; }
+  return TGA.c;
+}
+function tgaUnlock(){ const c = tgaCtx(); if (c && c.state === 'suspended') c.resume(); }
+function tgaOut(pan){ const c = TGA.c; if (pan && c.createStereoPanner) { const p = c.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pan)); p.connect(TGA.m); return p; } return TGA.m; }
+function tgaNoise(dur, ft, f0, f1, vol, pan, q){
+  const c = tgaCtx(); if (!c || !TGA.nb || vol < 0.003) return; const t = c.currentTime, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  s.buffer = TGA.nb; f.type = ft; f.Q.value = q || 0.8; f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.02, dur * 0.3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(tgaOut(pan)); s.start(t, Math.random() * 1.4, dur + 0.05);
+}
+function tgaTone(f0, f1, dur, type, vol, pan){
+  const c = tgaCtx(); if (!c || vol < 0.003) return; const t = c.currentTime, o = c.createOscillator(), g = c.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f0, t); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.02, dur * 0.3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(tgaOut(pan)); o.start(t); o.stop(t + dur + 0.05);
+}
+function tgaPan(a){ const dx = a.x - TG.me.x, dy = a.y - TG.me.y, d = Math.hypot(dx, dy) || 1; return (dx / d) * Math.cos(TG.yaw) + (dy / d) * -Math.sin(TG.yaw); }
+function tgaStep(v, pan, inside, sprint){ tgaNoise(inside ? 0.07 : 0.09, 'bandpass', inside ? 1100 : 420, inside ? 600 : 220, v * (sprint ? 1.3 : 1), pan, 1.2); tgaTone(inside ? 150 : 90, 60, 0.07, 'sine', v * 0.5, pan); }
+function tgaJump(){ tgaNoise(0.12, 'bandpass', 500, 1200, 0.18, 0, 0.8); tgaTone(220, 330, 0.1, 'sine', 0.06, 0); }
+function tgaLand(){ tgaTone(110, 45, 0.13, 'sine', 0.3, 0); tgaNoise(0.1, 'lowpass', 600, 200, 0.2, 0); }
+function tgaSlide(){ tgaNoise(0.55, 'bandpass', 700, 200, 0.28, 0, 0.6); }
+function tgaVault(who){ let v = 0.3, pan = 0; if (who) { const d = Math.hypot(who.x - TG.me.x, who.y - TG.me.y); if (d > 500) return; v *= 1 - d / 500; pan = tgaPan(who); } tgaNoise(0.3, 'bandpass', 900, 350, v, pan, 0.7); tgaTone(130, 70, 0.15, 'sine', v, pan); }
+function tgaSwing(){ tgaNoise(0.18, 'bandpass', 400, 1800, 0.25, 0, 0.9); }
+function tgaHit(){ tgaTone(150, 55, 0.16, 'sine', 0.55, 0); tgaNoise(0.1, 'lowpass', 1500, 300, 0.3, 0); setTimeout(() => tgaTone(660, 880, 0.12, 'triangle', 0.12, 0), 90); }
+function tgaHurt(){ tgaTone(90, 30, 0.9, 'sawtooth', 0.35, 0); tgaNoise(0.7, 'lowpass', 2000, 120, 0.4, 0); }
+function tgaRole(r){ if (r === 'rabbit') { tgaTone(660, 880, 0.18, 'sine', 0.14, 0); setTimeout(() => tgaTone(880, 1170, 0.2, 'sine', 0.12, 0), 140); } else if (r === 'wolf') { tgaTone(280, 520, 0.7, 'sawtooth', 0.12, 0); tgaTone(284, 530, 0.7, 'triangle', 0.1, 0); } else { tgaTone(349, 349, 0.5, 'sawtooth', 0.12, 0); tgaTone(440, 440, 0.5, 'sawtooth', 0.1, 0); } }
+function tgaWin(){ [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => tgaTone(f, f, 0.3, 'triangle', 0.18, 0), i * 140)); }
+function tgaLose(){ [392, 330, 262].forEach((f, i) => setTimeout(() => tgaTone(f, f * 0.97, 0.4, 'triangle', 0.18, 0), i * 220)); }
+function tgaTick(dt){
+  const c = TGA.c, me = TG.me; if (!c || !me) return;
+  if (me.h > me.gy + 3) TGA.air = true; else if (TGA.air && me.h <= me.gy + 1) { TGA.air = false; tgaLand(); }
+  const grounded = me.h <= me.gy + 1 && !me.vault && !me.dead;
+  if (me.mv && grounded && !(me.slideT > 0)) { TGA.stT += dt; if (TGA.stT >= (me.sprinting ? 0.24 : 0.36)) { TGA.stT = 0; tgaStep(0.22, 0, aiInFootXY(me.x, me.y) >= 0, me.sprinting); } } else TGA.stT = 0.2;
+  let n = 0;
+  for (const a of TG.ag) {
+    if (a.me || a.dead || !a.mv) continue; const d = Math.hypot(a.x - me.x, a.y - me.y); if (d > 420) continue;
+    let t = (TGA.ag.get(a) || 0) + dt; if (t >= (a.sprinting ? 0.24 : 0.36) && n < 4) { t = 0; n++; tgaStep(0.3 * Math.pow(1 - d / 420, 2), tgaPan(a), aiInFootXY(a.x, a.y) >= 0, a.sprinting); } TGA.ag.set(a, t);
+  }
+  if (!me.dead) {
+    let nd = 1e9; for (const a of TG.ag) { if (a.dead || a.me || !canTag(a, me)) continue; const d = Math.hypot(a.x - me.x, a.y - me.y); if (d < nd) nd = d; }
+    if (nd < 450) { TGA.hbT -= dt; if (TGA.hbT <= 0) { TGA.hbT = 0.32 + 0.6 * (nd / 450); const v = 0.25 + 0.3 * (1 - nd / 450); tgaTone(62, 40, 0.1, 'sine', v, 0); setTimeout(() => tgaTone(55, 38, 0.1, 'sine', v * 0.7, 0), 130); } }
+  }
+  if (TGA.wind) TGA.wind.gain.value = 0.015 + 0.02 * (me.mv ? (me.sprinting ? 1 : 0.5) : 0);
+}
+document.addEventListener('pointerdown', tgaUnlock); document.addEventListener('keydown', tgaUnlock);
+</script>
+<div id="start-overlay" style="position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#030712;color:#fff;text-align:center;padding:20px;overflow:auto;font-family:sans-serif">
+  <div style="font-size:30px;font-weight:900;margin-bottom:6px">태그 게임</div>
+  <div style="color:#94a3b8;font-size:13px;line-height:1.6;margin-bottom:14px">토끼·늑대·사냥꾼 역할이 1분마다 바뀌는 50인 술래잡기<br>왼쪽 드래그로 이동, 오른쪽 드래그로 시점 회전 (가로 화면 권장)</div>
+  <div id="lb-menu" style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px">
+    <input id="lb-name" maxlength="10" placeholder="닉네임" style="padding:10px 12px;border-radius:10px;border:1px solid #475569;background:#0f172a;color:#fff;font-size:16px;text-align:center">
+    <button id="lb-solo" style="padding:12px;border-radius:12px;background:#334155;color:#fff;font-weight:800;font-size:16px;border:0;cursor:pointer">혼자 하기 (AI 49명)</button>
+    <button id="lb-make" style="padding:12px;border-radius:12px;background:#f59e0b;color:#0f172a;font-weight:900;font-size:17px;border:0;cursor:pointer">방 만들기</button>
+    <div style="display:flex;gap:8px"><input id="lb-code" maxlength="4" placeholder="방 코드 4자리" style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #475569;background:#0f172a;color:#fff;font-size:18px;text-align:center;text-transform:uppercase;letter-spacing:.25em"><button id="lb-join" style="padding:10px 16px;border-radius:10px;background:#22c55e;color:#052e16;font-weight:900;border:0;cursor:pointer">방 참가</button></div>
+  </div>
+  <div id="lb-room" style="display:none;flex-direction:column;gap:8px;width:100%;max-width:320px">
+    <div style="color:#94a3b8;font-size:13px">방 코드</div>
+    <div id="lb-codeview" style="font-size:44px;font-weight:900;letter-spacing:.25em;color:#fde68a">----</div>
+    <div id="lb-share"><button id="lb-copy" style="padding:8px 14px;border-radius:10px;background:#1e293b;color:#e2e8f0;border:1px solid #475569;font-weight:700;cursor:pointer">초대 링크 복사</button></div>
+    <div id="lb-count" style="color:#94a3b8;font-size:13px"></div>
+    <div id="lb-list" style="text-align:left;font-size:15px"></div>
+    <button id="lb-start" style="padding:12px;border-radius:12px;background:#f59e0b;color:#0f172a;font-weight:900;font-size:17px;border:0;cursor:pointer">게임 시작</button>
+    <div id="lb-wait" style="display:none;color:#94a3b8;font-size:14px;padding:8px">방장이 시작하길 기다리는 중...</div>
+    <button id="lb-leave" style="padding:9px;border-radius:10px;background:#334155;color:#fff;font-weight:700;border:0;cursor:pointer">나가기</button>
+  </div>
+  <div id="lb-msg" style="color:#fca5a5;font-size:14px;min-height:22px;margin-top:10px;max-width:320px"></div>
+</div>
+<script>
+const NET = {mode: 'single', peer: null, conns: {}, hostConn: null, myId: null, code: '', name: '', players: [], started: false, prefix: 'tg49-'};
+const $n = id => document.getElementById(id);
+function netCode(){ const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let s = ''; for (let i = 0; i < 4; i++) s += c[(Math.random() * c.length) | 0]; return s; }
+function netMsg(t){ const e = $n('lb-msg'); if (e) e.textContent = t || ''; }
+function netShow(w){ $n('lb-menu').style.display = w === 'menu' ? 'flex' : 'none'; $n('lb-room').style.display = w === 'room' ? 'flex' : 'none'; }
+function netName(){ const v = ($n('lb-name').value.trim() || '플레이어').slice(0, 10); try { localStorage.setItem('tg49name', v); } catch (e) {} return v; }
+function netToHost(m){ try { if (NET.hostConn) NET.hostConn.send(m); } catch (e) {} }
+function netToPid(pid, m){ try { const c = NET.conns[pid]; if (c) c.send(m); } catch (e) {} }
+function netBcast(m){ for (const pid in NET.conns) netToPid(pid, m); }
+function netToIdx(idx, m){ const p = NET.players.find(q => q.idx === idx); if (p && !p.host) netToPid(p.pid, m); }
+function netHost(){
+  if (typeof Peer === 'undefined') { netMsg('네트워크 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인하세요.'); return; }
+  NET.name = netName(); NET.mode = 'host'; NET.started = false; NET.conns = {}; NET.code = netCode(); netMsg('방을 만드는 중...');
+  let peer; try { peer = new Peer(NET.prefix + NET.code); } catch (e) { netMsg('연결에 실패했어요'); return; }
+  NET.peer = peer;
+  peer.on('open', id => { NET.myId = id; NET.players = [{pid: id, name: NET.name, idx: 0, host: true}]; netShow('room'); netRoomRender(); netMsg(''); });
+  peer.on('error', err => { if (err.type === 'unavailable-id') { try { peer.destroy(); } catch (e) {} netHost(); } else netMsg('연결 오류: ' + err.type); });
+  peer.on('connection', conn => { conn.on('data', m => netRecv(conn.peer, m, conn)); conn.on('close', () => netLost(conn.peer)); conn.on('error', () => netLost(conn.peer)); });
+}
+function netJoin(){
+  if (typeof Peer === 'undefined') { netMsg('네트워크 라이브러리를 불러오지 못했어요. 인터넷 연결을 확인하세요.'); return; }
+  const code = $n('lb-code').value.trim().toUpperCase(); if (code.length !== 4) { netMsg('방 코드 4자리를 입력하세요'); return; }
+  NET.name = netName(); NET.mode = 'client'; NET.code = code; netMsg('방에 접속하는 중...');
+  let done = false, peer; const fail = t => { if (done) return; done = true; netMsg(t); try { peer.destroy(); } catch (e) {} NET.mode = 'single'; };
+  try { peer = new Peer(); } catch (e) { netMsg('연결에 실패했어요'); return; }
+  NET.peer = peer;
+  peer.on('open', id => {
+    NET.myId = id; const conn = peer.connect(NET.prefix + code, {reliable: true, serialization: 'json'}); NET.hostConn = conn;
+    conn.on('open', () => conn.send({t: 'hello', name: NET.name}));
+    conn.on('data', m => { done = true; netRecv(conn.peer, m, conn); });
+    conn.on('close', () => netHostLost()); conn.on('error', () => fail('연결 오류'));
+    setTimeout(() => { if (!done) fail('방을 찾을 수 없어요 (코드를 확인하세요)'); }, 9000);
+  });
+  peer.on('error', err => fail(err.type === 'peer-unavailable' ? '방을 찾을 수 없어요 (코드를 확인하세요)' : '연결 오류: ' + err.type));
+}
+function netLeave(){ try { if (NET.peer) NET.peer.destroy(); } catch (e) {} NET.peer = null; NET.hostConn = null; NET.conns = {}; NET.mode = 'single'; NET.players = []; NET.started = false; netShow('menu'); }
+function netLobbyBcast(){ netBcast({t: 'lobby', code: NET.code, players: NET.players.map(p => ({name: p.name, idx: p.idx, host: !!p.host}))}); netRoomRender(); }
+function netRoomRender(){
+  $n('lb-codeview').textContent = NET.code;
+  $n('lb-list').innerHTML = NET.players.map(p => '<div style="padding:6px 12px;border-radius:8px;background:#1e293b;margin:3px 0">' + (p.host ? '👑 ' : '👤 ') + String(p.name).replace(/</g, '&lt;') + '</div>').join('');
+  const host = NET.mode === 'host'; $n('lb-start').style.display = host ? 'block' : 'none'; $n('lb-wait').style.display = host ? 'none' : 'block'; $n('lb-share').style.display = host ? 'block' : 'none';
+  $n('lb-count').textContent = '참가자 ' + NET.players.length + ' / 8 (나머지는 AI가 채워 총 50명)';
+}
+function netLost(pid){
+  const i = NET.players.findIndex(p => p.pid === pid); if (i < 0) return; const p = NET.players[i]; NET.players.splice(i, 1); delete NET.conns[pid];
+  if (NET.started) { const a = TG.ag[p.idx]; if (a) a.human = false; tgToast(p.name + ' 님이 나갔어요 (AI가 이어받아요)', 2000); } else netLobbyBcast();
+}
+function netHostLost(){
+  if (TG.mp === 'client' && !TG.over) { TG.run = false; TG.over = true; $tg('tg-rt').textContent = '방장이 나갔어요'; $tg('tg-rd').textContent = '게임이 종료되었어요'; $tg('tg-retry').classList.add('hidden'); $tg('tg-specbtn').classList.add('hidden'); $tg('tg-result').classList.remove('hidden'); $tg('tg-result').classList.add('flex'); }
+  else if (!NET.started) { netMsg('방장이 나갔어요'); netLeave(); }
+}
+function netStart(){
+  if (NET.mode !== 'host' || NET.started) return; NET.started = true;
+  const pos = tgGenPos(), humans = NET.players.map(p => ({idx: p.idx, name: p.name}));
+  for (const p of NET.players) if (!p.host) netToPid(p.pid, {t: 'start', myIdx: p.idx, humans, pos});
+  $n('start-overlay').style.display = 'none';
+  startTag({mp: 'host', myIdx: 0, humans, pos});
+}
+function netRecv(from, msg, conn){
+  if (!msg || !msg.t) return;
+  if (NET.mode === 'host') {
+    if (msg.t === 'hello') {
+      if (conn) NET.conns[from] = conn;
+      if (NET.started) { netToPid(from, {t: 'busy'}); return; }
+      if (NET.players.length >= 8) { netToPid(from, {t: 'full'}); return; }
+      if (!NET.players.find(p => p.pid === from)) { const used = new Set(NET.players.map(p => p.idx)); let idx = 0; while (used.has(idx)) idx++; NET.players.push({pid: from, name: String(msg.name || '플레이어').slice(0, 10), idx}); }
+      netLobbyBcast();
+    } else if (msg.t === 'p') {
+      const p = NET.players.find(q => q.pid === from), a = p && TG.ag[p.idx];
+      if (a && !a.dead) { a.x = msg.x; a.y = msg.y; a.h = msg.h; a.fx = msg.fx; a.fz = msg.fz; a.mv = !!(msg.f & 1); a.sprinting = !!(msg.f & 2); a.slideT = (msg.f & 4) ? 1 : 0; }
+    } else if (msg.t === 'tag') { const p = NET.players.find(q => q.pid === from); if (p) tgRemoteTag(p.idx, msg); }
+  } else if (NET.mode === 'client') {
+    if (msg.t === 'lobby') { NET.players = msg.players; NET.code = msg.code || NET.code; netShow('room'); netRoomRender(); netMsg(''); }
+    else if (msg.t === 'full') { netMsg('방이 가득 찼어요 (최대 8명)'); netLeave(); }
+    else if (msg.t === 'busy') { netMsg('이미 게임이 시작된 방이에요'); netLeave(); }
+    else if (msg.t === 'start') { NET.started = true; $n('start-overlay').style.display = 'none'; startTag({mp: 'client', myIdx: msg.myIdx, humans: msg.humans, pos: msg.pos}); }
+    else if (msg.t === 's') { if (TG.mp === 'client' && TG.run) tgApplySnap(msg); }
+    else if (msg.t === 'dead') { TG.rank = msg.rank; if (TG.me && TG.mp === 'client') tgDie('tag'); }
+    else if (msg.t === 'tagok') { tgToast('태그 성공! 🎯', 1200); tgaHit(); const xh = $tg('tg-xh'); xh.style.borderColor = '#ef4444'; setTimeout(() => { xh.style.borderColor = 'rgba(255,255,255,.85)'; }, 160); }
+    else if (msg.t === 'end') { tgFinish(msg.w); }
+  }
+}
+function tgGenPos(){
+  if (!TG.map) TG.map = tgBuildMap(); TG.obs = TG.map.obs; const pos = [];
+  for (let i = 0; i < 50; i++) { let x, y, n = 0; do { const g = tgR(0, 6.283), d = tgR(0, 1400); x = TG.W / 2 + Math.cos(g) * d; y = TG.W / 2 + Math.sin(g) * d; n++; } while (!tgFree(x, y) && n < 40); pos.push([Math.round(x), Math.round(y)]); }
+  return pos;
+}
+const TG_RI = {rabbit: 0, wolf: 1, hunter: 2}, TG_RN = ['rabbit', 'wolf', 'hunter'];
+function tgFlags(a){ return (a.mv ? 1 : 0) | (a.sprinting ? 2 : 0) | (a.slideT > 0 ? 4 : 0); }
+function tgHostSend(dt){
+  TG.snT += dt; if (TG.snT < 1 / 15) return; TG.snT = 0;
+  netBcast({t: 's', rt: Math.ceil(TG.roleT), ag: TG.ag.map(a => [+a.x.toFixed(1), +a.y.toFixed(1), +a.h.toFixed(1), +a.fx.toFixed(2), +a.fz.toFixed(2), tgFlags(a), TG_RI[a.role], a.dead ? 1 : 0])});
+}
+function tgApplySnap(m){
+  m.ag.forEach((r, i) => {
+    const a = TG.ag[i]; if (!a) return;
+    if (i === TG.myIdx) {
+      const nr = TG_RN[r[6]]; if (a.role !== nr) { a.role = nr; a.stam = Math.min(a.stam, 3 * ROLE[nr].mul); tgaRole(nr); tgToast(ROLE[nr].e + ' ' + ROLE[nr].n + '(으)로 바뀌었어요!', 2800); }
+      if (r[7] && !a.dead) tgDie('tag'); return;
+    }
+    if (a.tx === undefined) { a.x = r[0]; a.y = r[1]; a.h = r[2]; }
+    a.tx = r[0]; a.ty = r[1]; a.th = r[2]; a.fx = r[3]; a.fz = r[4]; a.mv = !!(r[5] & 1); a.sprinting = !!(r[5] & 2); a.slideT = (r[5] & 4) ? 1 : 0; a.role = TG_RN[r[6]]; a.dead = !!r[7];
+  });
+  TG.roleT = m.rt;
+}
+function tgClientStep(dt){
+  const k = TG.keys, me = TG.me;
+  if (k.ArrowLeft) TG.yaw += 1.8 * dt; if (k.ArrowRight) TG.yaw -= 1.8 * dt; if (k.ArrowUp) TG.pitch = Math.max(-1.3, TG.pitch - 1.2 * dt); if (k.ArrowDown) TG.pitch = Math.min(1.3, TG.pitch + 1.2 * dt);
+  TG.roleT = Math.max(0, TG.roleT - dt);
+  if (!me.dead) tgPlayer(dt);
+  const f = Math.min(1, dt * 14);
+  for (const a of TG.ag) { if (a.me || a.dead || a.tx === undefined) continue; a.x += (a.tx - a.x) * f; a.y += (a.ty - a.y) * f; a.h += (a.th - a.h) * f; }
+  TG.stT += dt;
+  if (TG.stT >= 0.05 && !me.dead) { TG.stT = 0; netToHost({t: 'p', x: +me.x.toFixed(1), y: +me.y.toFixed(1), h: +me.h.toFixed(1), fx: +me.fx.toFixed(2), fz: +me.fz.toFixed(2), f: tgFlags(me)}); }
+}
+function tgRemoteTag(idx, m){
+  const a = TG.ag[idx]; if (!a || a.dead || a.cd > 0) return; a.cd = 0.6; a.x = m.x; a.y = m.y; a.h = m.h;
+  const fx = -Math.sin(m.yaw), fz = -Math.cos(m.yaw); let best = null, bd = 1e9;
+  for (const t of TG.ag) { if (t.dead || t === a || !canTag(a, t)) continue; const dx = t.x - a.x, dy = t.y - a.y, d = Math.hypot(dx, dy); if (d > 80 || (dx * fx + dy * fz) / (d || 1) < 0.4 || Math.abs(t.h - a.h) > 45) continue; if (d < bd) { bd = d; best = t; } }
+  if (best) tgKill(best, a);
+}
+function tgCheckEnd(){
+  if (TG.mp !== 'host' || TG.over) return; const alive = TG.ag.filter(a => !a.dead);
+  if (alive.length <= 1 || !alive.some(a => a.human)) { TG.over = true; const w = alive.length === 1 ? alive[0].idx : -1; netBcast({t: 'end', w}); tgFinish(w); }
+}
+function tgFinish(w){
+  TG.run = false; TG.over = true; const win = w === TG.myIdx, wa = TG.ag[w]; if (win) tgaWin(); else tgaLose();
+  $tg('tg-rt').textContent = win ? '🏆 승리!' : '🏁 게임 종료';
+  $tg('tg-rd').textContent = win ? '마지막 생존자예요!' : (w < 0 ? '모든 플레이어가 탈락했어요' : ((wa && wa.name) || (wa && wa.human ? '플레이어' : 'AI')) + ' 님이 마지막까지 살아남았어요');
+  $tg('tg-retry').classList.add('hidden'); $tg('tg-specbtn').classList.add('hidden'); $tg('tg-spec').classList.add('hidden');
+  $tg('tg-result').classList.remove('hidden'); $tg('tg-result').classList.add('flex');
+  try { if (document.pointerLockElement) document.exitPointerLock(); } catch (e) {}
+}
+function tgDie(why){
+  if (!TG.mp) { tgOver(false, why); return; }
+  if (TG.dieShown) return; TG.dieShown = true; TG.me.dead = true; tgaHurt();
+  const rank = TG.rank || (TG.ag.filter(a => !a.dead).length + 1);
+  $tg('tg-rt').textContent = '😵 태그당했다!'; $tg('tg-rd').textContent = '순위 ' + rank + '위 / 50 · 관전할 수 있어요';
+  $tg('tg-retry').classList.add('hidden'); $tg('tg-specbtn').classList.remove('hidden');
+  $tg('tg-result').classList.remove('hidden'); $tg('tg-result').classList.add('flex');
+  try { if (document.pointerLockElement) document.exitPointerLock(); } catch (e) {}
+}
+function tgSpecNext(){
+  const alive = TG.ag.filter(a => !a.dead && !a.me); if (!alive.length) { TG.specT = null; return; }
+  const i = alive.indexOf(TG.specT); TG.specT = alive[(i + 1) % alive.length];
+}
+function tgSpecStart(){ $tg('tg-result').classList.add('hidden'); $tg('tg-result').classList.remove('flex'); TG.spec = true; tgSpecNext(); $tg('tg-spec').classList.remove('hidden'); }
+function tgNames(){
+  const cv = $tg('tg-names'); if (!cv) return; const c = cv.getContext('2d');
+  if (cv.width !== Math.round(TG.vw * TG.dpr)) { cv.width = Math.round(TG.vw * TG.dpr); cv.height = Math.round(TG.vh * TG.dpr); cv.style.width = TG.vw + 'px'; cv.style.height = TG.vh + 'px'; }
+  c.setTransform(TG.dpr, 0, 0, TG.dpr, 0, 0); c.clearRect(0, 0, TG.vw, TG.vh);
+  if (!TG.mp || !TG.vp || !TG.eye) return;
+  const V = TG.vp; c.textAlign = 'center'; c.font = '700 13px sans-serif'; c.lineWidth = 3; c.strokeStyle = 'rgba(0,0,0,0.8)';
+  for (const a of TG.ag) {
+    if (!a.human || a.me || a.dead || a === (TG.spec ? TG.specT : null)) continue;
+    const x = a.x, y = a.h + 86, z = a.y, cw = V[3] * x + V[7] * y + V[11] * z + V[15]; if (cw <= 8) continue;
+    const cx = V[0] * x + V[4] * y + V[8] * z + V[12], cy = V[1] * x + V[5] * y + V[9] * z + V[13];
+    if (Math.hypot(a.x - TG.eye[0], a.y - TG.eye[2]) > 1500) continue;
+    const sx = (cx / cw * 0.5 + 0.5) * TG.vw, sy = (1 - (cy / cw * 0.5 + 0.5)) * TG.vh, t = ROLE[a.role].e + ' ' + (a.name || '플레이어');
+    c.strokeText(t, sx, sy); c.fillStyle = '#fff'; c.fillText(t, sx, sy);
+  }
+}
+(function(){
+  try { const n = localStorage.getItem('tg49name'); $n('lb-name').value = n || ('플레이어' + (10 + (Math.random() * 90 | 0))); } catch (e) { $n('lb-name').value = '플레이어'; }
+  const rp = new URLSearchParams(location.search).get('room'); if (rp) { $n('lb-code').value = rp.toUpperCase().slice(0, 4); netMsg('방 코드가 입력되어 있어요. 닉네임을 정하고 "방 참가"를 누르세요.'); }
+  $n('lb-solo').addEventListener('click', () => { $n('start-overlay').style.display = 'none'; startTag(); });
+  $n('lb-make').addEventListener('click', netHost); $n('lb-join').addEventListener('click', netJoin);
+  $n('lb-start').addEventListener('click', netStart); $n('lb-leave').addEventListener('click', netLeave);
+  $n('lb-copy').addEventListener('click', () => { const u = location.origin + location.pathname + '?room=' + NET.code; try { navigator.clipboard.writeText(u); netMsg('초대 링크를 복사했어요!'); } catch (e) { netMsg(u); } });
+  $tg('tg-spec').addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); tgSpecNext(); });
+  $tg('tg-specbtn').addEventListener('click', tgSpecStart);
+})();
+function showHome(){ location.reload(); }
+</script>
+</body>
+</html>
