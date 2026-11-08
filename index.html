@@ -403,6 +403,7 @@ const GAMES=[
   },
   {
     id:'battleground',
+    label:'update', labelDate:'2026-11-08',
     title:'3D Battleground', hanja:'',
     desc:'3D 배틀로얄 서바이벌 슈터. 맵을 뒤져 총기를 찾고 마지막까지 살아남아라. 방 코드로 친구와 멀티플레이도 가능, PC와 모바일 모두 지원.',
     keys:'WASD 이동 · 마우스 시점 · Shift 달리기 · Space 점프',
@@ -502,7 +503,7 @@ const GAMES=[
   },
   {
     id:'baseball',
-    label:'update', labelDate:'2026-11-02',
+    label:'update', labelDate:'2026-11-08',
     title:'고교야구 챔피언십', hanja:'',
     desc:'전국대회 결승전. 초에는 타자로, 말에는 투수와 야수로 직접 승부하세요. 투수 교체·대타 등 선수 기용까지 가능한 고교야구 게임. 온라인 대전 지원.',
     keys:'마우스/터치로 조준 · 투구·스윙 · V·B 시점 전환',
@@ -667,6 +668,26 @@ const GAMES=[
       </g>
       <g stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M170 74v-12M158 80l-9-8M182 80l9-8"/></g>
       <g stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".55"><path d="M66 112H92M60 124H86M252 112H278M258 124H282"/></g>
+    </svg>`
+  },
+  {
+    id:'smashcourt',
+    label:'new', labelDate:'2026-11-08',
+    title:'스매시 코트', hanja:'',
+    desc:'전국 배드민턴 선수권! 탑뷰 배드민턴 게임. 스토리 모드로 중학교부터 고등학교까지 전국대회를 제패하고, 샌드박스에서 단식·복식을 즐겨 보세요. 방 코드로 최대 4명(2 vs 2) 온라인 대전도 가능, PC와 모바일 모두 지원.',
+    keys:'WASD/방향키 이동 · J(Space) 스매시 · K 클리어 · L 드롭 · Shift 슬라이딩',
+    src:'games/smashcourt.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="scbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1424"/><stop offset="1" stop-color="#16345c"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#scbg)"/>
+      <rect x="40" y="14" width="240" height="152" rx="4" fill="#1f8f6a"/>
+      <g fill="none" stroke="#eaf2ff" stroke-width="2.2" opacity=".92"><rect x="52" y="24" width="216" height="132"/><path d="M52 40H268M52 140H268M160 24V62M160 118V156M52 90H268"/></g>
+      <path d="M160 14V166" stroke="#fff" stroke-width="4" stroke-dasharray="3 3" opacity=".8"/>
+      <g><circle cx="106" cy="118" r="10" fill="#3ee6a8"/><circle cx="106" cy="118" r="15" fill="none" stroke="#3ee6a8" stroke-width="1.5" opacity=".6"/>
+         <circle cx="214" cy="62" r="10" fill="#ff5d73"/><circle cx="214" cy="62" r="15" fill="none" stroke="#ff5d73" stroke-width="1.5" opacity=".6"/></g>
+      <path d="M118 104Q162 60 204 70" stroke="#ffd23f" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+      <g transform="translate(164 82) rotate(-35)"><path d="M0 0L-5 9H5Z" fill="#fff"/><circle cx="0" cy="-2" r="3.4" fill="#ffd23f"/></g>
     </svg>`
   }
 ];
