@@ -4,11 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b1424">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <title>스매시 코트 · 전국 배드민턴 선수권</title>
 <style>
 :root{--bg:#0b1424;--card:#13233b;--card2:#1b3052;--ac:#3ee6a8;--ac2:#4aa8ff;--hot:#ff5d73;--tx:#eaf2ff;--mut:#8fa6c8;--gold:#ffd23f}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;overflow:hidden;touch-action:none}
+html,body{margin:0;height:100%;overscroll-behavior:none;-webkit-touch-callout:none;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;overflow:hidden;touch-action:none}
 canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 #ui{position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;display:none;-webkit-overflow-scrolling:touch}
 #ui.on{display:block}
@@ -76,6 +80,9 @@ input[type=text]{width:100%;padding:13px;border-radius:12px;border:1px solid rgb
 #msg small{display:block;font-size:17px;font-weight:700;margin-top:4px;color:#dff}
 #hint{position:fixed;left:0;right:0;bottom:max(215px,calc(env(safe-area-inset-bottom) + 205px));text-align:center;font-size:13px;color:#fff;z-index:6;pointer-events:none;text-shadow:0 1px 6px #000;display:none}
 body.pc #hint{bottom:18px}
+body.land #hint{bottom:10px}
+body.land #joy{top:52px}
+body.land #btns{width:300px}
 /* controls */
 #joy{position:fixed;left:0;top:70px;bottom:0;width:56%;z-index:4;display:none;touch-action:none}
 #joyBase,#joyKnob{position:fixed;border-radius:50%;pointer-events:none;display:none}
@@ -108,6 +115,7 @@ body.pc #bD{width:62px;height:62px;right:178px;bottom:20px}
 #modal{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.7);display:none;touch-action:pan-y;overflow:auto}
 #modal.on{display:block}
 #modal .box{max-width:720px;margin:max(20px,env(safe-area-inset-top)) auto 30px;padding:16px;background:#0f1d33;border-radius:18px;border:1px solid rgba(120,170,255,.25)}
+body.in-match #toast{bottom:auto!important;top:112px}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:40;display:none}
 </style>
 </head>
@@ -549,11 +557,17 @@ const ARCS=[
    유틸 / 설정 / 사운드
    ===================================================================== */
 const $=id=>document.getElementById(id);
-const isTouch=('ontouchstart' in window)||navigator.maxTouchPoints>0;
-document.body.classList.toggle('pc',!isTouch);
+const DEV_TOUCH=('ontouchstart' in window)||navigator.maxTouchPoints>0||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);
+let isTouch=DEV_TOUCH;
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
-const SET=Object.assign({vol:.8,bgm:.6,auto:false,guide:true,names:true,marker:true,aim:'assist',vib:true},store.get('scb_set',{}));
+const SET=Object.assign({mode:'auto',vol:.8,bgm:.6,lowfx:false,auto:false,guide:true,names:true,marker:true,aim:'assist',vib:true},store.get('scb_set',{}));
 function saveSet(){store.set('scb_set',SET);}
+// 기기 모드: auto=기기 자동 인식, mobile/pc=수동 선택
+function applyMode(){
+  isTouch=SET.mode==='mobile'?true:SET.mode==='pc'?false:DEV_TOUCH;
+  document.body.classList.toggle('pc',!isTouch);
+  if(typeof layout==='function'&&typeof ctx!=='undefined')layout();
+}
 function toast(t,ms){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',ms||2200);}
 const Snd={ctx:null,master:null,sfx:null,mus:null,revIn:null,ambG:null,noiseBuf:null,
  init(){
@@ -656,13 +670,16 @@ let dpr=1,CW=0,CH=0,ppm=40,ox=0,oy=0,flip=false,inMatch=false,V=null,LOC=-1,role
 let zoom=1,crowdC=null,crowdE=0,perfT=0,dtR=.016,hitStop=0,netWig=0,LASTST=null;
 const FXs=[],PARTS=[],FLOATS=[],MARKS=[],trail=[];
 function layout(){
-  dpr=Math.min(window.devicePixelRatio||1,2);CW=innerWidth;CH=innerHeight;cv.width=Math.round(CW*dpr);cv.height=Math.round(CH*dpr);
-  const top=inMatch?60:0,bot=inMatch&&isTouch?170:(inMatch?50:0);
+  dpr=Math.min(window.devicePixelRatio||1,SET.lowfx?1.25:2);CW=innerWidth;CH=innerHeight;
+  const land=isTouch&&CW>CH*1.05;document.body.classList.toggle('land',land);cv.width=Math.round(CW*dpr);cv.height=Math.round(CH*dpr);
+  const top=inMatch?(land?50:60):0,bot=inMatch?(isTouch?(land?0:170):50):0;
   const availH=CH-top-bot,mW=W+2.4,mH=L+2.5;
   ppm=Math.min(CW/mW,availH/mH);ox=(CW-W*ppm)/2;oy=top+(availH-L*ppm)/2;
   buildCrowd();
 }
-addEventListener('resize',layout);
+addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,250));
+document.addEventListener('gesturestart',e=>e.preventDefault());
+document.addEventListener('contextmenu',e=>{if(inMatch)e.preventDefault();});
 const X=x=>ox+(flip?W-x:x)*ppm, Y=y=>oy+(flip?L-y:y)*ppm;
 function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
 function shade(hex,f){const n=parseInt(hex.slice(1),16);let r=n>>16,g=(n>>8)&255,b=n&255;r=clamp(Math.round(r*f),0,255);g=clamp(Math.round(g*f),0,255);b=clamp(Math.round(b*f),0,255);return 'rgb('+r+','+g+','+b+')';}
@@ -683,8 +700,8 @@ function buildCrowd(){
 }
 function drawArena(){
   ctx.fillStyle='#0a1220';ctx.fillRect(-20,-20,CW+40,CH+40);
-  if(crowdC){const bob=Math.sin(perfT*11)*crowdE*2.4;ctx.drawImage(crowdC,0,bob-2,CW,CH+4);
-    if(crowdE>.4&&Math.random()<.3){ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(Math.random()*CW,Math.random()*CH,2,2);}}
+  if(crowdC){const bob=SET.lowfx?0:Math.sin(perfT*11)*crowdE*2.4;ctx.drawImage(crowdC,0,bob-2,CW,CH+4);
+    if(!SET.lowfx&&crowdE>.4&&Math.random()<.3){ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(Math.random()*CW,Math.random()*CH,2,2);}}
   const m=1.2*ppm,rx=ox-m*.92,rw=W*ppm+m*1.84,ry=oy-m,rh=L*ppm+2*m;
   const fg=ctx.createLinearGradient(0,ry,0,ry+rh);fg.addColorStop(0,'#134a3b');fg.addColorStop(.5,'#175d49');fg.addColorStop(1,'#134a3b');
   ctx.fillStyle=fg;rr(rx,ry,rw,rh,14);ctx.fill();
@@ -897,6 +914,7 @@ function startMatch(cfg){
   $('midT').textContent=cfg.points+'점 선취';$('midS').textContent=cfg.title||'';
   $('nmA').style.color=V.players.find(p=>p.team===0).ch.col;$('nmB').style.color=V.players.find(p=>p.team===1).ch.col;
   updateHud(true);
+  if(isTouch&&CW>CH*1.05&&!startMatch.tip){startMatch.tip=1;toast('세로 화면에서 코트가 더 크게 보여요',3500);}
 }
 function endMatchUI(){Snd.amb(0);Music.hot=0;Music.play('menu');inMatch=false;document.body.classList.remove('in-match');$('hud').classList.remove('on');$('pauseBtn').classList.remove('on');$('hint').style.display='none';layout();}
 function updateHud(force){
@@ -1231,7 +1249,7 @@ const UI={cur:'',sb:{mode:'S',points:11,diff:1,slots:[0,4,1,6]},
  help(){
   this.set(`<div class="glass"><h2>조작법</h2>
   <ul class="list"><li><b>PC</b>: 이동 WASD/방향키 · 스매시 J(Space) · 클리어 K · 드롭 L</li>
-  <li><b>모바일</b>: 왼쪽 화면을 드래그해 이동(가상 조이스틱) · 오른쪽 버튼으로 샷</li>
+  <li><b>모바일</b>: 왼쪽 화면을 드래그해 이동(가상 조이스틱) · 오른쪽 버튼으로 샷 · 세로 화면 권장(가로도 지원) · iPhone은 공유 → 홈 화면에 추가하면 전체화면으로 실행됩니다</li>
   <li>셔틀이 라켓 범위(원) 안에 들어올 때 버튼을 누르면 칩니다. 조금 일찍 눌러도 0.2초간 유지됩니다.</li>
   <li>범위 밖이어도 아슬아슬하면 <b>런지</b>로 걷어올립니다(정확도 하락).</li>
   <li>샷 순간 이동 방향을 누르고 있으면 그 방향으로 조준, 가만히 있으면 상대 반대편으로 자동 조준합니다. (앞으로=짧게, 뒤로=깊게)</li>
@@ -1255,6 +1273,9 @@ const UI={cur:'',sb:{mode:'S',points:11,diff:1,slots:[0,4,1,6]},
   <h3>배경음악 <span id="bgmT">${Math.round(SET.bgm*100)}%</span></h3><input type="range" min="0" max="100" value="${Math.round(SET.bgm*100)}" oninput="UI.setBgm(this.value)">
   <button class="btn" onclick="SET.guide=!SET.guide;saveSet();UI.settings()">위치 유도: ${SET.guide?'켜짐':'꺼짐'}<small>샷을 친 뒤 입력이 없으면 단식은 코트 중앙으로, 복식은 정석 로테이션(공격=앞뒤 · 수비=좌우)에 맞춰 자동 이동하고 목표 위치를 표시합니다.</small></button>
   <button class="btn" onclick="SET.auto=!SET.auto;saveSet();UI.settings()">초보 보조 (공 위치로 자동 이동): ${SET.auto?'켜짐':'꺼짐'}<small>조작하지 않으면 날아오는 공 쪽으로 천천히 따라갑니다. 치는 건 직접 하며, 사람이 직접 움직일 때보다 느리고 반응이 늦고 위치도 조금 부정확합니다. 이동 입력을 하면 바로 수동으로 전환됩니다.</small></button>
+  <button class="btn" onclick="UI.setMode()">조작 모드: ${SET.mode==='auto'?'자동 인식 ('+(DEV_TOUCH?'모바일':'PC')+')':SET.mode==='mobile'?'모바일 (터치 조이스틱)':'PC (키보드)'}<small>누르면 자동 → 모바일 → PC 순서로 바뀝니다. 모바일은 화면 조이스틱·버튼, PC는 WASD/방향키·J/K/L 키입니다.</small></button>
+  <button class="btn" onclick="SET.lowfx=!SET.lowfx;saveSet();layout();UI.settings()">저사양 모드: ${SET.lowfx?'켜짐':'꺼짐'}<small>화면 해상도와 관중 연출을 줄여 오래된 폰에서도 부드럽게 돌아갑니다.</small></button>
+  ${document.fullscreenEnabled?'<button class="btn" onclick="UI.fs()">전체화면 전환<small>주소창 없이 크게 플레이 (가능한 기기에서)</small></button>':''}
   <button class="btn" onclick="SET.names=!SET.names;saveSet();UI.settings()">선수 이름 표시: ${SET.names?'켜짐':'꺼짐'}</button>
   <button class="btn" onclick="SET.marker=!SET.marker;saveSet();UI.settings()">착지 예상 표시: ${SET.marker?'켜짐':'꺼짐'}</button>
   <button class="btn" onclick="SET.aim=SET.aim==='assist'?'manual':'assist';saveSet();UI.settings()">조준 방식: ${SET.aim==='assist'?'자동 보조 (입력 없으면 상대 반대편)':'수동 (입력 없으면 정중앙)'}</button>
@@ -1262,6 +1283,8 @@ const UI={cur:'',sb:{mode:'S',points:11,diff:1,slots:[0,4,1,6]},
   <button class="btn" onclick="if(confirm('스토리 저장 데이터를 삭제할까요?')){SAVE=null;localStorage.removeItem('${SAVE_KEY}');toast('삭제됨');}">스토리 데이터 초기화</button>
   <button class="btn pri" onclick="UI.title()">돌아가기</button></div>`,'settings');
  },
+ setMode(){SET.mode=SET.mode==='auto'?'mobile':SET.mode==='mobile'?'pc':'auto';saveSet();applyMode();this.settings();},
+ fs(){try{if(document.fullscreenElement)document.exitFullscreen();else{document.documentElement.requestFullscreen({navigationUI:'hide'}).then(()=>{try{screen.orientation.lock('portrait').catch(()=>{});}catch(e){}}).catch(()=>toast('전체화면을 지원하지 않는 환경입니다.'));}}catch(e){toast('전체화면을 지원하지 않는 환경입니다.');}},
  setBgm(v){SET.bgm=clamp(+v/100,0,1);saveSet();Snd.applyVol();const e=$('bgmT');if(e)e.textContent=Math.round(SET.bgm*100)+'%';},
  setVol(v){SET.vol=clamp(+v/100,0,1);saveSet();Snd.applyVol();const e=$('volT');if(e)e.textContent=Math.round(SET.vol*100)+'%';clearTimeout(UI._vt);UI._vt=setTimeout(()=>Snd.ui(),120);},
  /* ---------- 스토리 ---------- */
@@ -1448,7 +1471,7 @@ function frame(now){
   }
   requestAnimationFrame(frame);
 }
-layout();UI.title();requestAnimationFrame(frame);
+applyMode();UI.title();requestAnimationFrame(frame);
 </script>
 </body>
 </html>
