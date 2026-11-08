@@ -203,6 +203,36 @@ footer b{color:var(--muted);font-weight:700}
 @media (max-width:760px){.rk-list{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
 @media (prefers-reduced-motion:reduce){.rk-bar span{transition:none}}
 
+/* ===== 검색 · 태그 필터 · 즐겨찾기 ===== */
+.card[hidden]{display:none}
+.filterbar{width:min(100%,980px);margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.filterbar+.grid{margin-top:14px}
+.searchbox{position:relative;display:flex;align-items:center}
+.searchbox svg{position:absolute;left:13px;width:17px;height:17px;color:var(--muted);pointer-events:none}
+.searchbox input{width:100%;font:inherit;font-size:.92rem;padding:10px 38px 10px 38px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--foam);box-shadow:var(--card-shadow)}
+.searchbox input::placeholder{color:var(--muted)}
+.searchbox input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.searchbox input::-webkit-search-cancel-button{display:none}
+.searchbox .qx{position:absolute;right:8px;width:26px;height:26px;border-radius:50%;border:0;background:transparent;color:var(--muted);font-size:1.1rem;line-height:1}
+.searchbox .qx:hover{color:var(--foam)}
+.searchbox .qx[hidden]{display:none}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.chips button{font:inherit;font-size:.8rem;padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);transition:.15s}
+.chips button small{margin-left:5px;font-size:.72rem;opacity:.75}
+.chips button:hover{border-color:var(--gold);color:var(--foam)}
+.chips button[aria-pressed="true"]{background:var(--foam);border-color:var(--foam);color:var(--ink);font-weight:700}
+.chips button[data-k="__fav"][aria-pressed="true"]{background:#e8c36a;border-color:#e8c36a;color:#10202a}
+.fcount{font-size:.76rem;color:var(--muted)}
+.nores{width:min(100%,980px);margin:18px 0 0}
+.nores[hidden]{display:none}
+.nores button{font:inherit;font-size:.82rem;margin-top:8px;padding:6px 16px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--foam)}
+.nores button:hover{border-color:var(--gold)}
+.fav{position:absolute;right:10px;bottom:10px;z-index:3;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:var(--chip);border:1px solid var(--line);color:var(--muted);font-size:1.15rem;line-height:1;cursor:pointer;transition:transform .15s,color .15s,border-color .15s}
+.fav:hover,.fav:focus-visible{color:var(--gold);border-color:var(--gold);outline:none;transform:scale(1.1)}
+.fav.on{color:#f5b301;border-color:#f5b301}
+@media (prefers-reduced-motion:reduce){.fav{transition:none}}
+
 /* ===== 닉네임 설정 창 ===== */
 #nickDlg{background:var(--panel);color:var(--foam);border:2px solid var(--line);border-radius:8px;padding:22px;width:min(92vw,380px);box-shadow:0 20px 50px -10px rgba(0,0,0,.5)}
 #nickDlg::backdrop{background:rgba(5,12,18,.6)}
@@ -265,7 +295,16 @@ footer b{color:var(--muted);font-weight:700}
     <button type="button" data-sort="total" aria-pressed="false">누적 인기순</button>
     <button type="button" data-sort="live" aria-pressed="false">실시간 인기순</button>
   </div>
+  <div class="filterbar" id="filterbar">
+    <div class="searchbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="게임 검색 (이름 · 설명 · 태그)" aria-label="게임 검색" autocomplete="off" enterkeyhint="search">
+      <button type="button" class="qx" id="qClear" aria-label="검색어 지우기" hidden>×</button>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="태그로 거르기"></div>
+  </div>
   <div class="grid" id="grid"></div>
+  <div class="nores hot-empty" id="noRes" hidden></div>
   <p class="last" id="last"></p>
   <footer>게임 관련 오류 제보/자기 게임 업로드 신청은 <b>dolgodora7942@gmail.com</b>으로</footer>
 </main>
@@ -310,6 +349,21 @@ footer b{color:var(--muted);font-weight:700}
     body:['## 추가','대결 모드에 상대 점수 표시','## 수정','일시정지 후 블록이 한 칸 내려가던 문제']},
    ============================================================ */
 const NOTICES=[
+  {date:'2026-11-08', tag:'공지', title:'신규 게임 3종 추가',
+   body:[
+     '## 추가',
+     '태그 게임 (11/05) — 1분마다 역할이 바뀌며 쫓고 쫓기는 술래잡기 게임, 멀티 지원 (made by 조승희)',
+     '스매시 코트 (11/08) — 탑뷰 배드민턴 게임, 스토리 모드와 최대 4명(2 vs 2) 온라인 대전',
+     '포근농장 (11/08) — 함께 가꾸는 힐링 농장 게임, 친구농장 코드를 공유해 서로 놀러 갈 수 있어요. 농장은 자동 저장돼요.'
+   ]},
+  {date:'2026-11-08', tag:'패치', title:'검색 · 태그 필터 · 즐겨찾기 추가',
+   body:[
+     '## 추가',
+     '게임 검색창과 태그 필터 — 멀티·2인용·액션 같은 태그를 골라 원하는 게임만 걸러 볼 수 있어요.',
+     '즐겨찾기(★) — 카드 오른쪽 아래 별을 누르면 그 게임이 맨 위로 올라와요. 로그인하면 다른 기기에서도 그대로 따라와요.',
+     '## 업데이트',
+     '3D Battleground, 고교야구 챔피언십이 업데이트되었어요.'
+   ]},
   {date:'2026-11-03', tag:'공지', title:'신규 게임 2종 추가',
    body:[
      '## 추가',
@@ -340,11 +394,14 @@ const NOTICE_NEW_DAYS=7; /* 며칠 동안 NEW 표시를 붙일지 */
    labelDate : (선택) 라벨을 단 날짜 'YYYY-MM-DD'. 이 날부터 LABEL_DAYS(3)일이 지나면 라벨이 저절로 사라져요. (단 'beta' 는 안 사라져요)
            날짜를 안 쓰면 사라지지 않고 계속 떠요. ※ label 줄 끝의 쉼표(,)를 꼭 붙이세요!
            예) {id:'tetris', title:'테트리스', label:'update', labelDate:'2026-11-05', ...}
+   tags  : (선택) 필터용 태그. 예) tags:['멀티','2인용','액션']  — 로비 위쪽 태그 칩이 여기 적힌 태그로 자동으로 만들어져요.
+           자주 쓰는 태그: 멀티(온라인) · 2인용(한 기기) · 액션 · 전략 · 시뮬 · 스포츠 · 퍼즐 · 보드 · 호러 · 서바이벌 · 스토리
    thumb : 대체용 SVG 그림. 실제 대표 이미지는 thumbs/<id>.jpg (16:9, 800x450 권장)를 넣으면 자동으로 사용돼요
    ============================================================ */
 const GAMES=[
   {
     id:'hansan',
+    tags:['액션'],
     title:'한산도 해전', hanja:'閑山島',
     desc:'판옥선을 몰아 왜선을 격파하라. 학익진, 거북선 개조, 백병전과 나포까지 즐기는 조선시대 배경 해전 액션.',
     keys:'WASD 이동 · Space 포격 · 1~5 진형',
@@ -364,6 +421,7 @@ const GAMES=[
   },
   {
     id:'silentbreach',
+    tags:['액션','전략'],
     title:'Silent Breach', hanja:'',
     desc:'탑다운 인질 구출 전술 액션. 문을 열고 섬광탄·수류탄을 벽에 튕겨 방 안으로 던진 뒤 돌입하라. 4개 작전, 경보와 처형 타이머, 기습 매복까지.',
     keys:'클릭 이동 · G 섬광탄 · H 수류탄 · E 문 · B 돌입 · P 정지',
@@ -385,6 +443,7 @@ const GAMES=[
   },
   {
     id:'ittycoon',
+    tags:['시뮬'],
     title:'IT 컴퍼니 타이쿤', hanja:'',
     desc:'작은 사무실에서 시작해 IT 회사를 키워라. 직원 채용, 프로젝트 수주, 재무 관리로 평판과 현금을 늘리는 경영 시뮬레이션. 월말마다 자동 저장으로 이어서 할 수 있어요.',
     keys:'마우스 클릭 · Space 일시정지',
@@ -403,6 +462,7 @@ const GAMES=[
   },
   {
     id:'battleground',
+    tags:['액션','서바이벌','멀티'],
     label:'update', labelDate:'2026-11-08',
     title:'3D Battleground', hanja:'',
     desc:'3D 배틀로얄 서바이벌 슈터. 맵을 뒤져 총기를 찾고 마지막까지 살아남아라. 방 코드로 친구와 멀티플레이도 가능, PC와 모바일 모두 지원.',
@@ -423,6 +483,7 @@ const GAMES=[
   },
   {
     id:'tetris',
+    tags:['퍼즐','멀티'],
     title:'테트리스', hanja:'',
     desc:'떨어지는 블록을 쌓아 줄을 지워라. 홀드, 다음 블록 미리보기, 배경음악까지 갖춘 클래식 퍼즐. 상대와 하는 대결 모드도 지원. 최고 기록이 저장돼요.',
     keys:'← → 이동 · ↓ 소프트드롭 · ↑ 회전 · Space 하드드롭 · Shift 홀드',
@@ -444,6 +505,7 @@ const GAMES=[
   },
   {
     id:'stickduel',
+    tags:['액션','2인용','멀티'],
     title:'스틱 듀얼리스트', hanja:'',
     desc:'한 화면에서 둘이 붙는 졸라맨 결투. 라운드마다 검·창·도끼·활·권총 등 무기가 주어지고, 발판 밖으로 날아가면 낙사. 2인, 1인, 온라인 대전 지원.',
     keys:'P1: A D W S · F  /  P2: ← → ↑ ↓ · /',
@@ -466,6 +528,7 @@ const GAMES=[
   },
   {
     id:'korea38',
+    tags:['전략','시뮬'],
     title:'38°선', hanja:'三八線',
     desc:'6·25 전쟁 전략 시뮬레이션. 월 단위 턴제 전략 지도에서 24개 지역을 다투고, 교전 지역은 실시간 워게임식 세부 전투로 직접 지휘. 남침·인천상륙·중공군 참전 등 실제 전황이 사건으로 발생해요.',
     keys:'마우스 지휘 · Enter/Space 턴 종료 · N/Tab 다음 부대',
@@ -484,6 +547,7 @@ const GAMES=[
   },
   {
     id:'zerozone',
+    tags:['전략','서바이벌'],
     title:'감염 제로 구역', hanja:'',
     desc:'관악중학교를 거점으로 살아남아라. 관악구 전체의 실제 지도 위에서 분대를 편성해 보급품을 수색하고, 안개 속 건물을 탐색하며 구조대가 올 때까지 기지를 지키는 좀비 서바이벌 전략.',
     keys:'마우스 지휘 · Space 정지/재생 · 1·2 배속 · Esc 선택 해제',
@@ -503,6 +567,7 @@ const GAMES=[
   },
   {
     id:'baseball',
+    tags:['스포츠','멀티'],
     label:'update', labelDate:'2026-11-08',
     title:'고교야구 챔피언십', hanja:'',
     desc:'전국대회 결승전. 초에는 타자로, 말에는 투수와 야수로 직접 승부하세요. 투수 교체·대타 등 선수 기용까지 가능한 고교야구 게임. 온라인 대전 지원.',
@@ -524,6 +589,7 @@ const GAMES=[
   },
   {
     id:'ilgito',
+    tags:['액션','2인용','멀티'],
     title:'자습서 일기토', hanja:'',
     desc:'관악중학교 최강의 장수를 가려라! 말 대신 자습서를 타고 돌격해 충돌 순간에 공격 버튼을 누르는 타이밍 대결. 스토리 도장깨기, 한 기기 2인, AI 대전, 온라인 대전을 지원해요.',
     keys:'충돌 순간에 타이밍 · P1: A 공격 S 필살 / P2: L 공격 K 필살',
@@ -544,6 +610,7 @@ const GAMES=[
   },
   {
     id:'segryeok',
+    tags:['시뮬'],
     title:'세력의 조건', hanja:'',
     desc:'코스닥 작전주 시뮬레이터. 대량 매수·덤핑, 자전거래, 루머 유포로 주가를 움직여 개미를 털어라. 단, 금감원 감시도가 100%가 되면 즉시 구속! 30영업일 안에 최고 수익을 노려보세요.',
     keys:'마우스 클릭 · 난이도 3단계 · 슬라이더로 주문 비중 조절',
@@ -561,6 +628,7 @@ const GAMES=[
   },
   {
     id:'stockexam',
+    tags:['시뮬'],
     title:'벼락치기 기말고사 주식시장', hanja:'',
     desc:'기말고사 D-7! 학교에 도는 찌라시를 믿고 과목별 주식에 용돈을 몰빵하라. 쌤의 한마디에 수학·영어·국어·과학·역사 주가가 폭등하고 폭락한다. 시험 당일, 내 용돈은 얼마가 될까?',
     keys:'마우스 클릭 · 매수/매도 버튼 · 다음 날로 넘기기',
@@ -570,6 +638,7 @@ const GAMES=[
   },
   {
     id:'groupproject',
+    tags:['시뮬','스토리'],
     title:'중학생 조별과제 무임승차 잔혹사', hanja:'',
     desc:'[놀랍게도 개발자의 실화기반]일을 짬맞아서 조장이 되어버렸다. 팀원들을 잘 갈궈서 7일 안에 조별과제를 끝내라. 우드락 만들기와 PPT 발표 두 가지 모드, 엔딩 5종.',
     keys:'마우스 클릭 · 선택지를 골라 7일간 단톡방 대화 진행',
@@ -579,6 +648,7 @@ const GAMES=[
   },
   {
     id:'omokbaduk',
+    tags:['보드','2인용','멀티'],
     label:'new', labelDate:'2026-11-02',
     title:'오목 & 바둑 스튜디오', hanja:'碁',
     desc:'클래식한 오목과 바둑을 한 곳에서. AI 대국, 한 기기 2인 대국, 링크로 친구와 하는 온라인 대전을 지원해요. 9·13·15·19줄 판 크기를 고를 수 있고, 바둑은 따낸 돌·패 규칙까지 들어 있어요.',
@@ -589,6 +659,7 @@ const GAMES=[
   },
   {
     id:'chess',
+    tags:['보드','2인용','멀티'],
     label:'new', labelDate:'2026-11-02',
     title:'웹 체스', hanja:'',
     desc:'AI와 한 판, 한 기기에서 2인 대결, 링크로 친구와 1:1 온라인 대전까지. 쉬움·보통·어려움 AI와 무르기, 이동 가능 칸 표시, 체크메이트 판정을 지원하는 정통 체스.',
@@ -599,6 +670,7 @@ const GAMES=[
   },
   {
     id:'arcadefighter',
+    tags:['액션','2인용'],
     label:'new', labelDate:'2026-11-03',
     title:'2인용 아케이드 파이터', hanja:'',
     desc:'둘이서 하는 철권 게임, 다양하고 개성있는 캐릭터들을 체험해 보세요! made by 조승희',
@@ -623,6 +695,7 @@ const GAMES=[
   },
   {
     id:'gwanakhorror',
+    tags:['호러','서바이벌','멀티'],
     label:['new','beta'], labelDate:'2026-11-03',
     title:'관악중학교 괴담', hanja:'',
     desc:'새벽의 학교, 아무도 없어야 할 복도에서 무언가 걸어 다닌다. 손전등 하나로 교문 열쇠를 찾아 괴물들을 피해 탈출하는 3D 호러 서바이벌. 학생회·밴드부 등 역할을 고르고 최대 4인 협동으로 도전하세요. (베타 테스트 중)',
@@ -648,6 +721,7 @@ const GAMES=[
   },
   {
     id:'taggame',
+    tags:['액션','멀티'],
     label:'new', labelDate:'2026-11-05',
     title:'태그 게임', hanja:'',
     desc:'1분마다 역할이 바뀌며 쫓고 쫓기는 술래잡기 게임! (멀티 지원) made by 조승희',
@@ -672,6 +746,7 @@ const GAMES=[
   },
   {
     id:'smashcourt',
+    tags:['스포츠','멀티'],
     label:'new', labelDate:'2026-11-08',
     title:'스매시 코트', hanja:'',
     desc:'전국 배드민턴 선수권! 탑뷰 배드민턴 게임. 스토리 모드로 중학교부터 고등학교까지 전국대회를 제패하고, 샌드박스에서 단식·복식을 즐겨 보세요. 방 코드로 최대 4명(2 vs 2) 온라인 대전도 가능, PC와 모바일 모두 지원.',
@@ -688,6 +763,30 @@ const GAMES=[
          <circle cx="214" cy="62" r="10" fill="#ff5d73"/><circle cx="214" cy="62" r="15" fill="none" stroke="#ff5d73" stroke-width="1.5" opacity=".6"/></g>
       <path d="M118 104Q162 60 204 70" stroke="#ffd23f" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
       <g transform="translate(164 82) rotate(-35)"><path d="M0 0L-5 9H5Z" fill="#fff"/><circle cx="0" cy="-2" r="3.4" fill="#ffd23f"/></g>
+    </svg>`
+  },
+  {
+    id:'pogeunfarm',
+    tags:['시뮬','멀티'],
+    title:'포근농장', hanja:'',
+    desc:'함께 가꾸는 힐링 농장. 땅을 갈고 씨앗을 심어 수확하고, 닭과 상점을 돌보며 코인으로 땅을 최대 9배까지 넓혀 보세요. 친구농장 코드·링크를 공유하면 친구가 놀러 와 물도 주고 꽃도 선물해요. 자동 저장되고, 자리를 비운 동안에도 작물이 자라요.',
+    keys:'WASD/방향키 이동 · 화면 클릭/터치 · Space 앞 칸 사용 · 1~6 도구 · Enter 채팅',
+    src:'games/pogeunfarm.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="pfsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fdcff"/><stop offset="1" stop-color="#e9f8ff"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#pfsky)"/>
+      <g fill="#fff" opacity=".95"><ellipse cx="70" cy="30" rx="26" ry="9"/><ellipse cx="90" cy="26" rx="18" ry="8"/><ellipse cx="248" cy="40" rx="24" ry="8"/></g>
+      <circle cx="286" cy="26" r="13" fill="#ffd966"/>
+      <rect y="86" width="320" height="94" fill="#8fd17a"/>
+      <path d="M0 92Q80 74 160 90T320 86V100H0Z" fill="#7cc466"/>
+      <g><rect x="22" y="58" width="58" height="42" fill="#d9674f"/><path d="M16 60L51 36 86 60Z" fill="#a8432f"/><rect x="42" y="76" width="18" height="24" fill="#fff3d6"/><rect x="28" y="66" width="10" height="10" fill="#fff3d6"/></g>
+      <g fill="#8b5a2b"><rect x="104" y="118" width="62" height="40" rx="4"/><rect x="176" y="118" width="62" height="40" rx="4"/><rect x="248" y="118" width="52" height="40" rx="4"/></g>
+      <g fill="#6f4520"><rect x="104" y="128" width="62" height="4"/><rect x="104" y="142" width="62" height="4"/><rect x="176" y="128" width="62" height="4"/><rect x="176" y="142" width="62" height="4"/><rect x="248" y="128" width="52" height="4"/><rect x="248" y="142" width="52" height="4"/></g>
+      <g stroke="#3f9b3f" stroke-width="3" stroke-linecap="round" fill="none"><path d="M122 120v-10M146 120v-12M194 120v-9M220 120v-12M266 120v-10M284 120v-8"/></g>
+      <g fill="#58c258"><ellipse cx="118" cy="108" rx="6" ry="3.5"/><ellipse cx="150" cy="106" rx="6" ry="3.5"/><ellipse cx="190" cy="109" rx="6" ry="3.5"/><ellipse cx="224" cy="106" rx="6" ry="3.5"/></g>
+      <g fill="#ff7a59"><circle cx="266" cy="108" r="5"/><circle cx="284" cy="110" r="5"/></g>
+      <g transform="translate(116 80)"><ellipse cx="0" cy="8" rx="10" ry="8" fill="#fff"/><circle cx="-8" cy="0" r="5" fill="#fff"/><path d="M-13 0l-5 2 5 2Z" fill="#ffb347"/><circle cx="-9" cy="-1" r="1.2" fill="#333"/><path d="M-9-6q-2-4 1-4t2 4" fill="#e04b4b"/></g>
     </svg>`
   }
 ];
@@ -955,14 +1054,14 @@ async function loadMine(){
    게임들은 최고 기록·저장 데이터를 이 브라우저(localStorage)에 저장해요. 로비와 게임은 같은 주소라서 로비가 그걸 읽어
    내 계정에 백업하고, 다른 기기·브라우저에서 로그인하면 내려받아요.
    ※ 새 게임이 localStorage 에 저장하는 키가 있으면 아래 SYNC_KEYS 에 이름을 추가하세요. */
-const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick'];
+const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pogeun_farm_v1'];
 const SYNC_MAX=300000; /* 키 하나당 최대 글자 수 */
 const encKey=k=>k.replace(/\./g,'__dot__');
 const hashStr=v=>{if(v==null)return null;let h=5381;for(let i=0;i<v.length;i++)h=((h<<5)+h+v.charCodeAt(i))|0;return v.length+':'+h;};
 function loadMeta(){try{const m=JSON.parse(localStorage.getItem('lobby-syncmeta')||'null');if(m&&m.h)return m;}catch(e){}return {uid:null,t:0,h:{}};}
 function saveMeta(m){try{localStorage.setItem('lobby-syncmeta',JSON.stringify(m));}catch(e){}}
 const lget=k=>{try{return localStorage.getItem(k);}catch(e){return null;}};
-function wipeLocal(){SYNC_KEYS.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});try{localStorage.removeItem('lobby-syncmeta');}catch(e){}}
+function wipeLocal(){SYNC_KEYS.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});try{localStorage.removeItem('lobby-syncmeta');}catch(e){}try{refreshFavs();}catch(e){}}
 let syncing=false,pushTimer=null;
 async function syncDown(){
   if(!me||syncing)return;syncing=true;
@@ -1068,6 +1167,88 @@ function stopPresence(){
   myGame=null;mySid=null;
 }
 addEventListener('pagehide',stopPresence);
+/* ---------- 검색 · 태그 필터 · 즐겨찾기 ----------
+   · 즐겨찾기(★): 카드 오른쪽 아래 별을 누르면 그 게임이 맨 위로 올라와요. 이 브라우저에 저장되고,
+     로그인하면 SYNC_KEYS 덕분에 계정에 백업돼서 다른 기기에서도 따라와요. (로그아웃하면 이 기기 기록과 함께 지워져요)
+   · 태그: GAMES 의 tags 로 칩이 자동 생성돼요. 여러 개를 고르면 "모두 가진" 게임만 보여줘요. */
+const FAV_KEY='lobby-favs';
+const TAG_ORDER=['멀티','2인용','액션','전략','시뮬','스포츠','퍼즐','보드','호러','서바이벌','스토리'];
+let favSet=new Set();
+const activeTags=new Set();let favOnly=false;
+function loadFavs(){
+  let a=[];try{a=JSON.parse(localStorage.getItem(FAV_KEY)||'[]');}catch(e){}
+  favSet=new Set((Array.isArray(a)?a:[]).filter(id=>GAMES.some(g=>g.id===id&&g.ready)));
+}
+function saveFavs(){
+  try{if(favSet.size)localStorage.setItem(FAV_KEY,JSON.stringify([...favSet]));else localStorage.removeItem(FAV_KEY);}catch(e){}
+  schedulePush();
+}
+function paintFav(el){
+  const id=el.dataset.fav,on=favSet.has(id),g=GAMES.find(x=>x.id===id);
+  el.textContent=on?'★':'☆';el.classList.toggle('on',on);el.setAttribute('aria-pressed',String(on));
+  const t=(g?g.title:'게임')+' 즐겨찾기 '+(on?'해제':'추가');el.setAttribute('aria-label',t);el.title=t;
+}
+function paintFavs(){document.querySelectorAll('.fav').forEach(paintFav);}
+function toggleFav(id){
+  if(favSet.has(id))favSet.delete(id);else favSet.add(id);
+  saveFavs();paintFavs();sortGrid();applyFilter();
+}
+function refreshFavs(){loadFavs();paintFavs();sortGrid();applyFilter();}
+GAMES.forEach(g=>{
+  if(!g.ready)return;
+  const th=grid.querySelector(`[data-id="${g.id}"] .thumb`);if(!th)return;
+  const el=document.createElement('span');el.className='fav';el.dataset.fav=g.id;el.setAttribute('role','button');el.tabIndex=0;
+  const act=e=>{e.preventDefault();e.stopPropagation();toggleFav(g.id);};
+  el.addEventListener('click',act);
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')act(e);});
+  th.appendChild(el);
+});
+
+const qInput=$('q'),qClear=$('qClear'),chipsBox=$('chips'),noRes=$('noRes');
+function tagsOf(g){return Array.isArray(g.tags)?g.tags.map(String):[];}
+function buildChips(){
+  const cnt={};GAMES.forEach(g=>tagsOf(g).forEach(t=>{cnt[t]=(cnt[t]||0)+1;}));
+  const names=Object.keys(cnt).sort((a,b)=>{const ia=TAG_ORDER.indexOf(a),ib=TAG_ORDER.indexOf(b);return (ia<0?99:ia)-(ib<0?99:ib)||a.localeCompare(b);});
+  chipsBox.innerHTML=`<button type="button" data-k="__all">전체</button><button type="button" data-k="__fav">★ 즐겨찾기</button>`+
+    names.map(t=>`<button type="button" data-k="${esc(t)}">${esc(t)}<small>${cnt[t]}</small></button>`).join('');
+}
+chipsBox.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-k]');if(!b)return;
+  const k=b.dataset.k;
+  if(k==='__all'){activeTags.clear();favOnly=false;}
+  else if(k==='__fav')favOnly=!favOnly;
+  else if(activeTags.has(k))activeTags.delete(k);else activeTags.add(k);
+  applyFilter();
+});
+function applyFilter(){
+  const terms=qInput.value.toLowerCase().split(/\s+/).filter(Boolean);
+  qClear.hidden=!qInput.value;
+  let shown=0;
+  GAMES.forEach(g=>{
+    const c=grid.querySelector(`[data-id="${g.id}"]`);if(!c)return;
+    const tg=tagsOf(g),hay=(g.title+' '+(g.hanja||'')+' '+g.desc+' '+tg.join(' ')).toLowerCase();
+    const ok=(!favOnly||favSet.has(g.id))&&[...activeTags].every(t=>tg.includes(t))&&terms.every(t=>hay.includes(t));
+    c.hidden=!ok;if(ok)shown++;
+  });
+  chipsBox.querySelectorAll('button[data-k]').forEach(b=>{
+    const k=b.dataset.k;
+    b.setAttribute('aria-pressed',String(k==='__all'?(!favOnly&&!activeTags.size):k==='__fav'?favOnly:activeTags.has(k)));
+  });
+  if(shown){noRes.hidden=true;}
+  else{
+    noRes.hidden=false;
+    noRes.innerHTML=(favOnly&&!favSet.size&&!terms.length&&!activeTags.size)
+      ?'즐겨찾기한 게임이 아직 없어요.<br>카드 오른쪽 아래의 ☆ 를 눌러 추가해 보세요.'
+      :'조건에 맞는 게임이 없어요.<br><button type="button" id="resetFilter">필터 초기화</button>';
+    const r=$('resetFilter');if(r)r.addEventListener('click',()=>{qInput.value='';activeTags.clear();favOnly=false;applyFilter();});
+  }
+}
+qInput.addEventListener('input',applyFilter);
+qInput.addEventListener('keydown',e=>{if(e.key==='Escape'){qInput.value='';applyFilter();}});
+qClear.addEventListener('click',()=>{qInput.value='';applyFilter();qInput.focus();});
+addEventListener('storage',e=>{if(e.key===FAV_KEY)refreshFavs();});
+buildChips();loadFavs();paintFavs();applyFilter();
+
 /* ---------- 정렬: 기본순 / 누적 인기순 / 실시간 인기순 ---------- */
 let sortMode='default';
 try{const m=localStorage.getItem('lobby-sort');if(['default','total','live'].includes(m))sortMode=m;}catch(e){}
@@ -1081,7 +1262,8 @@ function sortGrid(){
     live:(a,b)=>L(b)-L(a)||P(b)-P(a)||idx[a]-idx[b]
   }[sortMode];
   const cards=[...grid.children];
-  const sorted=cards.slice().sort((x,y)=>ready(x.dataset.id)-ready(y.dataset.id)||cmp(x.dataset.id,y.dataset.id));
+  const fv=id=>favSet.has(id)?0:1; /* 즐겨찾기한 게임을 맨 위로 */
+  const sorted=cards.slice().sort((x,y)=>ready(x.dataset.id)-ready(y.dataset.id)||fv(x.dataset.id)-fv(y.dataset.id)||cmp(x.dataset.id,y.dataset.id));
   if(sorted.some((c,i)=>c!==cards[i]))sorted.forEach(c=>grid.appendChild(c));
 }
 document.querySelectorAll('#sortbar [data-sort]').forEach(b=>{
@@ -1234,7 +1416,7 @@ $('nickReset').addEventListener('click',()=>{applyNick('');nickDlg.close();});
 nickInput.addEventListener('input',()=>{nickErr.textContent='';});
 function afterLogin(){
   if(!me)return;
-  renderAuth();pushRank();
+  renderAuth();pushRank();refreshFavs(); /* 다른 기기에서 정한 즐겨찾기 반영 */
   /* 닉네임이 아직 없고, 이 기기에서 물어본 적 없으면 한 번만 물어봐요 (동기화가 끝난 뒤라 다른 기기에서 정한 닉네임이 있으면 묻지 않아요) */
   let asked={};try{asked=JSON.parse(localStorage.getItem('lobby-nick-asked')||'{}');}catch(e){}
   if(!myNick()&&!asked[me.uid]){
@@ -1254,6 +1436,7 @@ function startRanks(){
 }
 
 startRanks();
+sortGrid(); /* 즐겨찾기 먼저 */
 startLive();
 initAuth();
 
