@@ -2,13 +2,15 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#8fd17a">
 <title>포근농장 · 함께 가꾸는 힐링 농장</title>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;overflow:hidden;background:#8fd17a;font-family:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:#4a3a2a;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:manipulation;background:#8fd17a;font-family:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:#4a3a2a;user-select:none;-webkit-user-select:none}
 canvas{position:fixed;left:0;top:0;touch-action:none;display:block}
+body{position:fixed;inset:0;width:100%}
 .card{background:rgba(255,250,235,.93);border:3px solid #e6cf9d;border-radius:16px;box-shadow:0 3px 0 #c9b07a,0 6px 14px rgba(0,0,0,.15)}
 button{font-family:inherit;color:inherit;cursor:pointer}
 .btn{background:#ffe9a8;border:3px solid #e0b95a;border-radius:12px;padding:6px 12px;font-size:15px;box-shadow:0 3px 0 #c9a04a}
@@ -57,13 +59,36 @@ textarea{height:70px;font-size:11px}
 .sw.on{box-shadow:0 0 0 3px #4a3a2a}
 .code{font-size:34px;letter-spacing:6px;text-align:center;background:#fff;border-radius:12px;padding:6px;border:2px dashed #e0b95a;margin:8px 0}
 #saved{position:fixed;right:12px;bottom:10px;font-size:12px;opacity:0;transition:opacity .4s;color:#3d6b2c;background:rgba(255,255,255,.7);padding:2px 8px;border-radius:8px}
-@media(max-width:600px){.tb{width:48px;height:52px;font-size:20px}.tb small{font-size:10px}#stats{font-size:14px;gap:6px}#xpbar{width:50px}#chatbar input{width:100px}}
+#joy,#actBtn{display:none;position:fixed;z-index:5;touch-action:none;user-select:none}
+#joy{left:calc(16px + env(safe-area-inset-left));bottom:calc(92px + env(safe-area-inset-bottom));width:124px;height:124px;border-radius:50%;background:rgba(255,250,235,.32);border:3px solid rgba(255,255,255,.65);align-items:center;justify-content:center}
+#joy i{width:54px;height:54px;border-radius:50%;background:rgba(255,250,235,.92);border:3px solid #e0b95a;box-shadow:0 3px 0 #c9a04a;pointer-events:none}
+#actBtn{right:calc(18px + env(safe-area-inset-right));bottom:calc(100px + env(safe-area-inset-bottom));width:76px;height:76px;border-radius:50%;font-size:32px;padding:0;align-items:center;justify-content:center}
+body.touch #joy,body.touch #actBtn{display:flex}
+body.touch #zoom{display:none}
+.lb{margin-left:4px}
+#stats{padding-top:max(6px,env(safe-area-inset-top))}
+@media(max-width:700px),(pointer:coarse){
+  #hotbar{bottom:calc(8px + env(safe-area-inset-bottom));padding:5px 6px;gap:4px}
+  .tb{width:46px;height:50px;font-size:20px;border-radius:12px}.tb small{font-size:10px}.tb .cnt{font-size:10px;padding:0 4px;top:-7px}
+  #stats{left:8px;top:calc(8px + env(safe-area-inset-top));font-size:13px;gap:6px;padding:5px 9px;max-width:calc(100vw - 186px)}#xpbar{width:44px;height:8px}
+  #topr{right:calc(8px + env(safe-area-inset-right));top:calc(8px + env(safe-area-inset-top));gap:4px}
+  #topr .btn{padding:5px 8px;font-size:17px;min-width:38px}.lb{display:none}
+  #where{left:8px;transform:none;top:calc(58px + env(safe-area-inset-top));font-size:13px;padding:4px 10px}
+  #toast{top:calc(100px + env(safe-area-inset-top));font-size:14px}
+  #chatbar{left:8px;bottom:auto;top:calc(100px + env(safe-area-inset-top));padding:4px 6px}#chatbar input{width:118px;font-size:16px}
+  #log{left:8px;bottom:auto;top:calc(150px + env(safe-area-inset-top));max-width:62vw}
+  #pop{bottom:calc(76px + env(safe-area-inset-bottom));padding:6px;gap:5px}#pop button{width:66px;font-size:11px}
+  #mbox{padding:12px 13px;width:96vw;max-height:90vh;font-size:15px}#mbox h2{font-size:20px}
+  .btn{min-height:38px}input[type=text],textarea,select{font-size:16px}
+  .code{font-size:28px;letter-spacing:4px}
+  #saved{bottom:calc(70px + env(safe-area-inset-bottom));right:8px}
+}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="stats" class="card"><span id="coins">💰 0</span><span id="lvl">Lv.1</span><div id="xpbar"><i></i></div><span id="clock"></span></div>
-<div id="topr"><button class="btn" id="bShop">🏪 상점</button><button class="btn" id="bNet">🌍 친구농장</button><button class="btn" id="bSet">⚙️</button><button class="btn" id="bHelp">❓</button></div>
+<div id="topr"><button class="btn" id="bShop">🏪<span class="lb">상점</span></button><button class="btn" id="bNet">🌍<span class="lb">친구농장</span></button><button class="btn" id="bSet">⚙️</button><button class="btn" id="bHelp">❓</button></div>
 <div id="where" class="card" hidden></div>
 <div id="zoom"><button class="btn" id="zi">＋</button><button class="btn" id="zo">－</button></div>
 <div id="log"></div>
@@ -72,6 +97,7 @@ textarea{height:70px;font-size:11px}
 <div id="hotbar" class="card"></div>
 <div id="toast"></div>
 <div id="saved">저장됨 ✓</div>
+<div id="joy"><i></i></div><button class="btn g" id="actBtn">🤚</button>
 <div id="modal" hidden><div id="mbox" class="card"></div></div>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
@@ -261,7 +287,9 @@ const world=()=>net.visiting?net.rw:S.world;
 const me={x:S.px,y:S.py,fx:0,fy:1,dir:1,mv:0,say:'',sayT:0,t:0};
 let tool='hand',selSeed='carrot',selDeco='flower_pink',pending=null,hover=null,home={x:me.x,y:me.y};
 let zm=1,cam={x:me.x*T,y:me.y*T},mouse=null,time=0;
-const keys={};
+const keys={},joy={x:0,y:0};
+const isTouchUI=()=>document.body.classList.contains('touch');
+if(matchMedia('(pointer:coarse)').matches||'ontouchstart' in window)document.body.classList.add('touch');
 const particles=[];
 
 /* ---------- 오디오 ---------- */
@@ -347,6 +375,7 @@ function canStand(w,x,y){
 function movePlayer(dt){
   let dx=0,dy=0;
   if(keys.ArrowLeft||keys.a)dx--;if(keys.ArrowRight||keys.d)dx++;if(keys.ArrowUp||keys.w)dy--;if(keys.ArrowDown||keys.s)dy++;
+  if(Math.hypot(joy.x,joy.y)>.25){dx=joy.x;dy=joy.y}
   const w=world();
   if(dx||dy){pending=null}
   else if(pending){
@@ -782,8 +811,8 @@ function netTick(dt){
 /* ---------- 렌더 ---------- */
 let VW=0,VH=0,DPR=1;
 function resize(){DPR=Math.min(devicePixelRatio||1,2);VW=innerWidth;VH=innerHeight;cv.width=VW*DPR;cv.height=VH*DPR;cv.style.width=VW+'px';cv.style.height=VH+'px'}
-addEventListener('resize',resize);resize();
-const zoomNow=()=>clamp(Math.min(VW/(T*17),VH/(T*11.5)),.5,1.4)*zm;
+addEventListener('resize',resize);addEventListener('orientationchange',()=>setTimeout(resize,200));if(window.visualViewport)visualViewport.addEventListener('resize',resize);resize();
+const zoomNow=()=>(isTouchUI()?clamp(Math.min(VW/(T*10),VH/(T*8.5)),.5,1.5):clamp(Math.min(VW/(T*17),VH/(T*11.5)),.5,1.4))*zm;
 function drawPondTo(g,lx,ly,lw,lh,R){
   const cx=(lx+lw/2)*T,cy=(ly+lh/2)*T,rx=lw/2*T+6,ry=lh/2*T+6;
   g.fillStyle='#d9c9a0';g.beginPath();g.ellipse(cx,cy,rx+6,ry+6,0,0,7);g.fill();
@@ -1068,11 +1097,35 @@ let last=performance.now();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;try{update(dt);render()}catch(e){console.error(e)}requestAnimationFrame(frame)}
 
 /* ---------- 입력 ---------- */
-let down=null;
-cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY};mouse={x:e.clientX,y:e.clientY};$('pop').hidden=true});
-cv.addEventListener('pointermove',e=>{mouse={x:e.clientX,y:e.clientY}});
-cv.addEventListener('pointerleave',()=>{mouse=null});
-cv.addEventListener('pointerup',e=>{if(down&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<12)onTap(e.clientX,e.clientY);down=null});
+let down=null;const ptrs=new Map();let pinch0=0,zm0=1;
+cv.addEventListener('pointerdown',e=>{
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(e.pointerType==='mouse')mouse={x:e.clientX,y:e.clientY};else if(!isTouchUI()){document.body.classList.add('touch')}
+  if(ptrs.size===1)down={x:e.clientX,y:e.clientY,id:e.pointerId};else{down=null;const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);zm0=zm}
+  $('pop').hidden=true;audioInit();
+});
+cv.addEventListener('pointermove',e=>{
+  if(ptrs.has(e.pointerId))ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size>=2&&pinch0>0){const [a,b]=[...ptrs.values()];zm=clamp(zm0*Math.hypot(a.x-b.x,a.y-b.y)/pinch0,.6,2.2)}
+  else if(e.pointerType==='mouse')mouse={x:e.clientX,y:e.clientY};
+});
+function endPtr(e){
+  if(e.type==='pointerup'&&down&&down.id===e.pointerId&&Math.hypot(e.clientX-down.x,e.clientY-down.y)<(e.pointerType==='mouse'?12:18))onTap(e.clientX,e.clientY);
+  ptrs.delete(e.pointerId);if(ptrs.size<2)pinch0=0;down=null;if(e.pointerType!=='mouse')mouse=null;
+}
+cv.addEventListener('pointerup',endPtr);cv.addEventListener('pointercancel',endPtr);
+cv.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse')mouse=null});
+// 가상 조이스틱 / 행동 버튼
+(function(){
+  const el=$('joy'),knob=el.firstElementChild;let jid=null,c=null;
+  const upd=e=>{let dx=e.clientX-c.x,dy=e.clientY-c.y;const R=el.offsetWidth/2*.75,d=Math.hypot(dx,dy);if(d>R){dx*=R/d;dy*=R/d}knob.style.transform='translate('+dx+'px,'+dy+'px)';joy.x=dx/R;joy.y=dy/R};
+  const off=()=>{jid=null;joy.x=joy.y=0;knob.style.transform=''};
+  el.addEventListener('pointerdown',e=>{e.preventDefault();audioInit();jid=e.pointerId;try{el.setPointerCapture(jid)}catch(_){}const r=el.getBoundingClientRect();c={x:r.left+r.width/2,y:r.top+r.height/2};pending=null;upd(e)});
+  el.addEventListener('pointermove',e=>{if(e.pointerId===jid)upd(e)});
+  el.addEventListener('pointerup',e=>{if(e.pointerId===jid)off()});el.addEventListener('pointercancel',off);
+  $('actBtn').addEventListener('pointerdown',e=>{e.preventDefault();audioInit();if($('modal').hidden)actFront()});
+  document.addEventListener('gesturestart',e=>e.preventDefault());
+  document.addEventListener('touchend',()=>audioInit(),{passive:true});
+})();
 cv.addEventListener('wheel',e=>{e.preventDefault();zm=clamp(zm*(e.deltaY<0?1.1:.9),.6,2)},{passive:false});
 addEventListener('keydown',e=>{
   if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT'))return;
