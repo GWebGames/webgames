@@ -1703,6 +1703,8 @@ function humanGeo() {
   HG.gun = new THREE.BoxGeometry(0.07, 0.11, 0.7);
   HG.barrel = new THREE.CylinderGeometry(0.02, 0.02, 0.35, 6);
   HG.mag = new THREE.BoxGeometry(0.05, 0.16, 0.07);
+  HG.stock = new THREE.BoxGeometry(0.09, 0.15, 0.3); HG.grip = new THREE.BoxGeometry(0.07, 0.15, 0.08); HG.hguard = new THREE.BoxGeometry(0.11, 0.1, 0.4);
+  HG.sight = new THREE.BoxGeometry(0.04, 0.07, 0.04); HG.muz = new THREE.CylinderGeometry(0.045, 0.045, 0.14, 8);
   HG.flash = new THREE.SphereGeometry(0.14, 8, 6);
   HG.flashMat = new THREE.MeshBasicMaterial({ color: 0xffe27a });
   return HG;
@@ -1734,11 +1736,11 @@ function makeHuman(shirt, pants, helmet, skinC) {
   const barrel = add(G.barrel, gunM, 0, 0, -0.97, rig); barrel.rotation.x = Math.PI / 2; gunParts.push(barrel);
   gunParts.push(add(G.mag, gunM, 0, -0.14, -0.4, rig));
   const gm2 = mat(0x3a3d42), gm3 = mat(0x6d747d);
-  gunParts.push(add(new THREE.BoxGeometry(0.09, 0.15, 0.3), gm2, 0, -0.02, 0.28, rig));          // 3 개머리판
-  gunParts.push(add(new THREE.BoxGeometry(0.07, 0.15, 0.08), gm2, 0, -0.12, -0.2, rig));         // 4 그립
-  gunParts.push(add(new THREE.BoxGeometry(0.11, 0.1, 0.4), gm2, 0, -0.01, -0.78, rig));          // 5 핸드가드
-  gunParts.push(add(new THREE.BoxGeometry(0.04, 0.07, 0.04), gm3, 0, 0.12, -0.9, rig));          // 6 가늠쇠
-  gunParts.push(add(new THREE.CylinderGeometry(0.045, 0.045, 0.14, 8), gm3, 0, 0, -1.08, rig));  // 7 소염기
+  gunParts.push(add(G.stock, gm2, 0, -0.02, 0.28, rig));          // 3 개머리판
+  gunParts.push(add(G.grip, gm2, 0, -0.12, -0.2, rig));         // 4 그립
+  gunParts.push(add(G.hguard, gm2, 0, -0.01, -0.78, rig));          // 5 핸드가드
+  gunParts.push(add(G.sight, gm3, 0, 0.12, -0.9, rig));          // 6 가늠쇠
+  gunParts.push(add(G.muz, gm3, 0, 0, -1.08, rig));  // 7 소염기
   gunParts[7].rotation.x = Math.PI / 2;
   const knife = add(G.knife, mat(0xcfd4d8), 0.02, -0.1, -0.5, rig); knife.visible = false;
   const scope = add(G.scope, mat(0x222428), 0, 0.06, -0.55, rig); scope.rotation.x = Math.PI / 2; scope.visible = false;
@@ -2791,8 +2793,8 @@ function enterCar(c) {
   seatTake(c, player, idx);
   if (idx === 0) { c.in.th = c.in.sr = c.in.br = 0; player.yaw = c.yaw; }
   player.stance = 0; player.reloadT = 0; aiming = false; mouseDown = false; closeLoot();
-  if (c.boat) toast(idx === 0 ? '🚤 보트 운전석 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차' : '🚤 보트 동승 — 좌클릭 사격 가능, E 하차', 3000);
-  else if (c.heli) toast(idx === 0 ? '🚁 헬기 조종석 — W/S 전진·후진, A/D 회전, Space 상승, C 하강(모바일: 앉기 버튼), E 하차(착륙 후)' : '🚁 헬기 동승 — 좌클릭 사격 가능, E 하차(착륙 후)', 3600);
+  if (c.boat) toast(idx === 0 ? '🚤 보트 운전석 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차 · F 선수 기관총' : '🚤 보트 동승 — 좌클릭 사격 가능, E 하차 · F 선수 기관총으로 이동', 3000);
+  else if (c.heli) toast(idx === 0 ? '🚁 헬기 조종석 — W/S 전진·후진, A/D 회전, Space 상승, C 하강(모바일: 앉기 버튼), E 하차(착륙 후)' : '🚁 헬기 동승 — 좌클릭 사격 가능, E 하차(착륙 후) · F 도어 기관포로 이동', 3600);
   else toast(c.hum ? (idx === 0 ? '🪖 험비 운전석 — W/S 가속·후진, A/D 조향, E 하차 · F 지붕 기관총으로 이동' : '🪖 험비 동승 — 좌클릭 사격, E 하차 · F 지붕 기관총으로 이동') : c.bike ? '🏍 오토바이 탑승 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차' : idx === 0 ? '🚗 운전석 탑승 — W/S 가속·후진, A/D 조향, Space 브레이크, E 하차' : '🚗 동승 — 좌클릭 사격 가능, E 하차', 3000);
 }
 function exitCar() {
@@ -2932,7 +2934,7 @@ function updateCars(dt) {
     if (c.turret) {
       const t = c.turret; carTurSync(t);
       const u = player.tur === t ? player : (!isClient ? t.user : null);
-      if (u) { u.pos.set(t.sx, GUN_Y, t.sz); if (u.remote) { u.net.x = t.sx; u.net.z = t.sz; u.net.y = GUN_Y; } }
+      if (u) { const gy = gunFootY(c); u.pos.set(t.sx, gy, t.sz); if (u.remote) { u.net.x = t.sx; u.net.z = t.sz; u.net.y = gy; } }
     }
     if (c.bike) {
       const yr = angDiff(c.yaw, c.lastYaw) / Math.max(dt, 1e-3); c.lastYaw = c.yaw;
@@ -3004,7 +3006,7 @@ function applyCarSnap(arr) {
       if (player.drv !== c || player.seat !== mySeat) {
         player.drv = c; player.seat = mySeat; player.carYaw = c.yaw; player.stance = 0; aiming = false; mouseDown = false; closeLoot();
         if (mySeat === 0) player.yaw = c.yaw;
-        toast(c.hum ? '🪖 험비 탑승 — E 하차 · F 지붕 기관총으로 이동' : c.boat ? '🚤 보트 탑승 — E 하차' : c.heli ? '🚁 헬기 탑승 — 조종: Space 상승 · C 하강 · E 하차(착륙 후)' : c.bike ? '🏍 오토바이 탑승 — E 하차' : mySeat === 0 ? '🚗 운전석 탑승 — E 하차' : '🚗 동승 — 좌클릭 사격 가능, E 하차', 2500);
+        toast(c.hum ? '🪖 험비 탑승 — E 하차 · F 지붕 기관총으로 이동' : c.boat ? '🚤 보트 탑승 — E 하차 · F 선수 기관총' : c.heli ? '🚁 헬기 탑승 — 조종: Space 상승 · C 하강 · E 하차(착륙 후) · 동승석 F 도어 기관포' : c.bike ? '🏍 오토바이 탑승 — E 하차' : mySeat === 0 ? '🚗 운전석 탑승 — E 하차' : '🚗 동승 — 좌클릭 사격 가능, E 하차', 2500);
       }
     } else if (player.drv === c) dismount(player, c);
   }
@@ -3501,7 +3503,8 @@ function findCarFor(b, R) {
   let best = null, bd = R * R;
   for (let i = 0; i < cars.length; i++) {
     const c = cars[i];
-    if (c.boat || c.heli || c.wreck || c.occId.some(v => v >= 0) || c.hp < c.maxHp * 0.6 || (c.tires[0] + c.tires[1] + c.tires[2] + c.tires[3]) < 4) continue;
+    if (c.wreck || c.occId.some(v => v >= 0) || c.hp < c.maxHp * 0.6 || (c.heli && c.y > 1.2) || (!c.boat && !c.heli && (c.tires[0] + c.tires[1] + c.tires[2] + c.tires[3]) < 4)) continue;
+    if (c.boat && !boatShore(c)) continue;   // 걸어서 닿을 수 있는 해안이 있는 보트만
     if (c.res && c.res !== b && c.res.alive && c.res.carT === c) continue;
     const d2 = (c.x - b.pos.x) * (c.x - b.pos.x) + (c.z - b.pos.z) * (c.z - b.pos.z);
     if (d2 < bd) { bd = d2; best = c; }
@@ -3510,18 +3513,89 @@ function findCarFor(b, R) {
 }
 function findSquadCar(b) {
   for (let i = 0; i < cars.length; i++) {
-    const c = cars[i]; if (c.boat || c.heli || c.wreck || c.occId[0] < 0 || c.occId.indexOf(-1) < 0) continue;
+    const c = cars[i]; if (c.wreck || c.occId[0] < 0 || c.occId.indexOf(-1) < 0 || (c.heli && c.y > 1.2)) continue;
     const d = c.occ[0]; if (!d || !d.alive || d.team !== b.team || d === b) continue;
     const dx = c.x - b.pos.x, dz = c.z - b.pos.z; if (dx * dx + dz * dz < 38 * 38) return c;
   }
   return null;
+}
+// 보트: 걸어서 닿을 수 있는 가장 가까운 해안 (dismountSpot의 보트 탐색과 같은 방식)
+function boatShore(c) {
+  for (let r = 3.5; r <= 18; r += 2.5) for (let k = 0; k < 12; k++) { const a = k * 0.5236 + c.yaw, x = c.x + Math.cos(a) * r, z = c.z + Math.sin(a) * r; if (pointFree(x, z, 0.4)) return { x, z }; }
+  return null;
+}
+function boatClear(x, z, ang, len) {
+  const fx = -Math.sin(ang), fz = -Math.cos(ang);
+  for (let d = 2.5; d <= len; d += 2.5) { const px = x + fx * d, pz = z + fz * d; if (!waterRaw(px, pz, -2.0) || onBridge(px, pz) || Math.abs(px) > MAP_HALF - 8 || Math.abs(pz) > MAP_HALF - 8) return false; }
+  return true;
+}
+function pickBoatGoal(b, c) {
+  for (let i = 0; i < 30; i++) {
+    const a = rand(0, Math.PI * 2), r = rand(40, 160), x = c.x + Math.cos(a) * r, z = c.z + Math.sin(a) * r;
+    if (!waterRaw(x, z, -6) || onBridge(x, z) || (zSafe() < 250 && Math.hypot(x, z) > zSafe() - 10)) continue;
+    if (boatClear(c.x, c.z, Math.atan2(-(x - c.x), -(z - c.z)), Math.min(r, 60))) { b.dg = { x, z }; b.dgT = 30; return true; }
+  }
+  b.dg = null; return false;
+}
+function boatBot(b, c, dt) {
+  b.drvT = (b.drvT || 0) + dt;
+  if (!b.dg || b.dgT <= 0) pickBoatGoal(b, c);
+  const gd = b.dg ? Math.hypot(b.dg.x - c.x, b.dg.z - c.z) : 0;
+  if (b.drvT > 45 || c.hp < c.maxHp * 0.35 || (b.dg && gd < 14) || !b.dg) {   // 목적지 도착/시간 경과/손상: 해안이 가까우면 하선
+    if (boatShore(c)) { b.carCd = 30; b.drvT = 0; b.dg = null; dismount(b, c); b.goal = null; b.idleT = rand(0.3, 1.5); return; }
+    if (!b.dg || gd < 14 || b.dgT <= 0) pickBoatGoal(b, c);
+  }
+  b.dgT -= dt;
+  if (!b.dg) { c.in.th = 0; c.in.sr = 0; c.in.br = 1; return; }
+  const dx = b.dg.x - c.x, dz = b.dg.z - c.z, want = Math.atan2(-dx, -dz), L = 16;
+  let ang = want;
+  if (!boatClear(c.x, c.z, want, L)) {
+    const pref = b.avoidSide || (Math.random() < 0.5 ? 1 : -1); let found = false;
+    for (const o of [0.4, -0.4, 0.8, -0.8, 1.3, -1.3, 2.0, -2.0]) { const a = want + o * pref; if (boatClear(c.x, c.z, a, L * 0.8)) { ang = a; b.avoidSide = Math.sign(o * pref); found = true; break; } }
+    if (!found) ang = want + pref * 1.6;
+  } else b.avoidSide = 0;
+  const da = angDiff(ang, c.yaw); let th = 0.85, sr = -clamp(da * 2.2, -1, 1);
+  if (Math.abs(da) > 0.9) th = 0.3; else if (Math.abs(da) > 0.45) th = 0.55;
+  if (b.rev > 0) { b.rev -= dt; th = -0.8; sr = Math.sign(da) || 1; }
+  else {
+    if (Math.abs(c.v) < 0.8 && th > 0.1) b.stuckC = (b.stuckC || 0) + dt; else b.stuckC = 0;
+    if (b.stuckC > 1.4) { b.rev = 1.6; b.stuckC = 0; b.dg = null; }
+  }
+  c.in.th = th; c.in.sr = sr; c.in.br = 0;
+}
+function pickHeliGoal(b, c) {
+  for (let i = 0; i < 40; i++) {
+    const a = rand(0, Math.PI * 2), rr = Math.sqrt(Math.random()) * Math.max(zSafe() * 0.7, 10), x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+    if (Math.hypot(x - c.x, z - c.z) > 140 && pointFree(x, z, 9) && !insideBuilding(x, z, 12) && !(hazards.length && hazardAt(x, z, 15))) { b.dg = { x, z }; b.dgT = 120; return; }
+  }
+  b.dg = { x: c.x0, z: c.z0 }; b.dgT = 120;
+}
+// 헬기 조종: 이륙(수직 상승) → 순항 고도 유지하며 목적지로 → 도착 근처에서 하강·착륙 → 하차
+function heliBot(b, c, dt) {
+  const I = c.in, air = c.y > 1.2; I.th = 0; I.sr = 0; I.br = 0;
+  if (b.waitT > 0 && !air) { b.waitT -= dt; return; }
+  b.drvT = (b.drvT || 0) + dt;
+  if (!b.dg || b.dgT <= 0) pickHeliGoal(b, c);
+  b.dgT -= dt;
+  let dx = b.dg.x - c.x, dz = b.dg.z - c.z, dist = Math.hypot(dx, dz);
+  if (b.hph !== 2 && air && (dist < 28 || c.hp < c.maxHp * 0.3 || b.drvT > 120)) { b.hph = 2; if (dist >= 28) { b.dg = { x: c.x, z: c.z }; dx = dz = dist = 0; } }
+  if (b.hph === 2) {   // 착륙
+    if (!air) { b.hph = 0; b.carCd = 30; b.drvT = 0; b.dg = null; dismount(b, c); b.goal = null; b.idleT = rand(0.3, 1.5); return; }
+    I.br = 2; I.th = dist > 8 && c.y > 8 ? 0.3 : 0;
+    const da2 = angDiff(Math.atan2(-dx, -dz), c.yaw); if (dist > 8) I.sr = -clamp(da2 * 2, -1, 1);
+    return;
+  }
+  const da = angDiff(Math.atan2(-dx, -dz), c.yaw);
+  I.sr = -clamp(da * 2, -1, 1);
+  if (c.y < 26) { I.br = 1; I.th = c.y > 12 && Math.abs(da) < 0.6 ? 0.6 : 0; }
+  else { I.br = c.y > 34 ? 2 : 0; I.th = Math.abs(da) < 0.5 ? 1 : 0.15; }
 }
 function enterBotCar(b, c) {
   const idx = c.occId.indexOf(-1);
   b.carT = null; c.res = null;
   if (idx < 0 || !carOpenFor(c, b.team)) return false;
   seatTake(c, b, idx);
-  b.dg = null; b.drvT = 0; b.rev = 0; b.stuckC = 0; b.revN = 0; b.avoidSide = 0; b.target = null; b.itemT = null; b.mesh.visible = false; b.react = 0;
+  b.dg = null; b.hph = 0; b.drvT = 0; b.rev = 0; b.stuckC = 0; b.revN = 0; b.avoidSide = 0; b.target = null; b.itemT = null; b.mesh.visible = false; b.react = 0;
   if (idx === 0) {
     c.in.th = c.in.sr = c.in.br = 0; b.waitT = 0;
     const tmm = teamMap[b.team] || [];
@@ -3533,7 +3607,7 @@ function mountBotTur(b, t) {
   if (!t || t.userId !== -1) return false;
   if (b.drv) releaseDriver(b);
   t.user = b; t.userId = b.id; t.res = null; b.tur = t; b.turT = null; b.target = null; b.itemT = null; b.carT = null; b.react = 0; b.turIdle = 0; b.burst = 3; b.fireCd = 1;
-  b.pos.set(t.sx, t.car ? GUN_Y : 0, t.sz); b.yaw = t.car ? b.yaw : t.yaw0; b.pt = 0; b.mesh.visible = true;
+  b.pos.set(t.sx, t.car ? gunFootY(t.car) : 0, t.sz); b.yaw = t.car ? b.yaw : t.yaw0; b.pt = 0; b.mesh.visible = true;
   return true;
 }
 function turretBot(b, dt, d2, outside) {
@@ -3570,9 +3644,9 @@ function freeTurretFor(b, r) {
 }
 function passengerBot(b, dt) {
   const c = b.drv;
-  if (c.hum && c.turret.userId === -1 && !c.wreck && c.occ[0] && c.occ[0].alive) { mountBotTur(b, c.turret); return; }
+  if (c.turret && c.turret.userId === -1 && !c.wreck && c.occ[0] && c.occ[0].alive) { mountBotTur(b, c.turret); return; }
   const dr = c.occ[0];
-  if ((!dr || !dr.alive) && Math.abs(c.v) < 1.5) { b.carCd = 10; dismount(b, c); return; }
+  if ((!dr || !dr.alive) && Math.abs(c.v) < 1.5 && !(c.heli && c.y > 1.2)) { b.carCd = 10; dismount(b, c); return; }   // 공중에선 내리지 않음
   b.scanT -= dt;
   if (b.scanT <= 0) { b.scanT = 0.35; b.target = b.gun ? findTarget(b) : null; }
   if (b.target && !b.target.alive) b.target = null;
@@ -3598,7 +3672,9 @@ function driveBot(b, dt) {
   b.mesh.visible = false;
   if (!c || c.wreck) { dismount(b, c); return; }
   if (b.seat > 0) { passengerBot(b, dt); return; }
+  if (c.heli) { heliBot(b, c, dt); return; }
   if (b.waitT > 0) { b.waitT -= dt; c.in.th = 0; c.in.sr = 0; c.in.br = 1; return; }
+  if (c.boat) { boatBot(b, c, dt); return; }
   b.drvT = (b.drvT || 0) + dt;
   const nT = c.tires[0] + c.tires[1] + c.tires[2] + c.tires[3];
   if (!b.dg || b.dgT <= 0) pickDriveGoal(b, c);
@@ -3930,11 +4006,13 @@ function updateBot(b, dt, d2) {
     if (b.descT > 25) { b.desc = null; b.lastRt = null; b.descT = 0; }
   } else if (b.carT) {
     const cc = b.carT; b.carWalk += dt;
-    if (cc.wreck || cc.occId.indexOf(-1) < 0 || b.carWalk > 16) { b.carT = null; b.carCd = 10; }
+    if (cc.wreck || cc.occId.indexOf(-1) < 0 || b.carWalk > 16 || (cc.heli && cc.y > 1.2)) { b.carT = null; b.carCd = 10; }
     else {
-      const dx = cc.x - b.pos.x, dz = cc.z - b.pos.z, dist = Math.hypot(dx, dz);
-      if (dist < 3.0) { enterBotCar(b, cc); return; }
-      const ang = steerClear(b, navAngle(b, cc.x, cc.z, dt), 4.5);
+      if (cc.boat && (!b.carTP || b.carTP.c !== cc)) b.carTP = { c: cc, p: boatShore(cc) };
+      const tp = cc.boat && b.carTP.p ? b.carTP.p : cc;
+      const dx = tp.x - b.pos.x, dz = tp.z - b.pos.z, dist = Math.hypot(dx, dz), dB = Math.hypot(cc.x - b.pos.x, cc.z - b.pos.z);
+      if (dB < (cc.boat ? 5.5 : cc.heli ? 4.2 : 3.0) || (cc.boat && dist < 2.2)) { enterBotCar(b, cc); return; }
+      const ang = steerClear(b, navAngle(b, tp.x, tp.z, dt), 4.5);
       if (b.navFail > 2) { b.navFail = 0; b.carT = null; cc.res = null; b.carCd = 8; }
       b.yaw = turnToward(b.yaw, ang, dt * 7); fwd = 1; spd = 6.2;
     }
@@ -4390,7 +4468,7 @@ function updateItems(dt, t) {
   medHintT -= dt; armHintT -= dt;
   const px = player.pos.x, pz = player.pos.z, canAct = player.alive && !player.air;
   nearCrate = null; nearSwap = null; nearCar = canAct && !player.drv && !player.tur ? nearestCar(px, pz) : null; nearTur = canAct && !player.drv && !player.tur ? nearestTurret(px, pz) : null;
-  nearGun = canAct && !player.tur ? (player.drv ? (player.drv.hum && player.drv.turret.userId === -1 ? player.drv : null) : nearestGunCar(px, pz)) : null;
+  nearGun = canAct && !player.tur ? (player.drv ? (player.drv.turret && player.drv.turret.userId === -1 ? player.drv : null) : nearestGunCar(px, pz)) : null;
   let bestC = 2.8 * 2.8, bestS = 2.4 * 2.4;
   for (let i = 0; i < crates.length; i++) {
     const cr = crates[i], dx = cr.x - px, dz = cr.z - pz, d2 = dx * dx + dz * dz;
@@ -4431,11 +4509,11 @@ function updateItems(dt, t) {
     else if (nearTur) hint = '[E] 거치포 사용';
     else if (nearCar || nearGun) {
       const hc = nearCar || nearGun;
-      hint = hc.hum ? ((nearCar ? '[E] 험비 ' + (nearCar.occId.indexOf(-1) === 0 ? '운전석' : '동승') + ' 탑승' : '') + (nearCar && nearGun ? ' · ' : '') + (nearGun ? '[F] 지붕 기관총 사수' : ''))
+      hint = hc.turret ? ((nearCar ? '[E] ' + (hc.heli ? '헬기' : hc.boat ? '보트' : '험비') + ' ' + (nearCar.occId.indexOf(-1) === 0 ? '운전석' : '동승') + ' 탑승' : '') + (nearCar && nearGun ? ' · ' : '') + (nearGun ? '[F] ' + (hc.heli ? '도어 기관포 사수' : hc.boat ? '선수 기관총 사수' : '지붕 기관총 사수') : ''))
         : '[E] ' + (nearCar.boat ? '보트' : nearCar.heli ? '헬기' : '차량') + ' 탑승 (' + (nearCar.occId.indexOf(-1) === 0 ? '운전석' : '동승') + ')';
     }
   }
-  if (player.drv && nearGun) hint += '   [F] 지붕 기관총으로 이동';
+  if (player.drv && nearGun) hint += '   [F] ' + (nearGun.heli ? '도어 기관포' : nearGun.boat ? '선수 기관총' : '지붕 기관총') + '으로 이동';
   const ah = $('actHint'); if (ah._h !== hint) { ah._h = hint; ah.textContent = hint; ah.style.display = hint ? 'block' : 'none'; }
 }
 function itemHint(it, e, d2, bestS) {
@@ -4477,10 +4555,65 @@ const turGeo = {
   });
 })();
 const GUN_LZ = 0.35;
-function carTurSync(t) { const c = t.car, s = Math.sin(c.yaw), co = Math.cos(c.yaw); t.x = t.sx = c.x + GUN_LZ * s; t.z = t.sz = c.z + GUN_LZ * co; t.yaw0 = c.yaw; }
+const GUN_NAME = c => c.heli ? '헬기 기관포' : c.boat ? '보트 기관총' : '험비 기관총';
+// 사수가 서는 높이 (험비/헬기/보트 공통). 헬기는 고도, 보트는 수면 기준
+function gunFootY(c) { return (c.heli ? c.y : c.boat ? WATER.y : 0) + (c.gunY == null ? GUN_Y : c.gunY); }
+function carTurSync(t) {
+  const c = t.car, s = Math.sin(c.yaw), co = Math.cos(c.yaw), lx = c.gunLX || 0, lz = c.gunLZ == null ? GUN_LZ : c.gunLZ;
+  t.x = t.sx = c.x + lx * co + lz * s; t.z = t.sz = c.z - lx * s + lz * co; t.yaw0 = c.yaw;
+}
+/* 헬기(도어 로터리 기관포) / 보트(선수 중기관총): 성능은 험비 기관총(WP.hu)과 동일, 외형만 다름 */
+const GM = {
+  steel: new THREE.MeshLambertMaterial({ color: 0x2f353b }), dark: new THREE.MeshLambertMaterial({ color: 0x14161a }), brass: new THREE.MeshLambertMaterial({ color: 0xb58b34 }),
+  olive: new THREE.MeshLambertMaterial({ color: 0x55603a }), plate: new THREE.MeshLambertMaterial({ color: 0x56646e })
+};
+const _cy = (r1, r2, h, sg) => new THREE.CylinderGeometry(r1, r2, h, sg || 10);
+const GG = {
+  hHouse: new THREE.BoxGeometry(0.26, 0.26, 0.5), hMotor: _cy(0.11, 0.11, 0.2).rotateX(Math.PI / 2), hBar: _cy(0.026, 0.026, 0.95, 6).rotateX(Math.PI / 2), hRing: _cy(0.1, 0.1, 0.04).rotateX(Math.PI / 2),
+  hDrum: _cy(0.2, 0.2, 0.28, 12).rotateZ(Math.PI / 2), hChute: new THREE.BoxGeometry(0.22, 0.08, 0.1), hGrip: new THREE.BoxGeometry(0.05, 0.14, 0.05), hCross: new THREE.BoxGeometry(0.3, 0.03, 0.03),
+  hArm: new THREE.BoxGeometry(0.34, 0.09, 0.14), hPost: _cy(0.05, 0.07, 0.72, 8), hBase: _cy(0.2, 0.22, 0.05, 12),
+  bRecv: new THREE.BoxGeometry(0.18, 0.22, 0.7), bCover: new THREE.BoxGeometry(0.14, 0.06, 0.5), bJack: _cy(0.052, 0.052, 0.62).rotateX(Math.PI / 2), bRing: _cy(0.064, 0.064, 0.03).rotateX(Math.PI / 2),
+  bBar: _cy(0.032, 0.032, 0.55, 8).rotateX(Math.PI / 2), bHide: _cy(0.05, 0.04, 0.1, 8).rotateX(Math.PI / 2), bHandle: new THREE.BoxGeometry(0.03, 0.07, 0.3), bCross: new THREE.BoxGeometry(0.3, 0.03, 0.03),
+  bGrip: new THREE.BoxGeometry(0.035, 0.12, 0.035), bCan: new THREE.BoxGeometry(0.22, 0.18, 0.12), bBelt: new THREE.BoxGeometry(0.03, 0.05, 0.2), bShield: new THREE.BoxGeometry(0.84, 0.46, 0.05),
+  bBevel: new THREE.BoxGeometry(0.84, 0.1, 0.05), bPost: _cy(0.06, 0.09, 0.8, 8), bBase: _cy(0.28, 0.3, 0.06, 12)
+};
+function buildCarGun(c) {
+  const heli = !!c.heli, par = c.lean || c.mesh;
+  c.gunLX = heli ? 1.38 : 0; c.gunLZ = heli ? 0.35 : -1.7; c.gunY = heli ? 0.7 : 0.5;
+  const PY = c.gunY + 1.05;   // 험비와 같은 비율: 사수 발 높이 + 1.05 가 포신 높이
+  const root = new THREE.Group(); root.position.set(c.gunLX, 0, c.gunLZ); par.add(root);
+  const add = (geo, m, x, y, z, p, rx) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); if (rx) o.rotation.x = rx; o.castShadow = true; (p || root).add(o); return o; };
+  const pivot = new THREE.Group(); pivot.position.y = PY; root.add(pivot);
+  const gun = new THREE.Group(); pivot.add(gun);
+  const muzzle = new THREE.Object3D(); let spin = null;
+  if (heli) {   // 도어 마운트 6연장 로터리 기관포
+    add(GG.hArm, GM.dark, -0.17, PY - 0.2, 0); add(GG.hPost, GM.dark, 0, PY - 0.35, 0); add(GG.hBase, GM.steel, 0, PY - 0.7, 0);
+    add(GG.hHouse, GM.steel, 0, 0, 0.05, gun); add(GG.hMotor, GM.dark, 0, 0, 0.4, gun);
+    spin = new THREE.Group(); spin.position.set(0, 0, -0.7); gun.add(spin);
+    for (let k = 0; k < 6; k++) { const a = k * Math.PI / 3; add(GG.hBar, GM.dark, Math.cos(a) * 0.07, Math.sin(a) * 0.07, -0.25, spin); }
+    add(GG.hRing, GM.steel, 0, 0, 0.15, spin); add(GG.hRing, GM.steel, 0, 0, -0.25, spin); add(GG.hRing, GM.steel, 0, 0, -0.7, spin);
+    add(GG.hDrum, GM.olive, 0.26, -0.12, 0.15, gun); add(GG.hChute, GM.brass, 0.13, -0.06, 0.12, gun);
+    add(GG.hCross, GM.dark, 0, -0.12, 0.34, gun); add(GG.hGrip, GM.dark, -0.12, -0.2, 0.34, gun); add(GG.hGrip, GM.dark, 0.12, -0.2, 0.34, gun);
+    muzzle.position.set(0, 0, -1.5);
+  } else {      // 선수 M2식 중기관총 (방패 + 탄통)
+    add(GG.bPost, GM.dark, 0, PY - 0.45, 0); add(GG.bBase, GM.steel, 0, PY - 0.81, 0);
+    add(GG.bRecv, GM.steel, 0, 0, 0, gun); add(GG.bCover, GM.dark, 0, 0.14, -0.02, gun); add(GG.bHandle, GM.dark, 0, 0.2, -0.4, gun);
+    add(GG.bJack, GM.steel, 0, 0.03, -0.62, gun); add(GG.bRing, GM.dark, 0, 0.03, -0.45, gun); add(GG.bRing, GM.dark, 0, 0.03, -0.62, gun); add(GG.bRing, GM.dark, 0, 0.03, -0.8, gun);
+    add(GG.bBar, GM.dark, 0, 0.03, -1.1, gun); add(GG.bHide, GM.dark, 0, 0.03, -1.42, gun);
+    add(GG.bCross, GM.dark, 0, 0, 0.4, gun); add(GG.bGrip, GM.dark, -0.13, -0.04, 0.4, gun); add(GG.bGrip, GM.dark, 0.13, -0.04, 0.4, gun);
+    add(GG.bCan, GM.olive, -0.25, -0.1, 0, gun); add(GG.bBelt, GM.brass, -0.14, -0.02, 0, gun);
+    add(GG.bShield, GM.plate, 0, 0.1, -0.45, pivot); add(GG.bBevel, GM.plate, 0, 0.38, -0.5, pivot, -0.6);
+    muzzle.position.set(0, 0.03, -1.5);
+  }
+  gun.add(muzzle);
+  const t = { id: turrets.length, car: c, x: c.x, z: c.z, sx: c.x, sz: c.z, yaw0: c.yaw, user: null, userId: -1, root, pivot, gun, muzzle, spin, ay: c.yaw, ap: 0, net: { yaw: c.yaw, pitch: 0 }, heat: 0, lock: 0 };
+  pivot.rotation.y = 0; turrets.push(t); c.turret = t;
+}
 (function () {
   cars.forEach(c => {
+    if (c.heli || c.boat) { buildCarGun(c); return; }
     if (!c.hum) return;
+    c.gunY = GUN_Y;
     const root = new THREE.Group(); root.position.set(0, 0, GUN_LZ); c.mesh.add(root);
     const add = (geo, m, x, y, z, par) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; (par || root).add(o); return o; };
     const pivot = new THREE.Group(); pivot.position.y = 1.9; root.add(pivot);
@@ -4496,17 +4629,17 @@ function carTurSync(t) { const c = t.car, s = Math.sin(c.yaw), co = Math.cos(c.y
 function nearestGunCar(x, z) {
   let best = null, bd = 3.6 * 3.6;
   for (let i = 0; i < cars.length; i++) {
-    const c = cars[i]; if (!c.hum || c.wreck || c.turret.userId !== -1 || !carOpenFor(c, player.team)) continue;
-    const dx = c.x - x, dz = c.z - z; if (dx * dx + dz * dz > 49) continue;
-    carLocal(c, x, z, _cl);
-    const ex = Math.max(0, Math.abs(_cl.x) - 0.97), ez = Math.max(0, Math.abs(_cl.z) - 2.17), d2 = ex * ex + ez * ez;
+    const c = cars[i]; if (!c.turret || c.wreck || c.turret.userId !== -1 || !carOpenFor(c, player.team) || (c.heli && c.y > 2.5)) continue;
+    const dx = c.x - x, dz = c.z - z; if (dx * dx + dz * dz > (c.hum ? 49 : 100)) continue;
+    carLocal(c, x, z, _cl); const dm = cdim(c);
+    const ex = Math.max(0, Math.abs(_cl.x) - dm[0]), ez = Math.max(0, Math.abs(_cl.z) - dm[1]), d2 = ex * ex + ez * ez;
     if (d2 < bd) { bd = d2; best = c; }
   }
   return best;
 }
 function interactGun() {
   if (!player.alive || player.air || player.tur) return;
-  const c = player.drv ? (player.drv.hum ? player.drv : null) : nearestGunCar(player.pos.x, player.pos.z);
+  const c = player.drv ? (player.drv.turret ? player.drv : null) : nearestGunCar(player.pos.x, player.pos.z);
   if (c && c.turret) enterTurret(c.turret);
 }
 function nearestTurret(x, z) {
@@ -4517,15 +4650,16 @@ function nearestTurret(x, z) {
 function enterTurret(t) {
   if (!t || t.userId !== -1 || player.tur || !player.alive || player.air) return;
   if (player.drv && player.drv !== t.car) return;
+  if (t.car && t.car.heli && t.car.y > 2.5 && player.drv === t.car && player.seat === 0) { toast('조종사는 비행 중 기관포를 쓸 수 없습니다 (동승자가 사용)', 1800); return; }
   if (t.car && (t.car.wreck || !carOpenFor(t.car, player.team))) return;
   if (NET.mode === 'client') { netSend(NET.hostConn, { t: 'tur', a: 'in', id: t.id }); return; }
   if (player.drv) releaseDriver(player);
   t.user = player; t.userId = 0; player.tur = t; seatTurret(t);
 }
 function seatTurret(t) {
-  player.pos.set(t.sx, t.car ? GUN_Y : 0, t.sz); player.vy = 0; player.grounded = true; player.yaw = t.yaw0; player.pitch = 0; player.stance = 0; player.slideT = 0;
+  player.pos.set(t.sx, t.car ? gunFootY(t.car) : 0, t.sz); player.vy = 0; player.grounded = true; player.yaw = t.yaw0; player.pitch = 0; player.stance = 0; player.slideT = 0;
   aiming = false; mouseDown = false; player.thr = null; player.throwWind = 0; player.reloadT = 0; closeLoot();
-  toast(t.car ? '🔫 험비 기관총 — 360° 회전, 마우스로 조준, 좌클릭 연사 (과열 주의), E 내리기' : '🔫 거치포 — 마우스로 조준, 좌클릭 연사 (과열 주의), E 내리기', 3200); sfxClick(900, 0.08, 0.2);
+  toast(t.car ? '🔫 ' + GUN_NAME(t.car) + ' — 360° 회전, 마우스로 조준, 좌클릭 연사 (과열 주의), E 내리기' : '🔫 거치포 — 마우스로 조준, 좌클릭 연사 (과열 주의), E 내리기', 3200); sfxClick(900, 0.08, 0.2);
 }
 function exitTurret() {
   const t = player.tur; if (!t) return;
@@ -4536,6 +4670,11 @@ function releaseTurret(e) {
   const t = e.tur; if (!t) return;
   t.user = null; t.userId = -1; e.tur = null;
   if (t.car) {
+    const cc = t.car;
+    if (cc.heli && cc.y > 2.5 && !cc.wreck && e.alive) {   // 공중에서는 땅이 아니라 다시 좌석으로
+      const idx = [1, 2, 3, 0].find(i => cc.occId[i] === -1);   // 조종석은 마지막 순위
+      if (idx !== undefined) { seatTake(cc, e, idx); if (e === player) { player.vy = 0; player.grounded = true; toast('기관포에서 내려 좌석에 앉았습니다', 900); } return; }
+    }
     const sp = dismountSpot(t.car, 0);
     if (e === player) { player.pos.set(sp.x, 0, sp.z); player.vy = 0; player.grounded = true; toast('기관총에서 내렸습니다', 900); }
     else if (e.remote) { e.net.x = sp.x; e.net.z = sp.z; e.net.y = 0; e.pos.set(sp.x, 0, sp.z); }
@@ -4553,8 +4692,9 @@ function hostTur(rp, m) {
   if (m.a === 'in') {
     if ((rp.drv && rp.drv !== t.car) || rp.tur || t.userId !== -1 || Math.hypot(t.sx - rp.pos.x, t.sz - rp.pos.z) > (t.car ? 4.6 : 3.6)) return;
     if (t.car && (t.car.wreck || !carOpenFor(t.car, rp.team))) return;
+    if (t.car && t.car.heli && t.car.y > 2.5 && rp.drv === t.car && rp.seat === 0) return;
     if (rp.drv) releaseDriver(rp);
-    const ty0 = t.car ? GUN_Y : 0;
+    const ty0 = t.car ? gunFootY(t.car) : 0;
     t.user = rp; t.userId = rp.id; rp.tur = t; rp.net.x = t.sx; rp.net.z = t.sz; rp.net.y = ty0; rp.pos.set(t.sx, ty0, t.sz);
   } else if (m.a === 'out' && rp.tur === t) releaseTurret(rp);
 }
@@ -4585,11 +4725,12 @@ function updateTurrets(dt) {
     t.root.visible = Math.hypot(t.x - camera.position.x, t.z - camera.position.z) < 320;
     if (t.lock > 0) { t.lock -= dt; if (t.lock <= 0) { t.lock = 0; t.heat = 0.3; } else t.heat = 0.3 + 0.7 * (t.lock / 3.0); }
     else t.heat = Math.max(0, t.heat - dt * (player.tur === t ? 0.14 : 0.5));
+    if (t.spin) { if (t.heat > (t.ph || 0) + 1e-4) t.spinV = 30; t.ph = t.heat; t.spinV = (t.spinV || 0) * Math.max(0, 1 - dt * 3); t.spin.rotation.z += t.spinV * dt; }
   }
 }
 function turretTick(p, dt) {
   const t = p.tur;
-  if (t.car) { carTurSync(t); p.pos.set(t.sx, GUN_Y, t.sz); p.pitch = clamp(p.pitch, -0.5, 1.0); }
+  if (t.car) { carTurSync(t); p.pos.set(t.sx, gunFootY(t.car), t.sz); p.pitch = clamp(p.pitch, -0.5, 1.0); }
   else { p.pos.set(t.sx, 0, t.sz); p.yaw = t.yaw0 + clamp(angDiff(p.yaw, t.yaw0), -1.75, 1.75); p.pitch = clamp(p.pitch, -0.4, 0.75); }
   p.vy = 0; p.grounded = true; p.moving = false; p.sprint = false; p.slideT = 0;
   p.fireCd -= dt; p.recoil *= Math.pow(0.02, dt);
@@ -6072,7 +6213,7 @@ function onClientMsg(conn, m) {
         const c = rp.drv;
         if (rp.seat === 0 && Array.isArray(m.ci)) { c.in.th = clamp(+m.ci[0] || 0, -1, 1); c.in.sr = clamp(+m.ci[1] || 0, -1, 1); c.in.br = clamp(m.ci[2] | 0, 0, 2); c.inT = performance.now(); }
         rp.net.x = c.x; rp.net.z = c.z; rp.net.y = c.heli ? c.y : 0;
-      } else if (rp.tur && rp.tur.car) { rp.net.x = rp.tur.sx; rp.net.z = rp.tur.sz; rp.net.y = GUN_Y; }
+      } else if (rp.tur && rp.tur.car) { rp.net.x = rp.tur.sx; rp.net.z = rp.tur.sz; rp.net.y = gunFootY(rp.tur.car); }
       break;
     case 'ping':
       if (!rp || !rp.alive || (NET.tn || 1) < 2) return;
@@ -6255,7 +6396,7 @@ function hostSnapshot() {
       if (b === rp || b.gone) return;
       if (b !== player && b.air && ((b.remote && b.net.ds === 0) || (!b.remote && b.dropState === 'plane'))) return;
       if (b === player && player.air && drop.state === 'plane') return;
-      const dx = b.pos.x - px, dz = b.pos.z - pz, lim = b.air ? 700 : b.zom ? 170 : 330;
+      const dx = b.pos.x - px, dz = b.pos.z - pz, lim = b.air ? 700 : b.zom ? 125 : 330;
       if (dx * dx + dz * dz > lim * lim) return;
       encEnt(e, b);
     };
@@ -6410,7 +6551,7 @@ function updateGhost(b, dt, d2) {
   const chute = !!(f & 4), hidden = !!(f & 8) || !!(f & 64);
   if (chute && !b.canopy) { b.canopy = makeCanopy(canopyColors[b.id % canopyColors.length]); scene.add(b.canopy); }
   if (!chute && b.canopy) { scene.remove(b.canopy); b.canopy = null; }
-  const vis = !hidden && d2 < (b.air ? 650 * 650 : b.zom ? ZVIS * ZVIS : 300 * 300);
+  const vis = !hidden && d2 < (b.air ? 650 * 650 : b.zom ? ZM.visR * ZM.visR : 300 * 300);
   b.mesh.visible = vis;
   if (b.canopy) { b.canopy.visible = vis; b.canopy.position.set(b.pos.x, b.pos.y + 4.6, b.pos.z); b.canopy.rotation.y = b.yaw; }
   if (!vis) return;
@@ -6498,15 +6639,20 @@ const ZT = [
   { n: '군인 좀비', hp: 230, spd: 1.2, run: 3.3, det: 44, dmg: 34, cd: 1.35, reach: 1.7, helm: 2, vest: 2, col: [0x3d4a2c, 0x2b3322, 0x3a4230, 0x6b8060] },
   { n: '신속 좀비', hp: 70, spd: 2.4, run: 7.6, det: 58, dmg: 13, cd: 0.55, reach: 1.5, helm: 0, vest: 0, col: [0x7a2a2a, 0x3a3028, 0x2a2a2a, 0xa7a878] }
 ];
-const ZVIS = 150;
+const ZVIS = 110; ZM.visR = ZVIS;   // 보이는 좀비 수에 따라 자동 조절되는 렌더 반경 (최대 ZVIS)
+const ZM_MAXALIVE = 200;
+const _zWound = new THREE.BoxGeometry(0.22, 0.26, 0.02);
+function zmCap() { return Math.min(ZM_MAXALIVE, zmBase() + Math.floor(gameTime / 60) * Math.round(zmBase() * 0.06)); }
 const zmBase = () => ZM_LV[ZM.lv - 1] || 130;
 function makeZombieMesh(zt) {
   const T = ZT[zt], m = makeHuman(T.col[0], T.col[1], T.col[2], T.col[3]), u = m.userData;
   setArmedVisual(m, false); u.knife.visible = false; u.zt = zt;
   u.armL.rotation.set(1.45, 0, 0.1); u.armR.rotation.set(1.45, 0, -0.1);
   if (zt === 2) { m.scale.x = 0.88; m.scale.z = 0.88; } else if (zt === 1) { m.scale.x = 1.1; m.scale.z = 1.1; }
-  if (zt === 0) { const w = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.26, 0.02), mat(0x5a0d0d)); w.position.set(Math.random() < 0.5 ? -0.14 : 0.14, 1.2, -0.175); m.add(w); }
+  if (zt === 0) { const w = new THREE.Mesh(_zWound, mat(0x5a0d0d)); w.position.set(Math.random() < 0.5 ? -0.14 : 0.14, 1.2, -0.175); m.add(w); }
   setArmorVisual(m, T.helm, T.vest);
+  m.remove(u.rig);   // 좀비는 총을 안 쓰므로 장면에서 제거 (메시 수 절감)
+  m.traverse(o => { if (o.isMesh) o.castShadow = false; });   // 그림자 패스 부하 제거
   return m;
 }
 function zombiePose(b, dt, sp) {
@@ -6519,8 +6665,11 @@ function zombiePose(b, dt, sp) {
   u.armL.rotation.x = a; u.armR.rotation.x = a + (run ? 0.1 : 0.0);
   b.mesh.rotation.x = -(run ? 0.32 : sp > 0.3 ? 0.13 : 0.06);
 }
+let _grT = 0;
 function sfxGroan(zt, d) {
-  if (!actx || d > 55) return; const v = 0.07 * (1 - d / 55);
+  if (!actx || d > 55) return;
+  const _n = performance.now(); if (_n - _grT < 150) return; _grT = _n;   // 동시 발음 제한
+  const v = 0.07 * (1 - d / 55);
   if (zt === 2) { sfxTone(300 + Math.random() * 120, 0.3, v, 'sawtooth'); sfxTone(170, 0.3, v * 0.7, 'square'); }
   else sfxTone((zt ? 70 : 95) + Math.random() * 30, 0.55, v, 'sawtooth');
 }
@@ -6557,7 +6706,7 @@ function zmSpawnAway(minD, zt) {
   }
   return null;
 }
-function zmSpawnInit() { ZM.kills = 0; ZM.zc = 0; ZM.spawnT = 2; ZM.hordeT = 55; ZM.cleanT = 2; ZM.warned = false; ZM.done = false; for (let i = 0; i < zmBase(); i++) zmSpawnAway(55); }
+function zmSpawnInit() { ZM.kills = 0; ZM.zc = 0; ZM.spawnT = 2; ZM.hordeT = 55; ZM.cleanT = 2; ZM.warned = false; ZM.done = false; for (let i = 0, n = Math.min(zmBase(), 70); i < n; i++) zmSpawnAway(55); }   // 나머지는 zmTick에서 나눠서 스폰 (시작 프레임 멈춤 방지)
 function zmMakeAlly(b, i) {
   const p = zmSlotPos(NET.nh + i);
   b.air = false; b.dropState = 'landed'; b.pos.set(p.x, 0, p.z); b.canopy = null; b.fallT = 0; b.name = 'ALLY-' + String(i + 1).padStart(2, '0'); b.yaw = rand(0, Math.PI * 2);
@@ -6603,8 +6752,8 @@ function zomHit(b, T) {
 function updateZombie(b, dt, d2) {
   const T = ZT[b.zt];
   if (!b.alive) {
-    b.deathT += dt; b.mesh.visible = d2 < ZVIS * ZVIS * 2; b.mesh.rotation.x = -Math.min(b.deathT * 3, 1) * Math.PI / 2;
-    if (b.deathT > 10) { scene.remove(b.mesh); b.gone = true; }
+    b.deathT += dt; b.mesh.visible = d2 < ZM.visR * ZM.visR; b.mesh.rotation.x = -Math.min(b.deathT * 3, 1) * Math.PI / 2;
+    if (b.deathT > 6) { scene.remove(b.mesh); b.gone = true; }
     return;
   }
   if (b.swing > 0) b.swing -= dt;
@@ -6657,7 +6806,7 @@ function updateZombie(b, dt, d2) {
     else b.stuckT = Math.max(0, b.stuckT - dt);
   }
   if (b.target && d2 < 45 * 45 && Math.random() < dt * 0.22) sfxGroan(b.zt, Math.sqrt(d2));
-  const vis = d2 < ZVIS * ZVIS; b.mesh.visible = vis;
+  const vis = d2 < ZM.visR * ZM.visR; b.mesh.visible = vis;
   if (vis) zombiePose(b, dt, moved / Math.max(dt, 1e-3));
   b.mesh.position.set(b.pos.x, b.pos.y, b.pos.z); b.mesh.rotation.y = b.yaw;
 }
@@ -6679,7 +6828,7 @@ function zmHorde() {
   let cx = 0, cz = 0, n = 0;
   for (let i = 0; i < entities.length; i++) { const e = entities[i]; if (e.team !== 0 || !e.alive) continue; cx += e.pos.x; cz += e.pos.z; n++; }
   if (!n) return; cx /= n; cz /= n;
-  const cnt = Math.min(34, 10 + Math.floor(gameTime / 60) * 3), a0 = rand(0, Math.PI * 2); let made = 0;
+  const cnt = Math.min(24, 10 + Math.floor(gameTime / 60) * 3, Math.max(0, zmCap() + 16 - ZM.zc)), a0 = rand(0, Math.PI * 2); let made = 0;
   for (let i = 0; i < cnt * 3 && made < cnt; i++) {
     const a = a0 + rand(-0.6, 0.6), r = rand(78, 105), x = cx + Math.cos(a) * r, z = cz + Math.sin(a) * r;
     if (Math.hypot(x, z) > ZONE_START - 8 || !pointFree(x, z, 0.8)) continue;
@@ -6694,8 +6843,8 @@ function zmTick(dt) {
     ZM.spawnT = 0.5; let alive = 0;
     for (let i = 0; i < bots.length; i++) if (bots[i].zom && bots[i].alive) alive++;
     ZM.zc = alive;
-    const cap = zmBase() + Math.floor(gameTime / 60) * Math.round(zmBase() * 0.06);
-    for (let k = 0; k < Math.min(2, cap - alive); k++) zmSpawnAway(90);
+    const cap = zmCap();
+    for (let k = 0; k < Math.min(alive < cap * 0.7 ? 5 : 2, cap - alive); k++) zmSpawnAway(90);
   }
   ZM.hordeT -= dt; if (ZM.hordeT <= 0) { ZM.hordeT = 60; zmHorde(); }
   if (!ZM.warned && gameTime >= ZM.T - 60) { ZM.warned = true; feed('🚁 구조 헬기가 1분 뒤 도착합니다 — 끝까지 버티세요!'); }
@@ -6720,7 +6869,7 @@ function randomPlayerSpawn() {
 function resetGame(m) {
   statsDone = false; newAch = []; lastGain = null; kcAbort();
   const role = NET.mode;
-  ZM.on = !ZM.boot && (role === 'client' ? !!(m && m.zm) : ZM.sel); ZM.nextZ = 1; ZM.done = false; ZM.kills = 0; ZM.zc = 0;
+  ZM.on = !ZM.boot && (role === 'client' ? !!(m && m.zm) : ZM.sel); ZM.nextZ = 1; ZM.done = false; ZM.kills = 0; ZM.zc = 0; ZM.visR = ZVIS;
   if (ZM.on) ZM.spawn = role === 'client' ? { x: m.zs[0], z: m.zs[1] } : randomPlayerSpawn();
   bots.forEach(b => { scene.remove(b.mesh); if (b.canopy) scene.remove(b.canopy); }); bots.length = 0;
   for (const k in ghosts) delete ghosts[k];
@@ -6890,7 +7039,7 @@ renderStats(); applySkin();
 /* ================= 킬캠 (나를 죽인 상대 시점 리플레이) ================= */
 const kc = { buf: [], bt: 0, on: false, ready: false, frames: null, t: 0, dur: 0, info: null, done: null, killer: null, proxy: null, gt: 0 };
 function killDesc(a) {
-  if (a.tur) return a.tur.car ? '험비 기관총' : '거치포';
+  if (a.tur) return a.tur.car ? GUN_NAME(a.tur.car) : '거치포';
   if (a.drv) return '차량';
   const k = a.weapon || a.wp; return k === 'knife' ? '칼' : (WP[k] && WP[k].n) || '총';
 }
@@ -7267,14 +7416,17 @@ function loop(now) {
     for (let i = 0; i < bots.length; i++) {
       const b = bots[i]; if (b.gone) continue;
       const ddx = b.pos.x - player.pos.x, ddz = b.pos.z - player.pos.z, dd2 = ddx * ddx + ddz * ddz;
-      const every = b.ghost || b.remote || b.drv || !b.alive || b.air || dd2 < 110 * 110 ? 1 : dd2 < 240 * 240 ? 2 : 4;
+      const every = b.ghost || b.remote || b.drv || !b.alive || b.air ? 1 : b.zom ? (dd2 < 45 * 45 ? 1 : dd2 < 100 * 100 ? 2 : dd2 < 200 * 200 ? 4 : 6) : dd2 < 110 * 110 ? 1 : dd2 < 240 * 240 ? 2 : 4;
       b.acc += dt;
       if ((frameNo + i) % every === 0) { updateBot(b, Math.min(b.acc, 0.12), dd2); b.acc = 0; }
     }
+    let nvz = 0;
     for (const b of bots) {
       const ud = b.mesh.userData;
       if (ud.flashT > 0) { ud.flashT -= dt; if (ud.flashT <= 0) ud.flash.visible = false; }
+      if (b.zom && b.mesh.visible) nvz++;
     }
+    if (ZM.on) ZM.visR = nvz > 55 ? Math.max(40, ZM.visR * 0.96) : nvz < 40 ? Math.min(ZVIS, ZM.visR * 1.02) : ZM.visR;
     updateItems(dt, now / 1000);
     updateEffects(dt);
     updateGrens(dt); updateRockets(dt); updateSmokes(dt); updateAirdrops(dt); updateTurrets(dt); updateEvents(dt);
