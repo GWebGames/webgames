@@ -185,6 +185,7 @@ body.mob.land #rot{display:none}
    <div class="row" id="modes"><button class="chip on" data-m="auto">자동</button><button class="chip" data-m="mob">📱 모바일</button><button class="chip" data-m="pc">🖥 PC</button></div>
    <button class="go" id="btnStart">경기 시작</button>
    <button class="go" id="btnTour" style="background:#7dff9b;box-shadow:0 4px 0 #2e8f47;color:#06210e">🏆 토너먼트 모드</button>
+   <button class="go" id="btnDerby" style="background:#ff9d3d;box-shadow:0 4px 0 #a85a0b;color:#2a1300">💥 홈런더비</button>
    <button class="chip" id="btnMP">🌐 온라인 대전 (친구와 2인)</button>
    <div class="help">
     <span><b>난이도</b> 쉬움: 굿·퍼펙트 스윙이 거의 항상 안타, 판정이 넉넉하고 상대가 약함(모바일 추천). 보통: 굿은 대체로 안타. 어려움: 굿 보장 없음, 퍼펙트만 안타, 상대 타자·투수가 강하고 도루·견제가 잦음.</span>
@@ -196,6 +197,16 @@ body.mob.land #rot{display:none}
     <span><b>규칙</b> 인필드 플라이(1·2루+2아웃 미만, 높은 내야 뜬공은 타자 자동 아웃) · 견제 제한(한 타석 2회까지, 소진하면 견제 불가 · 수비 중 I키 고의사구) · 수비 시프트(수비 때 위치 선택) · 연장전은 무사 1·2루 승부치기 · 콜드게임(5회 10점·7회 7점 차).</span>
     <span><b>모바일</b> 화면을 드래그해 조준하고 버튼으로 투구·스윙·슬라이딩. 가로 화면을 권장합니다.</span>
    </div>
+  </div>
+  <div id="derby" class="ov" hidden>
+   <h1>홈런 <em>더비</em></h1>
+   <p class="sub">배팅볼 투수가 던지는 공을 쳐서 담장을 넘기세요. <b>홈런이 아니면 전부 아웃!</b> 정해진 아웃을 다 쓰면 상대 차례, 홈런이 더 많은 쪽이 승리합니다. 동점이면 3아웃 서든데스.</p>
+   <div class="row" id="dbRounds"><span style="align-self:center;color:var(--muted)">라운드</span><button class="chip" data-n="1">1</button><button class="chip on" data-n="2">2</button><button class="chip" data-n="3">3</button></div>
+   <div class="row" id="dbOuts"><span style="align-self:center;color:var(--muted)">라운드당 아웃</span><button class="chip" data-n="5">5</button><button class="chip on" data-n="7">7</button><button class="chip" data-n="10">10</button></div>
+   <button class="go" id="dbSolo">혼자 도전 (vs CPU)</button>
+   <button class="go" id="dbOnline" style="background:#7ec8ff;box-shadow:0 4px 0 #2d6a99;color:#06182b">🌐 온라인 대결 (친구와)</button>
+   <button class="chip" id="dbBack">← 뒤로</button>
+   <div class="help"><span><b>타격</b> 일반 경기와 같습니다. PERFECT·GOOD로 정확히 맞힐수록 홈런이 잘 나오고, 헛스윙·파울·땅볼·뜬공은 모두 아웃입니다. 공을 지켜보는 건 괜찮지만 3구 연속이면 아웃.</span><span><b>온라인</b> 방장이 라운드/아웃 수를 정합니다. 방장이 먼저 치고, 상대의 타격은 실시간으로 지켜볼 수 있어요.</span></div>
   </div>
   <div id="lobby" class="ov" hidden>
    <h1 style="font-size:clamp(26px,5.5vw,48px)">온라인 <em>대전</em></h1>
@@ -1175,6 +1186,7 @@ function ballSprite(x,y,r,rot){
 function panel(x,y,w,h){const c=ctx;c.fillStyle='rgba(6,16,34,.88)';rr(c,x,y,w,h,8);c.fill();c.strokeStyle='rgba(255,255,255,.18)';c.lineWidth=1;c.stroke()}
 function avg(b){return '.'+String(Math.round(180+b.con*190)).padStart(3,'0')}
 function drawHUD(){
+  if(G.derby)return drawHUDDerby();
   const c=ctx;panel(14,12,270,76);
   for(let t=0;t<2;t++){const y=20+t*32;c.fillStyle=TEAMS[t].c;c.fillRect(22,y,6,26);
     tx(c,TEAMS[t].n,36,y+21,19,G.half===t?'#ffc83d':'#f3efe4','left',FONT_D);
@@ -2117,11 +2129,11 @@ function drawField3D(){
 let G=null,AC=null;
 const defT=()=>1-G.half;
 // 역할 판정: HB/HD = 사람이 조작하는 공격/수비 (싱글: 내가 한빛고, 멀티: 양쪽 모두 사람)
-const HB=()=>!!G.mp||G.half===0,HD=()=>!!G.mp||G.half===1;
+const HB=()=>!!G.mp||G.half===0,HD=()=>!G.derby&&(!!G.mp||G.half===1);
 let MP_D=16,MP_HOLD=(MP_D+3)/60;function mpSetD(d){MP_D=d;MP_HOLD=(d+3)/60}   // 멀티: 입력 지연(프레임)과 무스윙 판정 보류 시간
 const ME=()=>(G&&G.mp)?G.me:0;
 const lBat=()=>G.mp?G.half===G.me:G.half===0;   // 이 화면의 플레이어가 지금 타격 중인가
-const lDef=()=>G.mp?G.half!==G.me:G.half===1;   // 이 화면의 플레이어가 지금 수비 중인가
+const lDef=()=>!G.derby&&(G.mp?G.half!==G.me:G.half===1);   // 이 화면의 플레이어가 지금 수비 중인가
 const batter=()=>G.lineup[G.half][G.order[G.half]];
 // ---------- haptics ----------
 function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
@@ -2213,11 +2225,13 @@ function capPop(t){
   const m=M[t];if(m)cap(pick(m),m[0].length>14?2.4:1.8);
 }
 function capPitch(p){
+  if(G.derby)return;
   const pn=G.pit[defT()].name,b=batter().name,cnt=`${G.balls}-${G.strikes}`;
   const run=G.bases[1]||G.bases[2]||G.bases[3];
   cap(pick(run?[`${pn}, 주자를 살피며 셋 포지션… 던졌습니다.`,`카운트 ${cnt}. 주자를 신경 쓰며 ${pn}의 투구.`]:[`${pn}, 와인드업… 던졌습니다!`,`카운트 ${cnt}. ${jo(pn,'이','가')} ${jo(b,'을','를')} 상대로 던집니다.`]),2.2);
 }
 function capPA(){
+  if(G.derby)return;
   const b=batter();if(!b)return;const a='.'+String(Math.round(180+b.con*190)).padStart(3,'0');
   cap(pick([`${G.inn}회 ${G.half?'말':'초'}, ${b.num}번 ${b.name} 타석에 들어섭니다. 타율 ${a}.`,`${b.name}, 타율 ${a}. 타석에서 숨을 고릅니다.`]),2.6);
 }
@@ -2225,7 +2239,7 @@ function capPA(){
 // ---------- game stats ----------
 function stB(t,p){const m=G.st.b[t];let s=m.get(p);if(!s){s={ab:0,h:0,d:0,t:0,hr:0,bb:0,k:0,rbi:0,r:0,sb:0,late:G.st.init};m.set(p,s);G.st.bo[t].push(p)}return s}
 function stP(t,p){const m=G.st.p[t];let s=m.get(p);if(!s){s={outs:0,h:0,r:0,bb:0,k:0,pc:0,late:G.st.init};m.set(p,s);G.st.po[t].push(p)}return s}
-function newGame(max,diff,mpo,tour){
+function newGame(max,diff,mpo,tour,der){
   applyShift(0);
   if(!tour&&(TEAMS[0]!==TEAMS0[0]||TEAMS[1]!==TEAMS0[1])){TEAMS[0]=TEAMS0[0];TEAMS[1]=TEAMS0[1];if(typeof initBG==='function')initBG()}
   G={tour:!!tour,mp:!!mpo,me:mpo?mpo.me:0,noReplay:!!mpo,shift:0,cold:false,great:[0,0],bunt:false,orders:{1:false,2:false},hold:{1:0,2:0,3:0},pk:0,cpuBuntPA:false,diff:diff||'normal',paused:false,lineup:[TEAMS[0].L.slice(),TEAMS[1].L.slice()],bench:[TEAMS[0].bench.slice(),TEAMS[1].bench.slice()],pen:[TEAMS[0].pen.slice(),TEAMS[1].pen.slice()],pit:[{...TEAMS[0].pit},{...TEAMS[1].pit}],max,inn:1,half:0,outs:0,balls:0,strikes:0,score:[0,0],hits:[0,0],err:[0,0],inns:[[],[]],bases:[null,null,null,null],order:[0,0],stam:[100,100],pc:[0,0],
@@ -2233,6 +2247,7 @@ function newGame(max,diff,mpo,tour){
   G.st={b:[new Map(),new Map()],bo:[[],[]],p:[new Map(),new Map()],po:[[],[]],init:false};
   for(const t of [0,1]){G.lineup[t].forEach(p=>stB(t,p));stP(t,G.pit[t])}
   G.st.init=true;
+  G.derby=der||(mpo&&mpo.derby)||null;if(G.derby){derbyInit();return}
   say('1회초','#ffc83d',mpo?'온라인 대전 · '+TEAMS[0].n+' VS '+TEAMS[1].n:'공격: 타격 시작 · '+TEAMS[0].n+' VS '+TEAMS[1].n,1.6,56);
   beginPA();G.timer=1.7;
 }
@@ -2295,15 +2310,17 @@ function cpuPinch(){
   const risp=!!(G.bases[2]||G.bases[3]),close=Math.abs(G.score[0]-G.score[1])<=2,late=G.inn>=Math.max(2,G.max-2);
   if(Math.random()<(risp?0.5:0.12)*(close?1:0.4)*(late?1.5:0.7)){pinchHit(1,bi);G.cpuBuntPA=false}
 }
-function beginPA(){G.hb=null;G.bunt=false;G.orders={1:false,2:false};G.pk=0;G.cpuBuntPA=(!G.mp&&G.half===1)?cpuBuntWant(batter()):false;G.balls=G.strikes=0;G.mode='ready';G.view='main';G.timer=1.0;G.pitch=null;G.play=null;G.fx=null;G.fn=null;if(!G.mp){cpuBullpen();cpuPinch()}capPA()}
+function beginPA(){G.hb=null;G.bunt=false;G.orders={1:false,2:false};G.pk=0;G.cpuBuntPA=(!G.mp&&G.half===1)?cpuBuntWant(batter()):false;G.balls=G.strikes=0;G.mode='ready';G.view='main';G.timer=1.0;G.pitch=null;G.play=null;G.fx=null;G.fn=null;if(!G.mp&&!G.derby){cpuBullpen();cpuPinch()}if(G.derby){G.outs=0;G.bases=[null,null,null,null]}capPA()}
 function nextPitch(){
   G.pitch=null;G.view='main';
+  if(G.derby){G.mode='bwait';G.timer=R(0.45,0.8);return}
   if(!HD()&&G.balls===0&&G.strikes===0){cpuShift();if(cpuIBB())return}
   if(HD()){G.mode='aim'}else{G.mode='bwait';G.timer=R(0.6,1.0)}
 }
 // 콜드게임: 7회 이후 7점 차 / 5회 이후 10점 차 (7이닝 이상 경기)
 const coldM=()=>G.max<7?0:G.inn>=7?7:G.inn>=5?10:0;
 function afterPA(){
+  if(G.derby)return derbyAfter();
   G.order[G.half]=(G.order[G.half]+1)%9;
   if(G.outs>=3)return endHalf();
   if(G.half===1&&G.inn>=G.max&&G.score[1]>G.score[0])return gameOver();
@@ -2413,8 +2430,8 @@ function doSwing(q){
   if(!isFinite(t)||p.swingAt!=null||t<-0.3||t>p.T+0.19)return;
   const cur={x:CL(+q.x||0,-1.7,1.7),y:CL(+q.y||0,-1.7,1.7)};
   p.swingAt=t;p.swingStart=t;
-  if(G.bunt){p.bunt=true;p.res=userBunt(p,cur,t,batter());sfx('catch');return}
-  p.res=userSwing(p,cur,t,batter());perfectBoost(p);sfx('swing');
+  if(G.bunt&&!G.derby){p.bunt=true;p.res=userBunt(p,cur,t,batter());sfx('catch');return}
+  p.res=userSwing(p,cur,t,batter());if(G.derby)derbyBoost(p);else perfectBoost(p);sfx('swing');
 }
 // a PERFECT swing must never be a routine out: re-roll the contact until it falls in for a hit
 function perfectBoost(p){
@@ -2461,6 +2478,7 @@ function updPitch(dt){
   }
 }
 function pitchEnd(kind,skip){
+  if(G.derby)return derbyPitchEnd(G.pitch,kind);
   const p=G.pitch;G.lastSp=p.sp;let txt,col='#ffc83d',stl=null;
   if(!skip){if(dropRoll(p,kind))return playDrop3(p,kind);const w=wpRoll(p,kind);if(w)return playWP(p,kind,w)}
   if(kind==='ball'&&hbpRoll(p))return doHBP(p);
@@ -3025,6 +3043,7 @@ function hitDesc(P,nm){
 }
 function finalizePlay(){
   const P=G.play;if(P.done)return;P.done=true;
+  if(G.derby)G.dRes=(P.hr||P.plan.some(e=>e.from===0&&!e.out&&e.to>=4))?'hr':'out';
   const o=G.half,B=G.bases;let outs=0,runs=0,nb=[null,null,null,null],txt='',col='#fff',sub='';
   const moved=new Set(P.plan.map(e=>e.from));
   for(let b=1;b<=3;b++)if(B[b]&&!moved.has(b))nb[b]=B[b];
@@ -3105,7 +3124,7 @@ function startReplay(P0,after){
 }
 // ---------- 입력: 싱글은 즉시 적용, 멀티는 락스텝 큐(mp.js)를 거쳐 양쪽에 같은 프레임에 적용 ----------
 const ACT_BAT=new Set(['sw','bu','st','sl','tg','ph','rr','rj']),ACT_DEF=new Set(['th','pk','pb','ps','ib','sh','po','rt']);
-const canSubNow=()=>G&&!G.over&&(G.mode==='aim'||G.mode==='bwait'||G.mode==='ready');
+const canSubNow=()=>G&&!G.over&&!G.derby&&(G.mode==='aim'||G.mode==='bwait'||G.mode==='ready');
 function actArgs(k,b){
   const pt=G.pitch?G.pitch.t:0,ft=G.play?G.play.t:0;
   switch(k){
@@ -3126,6 +3145,7 @@ function act(k,b){
 function applyAct(role,k,a){
   if(!G||G.over||!a)return;
   if(G.mp){if(ACT_BAT.has(k)?role!==G.half:ACT_DEF.has(k)?role===G.half:true)return}
+  if(G.derby&&(k==='bu'||k==='st'||k==='sl'||k==='tg'||k==='ph'||k==='ps'))return;
   const team=G.mp?role:0,b=a.b|0;
   switch(k){
     case 'th':return doThrow(a);
@@ -3157,7 +3177,7 @@ function update(dt){
   if(G.capQ&&G.capQ.length){const q=G.capQ[0];if(G.tAll>=q.at){G.capQ.shift();cap(q.text,q.dur,true)}}
   switch(G.mode){
     case 'ready':G.timer-=dt;if(G.timer<=0)nextPitch();break;
-    case 'bwait':G.timer-=dt;if(G.timer<=0&&!HD()&&(G.bases[1]||G.bases[2]||G.bases[3])&&Math.random()<0.004&&doBalk())break;if(G.timer<=0&&!cpuPickoff())startPitch(cpuPitchout()||cpuPitch(G.balls,G.strikes,G.stam[defT()],G.pit[defT()].ctl));break;
+    case 'bwait':if(G.derby){G.timer-=dt;if(G.timer<=0)startPitch(derbyPitch());break}G.timer-=dt;if(G.timer<=0&&!HD()&&(G.bases[1]||G.bases[2]||G.bases[3])&&Math.random()<0.004&&doBalk())break;if(G.timer<=0&&!cpuPickoff())startPitch(cpuPitchout()||cpuPitch(G.balls,G.strikes,G.stam[defT()],G.pit[defT()].ctl));break;
     case 'pitch':updPitch(dt);break;
     case 'pause':G.timer-=dt;if(G.timer<=0){const f=G.fn;G.fn=null;f&&f()}break;
     case 'hitfx':G.fx.t+=dt;if(G.fx.t>=0.8)startField(G.fx.bb);break;
@@ -3210,6 +3230,7 @@ function boxHTML(t){
   <h3 style="margin-top:12px">${TEAMS[t].n} 투수</h3><table class="ls"><tr><th>선수</th><th>이닝</th><th>피안타</th><th>실점</th><th>볼넷</th><th>삼진</th><th>투구수</th><th>ERA</th></tr>${pr}</table></div>`;
 }
 window.showEnd=function(){
+  if(G.derby)return derbyShowEnd();
   const a=G.score[0],b=G.score[1],me=ME(),mine=G.score[me],their=G.score[1-me],win=mine>their,draw=a===b,cold=G.cold?' (콜드게임)':'';
   $('#endT').textContent=draw?'무승부':G.mp?(win?'승리! ':'패배… ')+TEAMS[me].n+cold:win?(G.cold?'콜드게임 승리! '+TEAMS[0].n:'우승! '+TEAMS[0].n):(G.cold?'콜드게임 패배…':'아쉬운 준우승');
   $('#endS').textContent=`${TEAMS[0].n} ${a} : ${b} ${TEAMS[1].n}  ·  안타 ${G.hits[0]} : ${G.hits[1]}  ·  호수비 ${G.great[0]} : ${G.great[1]}  ·  ${G.mp?'온라인 대전':'난이도 '+DIFFS[G.diff].n}${G.inn>G.max?'  ·  연장 '+G.inn+'회':''}`;
@@ -3403,7 +3424,7 @@ addEventListener('keydown',e=>{
 // ---- UI sync ----
 let lastKey='';
 function sync(){
-  if(!G||G.over){gS.hidden=true;gSh.hidden=true;return}
+  if(!G||G.over||G.derby){gS.hidden=true;gSh.hidden=true;return}
   const LB=lBat(),LD=lDef(),me=ME();
   const decide=G.mode==='field'&&G.play&&G.play.phase==='decide'&&LD;
   const showP=G.mode==='aim'&&LD,showB=LB&&G.view==='main'&&G.mode!=='ready'&&G.mode!=='over'&&G.mode!=='pause'&&!(G.mode==='field');
@@ -3446,6 +3467,7 @@ function sync(){
   else if(G.mode==='field'&&G.play&&G.play.sub)t=G.play.tip;
   else if(G.mode==='field')t=LB?(canSl?'베이스에 닿기 직전! 슬라이딩 (S / Space / 클릭)':'타구를 따라가는 중... 주자는 자동으로 달립니다.'):'타구 처리 중...';
   else t=TEAMS[0].n+' '+G.score[0]+' : '+G.score[1]+' '+TEAMS[1].n;
+  if(G.derby){if(!LB&&G.mode!=='pause')t=TEAMS[G.half].n+' 타자가 타격 중입니다. 지켜보세요!';else if(LB&&(G.mode==='bwait'||G.mode==='pitch'))t='홈런더비! 방망이를 공 코스에 맞추고, 공이 홈플레이트에 닿을 때 클릭/Space. PERFECT일수록 홈런 확률이 높아요. 홈런이 아니면 아웃!'}
   if(G.mp&&window.mpTip){const m=mpTip();if(m)t=m}
   if(t!==tip.textContent)tip.textContent=t;
 }
@@ -3491,7 +3513,7 @@ function mpPub(extra,force){
   if(!MP.room)return;
   const now=mpNow();if(!force&&now-(MP.lastPub||0)<(MP.room.p2p?12:45))return;MP.lastPub=now;
   const m=Object.assign({v:1,r:MP.role,ph:MP.phase},extra||{});
-  if(MP.role===0&&MP.seed){m.inns=MP.inns;m.seed=MP.seed;m.d=MP.dl;if(MP.peerLabel)m.to=MP.peerLabel}
+  if(MP.role===0&&MP.seed){m.inns=MP.inns;m.dby=MP.dby|0;m.rds=MP.rds|0;m.seed=MP.seed;m.d=MP.dl;if(MP.peerLabel)m.to=MP.peerLabel}
   if(MP.phase==='play'){m.up=MP.myUp;m.n=MP.out.length;m.ack=MP.recvN;{const ev=[];let sz=0;for(let i=MP.peerAck;i<MP.out.length&&ev.length<40;i++){const l=JSON.stringify(MP.out[i]).length+1;if(sz+l>2400)break;sz+=l;ev.push(MP.out[i])}m.ev=ev}m.hf=MP.hf;m.h=MP.hv}
   try{MP.room.presence({mp:m}).catch(e=>{MP.lastErr=e&&e.code||'error'})}catch(e){}
 }
@@ -3574,7 +3596,7 @@ function mpBegin(seed,inns,role,d){
   MP.hashes=new Map();MP.peerH=new Map();MP.hf=-1;MP.hv=0;MP.desync=false;MP.done=false;MP.rc=0;MP.lastAdv=mpNow();MP.lastPeer=mpNow();
   const rnd=mpMulberry(seed);MP.rnd=()=>{MP.rc++;return rnd()};
   mpEl('lobby').hidden=true;mpEl('menu').hidden=true;mpEl('end').hidden=true;
-  mpSeeded(()=>newGame(inns,'normal',{me:role}));
+  mpSeeded(()=>newGame(inns,'normal',{me:role,derby:MP.dby?{rounds:MP.rds||2,outs:MP.dby}:null}));
   mpEl('mpBar').hidden=false;
   mpEl('mpWho').textContent=`🌐 온라인 · 나: ${TEAMS[role].n} (${role?'후공':'선공'})`;
   if(MP.poll){clearInterval(MP.poll);MP.poll=0}
@@ -3777,7 +3799,7 @@ function mpLobbyPoll(){
   }else{
     const h=ps.find(p=>p.presence.mp.r===0&&(p.presence.mp.ph==='go'||p.presence.mp.ph==='play')&&p.presence.mp.to===MP.label&&Number.isInteger(p.presence.mp.seed));
     if(!h)return;
-    const m=h.presence.mp;MP.peerLabel=h.peer;
+    const m=h.presence.mp;MP.peerLabel=h.peer;MP.dby=[5,7,10].includes(m.dby)?m.dby:0;MP.rds=[1,2,3].includes(m.rds)?m.rds:2;
     mpBegin(m.seed>>>0,[3,5,9].includes(m.inns)?m.inns:3,1,m.d);
   }
 }
@@ -4246,4 +4268,139 @@ function drawRdHUD(){
   if(LB&&S.jukeCd>0){c.fillStyle='rgba(255,255,255,.2)';c.fillRect(X(0),y0+34,416,3);c.fillStyle='#ff9d3d';c.fillRect(X(0),y0+34,416*(1-S.jukeCd/1.1),3)}
   c.restore();
 }
+</script>
+<script>'use strict';
+// ============================================================================
+//  홈런더비: 배팅볼 투수(자동) 상대로 라운드당 N아웃 동안 홈런 개수를 겨룬다. 홈런이 아니면 전부 아웃.
+//  기존 타격/타구 엔진을 그대로 쓰고, G.derby 일 때만 규칙을 바꾼다 (온라인은 기존 락스텝 P2P 위에서 동작).
+// ============================================================================
+function derbyInit(){
+  const D=G.derby;
+  G.max=D.rounds;G.dOuts=D.outs;G.dOut=0;G.dRound=[0,0];G.dTot=[0,0];G.dHist=[[],[]];G.dRes=null;G.dTake=0;G.dWin=-1;
+  G.noReplay=true;G.pen=[[],[]];G.bench=[[],[]];G.stam=[100,100];G.half=0;G.inn=1;G.outs=0;G.dLong=0;
+  for(const t of [0,1]){let bi=0,bp=-1;G.lineup[t].forEach((p,i)=>{if(p.pow>bp){bp=p.pow;bi=i}});G.order[t]=bi}
+  say('홈런더비','#ffc83d',`${D.rounds}라운드 · 라운드당 ${D.outs}아웃${G.mp?' · 온라인':' · vs CPU'}`,2.0,64);
+  beginPA();G.timer=2.0;
+}
+function derbyPitch(){
+  const p=mkPitch(0,{x:R(-.55,.55),y:R(-.5,.4)});p.sp=Math.round(R(112,124));G.stam[1-G.half]=100;return p;
+}
+// 정타일수록 홈런이 나오도록 타구를 다시 굴려 홈런 타구를 고른다
+function derbyBoost(p){
+  const r=p.res;if(!r.hit)return;const b=batter();
+  const pr=r.label==='PERFECT'?0.9:r.label==='GOOD'?0.5:0.07;
+  if(Math.random()>=pr)return;
+  for(let i=0;i<60;i++){
+    const bb=i?mkBatted(r.q,r.dt,RN()*0.12,b.pow,R(3,9)):r.bb;
+    if(Math.abs(bb.sp)>40)continue;
+    const P=buildPlay(bb,G.bases,0,b);
+    if(P.hr){bb.perfect=true;bb.pre=P;r.bb=bb;return}
+  }
+}
+function derbyPitchEnd(p,kind){
+  G.lastSp=p.sp;sfx('mitt');
+  if(kind==='called'||kind==='ball'){
+    G.dTake=(G.dTake||0)+1;
+    if(G.dTake<3){pop(`지켜봄 ${G.dTake}/3`,'#cfd8e6',480,330,30,0.9);return setPause(0.8,nextPitch)}
+    G.dRes='out';say('아웃','#ff7a6b','3구 연속 지켜보면 아웃',1.2,52);return setPause(1.3,afterPA);
+  }
+  G.dRes='out';say(kind==='swing'?'헛스윙 아웃':'파울 아웃','#ff7a6b','홈런이 아니면 아웃!',1.2,52);setPause(1.3,afterPA);
+}
+function derbyAfter(){
+  const hr=G.dRes==='hr';G.dRes=null;G.dTake=0;G.bases=[null,null,null,null];G.outs=0;
+  if(hr){G.dRound[G.half]++;G.dTot[G.half]++}else G.dOut++;
+  if(G.dOut>=G.dOuts)return derbyRoundEnd();
+  G.view='main';G.fade=0.5;beginPA();
+}
+function derbyRoundEnd(){
+  G.fade=0.5;G.view='main';
+  G.dHist[G.half].push(G.dRound[G.half]);
+  if(G.half===0){
+    G.half=1;G.dOut=0;
+    say(`${TEAMS[0].n} ${G.dRound[0]}홈런`,'#ffc83d',G.mp?`다음 차례: ${TEAMS[1].n}`:`CPU(${TEAMS[1].n}) 차례`,2.0,58);
+    return setPause(2.2,G.mp?beginPA:derbyCpuRound);
+  }
+  derbyJudge();
+}
+function derbyCpuRound(){
+  const pHR={easy:0.2,normal:0.3,hard:0.4}[G.diff]||0.3;let n=0,o=0;
+  while(o<G.dOuts){if(Math.random()<pHR)n++;else o++}
+  G.dRound[1]=n;G.dTot[1]+=n;G.dOut=G.dOuts;
+  say(`${TEAMS[1].n} ${n}홈런`,'#ff9d8f','CPU의 타격 결과',2.0,58);sfx('cheer');
+  G.dHist[1].push(n);
+  setPause(2.4,derbyJudge);
+}
+function derbyJudge(){
+  const rd=G.dRound,tot=G.dTot;
+  if(G.inn>=G.max){
+    const d=G.inn===G.max?tot:rd;
+    if(d[0]!==d[1]){G.dWin=d[0]>d[1]?0:1;return derbyOver()}
+    G.inn++;G.dOuts=3;
+    say('동점! 서든데스','#ff7a6b','각자 3아웃 · 홈런이 더 많으면 승리',2.2,60);
+  }else{G.inn++;say(`${G.inn}라운드`,'#ffc83d',`현재 ${TEAMS[0].n} ${tot[0]} : ${tot[1]} ${TEAMS[1].n}`,2.0,58)}
+  G.half=0;G.dOut=0;G.dRound=[0,0];
+  setPause(2.3,beginPA);
+}
+function derbyOver(){
+  G.over=true;G.mode='over';G.view='main';
+  G.score=[G.dTot[0],G.dTot[1]];
+  say('더비 종료','#ffc83d',`${TEAMS[G.dWin].n} 승리`,2.0,70);sfx('cheer');
+  setTimeout(()=>window.showEnd&&showEnd(),1400);
+}
+function drawHUDDerby(){
+  const c=ctx;panel(14,12,270,76);
+  for(let t=0;t<2;t++){const y=20+t*32;c.fillStyle=TEAMS[t].c;c.fillRect(22,y,6,26);
+    tx(c,TEAMS[t].n,36,y+21,19,G.half===t?'#ffc83d':'#f3efe4','left',FONT_D);
+    tx(c,String(G.dTot[t]),176,y+22,26,'#fff','right',FONT_D);tx(c,'HR',184,y+20,12,'#9fb3d1','left',FONT_B,'700')}
+  c.fillStyle='rgba(255,255,255,.12)';c.fillRect(236,20,1,60);
+  tx(c,G.inn>G.max?'SD':'R',260,40,15,'#ffc83d','center',FONT_D);tx(c,G.inn>G.max?String(G.inn-G.max):G.inn+'/'+G.max,260,66,18,'#fff','center',FONT_D);
+  panel(292,12,170,76);
+  tx(c,'남은 아웃',300,30,12,'#9fb3d1','left',FONT_B,'700');
+  const n=G.dOuts,per=n>5?5:n;
+  for(let k=0;k<n;k++){const row=(k/per)|0,col=k%per;c.fillStyle=k<G.dOut?'#1d3358':'#ff5442';c.beginPath();c.arc(308+col*26,48+row*20,8,0,7);c.fill();c.strokeStyle='rgba(255,255,255,.4)';c.lineWidth=1.2;c.stroke()}
+  tx(c,`이번 라운드 ${G.dRound[G.half]}홈런`,300,82,12,'#ffd9a0','left',FONT_B,'700');
+  const b=batter();panel(W-338,12,324,76);
+  tx(c,'타자',W-326,32,11,'#9fb3d1','left',FONT_B,'700');
+  tx(c,b.name,W-326,56,22,'#fff','left',FONT_D);tx(c,`No.${b.num} · ${b.gr}학년 · 장타력 ${Math.round(b.pow*100)}`,W-326,76,12,'#cdd9ee','left',FONT_B);
+  tx(c,'투수',W-146,32,11,'#9fb3d1','left',FONT_B,'700');tx(c,'배팅볼 투수',W-146,56,18,'#fff','left',FONT_D);
+  tx(c,'홈런 더비',W-146,74,12,'#ffc83d','left',FONT_B,'700');
+}
+function derbyShowEnd(){
+  const me=G.mp?G.me:0,win=G.dWin===me,best=(()=>{try{return +localStorage.getItem('hb_derby_best')||0}catch(e){return 0}})();
+  $('#endT').textContent=(win?'승리! ':'패배… ')+TEAMS[G.dWin].n;
+  $('#endS').textContent=`홈런더비 · ${TEAMS[0].n} ${G.dTot[0]} : ${G.dTot[1]} ${TEAMS[1].n}  ·  ${G.mp?'온라인 대결':'난이도 '+DIFFS[G.diff].n}`;
+  if(!G.mp){const mine=G.dTot[0];if(mine>best){try{localStorage.setItem('hb_derby_best',String(mine))}catch(e){}}}
+  const N=Math.max(G.dHist[0].length,G.dHist[1].length),cols=[];for(let i=0;i<N;i++)cols.push(i);
+  const line=t=>`<tr><td>${TEAMS[t].n}</td>${cols.map(i=>`<td>${G.dHist[t][i]==null?'-':G.dHist[t][i]}</td>`).join('')}<td class="tot">${G.dTot[t]}</td></tr>`;
+  $('#endBox').innerHTML=`<table class="ls"><tr><th></th>${cols.map(i=>`<th>${i<G.derby.rounds?(i+1)+'R':'SD'}</th>`).join('')}<th>HR</th></tr>${line(0)}${line(1)}</table>`+(G.mp?'':`<p class="note">내 최고 기록: ${Math.max(best,G.dTot[0])}홈런 (한 경기 합계)</p>`);
+  $('#btnAgain').textContent=G.mp?'로비로 나가기':'다시 하기';
+  $('#end').hidden=false;$('#end').scrollTop=0;
+}
+// ---------- 메뉴 연결 ----------
+(function(){
+  let dbR=2,dbO=7;
+  const grp=(sel,fn)=>$$(sel+' .chip').forEach(b=>b.onclick=()=>{fn(+b.dataset.n);$$(sel+' .chip').forEach(x=>x.classList.toggle('on',x===b))});
+  grp('#dbRounds',n=>dbR=n);grp('#dbOuts',n=>dbO=n);
+  const lobbyH=document.querySelector('#lobby h1'),origH=lobbyH.innerHTML,hostBtn=$('#lbHost'),origHost=hostBtn.textContent,joinBtn=$('#lbJoin'),origJoin=joinBtn.textContent;
+  const openLobby=$('#btnMP').onclick;
+  const lobbyUi=d=>{lobbyH.innerHTML=d?'온라인 <em>홈런더비</em>':origH;$('#lbInns').hidden=!!d;hostBtn.textContent=d?'방 만들기 (방장 · 먼저 타격)':origHost;joinBtn.textContent=d?'참가하기 (나중에 타격)':origJoin};
+  $('#btnMP').onclick=()=>{MP.dby=0;MP.rds=0;lobbyUi(false);openLobby()};
+  $('#btnDerby').onclick=()=>{$('#menu').hidden=true;$('#derby').hidden=false;sfx('catch')};
+  $('#dbBack').onclick=()=>{$('#derby').hidden=true;$('#menu').hidden=false};
+  $('#dbSolo').onclick=()=>{
+    $('#derby').hidden=true;$('#end').hidden=true;if(typeof rs!=='undefined')rs.hidden=true;sfx('catch');
+    window.__derbyLast={rounds:dbR,outs:dbO};
+    newGame(dbR,diff,null,false,{rounds:dbR,outs:dbO});
+  };
+  $('#dbOnline').onclick=()=>{
+    MP.dby=dbO;MP.rds=dbR;$('#derby').hidden=true;lobbyUi(true);openLobby();
+    $('#lbMsg').textContent=`친구와 실시간 홈런더비 (${dbR}라운드 · 라운드당 ${dbO}아웃). 방장이 먼저 치고, 참가자가 이어서 칩니다.`;
+  };
+  // 혼자 하기: '다시 하기'는 같은 설정으로 재시작
+  const again=$('#btnAgain'),prev=again.onclick;
+  again.onclick=e=>{
+    if(G&&G.derby&&!G.mp&&window.__derbyLast){const d=window.__derbyLast;$('#end').hidden=true;newGame(d.rounds,diff,null,false,{rounds:d.rounds,outs:d.outs});return}
+    prev&&prev.call(again,e);
+  };
+})();
 </script>
