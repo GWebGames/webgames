@@ -1,0 +1,30 @@
+name: 🐞 오류 제보
+description: 게임이나 로비에서 문제가 생겼어요
+title: "[오류] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: 이슈는 공개돼요. 개인정보는 적지 마세요.
+  - type: input
+    id: game
+    attributes:
+      label: 어떤 게임인가요?
+      placeholder: "로비 전체라면 '로비'"
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: 무슨 일이 있었나요?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 어떻게 하면 다시 생기나요?
+  - type: input
+    id: env
+    attributes:
+      label: 기기 / 브라우저
+      placeholder: "예: 갤럭시 S23, Chrome"
