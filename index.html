@@ -234,6 +234,45 @@ footer b{color:var(--muted);font-weight:700}
 @media (prefers-reduced-motion:reduce){.fav{transition:none}}
 
 /* ===== 닉네임 설정 창 ===== */
+/* ---------- 빠른 이동 · 프로필 · 안 읽은 공지 ---------- */
+.quick{width:min(100%,980px);margin-top:26px;display:flex;gap:8px;flex-wrap:wrap}
+.quick button{font:inherit;font-size:.86rem;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--foam);cursor:pointer;transition:.15s}
+.quick button:hover{border-color:var(--gold)}
+.quick button[hidden]{display:none}
+.quick .qgo{background:var(--cinnabar);border-color:var(--cinnabar);color:var(--on-accent);font-weight:700}
+.quick .qgo:hover{filter:brightness(1.08);border-color:var(--cinnabar)}
+.quick+.sortbar{margin-top:14px}
+.udot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cinnabar);margin-left:6px;vertical-align:middle}
+.authbar .out{position:relative}
+.authbar .udot{position:absolute;top:2px;right:2px;margin:0}
+.note .udot{margin:0 6px 0 0}
+#profDlg{background:var(--panel);color:var(--foam);border:2px solid var(--line);border-radius:8px;padding:22px;width:min(94vw,520px);max-height:88vh;overflow:auto;box-shadow:0 20px 50px -10px rgba(0,0,0,.5)}
+#profDlg::backdrop{background:rgba(5,12,18,.6)}
+#profDlg h3{margin:0 0 4px;font-family:var(--f-display);font-weight:800;font-size:1.2rem;letter-spacing:.06em}
+#profDlg h4{margin:18px 0 8px;font-size:.9rem;color:var(--gold)}
+#profDlg .pf-sub{margin:0;color:var(--muted);font-size:.82rem}
+#profDlg .pf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+#profDlg .pf-stat{border:1px solid var(--line);border-radius:6px;padding:10px 8px;text-align:center}
+#profDlg .pf-stat b{display:block;font-size:1.25rem}
+#profDlg .pf-stat span{font-size:.74rem;color:var(--muted)}
+#profDlg .pf-games{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+#profDlg .pf-games li{display:grid;grid-template-columns:110px 1fr 54px;gap:8px;align-items:center;font-size:.82rem}
+#profDlg .pf-bar{height:8px;border-radius:4px;background:var(--ink);overflow:hidden}
+#profDlg .pf-bar i{display:block;height:100%;background:var(--gold)}
+#profDlg .pf-games em{font-style:normal;text-align:right;color:var(--muted)}
+#profDlg .pf-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+#profDlg .bd{border:1px solid var(--line);border-radius:6px;padding:10px;font-size:.78rem;opacity:.55;position:relative}
+#profDlg .bd.on{opacity:1;border-color:var(--gold)}
+#profDlg .bd b{display:block;font-size:.88rem;margin-bottom:2px}
+#profDlg .bd span{color:var(--muted)}
+#profDlg .bd .bdn{position:absolute;top:6px;right:8px;font-size:.66rem;font-weight:800;color:var(--on-accent);background:var(--cinnabar);padding:1px 6px;border-radius:999px}
+#profDlg .bd .bdp{display:block;height:4px;border-radius:2px;background:var(--ink);margin-top:6px;overflow:hidden}
+#profDlg .bd .bdp i{display:block;height:100%;background:var(--muted)}
+#profDlg .pf-close{margin-top:16px;text-align:right}
+#profDlg .pf-close button{font:inherit;font-size:.86rem;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer}
+footer .flinks{margin-top:6px}
+footer .flinks a{color:inherit;text-decoration:underline;margin:0 6px}
+footer .flinks a:hover{color:var(--foam)}
 #nickDlg{background:var(--panel);color:var(--foam);border:2px solid var(--line);border-radius:8px;padding:22px;width:min(92vw,380px);box-shadow:0 20px 50px -10px rgba(0,0,0,.5)}
 #nickDlg::backdrop{background:rgba(5,12,18,.6)}
 #nickDlg h3{margin:0 0 6px;font-family:var(--f-display);font-weight:800;font-size:1.2rem;letter-spacing:.06em}
@@ -289,6 +328,10 @@ footer b{color:var(--muted);font-weight:700}
     <div class="lb-head"><h2><b>RANK</b>가장 많이 플레이한 사람</h2><span class="lb-note">로그인한 플레이어 기준 · 닉네임이 없으면 계정 이름은 가운데를 가려서 표시돼요</span></div>
     <ol class="rk-list" id="rkList"></ol>
   </section>
+  <div class="quick" id="quick">
+    <button type="button" class="qgo" id="btnContinue" hidden></button>
+    <button type="button" id="btnRandom">🎲 랜덤 게임</button>
+  </div>
   <div class="sortbar" id="sortbar" role="group" aria-label="게임 정렬">
     <span class="lab">정렬</span>
     <button type="button" data-sort="default" aria-pressed="true">기본순</button>
@@ -306,8 +349,10 @@ footer b{color:var(--muted);font-weight:700}
   <div class="grid" id="grid"></div>
   <div class="nores hot-empty" id="noRes" hidden></div>
   <p class="last" id="last"></p>
-  <footer>게임 관련 오류 제보/자기 게임 업로드 신청은 <b>dolgodora7942@gmail.com</b>으로</footer>
+  <footer>게임 관련 오류 제보/자기 게임 업로드 신청은 <b>dolgodora7942@gmail.com</b>으로<div class="flinks" id="flinks" hidden></div></footer>
 </main>
+
+<dialog id="profDlg" aria-labelledby="profTitle"><h3 id="profTitle">내 프로필</h3><div id="profBody"></div><div class="pf-close"><button type="button" id="profClose">닫기</button></div></dialog>
 
 <dialog id="nickDlg" aria-labelledby="nickTitle">
   <form id="nickForm" autocomplete="off">
@@ -568,7 +613,7 @@ const GAMES=[
   {
     id:'baseball',
     tags:['스포츠','멀티'],
-    label:'update', labelDate:'2026-11-08',
+    label:'update', labelDate:'2026-11-09',
     title:'고교야구 챔피언십', hanja:'',
     desc:'전국대회 결승전. 초에는 타자로, 말에는 투수와 야수로 직접 승부하세요. 투수 교체·대타 등 선수 기용까지 가능한 고교야구 게임. 온라인 대전 지원.',
     keys:'마우스/터치로 조준 · 투구·스윙 · V·B 시점 전환',
@@ -861,7 +906,6 @@ paintThemeBtn();
   const box=$('notes'),more=$('noteMore'),now=Date.now();
   const list=NOTICES.map((n,i)=>({n,i}))
     .sort((a,b)=>(!!b.n.pin-!!a.n.pin)||String(b.n.date||'').localeCompare(String(a.n.date||''))||a.i-b.i).map(x=>x.n);
-  $('boardCnt').textContent=list.length?'총 '+list.length+'건':'';
   if(!list.length){box.innerHTML='<div class="hot-empty">아직 등록된 공지가 없어요.</div>';return;}
   const isNew=n=>{const t=Date.parse(n.date);return !isNaN(t)&&now-t>=-864e5&&now-t<(NOTICE_NEW_DAYS+1)*864e5;};
   const bodyHTML=b=>{
@@ -873,15 +917,27 @@ paintThemeBtn();
     }
     return out+(open?'</ul>':'');
   };
+  const nid=n=>String(n.date||'')+'|'+String(n.title||'');
+  let seenN=null;try{seenN=JSON.parse(localStorage.getItem('lobby-notice-seen'));}catch(e){}
+  if(!Array.isArray(seenN)){seenN=list.map(nid);try{localStorage.setItem('lobby-notice-seen',JSON.stringify(seenN));}catch(e){}} /* 처음 방문이면 기존 공지는 읽은 걸로 */
+  const unread=()=>list.filter(n=>!seenN.includes(nid(n))).length;
+  const paintCnt=()=>{const u=unread();$('boardCnt').textContent='총 '+list.length+'건'+(u?' · 안 읽은 공지 '+u:'');};
+  paintCnt();
   list.forEach((n,k)=>{
     const tag=n.tag||'공지',d=document.createElement('details');
+    const isUn=!seenN.includes(nid(n));
     d.className='note'+(n.pin?' pinned':'');if(k===0)d.open=true;if(k>=NOTICE_VISIBLE){d.hidden=true;d.dataset.extra='1';}
     d.innerHTML=`<summary><span class="ntag" data-t="${esc(tag)}">${esc(tag)}</span>`+
-      (n.pin?'<span class="npin">고정</span>':'')+(isNew(n)?'<span class="nnew">NEW</span>':'')+
+      (isUn?'<span class="udot" title="안 읽은 공지"></span>':'')+(n.pin?'<span class="npin">고정</span>':'')+(isNew(n)?'<span class="nnew">NEW</span>':'')+
       `<span class="ntitle">${esc(n.title||'')}</span>`+
       (n.version?`<span class="nver">${esc(n.version)}</span>`:'')+
       (n.date?`<span class="ndate">${esc(n.date)}</span>`:'')+`</summary>`+
       `<div class="nbody">${bodyHTML(n.body)}</div>`;
+    d.addEventListener('toggle',()=>{
+      if(!d.open||seenN.includes(nid(n)))return;
+      seenN.push(nid(n));try{localStorage.setItem('lobby-notice-seen',JSON.stringify(seenN.slice(-200)));}catch(e){}
+      const u=d.querySelector('.udot');if(u)u.remove();paintCnt();
+    });
     box.appendChild(d);
   });
   const extra=box.querySelectorAll('[data-extra]');
@@ -917,6 +973,7 @@ function closeGame(){
   try{lastId=localStorage.getItem('lobby-last');}catch(e){}
   const lg=GAMES.find(x=>x.id===lastId);
   if(lg)$('last').textContent='최근 플레이: '+lg.title;
+  if(typeof paintContinue==='function')paintContinue();
 }
 $('back').addEventListener('click',closeGame);
 $('reload').addEventListener('click',()=>{if(current){frame.src='about:blank';setTimeout(()=>{frame.src=current.src;frame.addEventListener('load',focusGame,{once:true});},50);}});
@@ -994,7 +1051,7 @@ function track(g){
   const now=Date.now();if(now-(seen[g.id]||0)<COUNT_COOLDOWN)return;
   seen[g.id]=now;try{localStorage.setItem('lobby-seen',JSON.stringify(seen));}catch(e){}
   plays[g.id]=(+plays[g.id]||0)+1;renderStats();
-  if(me){mine[g.id]=(+mine[g.id]||0)+1;renderMine();userPut('/plays/'+encodeURIComponent(g.id),{'.sv':{increment:1}});userPut('/seen/'+encodeURIComponent(g.id),now);pushRank();}
+  if(me){mine[g.id]=(+mine[g.id]||0)+1;renderMine();if(typeof renderAuth==='function')renderAuth();userPut('/plays/'+encodeURIComponent(g.id),{'.sv':{increment:1}});userPut('/seen/'+encodeURIComponent(g.id),now);pushRank();}
   if(DEMO)return;
   fetch(`${FIREBASE_URL}/plays/${encodeURIComponent(g.id)}.json`,{method:'PUT',body:JSON.stringify({'.sv':{increment:1}}),keepalive:true}).catch(()=>{});
 }
@@ -1012,9 +1069,10 @@ function renderAuth(msg){
   if(!authApi){authbar.hidden=true;return;}
   authbar.hidden=false;
   if(me){
-    authbar.innerHTML=`<span class="who">${me.photo?`<img src="${esc(me.photo)}" alt="" referrerpolicy="no-referrer">`:''}<span>${esc(myNick()||me.name||'플레이어')}</span></span><button type="button" class="out" id="btnNick">닉네임 변경</button><button type="button" class="out" id="btnOut">로그아웃</button>`;
+    authbar.innerHTML=`<span class="who">${me.photo?`<img src="${esc(me.photo)}" alt="" referrerpolicy="no-referrer">`:''}<span>${esc(myNick()||me.name||'플레이어')}</span></span><button type="button" class="out" id="btnProf">내 프로필${badgeDot()}</button><button type="button" class="out" id="btnNick">닉네임 변경</button><button type="button" class="out" id="btnOut">로그아웃</button>`;
     $('btnOut').addEventListener('click',doLogout);
     $('btnNick').addEventListener('click',()=>openNick(false));
+    $('btnProf').addEventListener('click',openProfile);
   }else{
     authbar.innerHTML=`${msg?`<span class="amsg">${esc(msg)}</span>`:''}<button type="button" class="abtn" id="btnIn">${G_ICON}Google로 로그인</button>`;
     $('btnIn').addEventListener('click',()=>{
@@ -1054,7 +1112,7 @@ async function loadMine(){
    게임들은 최고 기록·저장 데이터를 이 브라우저(localStorage)에 저장해요. 로비와 게임은 같은 주소라서 로비가 그걸 읽어
    내 계정에 백업하고, 다른 기기·브라우저에서 로그인하면 내려받아요.
    ※ 새 게임이 localStorage 에 저장하는 키가 있으면 아래 SYNC_KEYS 에 이름을 추가하세요. */
-const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pogeun_farm_v1'];
+const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','lobby-badges-seen','pogeun_farm_v1'];
 const SYNC_MAX=300000; /* 키 하나당 최대 글자 수 */
 const encKey=k=>k.replace(/\./g,'__dot__');
 const hashStr=v=>{if(v==null)return null;let h=5381;for(let i=0;i<v.length;i++)h=((h<<5)+h+v.charCodeAt(i))|0;return v.length+':'+h;};
@@ -1333,7 +1391,9 @@ function maskName(n){
   return a[0]+'*'.repeat(Math.min(a.length-2,4))+a[a.length-1];
 }
 const rankSection=$('rank'),rkList=$('rkList');
+let lastRanks=[];
 function renderRanks(list){
+  lastRanks=list;
   rankSection.hidden=false;
   if(!list.length){rkList.innerHTML='<li class="hot-empty">아직 순위가 없어요.<br>Google로 로그인하고 게임을 플레이하면 여기에 이름(가운데 가림)이 올라가요!</li>';return;}
   const max=list[0].n||1;
@@ -1393,6 +1453,74 @@ function checkNick(raw){
   if(!NICK_RE.test(v))return {err:'한글·영문·숫자·공백·_ - . 만 쓸 수 있어요'};
   return {v};
 }
+/* ---------- 업적 뱃지 · 내 프로필 ---------- */
+const BADGES=[
+  {id:'first',t:'첫 걸음',d:'게임 1회 플레이',v:()=>myTotal(),goal:1},
+  {id:'p10',t:'단골손님',d:'누적 10회 플레이',v:()=>myTotal(),goal:10},
+  {id:'p50',t:'열혈 게이머',d:'누적 50회 플레이',v:()=>myTotal(),goal:50},
+  {id:'p200',t:'로비의 전설',d:'누적 200회 플레이',v:()=>myTotal(),goal:200},
+  {id:'ex5',t:'탐험가',d:'서로 다른 게임 5종',v:()=>myKinds(),goal:5},
+  {id:'ex10',t:'수집가',d:'서로 다른 게임 10종',v:()=>myKinds(),goal:10},
+  {id:'one20',t:'한 우물',d:'한 게임을 20회',v:()=>myMax(),goal:20},
+  {id:'fav3',t:'큐레이터',d:'즐겨찾기 3개',v:()=>favSet.size,goal:3},
+  {id:'multi',t:'함께 놀기',d:'멀티 게임 플레이',v:()=>GAMES.filter(g=>tagsOf(g).includes('멀티')&&(+mine[g.id]||0)>0).length,goal:1},
+  {id:'nick',t:'나만의 이름',d:'닉네임 설정',v:()=>myNick()?1:0,goal:1},
+];
+const myTotal=()=>Object.values(mine).reduce((a,v)=>a+(+v||0),0);
+const myKinds=()=>GAMES.filter(g=>(+mine[g.id]||0)>0).length;
+const myMax=()=>Math.max(0,...GAMES.map(g=>+mine[g.id]||0));
+const badgesEarned=()=>me?BADGES.filter(b=>b.v()>=b.goal).map(b=>b.id):[];
+function badgesSeen(){let a=[];try{a=JSON.parse(lget('lobby-badges-seen')||'[]');}catch(e){}return Array.isArray(a)?a:[];}
+function badgeDot(){return me&&badgesEarned().some(id=>!badgesSeen().includes(id))?'<span class="udot" title="새 뱃지"></span>':'';}
+const profDlg=$('profDlg');
+function openProfile(){
+  if(!me||typeof profDlg.showModal!=='function')return;
+  const seen=badgesSeen(),got=badgesEarned(),total=myTotal();
+  const rk=lastRanks.findIndex(x=>x.uid===me.uid);
+  const rows=GAMES.filter(g=>(+mine[g.id]||0)>0).sort((a,b)=>(+mine[b.id])-(+mine[a.id]));
+  const max=rows.length?+mine[rows[0].id]:1;
+  $('profBody').innerHTML=
+    `<p class="pf-sub">${esc(myNick()||me.name||'플레이어')}</p>`+
+    `<div class="pf-stats"><div class="pf-stat"><b>${fmt(total)}</b><span>총 플레이</span></div>`+
+    `<div class="pf-stat"><b>${myKinds()}/${GAMES.filter(g=>g.ready).length}</b><span>해 본 게임</span></div>`+
+    `<div class="pf-stat"><b>${rk>=0?rk+1+'위':'TOP '+RANK_TOP+' 밖'}</b><span>내 순위</span></div></div>`+
+    `<h4>게임별 플레이</h4>`+(rows.length?`<ul class="pf-games">${rows.map(g=>`<li><span>${esc(g.title)}</span><span class="pf-bar"><i style="width:${Math.max(4,+mine[g.id]/max*100)}%"></i></span><em>${fmt(+mine[g.id])}회</em></li>`).join('')}</ul>`:'<p class="pf-sub">아직 플레이 기록이 없어요.</p>')+
+    `<h4>업적 뱃지 ${got.length}/${BADGES.length}</h4><div class="pf-badges">${BADGES.map(b=>{
+      const on=got.includes(b.id),v=Math.min(b.v(),b.goal);
+      return `<div class="bd${on?' on':''}"><b>${on?'🏅 ':'🔒 '}${esc(b.t)}</b><span>${esc(b.d)}</span>${on?(seen.includes(b.id)?'':'<i class="bdn">NEW</i>'):`<span class="bdp"><i style="width:${v/b.goal*100}%"></i></span>`}</div>`;}).join('')}</div>`;
+  try{localStorage.setItem('lobby-badges-seen',JSON.stringify(got));}catch(e){}
+  schedulePush();renderAuth();
+  profDlg.showModal();
+}
+$('profClose').addEventListener('click',()=>profDlg.close());
+profDlg.addEventListener('click',e=>{if(e.target===profDlg)profDlg.close();});
+
+/* ---------- 이어서 하기 · 랜덤 게임 · 제보 링크 ---------- */
+const btnContinue=$('btnContinue');
+function paintContinue(){
+  const lg=GAMES.find(g=>g.id===lget('lobby-last')&&g.ready);
+  btnContinue.hidden=!lg;
+  if(lg)btnContinue.textContent='▶ 이어서 하기 · '+lg.title;
+}
+btnContinue.addEventListener('click',()=>{const lg=GAMES.find(g=>g.id===lget('lobby-last')&&g.ready);if(lg)openGame(lg);});
+$('btnRandom').addEventListener('click',()=>{
+  let pool=GAMES.filter(g=>g.ready&&!(grid.querySelector(`[data-id="${g.id}"]`)||{}).hidden);
+  if(!pool.length)pool=GAMES.filter(g=>g.ready);
+  if(pool.length>1&&current)pool=pool.filter(g=>g!==current);
+  const lg=lget('lobby-last');
+  const alt=pool.filter(g=>g.id!==lg);if(alt.length)pool=alt; /* 방금 한 게임은 되도록 피해요 */
+  if(pool.length)openGame(pool[Math.floor(Math.random()*pool.length)]);
+});
+paintContinue();
+(function(){
+  const m=location.hostname.match(/^([a-z0-9-]+)\.github\.io$/i);if(!m)return;
+  const seg=location.pathname.split('/').filter(Boolean)[0];
+  const repo=seg&&!/\.html?$/i.test(seg)?seg:m[1]+'.github.io';
+  const base='https://github.com/'+m[1]+'/'+repo+'/issues/new?template=';
+  const f=$('flinks');
+  f.innerHTML=`<a href="${base}bug-report.yml" target="_blank" rel="noopener">🐞 오류 제보</a>·<a href="${base}game-submission.yml" target="_blank" rel="noopener">🎮 게임 업로드 신청</a>`;
+  f.hidden=false;
+})();
 const nickDlg=$('nickDlg'),nickInput=$('nickInput'),nickErr=$('nickErr');
 function openNick(first){
   if(!me||typeof nickDlg.showModal!=='function')return;
