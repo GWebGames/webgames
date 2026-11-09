@@ -1383,9 +1383,10 @@ function pushRank(){
    ============================================================ */
 const NICK_KEY='lobby-nick',NICK_MIN=2,NICK_MAX=12;
 const MASK_NICKNAME=false; /* true 면 닉네임도 순위표에서 가운데를 가려요 */
-const NICK_RE=/^[\p{L}\p{N} _.\-]+$/u;
+const NICK_RE=/^[가-힣ㄱ-ㅎㅏ-ㅣA-Za-z0-9 _.\-]+$/; /* Firebase 규칙(ranks/name)과 같은 문자만 허용 */
+const RANK_NAME_RE=/^[가-힣ㄱ-ㅎㅏ-ㅣA-Za-z0-9 _.*\-]{1,30}$/;
 function myNick(){return me?String(lget(NICK_KEY)||'').trim().slice(0,NICK_MAX):'';}
-function rankName(){const nk=myNick();return nk?(MASK_NICKNAME?maskName(nk):nk):maskName(me.name);}
+function rankName(){const nk=myNick(),nm=nk?(MASK_NICKNAME?maskName(nk):nk):maskName(me.name);return RANK_NAME_RE.test(nm)?nm:'플레이어';} /* 규칙에 안 맞는 문자(다른 나라 글자 등)는 기본 이름으로 */
 function checkNick(raw){
   const v=String(raw||'').replace(/\s+/g,' ').trim(),len=Array.from(v).length;
   if(len<NICK_MIN||len>NICK_MAX)return {err:`닉네임은 ${NICK_MIN}~${NICK_MAX}자로 적어 주세요`};
