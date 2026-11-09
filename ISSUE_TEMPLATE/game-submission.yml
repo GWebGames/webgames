@@ -1,0 +1,64 @@
+name: 🎮 게임 업로드 신청
+description: 내가 만든 게임을 로비에 올려 달라고 신청해요
+title: "[게임 신청] "
+labels: ["game-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        신청해 주셔서 고마워요! 검토 후 로비에 올려 드려요.
+        ⚠️ 비밀번호·개인정보는 이 글에 적지 마세요. 이슈는 공개돼요.
+  - type: input
+    id: title
+    attributes:
+      label: 게임 이름
+    validations:
+      required: true
+  - type: textarea
+    id: desc
+    attributes:
+      label: 게임 설명
+      description: 로비 카드에 들어갈 한두 문장 (제작자 이름 포함)
+    validations:
+      required: true
+  - type: input
+    id: keys
+    attributes:
+      label: 조작법
+      placeholder: "이동: WASD, 점프: Space"
+  - type: dropdown
+    id: multi
+    attributes:
+      label: 멀티플레이 여부
+      options:
+        - 싱글 전용
+        - 같은 기기에서 2인
+        - 온라인 멀티
+    validations:
+      required: true
+  - type: input
+    id: tags
+    attributes:
+      label: 원하는 태그
+      placeholder: "액션, 퍼즐, 멀티 ..."
+  - type: textarea
+    id: file
+    attributes:
+      label: 게임 파일 / 링크
+      description: 단일 HTML 파일이면 이 칸에 끌어다 놓아 첨부하거나, 다운로드 링크를 적어 주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: libs
+    attributes:
+      label: 사용한 외부 라이브러리 / 네트워크 사용
+      description: CDN 라이브러리, 서버 통신(PeerJS, Firebase 등)이 있으면 적어 주세요.
+  - type: checkboxes
+    id: agree
+    attributes:
+      label: 확인
+      options:
+        - label: 직접 만들었거나 사용 허락을 받은 게임이에요.
+          required: true
+        - label: 개인정보를 수집하거나 외부로 보내는 코드가 없어요.
+          required: true
