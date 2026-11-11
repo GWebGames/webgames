@@ -1,18 +1,15 @@
 <title>고교야구 챔피언십</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 /* Layout: 16:9 broadcast stage on top, thumb-reach control tray below. Night game, school-color blue vs red, chalk + clay accents. */
 :root{--night:#06101f;--panel:#0d2340;--panel2:#16345c;--chalk:#f3efe4;--gold:#ffc83d;--blue:#3b82ff;--red:#ff5442;--line:rgba(255,255,255,.16);--muted:#9fb3d1;color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--night);color:var(--chalk);font:14px/1.4 'Noto Sans KR',system-ui,sans-serif;padding-inline:12px;padding-block:10px}
+body{background:var(--night);color:var(--chalk);font:14px/1.4 'Apple SD Gothic Neo','Malgun Gothic','Noto Sans CJK KR','Noto Sans KR','Nanum Gothic',system-ui,sans-serif;padding-inline:12px;padding-block:10px}
 #wrap{max-width:none;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 #stage{position:relative;aspect-ratio:16/9;width:100%;background:#000;border-radius:10px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.5);touch-action:none}
 canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
 .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;z-index:7;background:radial-gradient(ellipse at 50% 25%,rgba(22,56,110,.9),rgba(4,10,22,.97));text-align:center;padding:16px;overflow:auto}
-h1{font-family:'Black Han Sans','Noto Sans KR',sans-serif;font-weight:400;font-size:clamp(30px,7vw,66px);margin:0;line-height:1.05;text-wrap:balance}
+h1{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans CJK KR','Noto Sans KR','Nanum Gothic',system-ui,sans-serif;font-weight:900;font-size:clamp(30px,7vw,66px);margin:0;line-height:1.05;text-wrap:balance}
 h1 em{font-style:normal;color:var(--gold)}
 .sub{color:var(--muted);margin:0;max-width:56ch;text-wrap:balance}
 .vs{display:flex;gap:14px;align-items:center;font-weight:900;font-size:clamp(16px,3.4vw,26px)}
@@ -48,7 +45,7 @@ button{font:inherit;color:var(--chalk);cursor:pointer}
 .chip small{color:inherit;opacity:.7;margin-left:4px}
 .chip.alert{border-color:var(--red);box-shadow:0 0 0 2px rgba(255,84,66,.35)}
 .modal{position:fixed;inset:0;z-index:30;background:rgba(3,8,18,.94);display:flex;flex-direction:column;align-items:center;gap:12px;padding:calc(20px + env(safe-area-inset-top,0px)) 16px 24px;overflow:auto}
-.modal h2{font-family:'Black Han Sans','Noto Sans KR',sans-serif;font-weight:400;font-size:clamp(22px,4.5vw,32px);margin:0;text-wrap:balance;text-align:center}
+.modal h2{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans CJK KR','Noto Sans KR','Nanum Gothic',system-ui,sans-serif;font-weight:900;font-size:clamp(22px,4.5vw,32px);margin:0;text-wrap:balance;text-align:center}
 #rsL{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;width:100%;max-width:820px}
 .pc{border:2px solid var(--line);background:var(--panel);border-radius:10px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:7px;min-width:0}
 .pc:hover,.pc:focus-visible{border-color:var(--gold);background:var(--panel2);outline:none}
@@ -65,7 +62,7 @@ button{font:inherit;color:var(--chalk);cursor:pointer}
 .ls th{color:var(--muted);font-weight:700}.ls td:first-child,.ls th:first-child{text-align:left}
 .ls .tot{color:var(--gold);font-weight:900}
 .mvp{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,rgba(255,200,61,.22),rgba(255,200,61,.05));border:2px solid var(--gold);border-radius:12px;padding:12px 16px}
-.mvp b.big{font-family:'Black Han Sans','Noto Sans KR',sans-serif;font-weight:400;font-size:30px;color:var(--gold);line-height:1}
+.mvp b.big{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans CJK KR','Noto Sans KR','Nanum Gothic',system-ui,sans-serif;font-weight:900;font-size:30px;color:var(--gold);line-height:1}
 .mvp .nm{font-weight:900;font-size:20px}.mvp .ln{color:var(--muted);font-size:13px}
 .boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
 .bx{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:10px;overflow-x:auto}
@@ -141,7 +138,7 @@ body.mob.land .go{padding:8px 22px;font-size:16px}
 body.mob.land #rot{display:none}
 
 #tour{justify-content:flex-start;gap:10px}
-#tour h2{font-family:'Black Han Sans','Noto Sans KR',sans-serif;font-weight:400;font-size:clamp(20px,4.2vw,34px);margin:0}
+#tour h2{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans CJK KR','Noto Sans KR','Nanum Gothic',system-ui,sans-serif;font-weight:900;font-size:clamp(20px,4.2vw,34px);margin:0}
 #tour h2 em{font-style:normal;color:var(--gold)}
 #tour .sub{font-size:13px}
 #tour input.nm{font:inherit;font-weight:900;font-size:22px;text-align:center;width:11ch;background:rgba(255,255,255,.08);border:2px solid var(--line);border-radius:8px;color:var(--chalk);padding:6px}
@@ -213,7 +210,7 @@ body.mob.land #rot{display:none}
    <p class="sub" id="lbMsg"></p>
    <div class="row" id="lbInns"><button class="chip on" data-n="3">3이닝</button><button class="chip" data-n="5">5이닝</button><button class="chip" data-n="9">9이닝</button></div>
    <button class="go" id="lbHost">방 만들기 (방장 · 한빛고 선공)</button>
-   <div id="lbCodeShow" hidden style="font-size:20px">방 코드 <b id="lbCodeB" style="font-family:'Black Han Sans',sans-serif;font-size:44px;letter-spacing:.12em;color:var(--gold);display:block"></b></div>
+   <div id="lbCodeShow" hidden style="font-size:20px">방 코드 <b id="lbCodeB" style="font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans CJK KR","Noto Sans KR","Nanum Gothic",system-ui,sans-serif;font-weight:900;font-size:44px;letter-spacing:.12em;color:var(--gold);display:block"></b></div>
    <div class="row" id="lbJoinRow"><input id="lbCode" maxlength="6" placeholder="방 코드" autocomplete="off" spellcheck="false" aria-label="방 코드"><button class="go" id="lbJoin">참가하기 (청룡고 후공)</button></div>
    <button class="chip" id="lbBack">← 뒤로</button>
    <div class="help"><span>이닝 수는 방장이 정합니다. 두 사람이 같은 <b>게임 주소</b>를 열고, 방장이 만든 코드를 참가자가 입력하면 시작돼요.</span><span>두 사람의 브라우저가 직접 연결(P2P)됩니다. 같은 PC의 탭 2개로도 테스트할 수 있어요. 학교·회사 와이파이는 P2P를 막는 경우가 있어요.</span><span>입력은 약 0.3초 뒤에 양쪽에 동시에 적용됩니다(지연 보정).</span></div>
@@ -777,9 +774,9 @@ function userSwing(p,cur,st,b){
 </script>
 <script>'use strict';
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-const FONT_D="'Black Han Sans','Noto Sans KR',sans-serif",FONT_B="'Noto Sans KR',system-ui,sans-serif";
+const FONT_D="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans CJK KR','Noto Sans KR','Nanum Gothic',system-ui,sans-serif",FONT_B="'Apple SD Gothic Neo','Malgun Gothic','Noto Sans CJK KR','Noto Sans KR','Nanum Gothic',system-ui,sans-serif";
 function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
-function tx(c,s,x,y,sz,col,al,fn,wt){c.font=`${wt||''} ${sz}px ${fn||FONT_B}`;c.fillStyle=col;c.textAlign=al||'left';c.textBaseline='alphabetic';c.fillText(s,x,y)}
+function tx(c,s,x,y,sz,col,al,fn,wt){c.font=`${wt||(fn===FONT_D?'900':'')} ${sz}px ${fn||FONT_B}`;c.fillStyle=col;c.textAlign=al||'left';c.textBaseline='alphabetic';c.fillText(s,x,y)}
 const mkc=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c};
 let BGM,BGF=null;
 const fs=(x,y)=>({x:480+4.2*x,y:508-4.0*y});
@@ -3193,11 +3190,7 @@ initBG();
 {
   let done=false;
   const after=()=>{if(done)return;done=true;initBG();if(typeof prebuildViews==='function')prebuildViews()};
-  if(document.fonts&&document.fonts.load){
-    const txt='한빛고청룡전국고교야구결승동문회학부모문구체육사교우응원단필승화이팅초말회';
-    Promise.all([document.fonts.load("20px 'Black Han Sans'",txt),document.fonts.load("700 14px 'Noto Sans KR'",txt)]).then(after).catch(after);
-    setTimeout(after,2500);
-  }else after();
+  after();
 }
 // ---- menu ----
 $$('#inns .chip').forEach(b=>b.onclick=()=>{inns=+b.dataset.n;$$('#inns .chip').forEach(x=>x.classList.toggle('on',x===b))});
@@ -3473,12 +3466,23 @@ function sync(){
 }
 // ---- loop ----
 let last=performance.now();
+let loopErr=0;
 function loop(now){
-  const dt=Math.min(0.05,(now-last)/1000);last=now;
-  if(G&&G.mp)mpTick(dt);else update(dt);
-  draw();sync();
-  if((fitN=(fitN+1)%20)===0&&!document.body.classList.contains('mob')&&document.documentElement.scrollHeight>innerHeight+1){fitRes+=document.documentElement.scrollHeight-innerHeight+2;fit()}
   requestAnimationFrame(loop);
+  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  try{
+    if(G&&G.mp)mpTick(dt);else update(dt);
+    draw();sync();
+    loopErr=0;
+    if((fitN=(fitN+1)%30)===0&&!document.body.classList.contains('mob')){
+      const ov=document.documentElement.scrollHeight-innerHeight;
+      if(ov>1&&fitRes<innerHeight*0.7){fitRes+=ov+2;fit()}
+    }
+  }catch(e){
+    // 예외가 나도 게임 루프가 멈추지 않게 한다(멈추면 화면이 굳어 '튕긴' 것처럼 보임). 같은 오류가 계속되면 안전한 상태로 복구.
+    console.error(e);
+    if(++loopErr===90&&G&&!G.over){try{G.play=null;G.view='main';G.fade=0;if(G.derby&&G.dOut>=G.dOuts){}else nextPitch()}catch(_){}}
+  }
 }
 requestAnimationFrame(loop);
 </script>
