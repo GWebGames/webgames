@@ -102,6 +102,8 @@ body.touch #hint{display:none}
 #bUse{right:20px;bottom:30px;width:84px;height:84px;font-size:15px;font-weight:700}
 #bAct{right:116px;bottom:56px;width:66px;height:66px;font-size:15px;font-weight:700;border-color:#ffd86a}
 #bSpace{right:30px;bottom:126px;width:62px;height:62px}
+#bRun{right:112px;bottom:196px;width:54px;height:54px;font-size:11px}
+.tb2.on{background:rgba(40,140,70,.8);border-color:#9f9}
 #bFlash{right:112px;bottom:132px;width:54px;height:54px;font-size:22px}
 #bGtr{right:186px;bottom:44px;width:62px;height:62px;font-size:22px;display:none}
 #bMap{right:186px;bottom:114px;width:50px;height:50px;font-size:20px;display:none}
@@ -137,7 +139,7 @@ body.touch .tb{width:min(60vh,88vw)}
   <div id="hot"></div><div id="prompt"></div><div id="cross"></div><div id="sub"></div><div id="toasts"></div><div id="specInfo"></div>
   <div id="hint">WASD 이동 · Shift 달리기 · F 손전등<br>E 상호작용 · 1~9 선택 · 클릭 사용 · G 버리기<br>M 지도(학생회) · 우클릭 길게: 기타 연주 · Space 뜀틀/저항</div>
   <div id="touch"><div id="joyHint"></div><div id="joyZone"><div id="joyBase"><div id="joyKnob"></div></div></div><div id="lookZone"></div>
-    <div class="tb2" id="bUse">사용<br>/공격</div><div class="tb2" id="bAct">E<br>상호작용</div><div class="tb2" id="bSpace">뜀틀<br>/저항</div><div class="tb2" id="bFlash">🔦</div><div class="tb2" id="bGtr">🎸</div><div class="tb2" id="bMap">🗺️</div><div class="tb2" id="bDrop">🗑</div><div class="tb2" id="bPause">⏸</div><div class="tb2" id="bSpecL">◀</div><div class="tb2" id="bSpecR">▶</div></div>
+    <div class="tb2" id="bUse">사용<br>/공격</div><div class="tb2" id="bAct">E<br>상호작용</div><div class="tb2" id="bSpace">뜀틀<br>/저항</div><div class="tb2" id="bRun">달리기<br>OFF</div><div class="tb2" id="bFlash">🔦</div><div class="tb2" id="bGtr">🎸</div><div class="tb2" id="bMap">🗺️</div><div class="tb2" id="bDrop">🗑</div><div class="tb2" id="bPause">⏸</div><div class="tb2" id="bSpecL">◀</div><div class="tb2" id="bSpecR">▶</div></div>
   <div id="vault"><div id="vaultTxt">뜀틀! 흰 선이 초록 구간일 때 <b>SPACE</b></div><div id="vaultBar"><div id="vaultZone"></div><div id="vaultCur"></div></div></div>
   <div id="qte"><div id="qteTxt">변기가 끌어당긴다! <b>SPACE</b> 연타!</div><div id="qteB"><i id="qteI" style="width:40%"></i></div></div>
 </div>
@@ -1169,7 +1171,7 @@ function spawnItems() {
   for (const bb of [BLDS.M, BLDS.R]) for (let f = 0; f < 4; f++) { if (RNG() < .6) { const cs = bb.corr[f]; const n = cs[ri(1, cs.length - 2)]; addItem(pickType(), n.x + rr(-.5, .5), f * FH + bb.yo, bb.oz + rr(.5, 2.6), f, { room: '복도' }); } }
 }
 /* ---- 실외 ---- */
-const PER = { x0: -18, x1: 130, z0: -62, z1: 150 }, GYM = { x0: 88, x1: 118, z0: 26, z1: 66, h: 9 }, GATEX = 20;
+const PER = { x0: -18, x1: 130, z0: -62, z1: 150 }, GYM = { x0: 88, x1: 118, z0: 26, z1: 66, h: 9 }, GATEX = 96;
 function fenceLine(x0, z0, x1, z1, h = 3.4) {
   const alongX = Math.abs(x1 - x0) > Math.abs(z1 - z0), L = 90;
   if (alongX) { box(x0, 0, z0 - .03, x1, h, z0 + .03, 'fence', L); addCol(0, x0, z0 - .15, x1, z0 + .15, {}); for (let x = x0; x <= x1; x += 6) box(x - .06, 0, z0 - .06, x + .06, h + .1, z0 + .06, 'pole', L); }
@@ -1181,7 +1183,6 @@ function buildOutdoors() {
   box(PER.x0, -.5, 26, PER.x1, -.014, 150, 'ground', L);
   // 운동장 라인
   const tr = (x0, z0, x1, z1) => box(x0, -.014, z0, x1, -.01, z1, 'line', L);
-  tr(0, 78, 60, 78.2); tr(0, 138, 60, 138.2); tr(0, 78, .2, 138.2); tr(59.8, 78, 60, 138.2); tr(29.9, 78, 30.1, 138.2);
   // 울타리
   fenceLine(PER.x0, PER.z0, PER.x1, PER.z0); fenceLine(PER.x0, PER.z0, PER.x0, PER.z1); fenceLine(PER.x1, PER.z0, PER.x1, PER.z1);
   fenceLine(PER.x0, PER.z1, GATEX - 3, PER.z1); fenceLine(GATEX + 3, PER.z1, PER.x1, PER.z1);
@@ -1198,7 +1199,7 @@ function buildOutdoors() {
   W.gate = { x: GATEX, z: PER.z1, open: false, t: 0, leaves, chain, lock, col: addCol(0, GATEX - 3, PER.z1 - .2, GATEX + 3, PER.z1 + .2, {}) };
   // 운동장 바깥 가로등 & 도로
   W.extra.lamps = [[GATEX + 6, 156], [GATEX - 14, 156]];
-  for (const [x, z] of [[30, 12], [70, 14], [100, 22], [40, -37], [95, -37], [10, 45], [60, 100], [20, 130], [GATEX + 6, 156], [GATEX - 14, 156], [112, 80], [112, 20]]) {
+  for (const [x, z] of [[30, 12], [70, 14], [100, 22], [40, -37], [95, -37], [10, 45], [48, 100], [20, 130], [GATEX + 6, 156], [GATEX - 14, 156], [112, 80], [112, 20]]) {
     const gy = terrainY(x, z); box(x - .08, gy, z - .08, x + .08, gy + 5, z + .08, 'pole', L); box(x - .5, gy + 4.9, z - .1, x + .1, gy + 5.1, z + .1, 'pole', L);
     const gs = glowSprite(0xffe9b0, 5, .35); gs.position.set(x - .4, gy + 4.8, z); W.scene.add(gs); const gs2 = glowSprite(0xfff6d8, 1.2, .9); gs2.position.set(x - .4, gy + 4.85, z); W.scene.add(gs2);
   }
@@ -1207,7 +1208,7 @@ function buildOutdoors() {
   const mt = new THREE.Matrix4(); let k = 0;
   const blocked = (x, z) => (x > -4 && x < 104 && z > -9.5 && z < 6) || (x > -4 && x < 112 && z > -53 && z < -38.5) || (x > 78 && x < 86 && z > -42 && z < -6) || (x > -3 && x < 7 && z > -42 && z < -6) || (x > -2 && x < 108 && z > -42 && z < -6) || (x > 95 && x < 128 && z > -35 && z < -29) || (x > 121.5 && x < 128.5 && z > -35 && z < 28) || (x > GYM.x0 - 4 && x < GYM.x1 + 4 && z > 22 && z < 70);
   let guard = 0; while (k < tc && guard++ < 800) {
-    const x = rr(PER.x0 + 2, PER.x1 - 2), z = rr(PER.z0 + 2, 140); if (blocked(x, z) || (z > 26 && z < 144 && x > 0 && x < 62 && z > 70 && z < 146)) continue; if (z > 26 && RNG() < .7 && x > 2 && x < 86) continue;
+    const x = rr(PER.x0 + 2, PER.x1 - 2), z = rr(PER.z0 + 2, 140); if (blocked(x, z) || (x > 48 && x < 134 && z > 64 && z < 150)) continue; if (z > 26 && RNG() < .7 && x > 2 && x < 86) continue;
     const sc = rr(.8, 1.3); mt.compose(new THREE.Vector3(x, 1.5 * sc, z), new THREE.Quaternion(), new THREE.Vector3(sc, sc, sc)); tm.setMatrixAt(k, mt);
     mt.compose(new THREE.Vector3(x, 3.4 * sc + 1.2, z), new THREE.Quaternion(), new THREE.Vector3(sc, sc, sc)); fm.setMatrixAt(k, mt);
     mt.compose(new THREE.Vector3(x, 5.6 * sc + 1.2, z), new THREE.Quaternion(), new THREE.Vector3(sc, sc, sc)); fm2.setMatrixAt(k, mt);
@@ -1226,13 +1227,13 @@ function buildGym() {
   box(x0 + .4, -.1, z0 + .4, x1 - .4, 0, z1 - .4, 'gymFloor', L);
   const ln = (a, b, c, d) => box(a, 0, b, c, .006, d, 'line', L); ln(x0 + 1, 46, x1 - 1, 46.15); ln(x0 + 1, 28, x1 - 1, 28.15);
   for (const zz of [26.9, 65.0]) { box(dx - .9, 2.9, zz, dx + .9, 3.95, zz + .06, 'white', L); box(dx - .25, 2.9, zz + (zz < 40 ? .06 : -.5), dx + .25, 2.95, zz + (zz < 40 ? .5 : 0), 'redM', L); }
-  for (let k = 0; k < 3; k++) { const hh = .45 * (3 - k); box(x0 + .4 + k, 0, 28, x0 + 1.4 + k, hh, 64, 'bleach', L); box(x1 - 1.4 - k, 0, 28, x1 - .4 - k, hh, 64, 'bleach', L); }
-  addCol(0, x0 + .4, 28, x0 + 3.4, 64, { low: true }); addCol(0, x1 - 3.4, 28, x1 - .4, 64, { low: true });
+  for (let k = 0; k < 3; k++) { const hh = .45 * (3 - k); box(x0 + .4 + k, 0, 32, x0 + 1.4 + k, hh, 64, 'bleach', L); box(x1 - 1.4 - k, 0, 32, x1 - .4 - k, hh, 64, 'bleach', L); }
+  addCol(0, x0 + .4, 32, x0 + 3.4, 64, { low: true }); addCol(0, x1 - 3.4, 32, x1 - .4, 64, { low: true });
   for (let z = z0 + 3; z < z1; z += 6) { box(x0, h - .9, z, x1, h - .7, z + .25, 'dark', L); }
   for (let z = z0 + 6; z < z1; z += 9)for (let x = x0 + 5; x < x1; x += 9) box(x - .8, h - .3, z - .15, x + .8, h - .15, z + .15, 'lamp', L);
   for (const wx of [x0 + .45, x1 - .45]) for (let z = z0 + 3; z < z1 - 4; z += 6) box(wx - .02, 5.8, z, wx + .02, 7.4, z + 4, 'glass', L);
   W.vault = [];
-  for (const rz of [33, 39, 45, 51, 57]) {
+  for (const rz of [36, 46, 56]) {
     for (let x = x0 + .4; x < x1 - .5; x += 1.0) { box(x, 0, rz - .5, x + .96, .75, rz + .5, ((x | 0) % 3 === 0) ? 'vaultB' : 'vault', L); box(x, .75, rz - .5, x + .96, 1.12, rz + .5, 'leather', L); }
     addCol(0, x0 + .4, rz - .55, x1 - .4, rz + .55, { low: true, vault: true, rz }); W.vault.push({ z: rz });
   }
@@ -1397,8 +1398,15 @@ function classDesks(r, b, l, y0, x0, x1, oz, w) {
 
 /* ---- 03c_world3 ---- */
 /* ============ 추가 월드: 운동장 / 구령대+창고 / 후관 창고·분리수거장 / 교문 / 커튼 ============ */
-const FIELD = { x0: 1.5, x1: 58.5, z0: 80, z1: 136 };
-const STO = { x0: 33.4, x1: 42.0, z0: 67.0, z1: 77.2, h: 2.7, cx: 37.7, cz: 72.2 };
+const FX = 54, FZ = 2;
+const FIELD = { x0: 1.5 + FX, x1: 58.5 + FX, z0: 80 + FZ, z1: 136 + FZ };
+const STO0 = { x0: 33.4, x1: 42.0, z0: 67.0, z1: 77.2, h: 2.7, cx: 37.7, cz: 72.2 };
+const STO = { x0: STO0.x0 + FX, x1: STO0.x1 + FX, z0: STO0.z0 + FZ, z1: STO0.z1 + FZ, h: 2.7, cx: STO0.cx + FX, cz: STO0.cz + FZ };
+const fbox = (x0, y0, z0, x1, y1, z1, m, l) => box(x0 + FX, y0, z0 + FZ, x1 + FX, y1, z1 + FZ, m, l);
+const fcol = (l, x0, z0, x1, z1, o) => addCol(l, x0 + FX, z0 + FZ, x1 + FX, z1 + FZ, o);
+const fsign = (t, x, y, z, l, d, w, h) => sign(t, x + FX, y, z + FZ, l, d, w, h);
+const fwx = (x0, x1, z, th, y0, y1, m, l, gaps = [], ...r) => wallX(x0 + FX, x1 + FX, z + FZ, th, y0, y1, m, l, gaps.map(g => ({ ...g, a: g.a + FX, b: g.b + FX })), ...r);
+const fwz = (z0, z1, x, th, y0, y1, m, l, gaps = [], ...r) => wallZ(z0 + FZ, z1 + FZ, x + FX, th, y0, y1, m, l, gaps.map(g => ({ ...g, a: g.a + FZ, b: g.b + FZ })), ...r);
 function curtain(wx, y1, y2, zN, l) {
   const g = new THREE.BoxGeometry(2.2, y2 - y1, .035); g.translate(1.1, 0, 0);
   const m = new THREE.Mesh(g, getMat('drape')); m.position.set(wx - 1.1, (y1 + y2) / 2, zN + .035); regObj(m, l);
@@ -1407,55 +1415,55 @@ function curtain(wx, y1, y2, zN, l) {
 function updateCurtains(dt) { for (const c of W.curtains) { const tg = c.open ? 1 : 0; if (c.t !== tg) { c.t += clamp(tg - c.t, -dt * 2, dt * 2); c.mesh.scale.x = 1 - c.t * .82; } } }
 function setCurtain(c, open, silent) { if (c.open === open) return; c.open = open; if (!silent) AU.sp('creak', c.x, c.z, .5); }
 function buildFieldDesign() {
-  const L = 90, F = FIELD;
-  box(-2, -.3, 76, 62, .004, 140, 'track', L);
-  box(F.x0 + 3, -.3, F.z0 + 3, F.x1 - 3, .006, F.z1 - 3, 'turf', L);
-  const ln = (x0, z0, x1, z1) => box(x0, .004, z0, x1, .009, z1, 'line', L);
+  const L = 90, F = { x0: 1.5, x1: 58.5, z0: 80, z1: 136 };
+  fbox(-2, -.3, 76, 62, .004, 140, 'track', L);
+  fbox(F.x0 + 3, -.3, F.z0 + 3, F.x1 - 3, .006, F.z1 - 3, 'turf', L);
+  const ln = (x0, z0, x1, z1) => fbox(x0, .004, z0, x1, .009, z1, 'line', L);
   ln(F.x0 + 3, F.z0 + 3, F.x1 - 3, F.z0 + 3.15); ln(F.x0 + 3, F.z1 - 3.15, F.x1 - 3, F.z1 - 3); ln(F.x0 + 3, F.z0 + 3, F.x0 + 3.15, F.z1 - 3); ln(F.x1 - 3.15, F.z0 + 3, F.x1 - 3, F.z1 - 3); ln(F.x0 + 3, 108, F.x1 - 3, 108.15);
   for (const z of [F.z0 + 3, F.z1 - 3]) { const s = z < 100 ? 1 : -1; ln(22, z, 22.15, z + s * 9); ln(37.85, z, 38, z + s * 9); ln(22, z + s * 9, 38, z + s * 9.15); }
   // 트랙 레인
   for (let i = 1; i < 4; i++) { ln(-2 + i * .9, 78, -1.9 + i * .9, 138); ln(61 - i * .9, 78, 61.1 - i * .9, 138); }
   // 축구골대
   for (const z of [F.z0 + 3, F.z1 - 3]) {
-    const s = z < 100 ? -1 : 1; for (const x of [26.5, 33.5]) box(x - .06, 0, z - .06, x + .06, 2.4, z + .06, 'white', L); box(26.5, 2.35, z - .06, 33.5, 2.45, z + .06, 'white', L); box(26.5, 0, z + s * 1.8, 33.5, 2.4, z + s * 1.8 + .02, 'fence', L); addCol(0, 26.4, z - .2, 33.6, z + .2, { low: true });
+    const s = z < 100 ? -1 : 1; for (const x of [26.5, 33.5]) fbox(x - .06, 0, z - .06, x + .06, 2.4, z + .06, 'white', L); fbox(26.5, 2.35, z - .06, 33.5, 2.45, z + .06, 'white', L); fbox(26.5, 0, z + s * 1.8, 33.5, 2.4, z + s * 1.8 + .02, 'fence', L); fcol(0, 26.4, z - .2, 33.6, z + .2, { low: true });
   }
   // 농구골대 (운동장 동쪽)
   for (const z of [96, 120]) {
-    box(63.8, 0, z - .07, 63.94, 3.9, z + .07, 'pole', L); box(63.94, 3.0, z - .9, 64.0, 4.0, z + .9, 'white', L); box(63.7, 3.05, z - .24, 64.2, 3.1, z + .24, 'orange', L); addCol(0, 63.7, z - .2, 64, z + .2, {});
-    box(64.4, -.3, z - 7, 80, .006, z + 7, 'asphalt', L);
+    fbox(63.8, 0, z - .07, 63.94, 3.9, z + .07, 'pole', L); fbox(63.94, 3.0, z - .9, 64.0, 4.0, z + .9, 'white', L); fbox(63.7, 3.05, z - .24, 64.2, 3.1, z + .24, 'orange', L); fcol(0, 63.7, z - .2, 64, z + .2, {});
+    fbox(64.4, -.3, z - 7, 74, .006, z + 7, 'asphalt', L);
   }
   // 운동장 가장자리 스탠드 계단(관중석)과 벽화
-  box(-2.2, 0, 84, -1.4, 3.2, 134, 'cream', L); addCol(0, -2.3, 84, -1.3, 134, {}); sign('관악중학교', -1.35, 2.2, 109, L, 1, 7, 1.2).rotation.y = Math.PI / 2;
+  fbox(-2.2, 0, 84, -1.4, 3.2, 134, 'cream', L); fcol(0, -2.3, 84, -1.3, 134, {}); fsign('관악중학교', -1.35, 2.2, 109, L, 1, 7, 1.2).rotation.y = Math.PI / 2;
 }
 function buildGuryeongdae() {
-  const L = 90, x0 = 19, x1 = 42.6, z0 = 66, z1 = 77.8, S = STO;
+  const L = 90, x0 = 19, x1 = 42.6, z0 = 66, z1 = 77.8, S = STO0;
   // 단상 (사진 10: 주황 벽 + 흰 계단 + 아치 지붕 + 창고)
-  box(x0, 0, z0, 33, 1.25, z1 - .8, ['orange', 'orange', 'cream', 'orange', 'orange', 'orange'], L); addCol(0, x0, z0, 33, z1 - .8, {});
-  for (let i = 0; i < 4; i++) { box(x0 + 3, 0, z1 - .8 + i * .22, x0 + 6.4, .3 + i * .3, z1 - .8 + i * .22 + .22, 'white', L); } addCol(0, x0 + 3, z1 - .8, x0 + 6.4, z1 + .1, { low: true });
+  fbox(x0, 0, z0, 33, 1.25, z1 - .8, ['orange', 'orange', 'cream', 'orange', 'orange', 'orange'], L); fcol(0, x0, z0, 33, z1 - .8, {});
+  for (let i = 0; i < 4; i++) { fbox(x0 + 3, 0, z1 - .8 + i * .22, x0 + 6.4, .3 + i * .3, z1 - .8 + i * .22 + .22, 'white', L); } fcol(0, x0 + 3, z1 - .8, x0 + 6.4, z1 + .1, { low: true });
   // 뒷벽 (로고)
-  box(x0, 0, z0 - .4, x1, 4.6, z0, 'orange', L); addCol(0, x0, z0 - .5, x1, z0 + .05, {}); sign('관악중학교', 26, 3.6, z0 + .02, 0, 1, 7, 1.1); sign('관악중학교', 26, 3.6, z0 - .42, 0, -1, 7, 1.1);
+  fbox(x0, 0, z0 - .4, x1, 4.6, z0, 'orange', L); fcol(0, x0, z0 - .5, x1, z0 + .05, {}); fsign('관악중학교', 26, 3.6, z0 + .02, 0, 1, 7, 1.1); fsign('관악중학교', 26, 3.6, z0 - .42, 0, -1, 7, 1.1);
   // 아치 지붕
-  const arc = new THREE.Mesh(new THREE.CylinderGeometry(7.2, 7.2, 24, 20, 1, true, 0, Math.PI), getMat('canopy')); arc.rotation.z = Math.PI / 2; arc.rotation.y = Math.PI / 2; arc.scale.set(1, 1, .3); arc.position.set((x0 + x1) / 2, 3.4, (z0 + z1) / 2 - 1.5); arc.material = new THREE.MeshStandardMaterial({ color: 0x2c8f95, roughness: .5, metalness: .3, side: THREE.DoubleSide }); regObj(arc, L);
-  for (const x of [x0 + .3, 32, x1 - .3]) box(x - .1, 0, z1 - 1.1, x + .1, 3.9, z1 - .9, 'white', L);
+  const arc = new THREE.Mesh(new THREE.CylinderGeometry(7.2, 7.2, 24, 20, 1, true, 0, Math.PI), getMat('canopy')); arc.rotation.z = Math.PI / 2; arc.rotation.y = Math.PI / 2; arc.scale.set(1, 1, .3); arc.position.set((x0 + x1) / 2 + FX, 3.4, (z0 + z1) / 2 - 1.5 + FZ); arc.material = new THREE.MeshStandardMaterial({ color: 0x2c8f95, roughness: .5, metalness: .3, side: THREE.DoubleSide }); regObj(arc, L);
+  for (const x of [x0 + .3, 32, x1 - .3]) fbox(x - .1, 0, z1 - 1.1, x + .1, 3.9, z1 - .9, 'white', L);
   // 관중 계단(티어)
-  for (let i = 0; i < 3; i++) box(x0 + 3, 1.25 + i * .22, z0 + .5 + i * .8, 32, 1.47 + i * .22, z0 + 1.3 + i * .8, 'cream', L);
+  for (let i = 0; i < 3; i++) fbox(x0 + 3, 1.25 + i * .22, z0 + .5 + i * .8, 32, 1.47 + i * .22, z0 + 1.3 + i * .8, 'cream', L);
   // 창고 (주황 벽 · 남쪽 문)
   const th = .4, M = ['orange', 'orange', 'orange', 'orange', 'orange', 'orange'];
-  wallX(S.x0 - .4, S.x1 + .4, S.z1 + .2, th, 0, 3.0, M, L, [{ a: 36.6, b: 38.0, h: 2.2 }]); wallX(S.x0 - .4, S.x1 + .4, S.z0 - .2, th, 0, 3.0, M, L);
-  wallZ(S.z0 - .4, S.z1 + .4, S.x0 - .2, th, 0, 3.0, M, L); wallZ(S.z0 - .4, S.z1 + .4, S.x1 + .2, th, 0, 3.0, M, L);
-  box(S.x0 - .6, 3.0, S.z0 - .6, S.x1 + .6, 3.35, S.z1 + .6, ['concrete', 'concrete', 'roof', 'ceil', 'concrete', 'concrete'], L);
-  box(S.x0, 0, S.z0, S.x1, .01, S.z1, 'concrete', L); box(S.x0, S.h, S.z0, S.x1, 3.0, S.z1, 'ceil', L);
-  const dr = mkDoor(0, 37.3, S.z1 + .2, 1.4, 'x', { sto: true }); dr.pan.children[0].material = getMat('ybk'); W.extra.stoDoor = dr; sign('창고', 37.3, 2.5, S.z1 + .42, 0, 1, 1.1, .3);
+  fwx(S.x0 - .4, S.x1 + .4, S.z1 + .2, th, 0, 3.0, M, L, [{ a: 36.6, b: 38.0, h: 2.2 }]); fwx(S.x0 - .4, S.x1 + .4, S.z0 - .2, th, 0, 3.0, M, L);
+  fwz(S.z0 - .4, S.z1 + .4, S.x0 - .2, th, 0, 3.0, M, L); fwz(S.z0 - .4, S.z1 + .4, S.x1 + .2, th, 0, 3.0, M, L);
+  fbox(S.x0 - .6, 3.0, S.z0 - .6, S.x1 + .6, 3.35, S.z1 + .6, ['concrete', 'concrete', 'roof', 'ceil', 'concrete', 'concrete'], L);
+  fbox(S.x0, 0, S.z0, S.x1, .01, S.z1, 'concrete', L); fbox(S.x0, S.h, S.z0, S.x1, 3.0, S.z1, 'ceil', L);
+  const dr = mkDoor(0, 37.3 + FX, S.z1 + .2 + FZ, 1.4, 'x', { sto: true }); dr.pan.children[0].material = getMat('ybk'); W.extra.stoDoor = dr; fsign('창고', 37.3, 2.5, S.z1 + .42, 0, 1, 1.1, .3);
   // 내부: 선반, 공, 허들, 매트
-  for (const z of [S.z0 + .3, S.z0 + 1.6]) { box(S.x0 + .2, 0, z, S.x0 + 3.4, 1.9, z + .45, 'cab', L); addCol(0, S.x0 + .2, z, S.x0 + 3.4, z + .45, {}); for (let k = 0; k < 5; k++) { const b = new THREE.Mesh(new THREE.SphereGeometry(.12, 8, 6), cmat(k % 2 ? 0xd9d2c0 : 0xc4553c, .9)); b.position.set(S.x0 + .5 + k * .6, 1.3 + (k % 2) * .6, z + .2); regObj(b, L); }
+  for (const z of [S.z0 + .3, S.z0 + 1.6]) { fbox(S.x0 + .2, 0, z, S.x0 + 3.4, 1.9, z + .45, 'cab', L); fcol(0, S.x0 + .2, z, S.x0 + 3.4, z + .45, {}); for (let k = 0; k < 5; k++) { const b = new THREE.Mesh(new THREE.SphereGeometry(.12, 8, 6), cmat(k % 2 ? 0xd9d2c0 : 0xc4553c, .9)); b.position.set(S.x0 + .5 + k * .6 + FX, 1.3 + (k % 2) * .6, z + .2 + FZ); regObj(b, L); }
   }
-  box(S.x1 - 2.6, 0, S.z0 + .3, S.x1 - .2, .45, S.z0 + 2.2, 'blueG', L); addCol(0, S.x1 - 2.6, S.z0 + .3, S.x1 - .2, S.z0 + 2.2, { low: true });
-  for (let i = 0; i < 4; i++) { box(S.x1 - 2.4 + i * .55, 0, S.z1 - 1.3, S.x1 - 2.2 + i * .55, .75, S.z1 - .4, 'steel', L); }
-  const lamp = new THREE.PointLight(0xffd9a0, 6, 9, 2); lamp.position.set(S.cx, 2.4, S.cz); regObj(lamp, L); box(S.cx - .3, 2.62, S.cz - .1, S.cx + .3, 2.7, S.cz + .1, 'lamp', L);
+  fbox(S.x1 - 2.6, 0, S.z0 + .3, S.x1 - .2, .45, S.z0 + 2.2, 'blueG', L); fcol(0, S.x1 - 2.6, S.z0 + .3, S.x1 - .2, S.z0 + 2.2, { low: true });
+  for (let i = 0; i < 4; i++) { fbox(S.x1 - 2.4 + i * .55, 0, S.z1 - 1.3, S.x1 - 2.2 + i * .55, .75, S.z1 - .4, 'steel', L); }
+  const lamp = new THREE.PointLight(0xffd9a0, 6, 9, 2); lamp.position.set(S.cx + FX, 2.4, S.cz + FZ); regObj(lamp, L); fbox(S.cx - .3, 2.62, S.cz - .1, S.cx + .3, 2.7, S.cz + .1, 'lamp', L);
   // 시체 (사진: 창고 속 친구)
-  const cp = roleAvatar('athlete'); cp.rotation.x = -Math.PI / 2; cp.rotation.z = .5; cp.position.set(S.cx + .3, .18, S.cz); regObj(cp, L);
-  const bl = new THREE.Mesh(new THREE.CircleGeometry(1.1, 16), new THREE.MeshBasicMaterial({ color: 0x3a0505, transparent: true, opacity: .85 })); bl.rotation.x = -Math.PI / 2; bl.position.set(S.cx + .1, .02, S.cz + .1); regObj(bl, L);
-  W.extra.sto = { x: S.cx + .3, z: S.cz, door: dr };
+  const cp = roleAvatar('athlete'); cp.rotation.x = -Math.PI / 2; cp.rotation.z = .5; cp.position.set(S.cx + .3 + FX, .18, S.cz + FZ); regObj(cp, L);
+  const bl = new THREE.Mesh(new THREE.CircleGeometry(1.1, 16), new THREE.MeshBasicMaterial({ color: 0x3a0505, transparent: true, opacity: .85 })); bl.rotation.x = -Math.PI / 2; bl.position.set(S.cx + .1 + FX, .02, S.cz + .1 + FZ); regObj(bl, L);
+  W.extra.sto = { x: S.cx + .3 + FX, z: S.cz + FZ, door: dr };
 }
 function buildShedAndRecycle() {
   const L = 90, y = ROFF, z0 = -40.2, z1 = -36.6;
@@ -1495,9 +1503,9 @@ function buildExtras() { buildFieldDesign(); buildGuryeongdae(); buildShedAndRec
 /* ---- 04_player ---- */
 /* ============ 플레이어 ============ */
 const DIFFS = [
-  { nm: '하', mspd: .85, hear: .8, sight: .85, items: 1.35, wash: 28, clayTime: 34, clayThr: .48, vaultW: .36, dmg: .85, gym: 2.6, moral: 1.4 },
-  { nm: '중', mspd: 1.0, hear: 1.0, sight: 1.0, items: 1.0, wash: 22, clayTime: 28, clayThr: .58, vaultW: .27, dmg: 1.0, gym: 3.1, moral: 1.0 },
-  { nm: '상', mspd: 1.18, hear: 1.25, sight: 1.15, items: .75, wash: 16, clayTime: 22, clayThr: .68, vaultW: .20, dmg: 1.2, gym: 3.7, moral: .75 }];
+  { nm: '하', mspd: .85, hear: .8, sight: .85, items: 1.35, wash: 28, clayTime: 34, clayThr: .48, vaultW: .78, dmg: .85, gym: 1.5, moral: 1.4 },
+  { nm: '중', mspd: 1.0, hear: 1.0, sight: 1.0, items: 1.0, wash: 22, clayTime: 28, clayThr: .58, vaultW: .68, dmg: 1.0, gym: 1.8, moral: 1.0 },
+  { nm: '상', mspd: 1.18, hear: 1.25, sight: 1.15, items: .75, wash: 16, clayTime: 22, clayThr: .68, vaultW: .58, dmg: 1.2, gym: 2.1, moral: .75 }];
 let DIFF = DIFFS[1];
 const G = { running: false, mode: 'solo', diff: 1, host: true, myId: 'p0', players: {}, t: 0, over: false, time: 0, seed: 1, shake: 0, seenMon: 0, esc: false };
 const Input = { keys: {}, mouse: { l: false, r: false }, locked: false, sens: 1 };
@@ -1954,10 +1962,10 @@ const Haunts = {
     if (this.toi && this.toi.st === 'grab') { this.toi.p += .075 * (.6 + .4 * mf()); AU.click(.6); return true; }
     if (P.vaulting) return true; if (Gym.near && P.lockMove <= 0 && !P.vaulting) { Haunts.vault(); return true; } return false;
   },
-  vault() {
-    const n = Gym.near; if (!n) return; const c = (Math.sin(Gym.cT * Gym.sp) + 1) / 2, ok = Math.abs(c - .5) < DIFF.vaultW / 2;
+  vault(force) {
+    const n = Gym.near; if (!n) return; const c = (Math.sin(Gym.cT * Gym.sp) + 1) / 2, ok = force || Math.abs(c - .5) < DIFF.vaultW / 2;
     if (ok) { P.vaulting = { t: 0, dur: .72, x0: P.x, z0: P.z, z1: n.dir > 0 ? n.rz + .55 + 1.0 : n.rz - .55 - 1.0 }; P.vx = P.vz = 0; AU.tone(200, .3, 'triangle', .2, 500); Gym.near = null; }
-    else { hurt(6, '체육관 귀신', { raw: true, mn: .3 }); P.stagger = 1.1; toast('타이밍 실패! 뜀틀에 걸렸다', 1500, 'bad'); AU.thud(.8); Gym.cT += .6; }
+    else { P.stagger = .3; toast('조금만 더! 다시 Space', 1200, 'bad'); AU.thud(.5); Gym.cT += .5; }
   },
   /* -- 체육관 귀신 -- */
   updGym(dt) {
@@ -1972,10 +1980,10 @@ const Haunts = {
       if (o.taunt > 0) { o.taunt -= dt; } else if (o.jt >= 0) { o.jt += dt; const p = clamp(o.jt / .65, 0, 1); o.z = lerp(o.jz0, o.jz1, p); o.y = Math.sin(p * Math.PI) * 1.9; if (p >= 1) { o.jt = -1; o.y = 0; AU.thud(.5); } moving = true; }
       else { o.x += clamp(P.x - o.x, -3 * dt, 3 * dt); const sp = DIFF.gym * (P.vaulting ? 1 : 1); o.z += dir * Math.min(Math.abs(dz), sp * dt); moving = true; for (const r of W.vault) { const edge = dir > 0 ? r.z - .6 - o.z : o.z - (r.z + .6); if (edge > -.05 && edge < .6 && ((dir > 0 && o.z < r.z) || (dir < 0 && o.z > r.z))) { o.jt = 0; o.jz0 = o.z; o.jz1 = r.z + dir * 1.5; AU.sp('thud', o.x, o.z, .5); break; } } }
       g.position.set(o.x, o.y, o.z); g.rotation.y = Math.atan2(P.x - o.x, P.z - o.z); const s = Math.sin(G.time * 10) * (moving ? 1 : 0) * (o.jt >= 0 ? 0 : 1); u.legL.rotation.x = o.jt >= 0 ? -.9 : s; u.legR.rotation.x = o.jt >= 0 ? .9 : -s; u.armL.rotation.x = o.jt >= 0 ? -2.6 : -s * .8; u.armR.rotation.x = o.jt >= 0 ? -2.6 : s * .8;
-      const d = Math.hypot(P.x - o.x, P.z - o.z); if (d < 1.4 && Gym.hitCd <= 0 && !P.vaulting && o.jt < 0) { Gym.hitCd = 3; o.taunt = 1.8; hurt(40, '체육관 귀신에게 붙잡혔다'); P.stagger = 1.2; UI.say('📢 "다시! 처음부터!"', 2); AU.whistle(1); } }
+      const d = Math.hypot(P.x - o.x, P.z - o.z); if (d < 1.4 && Gym.hitCd <= 0 && !P.vaulting && o.jt < 0) { Gym.hitCd = 6; o.taunt = 1.8; hurt(15, '체육관 귀신에게 붙잡혔다'); P.stagger = .6; UI.say('📢 "다시! 처음부터!"', 2); AU.whistle(1); } }
     // 뜀틀 타이밍
-    Gym.near = null; if (!P.vaulting && P.lockMove <= 0 && P.alive && P.faint <= 0) { const fz = -Math.cos(P.yaw); for (const r of W.vault) { if (P.z < r.z - .55 && r.z - .55 - P.z < 1.9 && fz > .25) { Gym.near = { rz: r.z, dir: 1 }; break; } if (P.z > r.z + .55 && P.z - r.z - .55 < 1.9 && fz < -.25) { Gym.near = { rz: r.z, dir: -1 }; break; } } }
-    Gym.sp = 4.6 + G.diff * .7; if (Gym.near) { Gym.cT += dt; UI.vault(true, (Math.sin(Gym.cT * Gym.sp) + 1) / 2, DIFF.vaultW); } else UI.vault(false);
+    Gym.near = null; if (!P.vaulting && P.lockMove <= 0 && P.alive && P.faint <= 0) { const fz = -Math.cos(P.yaw); for (const r of W.vault) { if (P.z < r.z - .55 && r.z - .55 - P.z < 2.6 && fz > .05) { Gym.near = { rz: r.z, dir: 1 }; break; } if (P.z > r.z + .55 && P.z - r.z - .55 < 2.6 && fz < -.05) { Gym.near = { rz: r.z, dir: -1 }; break; } } }
+    Gym.sp = 2.6 + G.diff * .3; if (Gym.near) { Gym.nearT = (Gym.nearT || 0) + dt; if (Gym.nearT > 4) { Gym.nearT = 0; toast('선생님이 도와줬다 (자동 넘기)', 1500, 'good'); Haunts.vault(true); } Gym.cT += dt; UI.vault(true, (Math.sin(Gym.cT * Gym.sp) + 1) / 2, DIFF.vaultW); } else { Gym.nearT = 0; UI.vault(false); }
     if (P.z > gb.z1 - 3.5) setDoor(dS, true, true);
     if (P.z > gb.z1 - .8 && Gym.st !== 'done') { Gym.st = 'done'; this.clearGhost(); toast('체육관을 탈출했다!', 3500, 'good'); AU.whistle(.5); }
   },
@@ -2053,8 +2061,8 @@ function animNew(m, dt) {
 /* ---- 배치 ---- */
 function initNewMonsters(nPlayers) {
   const M = BLDS.M, cc = (b, f, k) => b.corr[f][Math.min(b.corr[f].length - 1, Math.floor(b.corr[f].length * k))], S = W.extra.sto;
-  const ar = addMon('ar0', 'archer', 30, 108, 0); ar.st = 'idle'; ar.wait = 1;
-  if (G.diff === 2 && nPlayers >= 2) { const a2 = addMon('ar1', 'archer', 12, 125, 0); a2.st = 'idle'; a2.wait = 2; }
+  const ar = addMon('ar0', 'archer', FIELD.x0 + 28, FIELD.z0 + 26, 0); ar.st = 'idle'; ar.wait = 1;
+  if (G.diff === 2 && nPlayers >= 2) { const a2 = addMon('ar1', 'archer', FIELD.x0 + 10, FIELD.z0 + 44, 0); a2.st = 'idle'; a2.wait = 2; }
   const wh = addMon('wh0', 'white', S.x + 1.2, S.z - .8, 0); wh.st = 'ceil'; wh.hidden = true;
   const mr_ = W.rooms.find(r => r.nm === '음악실'); if (mr_) { const mu = addMon('mu0', 'music', (mr_.x0 + mr_.x1) / 2, (mr_.z0 + mr_.z1) / 2, mr_.lvl); mu.st = 'idle'; mu.hidden = true; mu.room = mr_; mu.cool = 0; }
   const g1 = cc(M, 0, .55); const gd = addMon('gd0', 'guard', g1.x, g1.z, 0); gd.st = 'patrol';
@@ -2079,11 +2087,11 @@ function clampTo(m, x0, x1, z0, z1) { m.x = clamp(m.x, x0, x1); m.z = clamp(m.z,
 function simArcher(m, dt, pl, sp) {
   const c = MCFG.archer; let best = null, bd = 1e9;
   for (const p of pl) { if (!inField(p) || p.busy) continue; const d = Math.hypot(p.x - m.x, p.z - m.z); if (d < bd) { bd = d; best = p; } }
-  if (!best) { m.pend = 0; m.st = 'idle'; if (m.wait > 0) { m.wait -= dt; m.moving = false; } else if (!m.wp || Math.hypot(m.wp.x - m.x, m.wp.z - m.z) < 1) { m.wp = { x: rr(FIELD.x0 + 3, FIELD.x1 - 3), z: rr(FIELD.z0 + 3, FIELD.z1 - 3) }; m.wait = mr(1, 3); } else directMove(m, m.wp.x, m.wp.z, dt, c.walk * sp); clampTo(m, -1, 60, 78, 139); return; }
-  if (m.pend > 0) { m.pend -= dt; m.moving = false; faceTo(m, best.x, best.z); m.st = 'aim'; if (m.pend <= 0) { fireArrow(m, best); m.cool = mr(1.9, 2.7) / Math.max(.6, DIFF.mspd); } clampTo(m, -1, 60, 78, 139); return; }
+  if (!best) { m.pend = 0; m.st = 'idle'; if (m.wait > 0) { m.wait -= dt; m.moving = false; } else if (!m.wp || Math.hypot(m.wp.x - m.x, m.wp.z - m.z) < 1) { m.wp = { x: rr(FIELD.x0 + 3, FIELD.x1 - 3), z: rr(FIELD.z0 + 3, FIELD.z1 - 3) }; m.wait = mr(1, 3); } else directMove(m, m.wp.x, m.wp.z, dt, c.walk * sp); clampTo(m, FIELD.x0 - 2.5, FIELD.x1 + 1.5, FIELD.z0 - 2, FIELD.z1 + 3); return; }
+  if (m.pend > 0) { m.pend -= dt; m.moving = false; faceTo(m, best.x, best.z); m.st = 'aim'; if (m.pend <= 0) { fireArrow(m, best); m.cool = mr(1.9, 2.7) / Math.max(.6, DIFF.mspd); } clampTo(m, FIELD.x0 - 2.5, FIELD.x1 + 1.5, FIELD.z0 - 2, FIELD.z1 + 3); return; }
   faceTo(m, best.x, best.z);
   if (bd > 22) { m.st = 'chase'; directMove(m, best.x, best.z, dt, c.run * sp); } else if (bd < 8) { m.st = 'chase'; directMove(m, m.x - (best.x - m.x), m.z - (best.z - m.z), dt, c.walk * 1.4 * sp); faceTo(m, best.x, best.z); } else { m.st = 'aim'; m.moving = false; }
-  clampTo(m, -1, 60, 78, 139);
+  clampTo(m, FIELD.x0 - 2.5, FIELD.x1 + 1.5, FIELD.z0 - 2, FIELD.z1 + 3);
   if (m.cool <= 0 && bd < 34) { m.pend = .6; m.ph = 0; }
 }
 function simWhite(m, dt, pl) {
@@ -2737,15 +2745,15 @@ function initTouch() {
   if (!TOUCH) return; document.body.classList.add('touch'); Input.locked = true; Input.sens = SET.sens;
   const jz = $('joyZone'), base = $('joyBase'), knob = $('joyKnob'), lz = $('lookZone'); let jid = null, jc = null, lid = null, lp = null; const R = 56;
   jz.addEventListener('touchstart', e => { e.preventDefault(); if (jid !== null) return; const t = e.changedTouches[0]; jid = t.identifier; jc = { x: t.clientX, y: t.clientY }; base.style.display = 'block'; base.style.left = t.clientX + 'px'; base.style.top = (t.clientY - jz.getBoundingClientRect().top) + 'px'; knob.style.transform = 'translate(0,0)'; Input.joy = { x: 0, y: 0 }; }, { passive: false });
-  jz.addEventListener('touchmove', e => { e.preventDefault(); for (const t of e.changedTouches) if (t.identifier === jid) { let dx = t.clientX - jc.x, dy = t.clientY - jc.y; const d = Math.hypot(dx, dy); if (d > R) { dx *= R / d; dy *= R / d; } knob.style.transform = `translate(${dx}px,${dy}px)`; Input.joy = { x: dx / R, y: -dy / R }; Input.keys.ShiftLeft = Math.hypot(dx, dy) / R > .92; } }, { passive: false });
-  const jend = e => { for (const t of e.changedTouches) if (t.identifier === jid) { jid = null; Input.joy = null; Input.keys.ShiftLeft = false; base.style.display = 'none'; } };
+  jz.addEventListener('touchmove', e => { e.preventDefault(); for (const t of e.changedTouches) if (t.identifier === jid) { let dx = t.clientX - jc.x, dy = t.clientY - jc.y; const d = Math.hypot(dx, dy); if (d > R) { dx *= R / d; dy *= R / d; } knob.style.transform = `translate(${dx}px,${dy}px)`; Input.joy = { x: dx / R, y: -dy / R }; } }, { passive: false });
+  const jend = e => { for (const t of e.changedTouches) if (t.identifier === jid) { jid = null; Input.joy = null; base.style.display = 'none'; } };
   jz.addEventListener('touchend', jend); jz.addEventListener('touchcancel', jend);
   lz.addEventListener('touchstart', e => { e.preventDefault(); if (lid !== null) return; const t = e.changedTouches[0]; lid = t.identifier; lp = { x: t.clientX, y: t.clientY }; }, { passive: false });
   lz.addEventListener('touchmove', e => { e.preventDefault(); for (const t of e.changedTouches) if (t.identifier === lid) { const dx = t.clientX - lp.x, dy = t.clientY - lp.y; lp = { x: t.clientX, y: t.clientY }; if (!G.running || Cut.active || Clay.on || P.faint > 0 || !P.alive || P.lookAt || (Haunts.toi && Haunts.toi.st === 'grab')) return; P.yaw -= dx * .0055 * Input.sens; P.pitch = clamp(P.pitch - dy * .0055 * Input.sens, -1.45, 1.45); } }, { passive: false });
   const lend = e => { for (const t of e.changedTouches) if (t.identifier === lid) lid = null; }; lz.addEventListener('touchend', lend); lz.addEventListener('touchcancel', lend);
   const btn = (id, down, up) => { const el = $(id); el.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); el.classList.add('dn'); down && down(); }, { passive: false }); const u = e => { e.preventDefault(); el.classList.remove('dn'); up && up(); }; el.addEventListener('touchend', u, { passive: false }); el.addEventListener('touchcancel', u, { passive: false }); };
   btn('bUse', () => { Input.mouse.l = true; if (G.running && P.alive && P.faint <= 0 && !UI.modal && P.lockMove <= 0 && !G.spec && !Cut.active && !Clay.on) useSel(); }, () => { Input.mouse.l = false; });
-  btn('bAct', () => fireKey('KeyE')); btn('bSpace', () => fireKey('Space')); btn('bFlash', () => fireKey('KeyF')); btn('bDrop', () => fireKey('KeyG')); btn('bMap', () => fireKey('KeyM'));
+  btn('bRun', () => { const on = !Input.keys.ShiftLeft; Input.keys.ShiftLeft = on; const e = $('bRun'); e.classList.toggle('on', on); e.innerHTML = on ? '달리기<br>ON' : '달리기<br>OFF'; }); btn('bAct', () => fireKey('KeyE')); btn('bSpace', () => fireKey('Space')); btn('bFlash', () => fireKey('KeyF')); btn('bDrop', () => fireKey('KeyG')); btn('bMap', () => fireKey('KeyM'));
   btn('bGtr', () => { const i = hotList().findIndex(h => h.k === 'guitar'); if (i >= 0 && P.sel !== i) { P.sel = i; refreshViewmodel(); } Input.mouse.r = true; }, () => { Input.mouse.r = false; });
   btn('bPause', () => { if (G.running && !G.over) $('pause').classList.add('on'); });
   btn('bSpecL', () => fireKey('ArrowLeft')); btn('bSpecR', () => fireKey('ArrowRight'));
