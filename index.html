@@ -394,6 +394,14 @@ footer .flinks a:hover{color:var(--foam)}
     body:['## 추가','대결 모드에 상대 점수 표시','## 수정','일시정지 후 블록이 한 칸 내려가던 문제']},
    ============================================================ */
 const NOTICES=[
+  {date:'2026-11-11', tag:'공지', title:'신규 게임 3종 추가',
+   body:[
+     '## 추가',
+     '픽셀 던전 로그라이크 — 격자 위를 한 칸씩 움직이는 턴제 로그라이크, AI 연습전과 온라인 결투 지원 (made by 윤준우)',
+     '서버 너머의 영면 — 세상을 떠난 이의 디지털 흔적을 정리하며 선택을 내리는 스토리 게임 (학교폭력 등 무거운 소재가 나와요)',
+     '리듬 배낚시 · 파도 위의 합주 — 박자에 맞춰 낚시하는 리듬 게임, 내 위치의 날씨가 바다에 반영돼요',
+     '진행 기록은 브라우저에 저장되고, 로그인하면 다른 기기에서도 이어서 할 수 있어요.'
+   ]},
   {date:'2026-11-08', tag:'공지', title:'신규 게임 3종 추가',
    body:[
      '## 추가',
@@ -833,6 +841,65 @@ const GAMES=[
       <g fill="#ff7a59"><circle cx="266" cy="108" r="5"/><circle cx="284" cy="110" r="5"/></g>
       <g transform="translate(116 80)"><ellipse cx="0" cy="8" rx="10" ry="8" fill="#fff"/><circle cx="-8" cy="0" r="5" fill="#fff"/><path d="M-13 0l-5 2 5 2Z" fill="#ffb347"/><circle cx="-9" cy="-1" r="1.2" fill="#333"/><path d="M-9-6q-2-4 1-4t2 4" fill="#e04b4b"/></g>
     </svg>`
+  },
+  {
+    id:'pixeldungeon',
+    tags:['로그라이크','전략','멀티'],
+    label:'new', labelDate:'2026-11-11',
+    title:'픽셀 던전 로그라이크', hanja:'',
+    desc:'격자 위를 한 칸씩 움직이는 턴제 로그라이크. 빨간 칸의 공격을 피하며 장비와 정수를 모아 던전 깊이 내려가 보세요. AI 연습전과 온라인 결투도 즐길 수 있어요. made by 윤준우',
+    keys:'WASD/방향키 이동 · 클릭/터치 · 가방 칸으로 장비 교체',
+    src:'games/pixeldungeon.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#0c0a14"/>
+      <g fill="#1c1830" stroke="#3b3560"><rect x="40" y="20" width="40" height="40"/><rect x="80" y="20" width="40" height="40"/><rect x="120" y="20" width="40" height="40"/><rect x="160" y="20" width="40" height="40"/><rect x="200" y="20" width="40" height="40"/><rect x="240" y="20" width="40" height="40"/><rect x="40" y="60" width="40" height="40"/><rect x="80" y="60" width="40" height="40"/><rect x="120" y="60" width="40" height="40"/><rect x="160" y="60" width="40" height="40"/><rect x="200" y="60" width="40" height="40"/><rect x="240" y="60" width="40" height="40"/><rect x="40" y="100" width="40" height="40"/><rect x="80" y="100" width="40" height="40"/><rect x="120" y="100" width="40" height="40"/><rect x="160" y="100" width="40" height="40"/><rect x="200" y="100" width="40" height="40"/><rect x="240" y="100" width="40" height="40"/></g>
+      <g fill="#e0453a" opacity=".55"><rect x="160" y="60" width="40" height="40"/><rect x="200" y="60" width="40" height="40"/><rect x="200" y="100" width="40" height="40"/></g>
+      <g><rect x="92" y="72" width="16" height="18" fill="#ffb454"/><rect x="96" y="66" width="8" height="8" fill="#efe9d8"/><rect x="108" y="76" width="4" height="14" fill="#b8c4d0"/></g>
+      <g><rect x="212" y="110" width="16" height="16" fill="#6fbf5a"/><rect x="215" y="114" width="3" height="3" fill="#0c0a14"/><rect x="222" y="114" width="3" height="3" fill="#0c0a14"/></g>
+      <rect x="250" y="30" width="20" height="20" fill="#ffb454"/><rect x="255" y="35" width="10" height="10" fill="#0c0a14"/>
+    </svg>`
+  },
+  {
+    id:'restinserver',
+    tags:['스토리','시뮬'],
+    label:'new', labelDate:'2026-11-11',
+    title:'서버 너머의 영면', hanja:'',
+    desc:'세상을 떠난 이들이 남긴 디지털 흔적을 정리하는 일. 일기와 대화, 사진을 하나씩 살펴보고 가족의 의뢰를 어떻게 마무리할지 직접 결정하는 스토리 게임이에요. (학교폭력 등 무거운 소재가 나와요)',
+    keys:'마우스/터치로 파일 확인 · 선택',
+    src:'games/restinserver.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#0b0a14"/>
+      <rect x="60" y="26" width="200" height="128" rx="6" fill="#171428" stroke="#3b3560" stroke-width="2"/>
+      <rect x="60" y="26" width="200" height="16" rx="6" fill="#2a2548"/>
+      <g fill="#8d84c8"><rect x="76" y="56" width="90" height="6"/><rect x="76" y="72" width="140" height="6" opacity=".7"/><rect x="76" y="88" width="120" height="6" opacity=".5"/><rect x="76" y="104" width="70" height="6" opacity=".35"/></g>
+      <rect x="76" y="124" width="64" height="18" rx="3" fill="#c8402b"/>
+      <circle cx="232" cy="110" r="22" fill="none" stroke="#d9a441" stroke-width="3" stroke-dasharray="6 5"/>
+      <circle cx="232" cy="110" r="4" fill="#d9a441"/>
+    </svg>`
+  },
+  {
+    id:'rhythmfishing',
+    tags:['시뮬','리듬'],
+    label:'new', labelDate:'2026-11-11',
+    title:'리듬 배낚시 · 파도 위의 합주', hanja:'',
+    desc:'박자에 맞춰 낚싯줄을 던지고 챔질하는 리듬 낚시 게임. 지금 내 위치의 날씨에 따라 바다가 달라지고, 잡은 물고기는 아이스박스와 도감에 쌓여요.',
+    keys:'Space/Enter/J/F 던지기·챔질 · ↑ 또는 R 릴 · ←→ 또는 A D 버티기 · 터치 지원',
+    src:'games/rhythmfishing.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="rfsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#06142b"/><stop offset="1" stop-color="#1d5a8a"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#rfsky)"/>
+      <circle cx="262" cy="36" r="14" fill="#f4e9b8"/>
+      <rect y="92" width="320" height="88" fill="#0f3d66"/>
+      <path d="M0 96Q40 86 80 96T160 96T240 96T320 96" fill="none" stroke="#7fc4ee" stroke-width="3"/>
+      <path d="M0 116Q40 106 80 116T160 116T240 116T320 116" fill="none" stroke="#4f9fd0" stroke-width="2" opacity=".7"/>
+      <path d="M96 92l14-18h40l10 18Z" fill="#d9a441"/><rect x="104" y="92" width="64" height="8" fill="#8b5a2b"/>
+      <path d="M150 74L214 40" stroke="#efe9d8" stroke-width="2"/><path d="M214 40V128" stroke="#cfe6f5" stroke-width="1"/>
+      <g fill="#ffb454"><ellipse cx="214" cy="134" rx="12" ry="6"/><path d="M226 134l9-6v12Z"/></g>
+      <g fill="none" stroke="#fff" stroke-width="2" opacity=".6"><circle cx="40" cy="150" r="5"/><circle cx="270" cy="156" r="4"/></g>
+    </svg>`
   }
 ];
 
@@ -1112,7 +1179,7 @@ async function loadMine(){
    게임들은 최고 기록·저장 데이터를 이 브라우저(localStorage)에 저장해요. 로비와 게임은 같은 주소라서 로비가 그걸 읽어
    내 계정에 백업하고, 다른 기기·브라우저에서 로그인하면 내려받아요.
    ※ 새 게임이 localStorage 에 저장하는 키가 있으면 아래 SYNC_KEYS 에 이름을 추가하세요. */
-const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','lobby-badges-seen','pogeun_farm_v1'];
+const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pd_save2','pd_sb','rest_in_server_v1','rhythm_boat_fishing_v1','lobby-badges-seen','pogeun_farm_v1'];
 const SYNC_MAX=300000; /* 키 하나당 최대 글자 수 */
 const encKey=k=>k.replace(/\./g,'__dot__');
 const hashStr=v=>{if(v==null)return null;let h=5381;for(let i=0;i<v.length;i++)h=((h<<5)+h+v.charCodeAt(i))|0;return v.length+':'+h;};
@@ -1230,7 +1297,7 @@ addEventListener('pagehide',stopPresence);
      로그인하면 SYNC_KEYS 덕분에 계정에 백업돼서 다른 기기에서도 따라와요. (로그아웃하면 이 기기 기록과 함께 지워져요)
    · 태그: GAMES 의 tags 로 칩이 자동 생성돼요. 여러 개를 고르면 "모두 가진" 게임만 보여줘요. */
 const FAV_KEY='lobby-favs';
-const TAG_ORDER=['멀티','2인용','액션','전략','시뮬','스포츠','퍼즐','보드','호러','서바이벌','스토리'];
+const TAG_ORDER=['멀티','2인용','액션','전략','시뮬','스포츠','퍼즐','보드','호러','서바이벌','스토리','로그라이크','리듬'];
 let favSet=new Set();
 const activeTags=new Set();let favOnly=false;
 function loadFavs(){
