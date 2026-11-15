@@ -200,6 +200,14 @@ footer b{color:var(--muted);font-weight:700}
 .rk-bar span{display:block;height:100%;background:var(--cinnabar);transition:width .6s}
 .rk.r1 .rk-bar span{background:var(--gold)}
 .rk-list .hot-empty{grid-column:1/-1;grid-row:1}
+.bs-tabs{display:flex;gap:6px}
+.bs-tabs button{font:inherit;font-size:.82rem;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;transition:.15s}
+.bs-tabs button:hover{color:var(--foam);border-color:var(--gold)}
+.bs-tabs button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--gold-on);font-weight:700}
+.bs-list{grid-template-rows:repeat(3,auto)}
+.bs-list .rk{cursor:pointer;transition:border-color .15s}
+.bs-list .rk:hover{border-color:var(--gold)}
+@media (max-width:760px){.bs-list{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
 @media (max-width:760px){.rk-list{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}}
 @media (prefers-reduced-motion:reduce){.rk-bar span{transition:none}}
 
@@ -324,6 +332,11 @@ footer .flinks a:hover{color:var(--foam)}
     <div class="hot-head"><h2><b>LIVE</b>지금 가장 인기 있는 게임</h2><span class="live" id="liveState"><i></i><span>연결 중…</span></span></div>
     <div class="podium" id="podium"></div>
   </section>
+  <section class="lb" id="best" aria-label="기간별 베스트 게임">
+    <div class="lb-head"><h2><b>BEST</b>기간별 베스트 게임</h2><div class="bs-tabs" id="bsTabs" role="group" aria-label="기간 선택"><button type="button" data-p="1" aria-pressed="true">일간</button><button type="button" data-p="7" aria-pressed="false">주간</button><button type="button" data-p="30" aria-pressed="false">월간</button></div></div>
+    <div class="lb-note" id="bsNote" style="margin:-4px 0 10px"></div>
+    <ol class="rk-list bs-list" id="bsList"></ol>
+  </section>
   <section class="lb" id="rank" aria-label="플레이어 랭킹" hidden>
     <div class="lb-head"><h2><b>RANK</b>가장 많이 플레이한 사람</h2><span class="lb-note">로그인한 플레이어 기준 · 닉네임이 없으면 계정 이름은 가운데를 가려서 표시돼요</span></div>
     <ol class="rk-list" id="rkList"></ol>
@@ -394,6 +407,25 @@ footer .flinks a:hover{color:var(--foam)}
     body:['## 추가','대결 모드에 상대 점수 표시','## 수정','일시정지 후 블록이 한 칸 내려가던 문제']},
    ============================================================ */
 const NOTICES=[
+  {date:'2026-11-15', tag:'패치', title:'기간별 베스트 · 내 프로필 · 편의 기능 추가',
+   body:[
+     '## 추가',
+     '기간별 베스트 — 일간(오늘) · 주간(최근 7일) · 월간(최근 30일) 동안 가장 많이 플레이된 게임 TOP 6을 볼 수 있어요. 한국 시간 기준이에요.',
+     '내 프로필 · 업적 뱃지 — 로그인하면 총 플레이 수, 게임별 기록, 내 순위, 업적 뱃지 10종을 확인할 수 있어요. 새 뱃지는 빨간 점으로 알려 줘요.',
+     '이어서 하기 · 랜덤 게임 — 마지막으로 한 게임을 바로 이어서 하거나, 지금 필터에 맞는 게임 중 하나를 무작위로 골라 줘요.',
+     '안 읽은 공지 표시 — 아직 열어 보지 않은 공지에 빨간 점이 표시돼요.',
+     '오류 제보 · 게임 업로드 신청 — 페이지 아래 링크에서 GitHub 양식으로 바로 접수할 수 있어요.'
+   ]},
+  {date:'2026-11-15', tag:'공지', title:'신규 게임 4종 추가 · 업데이트',
+   body:[
+     '## 추가',
+     '드리프트 러시 — 등굣길 자전거 레이싱, 드리프트로 부스터를 모아 3바퀴 완주 · 친구와 1:1 대결',
+     '전교 팔씨름왕 — 연타와 필살기로 겨루는 팔씨름 대회, AI · 2인 · 온라인 대결',
+     '노크아웃 아레나 — 20종 브롤러, 5가지 모드의 팀 대전 · 온라인 협동 지원',
+     '미니 월드박스 — 지형을 칠하고 생명을 소환하는 샌드박스 세계 만들기',
+     '## 업데이트',
+     '고교야구 챔피언십, 픽셀 던전 로그라이크가 업데이트되었어요.'
+   ]},
   {date:'2026-11-11', tag:'공지', title:'신규 게임 3종 추가',
    body:[
      '## 추가',
@@ -621,7 +653,7 @@ const GAMES=[
   {
     id:'baseball',
     tags:['스포츠','멀티'],
-    label:'update', labelDate:'2026-11-09',
+    label:'update', labelDate:'2026-11-15',
     title:'고교야구 챔피언십', hanja:'',
     desc:'전국대회 결승전. 초에는 타자로, 말에는 투수와 야수로 직접 승부하세요. 투수 교체·대타 등 선수 기용까지 가능한 고교야구 게임. 온라인 대전 지원.',
     keys:'마우스/터치로 조준 · 투구·스윙 · V·B 시점 전환',
@@ -845,7 +877,7 @@ const GAMES=[
   {
     id:'pixeldungeon',
     tags:['로그라이크','전략','멀티'],
-    label:'new', labelDate:'2026-11-11',
+    label:'update', labelDate:'2026-11-15',
     title:'픽셀 던전 로그라이크', hanja:'',
     desc:'격자 위를 한 칸씩 움직이는 턴제 로그라이크. 빨간 칸의 공격을 피하며 장비와 정수를 모아 던전 깊이 내려가 보세요. AI 연습전과 온라인 결투도 즐길 수 있어요. made by 윤준우',
     keys:'WASD/방향키 이동 · 클릭/터치 · 가방 칸으로 장비 교체',
@@ -899,6 +931,84 @@ const GAMES=[
       <path d="M150 74L214 40" stroke="#efe9d8" stroke-width="2"/><path d="M214 40V128" stroke="#cfe6f5" stroke-width="1"/>
       <g fill="#ffb454"><ellipse cx="214" cy="134" rx="12" ry="6"/><path d="M226 134l9-6v12Z"/></g>
       <g fill="none" stroke="#fff" stroke-width="2" opacity=".6"><circle cx="40" cy="150" r="5"/><circle cx="270" cy="156" r="4"/></g>
+    </svg>`
+  },
+  {
+    id:'driftrush',
+    tags:['레이싱','멀티'],
+    label:'new', labelDate:'2026-11-15',
+    title:'드리프트 러시', hanja:'',
+    desc:'등굣길 자전거 레이싱! 코너에서 드리프트로 부스터를 모아 제한 시간 안에 3바퀴를 완주하세요. 코스 5종, 친구와 코드로 연결하는 1:1 대결도 지원해요.',
+    keys:'←→/A D 또는 화면 좌우 꾹 누르기 · Space/↑/W 부스터 · P/Esc 일시정지 · M 음소거',
+    src:'games/driftrush.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="drsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a5a"/><stop offset="1" stop-color="#ffd9a0"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#drsky)"/><circle cx="240" cy="70" r="26" fill="#fff2c4"/>
+      <rect y="84" width="320" height="96" fill="#5a5f6e"/>
+      <path d="M130 84L20 180H110L150 84Z" fill="#44485a"/><path d="M190 84L300 180H210L170 84Z" fill="#44485a"/>
+      <g fill="#fff"><rect x="157" y="92" width="6" height="12"/><rect x="155" y="116" width="10" height="20"/><rect x="152" y="148" width="16" height="28"/></g>
+      <g><circle cx="150" cy="150" r="9" fill="none" stroke="#222" stroke-width="3"/><circle cx="178" cy="150" r="9" fill="none" stroke="#222" stroke-width="3"/><path d="M150 150L162 134L178 150M162 134H170" stroke="#e8531c" stroke-width="3" fill="none"/></g>
+      <path d="M30 140q-14 0-20 10" stroke="#ff7a1a" stroke-width="4" fill="none" opacity=".7"/>
+    </svg>`
+  },
+  {
+    id:'armwrestling',
+    tags:['액션','2인용','멀티'],
+    label:'new', labelDate:'2026-11-15',
+    title:'전교 팔씨름왕', hanja:'',
+    desc:'연타로 말하는 교실 최강전! 필살기 타이밍을 노려 상대 4명을 차례로 꺾으세요. AI 대결, 한 기기 2인, 방 코드 온라인 대결까지 지원해요.',
+    keys:'1P A D 번갈아 연타 · W 필살기 / 2P ←→ 연타 · ↑ 필살기 · 터치는 아래 패드',
+    src:'games/armwrestling.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#f6f1e4"/>
+      <rect x="20" y="118" width="280" height="34" rx="4" fill="#c9a36a"/>
+      <rect x="150" y="30" width="20" height="90" fill="#8b5a2b" opacity=".0"/>
+      <path d="M96 118V74q0-14 14-14h20v34h20V60h20q14 0 14 14v44" fill="none" stroke="#1d2a3a" stroke-width="0"/>
+      <g fill="#3b6fd1"><rect x="62" y="70" width="36" height="48" rx="8"/><circle cx="80" cy="56" r="14"/></g>
+      <g fill="#d84a3a"><rect x="222" y="70" width="36" height="48" rx="8"/><circle cx="240" cy="56" r="14"/></g>
+      <path d="M96 100L224 100" stroke="#f0c8a0" stroke-width="16" stroke-linecap="round"/>
+      <circle cx="160" cy="100" r="11" fill="#ffd24a" stroke="#1d2a3a" stroke-width="3"/>
+      <g fill="#1d2a3a"><path d="M150 26l6 12h-12z"/><path d="M170 26l6 12h-12z"/></g>
+      <text x="160" y="170" text-anchor="middle" font-size="18" font-weight="800" fill="#1d2a3a">1 · 2 · 1 · 2 !</text>
+    </svg>`
+  },
+  {
+    id:'knockoutarena',
+    tags:['액션','전략','멀티'],
+    label:'new', labelDate:'2026-11-15',
+    title:'노크아웃 아레나', hanja:'',
+    desc:'20종 브롤러로 즐기는 팀 대전. 노크아웃·듀얼·하이스트·핫존·솔로쇼다운 5가지 모드와 맵 6종, 코인으로 브롤러 업그레이드까지. 친구와 한 화면·온라인 협동도 가능해요. made by 윤준우',
+    keys:'WASD 이동 · 마우스 조준·클릭 공격 · Space/우클릭 슈퍼 · Q/E/Shift 가젯 · 모바일 조이스틱',
+    src:'games/knockoutarena.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#2b9e92"/>
+      <g fill="#33aa9d"><rect x="0" y="0" width="60" height="60"/><rect x="120" y="0" width="60" height="60"/><rect x="240" y="0" width="60" height="60"/><rect x="60" y="60" width="60" height="60"/><rect x="180" y="60" width="60" height="60"/><rect x="0" y="120" width="60" height="60"/><rect x="120" y="120" width="60" height="60"/><rect x="240" y="120" width="60" height="60"/></g>
+      <rect x="140" y="50" width="40" height="80" fill="#f2b84b" stroke="#1d1b3a" stroke-width="4"/>
+      <rect x="40" y="130" width="60" height="30" fill="#2f8f46" opacity=".9"/>
+      <circle cx="70" cy="70" r="17" fill="#a86a3c" stroke="#c8f169" stroke-width="4"/><circle cx="252" cy="104" r="17" fill="#5a4bd1" stroke="#ff4f8b" stroke-width="4"/>
+      <circle cx="104" cy="74" r="5" fill="#ffd24a"/><circle cx="116" cy="78" r="4" fill="#ffd24a"/><circle cx="214" cy="100" r="5" fill="#fff"/>
+    </svg>`
+  },
+  {
+    id:'miniworldbox',
+    tags:['시뮬'],
+    label:'new', labelDate:'2026-11-15',
+    title:'미니 월드박스', hanja:'',
+    desc:'지형을 칠하고 인간·엘프·오크·양을 소환해 작은 세계를 가꾸는 샌드박스. 불, 운석, 번개 같은 재앙도 내려 보세요. made by 윤준우',
+    keys:'드래그로 칠하기 · 휠/핀치 확대 · 아래 탭에서 도구 선택',
+    src:'games/miniworldbox.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#0f3b82"/>
+      <path d="M40 120q10-50 70-60t110 10q50 20 30 60t-90 30-120-40z" fill="#e3d18f"/>
+      <path d="M70 110q20-30 60-34t80 8q30 14 18 38t-60 20-98-32z" fill="#62ad4c"/>
+      <g fill="#265f2f"><path d="M110 92l8-16 8 16z"/><path d="M130 100l8-16 8 16z"/><path d="M215 100l8-16 8 16z"/></g>
+      <path d="M170 90l14-28 14 28z" fill="#8a857c"/><path d="M170 90l14-28 5 10z" fill="#f4f7fa"/>
+      <rect x="150" y="104" width="12" height="10" fill="#e8d8b0"/><path d="M148 104l8-8 8 8z" fill="#b5452d"/>
+      <circle cx="250" cy="130" r="6" fill="#e8531c"/><circle cx="250" cy="130" r="12" fill="#ff7a1a" opacity=".35"/>
     </svg>`
   }
 ];
@@ -1111,16 +1221,53 @@ function renderStats(){
   updateNow();
 }
 
+/* ---------- 일간 · 주간 · 월간 베스트 ----------
+   서버(daily/날짜/게임)에 하루 단위 플레이 횟수를 쌓고, 일간=오늘 · 주간=최근 7일 · 월간=최근 30일을 합산해요. 날짜는 한국 시간(KST) 기준이에요. */
+const BEST_TOP=6,BEST_REFRESH_MS=60000,BEST_NOTE={1:'오늘(한국 시간 기준) 가장 많이 플레이된 게임',7:'최근 7일 동안 가장 많이 플레이된 게임',30:'최근 30일 동안 가장 많이 플레이된 게임'};
+let daily={},bestP=1;
+const kstDay=(back=0)=>new Date(Date.now()+9*36e5-back*864e5).toISOString().slice(0,10);
+function renderBest(){
+  const days=[];for(let i=0;i<bestP;i++)days.push(kstDay(i));
+  const sum={};for(const d of days){const o=daily[d];if(o)for(const k in o)sum[k]=(sum[k]||0)+(+o[k]||0);}
+  const list=GAMES.map((g,i)=>({g,n:sum[g.id]||0,i})).filter(x=>x.g.ready&&x.n>0).sort((a,b)=>b.n-a.n||a.i-b.i).slice(0,BEST_TOP);
+  $('bsNote').textContent=BEST_NOTE[bestP];
+  const ul=$('bsList');
+  if(!list.length){ul.innerHTML='<li class="hot-empty">'+((FIREBASE_URL||DEMO)?'아직 이 기간의 플레이 기록이 없어요.<br>지금 플레이하면 바로 순위에 올라가요!':'기간별 베스트가 곧 열려요.')+'</li>';return;}
+  const max=list[0].n;
+  ul.innerHTML=list.map((x,k)=>`<li class="rk r${k+1}" data-id="${x.g.id}" tabindex="0" role="button"><span class="rk-no">${k+1}</span>`+
+    `<span class="rk-name">${esc(x.g.title)}${labelHTML(x.g)}</span>`+
+    `<span class="rk-n"><strong>${fmt(x.n)}</strong>회</span>`+
+    `<span class="rk-bar"><span style="width:${Math.max(6,x.n/max*100)}%"></span></span></li>`).join('');
+}
+$('bsList').addEventListener('click',e=>{const li=e.target.closest('[data-id]');const g=li&&GAMES.find(x=>x.id===li.dataset.id);if(g&&g.ready)openGame(g);});
+$('bsList').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const li=e.target.closest('[data-id]');const g=li&&GAMES.find(x=>x.id===li.dataset.id);if(g&&g.ready){e.preventDefault();openGame(g);}}});
+$('bsTabs').addEventListener('click',e=>{const b=e.target.closest('button[data-p]');if(!b)return;bestP=+b.dataset.p;$('bsTabs').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderBest();});
+async function loadBest(){
+  if(DEMO||!FIREBASE_URL)return;
+  const get=u=>fetch(FIREBASE_URL+u,{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();});
+  try{
+    let d;
+    try{d=await get('/daily.json?orderBy=%22%24key%22&startAt=%22'+kstDay(29)+'%22');} /* 최근 30일만 */
+    catch(e){d=await get('/daily.json');}
+    d=d||{};
+    for(const k in d){const o=d[k];if(!o||typeof o!=='object')continue;daily[k]=daily[k]||{};for(const g in o)daily[k][g]=Math.max(+o[g]||0,+daily[k][g]||0);}
+    renderBest();
+  }catch(e){console.warn('[베스트] 불러오기 실패 — Firebase 규칙에 daily 읽기가 허용돼 있는지 확인하세요');renderBest();}
+}
+function bestAdd(id){const d=kstDay();daily[d]=daily[d]||{};daily[d][id]=(+daily[d][id]||0)+1;renderBest();}
+setInterval(()=>{if(!document.hidden)loadBest();},BEST_REFRESH_MS);
+
 /* 플레이 시작할 때 서버 숫자를 +1 (서버가 직접 더해서 동시에 눌러도 정확해요) */
 function track(g){
   if(!DEMO&&!FIREBASE_URL)return;
   let seen={};try{seen=JSON.parse(localStorage.getItem('lobby-seen')||'{}');}catch(e){}
   const now=Date.now();if(now-(seen[g.id]||0)<COUNT_COOLDOWN)return;
   seen[g.id]=now;try{localStorage.setItem('lobby-seen',JSON.stringify(seen));}catch(e){}
-  plays[g.id]=(+plays[g.id]||0)+1;renderStats();
+  plays[g.id]=(+plays[g.id]||0)+1;renderStats();bestAdd(g.id);
   if(me){mine[g.id]=(+mine[g.id]||0)+1;renderMine();if(typeof renderAuth==='function')renderAuth();userPut('/plays/'+encodeURIComponent(g.id),{'.sv':{increment:1}});userPut('/seen/'+encodeURIComponent(g.id),now);pushRank();}
   if(DEMO)return;
   fetch(`${FIREBASE_URL}/plays/${encodeURIComponent(g.id)}.json`,{method:'PUT',body:JSON.stringify({'.sv':{increment:1}}),keepalive:true}).catch(()=>{});
+  fetch(`${FIREBASE_URL}/daily/${kstDay()}/${encodeURIComponent(g.id)}.json`,{method:'PUT',body:JSON.stringify({'.sv':{increment:1}}),keepalive:true}).catch(()=>{});
 }
 
 /* ============================================================
@@ -1179,7 +1326,7 @@ async function loadMine(){
    게임들은 최고 기록·저장 데이터를 이 브라우저(localStorage)에 저장해요. 로비와 게임은 같은 주소라서 로비가 그걸 읽어
    내 계정에 백업하고, 다른 기기·브라우저에서 로그인하면 내려받아요.
    ※ 새 게임이 localStorage 에 저장하는 키가 있으면 아래 SYNC_KEYS 에 이름을 추가하세요. */
-const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pd_save2','pd_sb','rest_in_server_v1','rhythm_boat_fishing_v1','lobby-badges-seen','pogeun_farm_v1'];
+const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pd_save2','pd_sb','rest_in_server_v1','rhythm_boat_fishing_v1','ka_lv','ka_tr','ka_c','jg_nick','jg_bt_0','jg_bt_1','jg_bt_2','jg_bt_3','jg_bt_4','lobby-badges-seen','pogeun_farm_v1'];
 const SYNC_MAX=300000; /* 키 하나당 최대 글자 수 */
 const encKey=k=>k.replace(/\./g,'__dot__');
 const hashStr=v=>{if(v==null)return null;let h=5381;for(let i=0;i<v.length;i++)h=((h<<5)+h+v.charCodeAt(i))|0;return v.length+':'+h;};
@@ -1297,7 +1444,7 @@ addEventListener('pagehide',stopPresence);
      로그인하면 SYNC_KEYS 덕분에 계정에 백업돼서 다른 기기에서도 따라와요. (로그아웃하면 이 기기 기록과 함께 지워져요)
    · 태그: GAMES 의 tags 로 칩이 자동 생성돼요. 여러 개를 고르면 "모두 가진" 게임만 보여줘요. */
 const FAV_KEY='lobby-favs';
-const TAG_ORDER=['멀티','2인용','액션','전략','시뮬','스포츠','퍼즐','보드','호러','서바이벌','스토리','로그라이크','리듬'];
+const TAG_ORDER=['멀티','2인용','액션','전략','시뮬','스포츠','퍼즐','보드','호러','서바이벌','스토리','로그라이크','리듬','레이싱'];
 let favSet=new Set();
 const activeTags=new Set();let favOnly=false;
 function loadFavs(){
@@ -1436,13 +1583,15 @@ function startLive(){
   if(DEMO){
     plays={hansan:1280,silentbreach:960,ittycoon:430,battleground:2140,tetris:1760,stickduel:880,korea38:610,zerozone:1495,baseball:1210,ilgito:1530,segryeok:790,stockexam:1340,groupproject:1620,omokbaduk:980,chess:1150};
     live={hansan:3,silentbreach:2,ittycoon:1,battleground:12,tetris:7,stickduel:2,korea38:4,zerozone:5,baseball:6,ilgito:9,segryeok:3,stockexam:8,groupproject:11,omokbaduk:4,chess:6};
+    for(let i=0;i<30;i++){const o={};GAMES.filter(g=>g.ready).forEach((g,k)=>{o[g.id]=Math.floor((plays[g.id]||200)/60*(.4+((k*7+i*3)%10)/10))});daily[kstDay(i)]=o;}
+    renderBest();
     setLive('demo','데모 데이터');renderStats();updateNow();
     setInterval(()=>{const r=GAMES.filter(g=>g.ready);const g=r[Math.floor(Math.random()*r.length)];plays[g.id]=(+plays[g.id]||0)+1+Math.floor(Math.random()*3);const h=r[Math.floor(Math.random()*r.length)].id;live[h]=Math.max(0,(live[h]||0)+(Math.random()<.5?-1:1));renderStats();},2200);
     return;
   }
-  renderStats();
+  renderStats();renderBest();
   if(!FIREBASE_URL){setLive('','집계 준비 중');return;}
-  poll();
+  poll();loadBest();
 }
 /* ============================================================
    플레이어 랭킹 — 로그인한 사람이 게임을 시작한 횟수(내 기록 합계) TOP 10.
