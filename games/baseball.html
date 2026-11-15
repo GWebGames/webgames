@@ -604,13 +604,14 @@ function batterSafe(P){
 }
 // the ball reaches the covering fielder: decide who is out (slides change the margin)
 function settleThrow(P,res){
-  const k=res.k;
+  const k=res.k,pre=new Set(res.cand.filter(e=>e.out));
   for(const e of res.cand){
     if(e.out||(P.perfect&&e.from===0))continue;
     const b=e.slide?e.slide.b:0;
     if(e.tArr-b-res.tC+RN()*0.04>0){e.out=true;e.tOut=res.tC;res.outs.push(e)}
   }
   res.safe=res.cand.filter(e=>!e.out);
+  for(const e of res.cand){if(pre.has(e)||(P.perfect&&e.from===0))continue;const m=Math.abs(e.tArr-(e.slide?e.slide.b:0)-res.tC);if(m<0.09&&(!P.close||m<P.close.m))P.close={m,out:!!e.out,k,tC:res.tC,who:e.r.name}}
   for(const e of res.cand)if(Math.abs(e.tArr-res.tC)<0.45||e.slide)e.vis=true;
   if(res.outs.length&&k===2&&res.outs[0].from===1&&!P.caughtAir&&P.outs0+1<3&&P.cov&&P.cov[1]){
     const bt=P.plan.find(e=>e.from===0&&!e.out&&e.to===1);
@@ -620,6 +621,7 @@ function settleThrow(P,res){
       const b=bt.slide?bt.slide.b:0;
       if(bt.tArr-b-res.t2+RN()*0.04>0){bt.out=true;bt.tOut=res.t2;res.dp=bt}
       if(Math.abs(bt.tArr-res.t2)<0.45||bt.slide)bt.vis=true;
+      {const m2=Math.abs(bt.tArr-b-res.t2);if(m2<0.09&&(!P.close||m2<P.close.m))P.close={m:m2,out:!!bt.out,k:1,tC:res.t2,who:bt.r.name}}
     }
   }
 }
@@ -1514,6 +1516,8 @@ function draw(){
   if(!G){ctx.fillStyle='#0b1a35';ctx.fillRect(0,0,W,H);if(BGM)ctx.drawImage(BGM,0,0);return}
   if(G.view==='field'&&G.play&&G.play.brawl)drawBrawl();else if(G.view==='field'&&G.play)(FV==='3d'||G.play.steal||G.play.rp?drawField3D():drawField());else (PV==='back'?drawMain():drawPitch3D());
   if(G.view==='field'&&G.play&&G.play.rd&&G.play.S)drawRdHUD();
+  if(G.view==='field'&&G.play&&G.play.close0)drawReview();
+  if(G.mode==='ready'&&G.intro)drawIntro();
   if(G.fade>0){ctx.fillStyle=`rgba(0,0,0,${G.fade})`;ctx.fillRect(0,0,W,H)}
 }
 </script>
@@ -2138,6 +2142,7 @@ function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}}
 function tone(f,d,ty,v,sl){const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type=ty||'sine';o.frequency.setValueAtTime(f,t);if(sl)o.frequency.exponentialRampToValueAtTime(sl,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.001,t+d);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d)}
 function noise(d,v,hp){const t=AC.currentTime,n=AC.sampleRate*d,b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(NR()*2-1)*(1-i/n);const s=AC.createBufferSource(),g=AC.createGain(),f=AC.createBiquadFilter();f.type='highpass';f.frequency.value=hp||800;s.buffer=b;g.gain.value=v;s.connect(f).connect(g).connect(AC.destination);s.start(t)}
 function sfx(k){try{
+  if(k==='cheer'&&window.AUD&&AUD.ready&&AUD.on)return;
   if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();
   if(k==='hit'){noise(0.12,0.7,1500);tone(220,0.12,'square',0.25,90);buzz(22)}
   else if(k==='mitt'){noise(0.07,0.5,400);tone(110,0.09,'sine',0.4,60)}
@@ -2148,7 +2153,7 @@ function sfx(k){try{
   else if(k==='out'){tone(300,0.25,'sawtooth',0.12,150);buzz(35)}
 }catch(e){}}
 // ---------- helpers ----------
-function say(text,col,sub,dur,sz){G.banner={text,col,sub,dur:dur||1.3,sz,t:0};capSay(text,sub)}
+function say(text,col,sub,dur,sz){try{AUD.react(text)}catch(e){}G.banner={text,col,sub,dur:dur||1.3,sz,t:0};capSay(text,sub)}
 function pop(text,col,x,y,sz,dur){G.popups.push({text,col,x,y,sz,dur:dur||1.0,t:0});capPop(text)}
 function setPause(s,fn){G.mode='pause';G.timer=s;G.fn=fn}
 function addRuns(n){if(!n)return;G.score[G.half]+=n;G.inns[G.half][G.inn-1]=(G.inns[G.half][G.inn-1]||0)+n}
@@ -2262,7 +2267,7 @@ function swapPitcher(t,i){
   const np=G.pen[t][i];if(!np)return;
   const sg=t===0?-1:1,D={x:sg*30,y:4},Dp={x:sg*28,y:6},M={x:0,y:18.4},Mh={x:sg*2.4,y:17.2},BP={x:sg*38,y:26},T=TEAMS[t];
   const tArr=0.3+dist(BP,M)/9;
-  subScene({dur:tArr+1.0,tip:'투수 교체 중...',
+  subScene({dur:tArr+1.0,tip:'투수 교체 중... (클릭/Space: 건너뛰기)',
     actors:s=>{
       const o=[];
       if(s<3.9){const q=s<2.3?lerpP(D,Mh,0,1.5,s):lerpP(Mh,D,2.3,3.8,s);o.push({...q,team:MGR,lab:'감'})}
@@ -2279,7 +2284,7 @@ function swapPitcher(t,i){
 function pinchHit(t,i){
   const nb=G.bench[t][i];if(!nb)return;
   const old=batter(),idx=G.order[t],sg=t===0?-1:1,box={x:-1.4,y:-1.0},D={x:sg*28,y:3},T=TEAMS[t],tArr=0.4+dist(D,box)/10;
-  subScene({dur:tArr+0.9,tip:'대타 기용 중...',
+  subScene({dur:tArr+0.9,tip:'대타 기용 중... (클릭/Space: 건너뛰기)',
     actors:s=>{
       const o=[];
       if(s<2.9)o.push({...lerpP(box,D,0.2,2.8,s),team:T,lab:old.num});
@@ -2307,7 +2312,7 @@ function cpuPinch(){
   const risp=!!(G.bases[2]||G.bases[3]),close=Math.abs(G.score[0]-G.score[1])<=2,late=G.inn>=Math.max(2,G.max-2);
   if(Math.random()<(risp?0.5:0.12)*(close?1:0.4)*(late?1.5:0.7)){pinchHit(1,bi);G.cpuBuntPA=false}
 }
-function beginPA(){G.hb=null;G.bunt=false;G.orders={1:false,2:false};G.pk=0;G.cpuBuntPA=(!G.mp&&G.half===1)?cpuBuntWant(batter()):false;G.balls=G.strikes=0;G.mode='ready';G.view='main';G.timer=1.0;G.pitch=null;G.play=null;G.fx=null;G.fn=null;if(!G.mp&&!G.derby){cpuBullpen();cpuPinch()}if(G.derby){G.outs=0;G.bases=[null,null,null,null]}capPA()}
+function beginPA(){G.hb=null;G.bunt=false;G.orders={1:false,2:false};G.pk=0;G.cpuBuntPA=(!G.mp&&G.half===1)?cpuBuntWant(batter()):false;G.balls=G.strikes=0;G.mode='ready';G.view='main';G.timer=1.0;G.pitch=null;G.play=null;G.fx=null;G.fn=null;if(!G.mp&&!G.derby){cpuBullpen();cpuPinch()}if(G.derby){G.outs=0;G.bases=[null,null,null,null]}capPA();G.introPend=!G.derby;G.intro=null}
 function nextPitch(){
   G.pitch=null;G.view='main';
   if(G.derby){G.mode='bwait';G.timer=R(0.45,0.8);return}
@@ -2361,6 +2366,7 @@ function walk(hbp){
 }
 // ---------- pitch ----------
 function startPitch(p){
+  try{AUD.walkFade(0.5)}catch(e){}
   p.lead=(G.bases[1]||G.bases[2]||G.bases[3])?0.6:0.85;p.t=-p.lead;p.swingAt=null;p.swingStart=null;p.res=null;p.done=false;p.trail=[];G.pitch=p;G.mode='pitch';
   G.pc[defT()]++;stP(defT(),G.pit[defT()]).pc++;if(p.po){cap(p.cpuRead?'상대 포수가 사인을 읽었습니다! 피치아웃! 포수가 일어섭니다.':'피치아웃! 포수가 일어서며 공을 바깥으로 뺍니다.',2.8);pop('피치아웃!','#ffd23f',480,150,34,1.4)}else capPitch(p);p.sp+=G.pit[defT()].vel||0;G.stam[defT()]=Math.max(0,G.stam[defT()]-1.1);
   for(const b of [1,2,3])G.hold[b]=G.bases[b]?G.hold[b]*0.6:0;
@@ -3003,7 +3009,7 @@ function userTag(b,tt){
 }
 
 function updField(dt){
-  const P=G.play;if(!P)return;P.t+=dt*(P.rate||1);
+  const P=G.play;if(!P)return;P.t+=dt*(P.rateFn?P.rateFn(P.t):(P.rate||1));
   for(let i=P.ev.length-1;i>=0;i--)if(P.t>=P.ev[i].t)P.ev.splice(i,1)[0].fn();
   if(P.liveStep)P.liveStep(dt*(P.rate||1));
   if(!P.steal&&!P.sub&&!P.rd)recFrame(P);
@@ -3079,7 +3085,7 @@ function finalizePlay(){
   G.outs=Math.min(3,total);G.bases=nb;addRuns(runs);
   if(runs>0)sfx('cheer');
   say(txt,col,sub,1.5,52);
-  if(P.hr||P.special)setPause(1.9,()=>startReplay(P,afterPA));else setPause(1.8,afterPA);
+  if(P.hr||P.special)setPause(1.9,()=>startReplay(P,afterPA));else if(P.close&&!G.noReplay&&!G.derby)setPause(1.6,()=>startReplay(P,afterPA));else setPause(1.8,afterPA);
 }
 
 // ---------- highlight replay ----------
@@ -3107,7 +3113,7 @@ function startReplay(P0,after){
   const T=R[R.length-1].t;let ix=0;
   const seek=t=>{if(t<R[ix].t)ix=0;while(ix<R.length-2&&R[ix+1].t<=t)ix++;const a=R[ix],b=R[Math.min(R.length-1,ix+1)],f=b.t>a.t?CL((t-a.t)/(b.t-a.t),0,1):0;return {a,b,f}};
   const lerp=(a,b,f)=>a+(b-a)*f;
-  const off=TEAMS[G.half];
+  const off=TEAMS[G.half],K=(!P0.hr&&!P0.special)?P0.close:null;
   const P={sub:true,rp:true,rate:0.72,t:0,phase:'settle',hr:false,plan:[],ev:[],f:null,fp:{x:0,y:18.4},hitT:0.05,tf:0,res:null,special:null,miss:null,error:false,caughtAir:false,
     need:new Set(),inf:false,m:{tL:0,fence:100,D:0},bb:{},batter:null,hide:new Set([1,2,3]),tip:'하이라이트 리플레이 · 클릭/Space로 건너뛰기',
     cam:RCAM,bg:vbg('rep'),endT:T+1.0,
@@ -3117,6 +3123,9 @@ function startReplay(P0,after){
     actors:t=>{const s=seek(t),A=s.a.rn,B=s.b.rn;return A.map((r,k)=>{const q=B[k]||r;return {x:lerp(r.x,q.x,s.f),y:lerp(r.y,q.y,s.f),team:off,lab:r.lab,a:r.a,pose:r.pose}})}};
   P.after=()=>{G.play=null;G.view='main';G.fade=0.4;after()};
   G.play=P;G.view='field';G.mode='field';G.fade=0.5;
+  if(K){const t0=Math.max(0,K.tC-2.0);P.t=t0;P.rateFn=t=>(t>K.tC-0.35&&t<K.tC+0.35)?0.3:1;P.endT=Math.max(K.tC+0.6,Math.min(T+1.0,K.tC+1.9));P.close0=K;P.tip='비디오 판독 · 클릭/Space로 건너뛰기';
+    P.ev.push({t:K.tC,fn:()=>{G.flash=0.2;sfx(K.out?'out':'catch');try{buzz([20])}catch(e){}}});
+    cap(`비디오 판독! ${K.who} 선수의 ${K.k===4?'홈':K.k+'루'} ${K.out?'아웃':'세이프'} 여부를 다시 확인합니다.`,3.0,true);return}
   cap(P0.hr?'리플레이! 홈런 장면을 다시 보겠습니다.':'리플레이! 방금의 호수비를 다시 보겠습니다.',3.0,P0.hr);
 }
 // ---------- 입력: 싱글은 즉시 적용, 멀티는 락스텝 큐(mp.js)를 거쳐 양쪽에 같은 프레임에 적용 ----------
@@ -3141,10 +3150,11 @@ function act(k,b){
 }
 function applyAct(role,k,a){
   if(!G||G.over||!a)return;
-  if(G.mp){if(ACT_BAT.has(k)?role!==G.half:ACT_DEF.has(k)?role===G.half:true)return}
+  if(G.mp&&k!=='sk'){if(ACT_BAT.has(k)?role!==G.half:ACT_DEF.has(k)?role===G.half:true)return}
   if(G.derby&&(k==='bu'||k==='st'||k==='sl'||k==='tg'||k==='ph'||k==='ps'))return;
   const team=G.mp?role:0,b=a.b|0;
   switch(k){
+    case 'sk':return doSkip();
     case 'th':return doThrow(a);
     case 'sw':return doSwing(a);
     case 'bu':return buntToggle();
@@ -3173,7 +3183,7 @@ function update(dt){
   if(G.cap){G.cap.t+=dt;if(G.cap.t>=G.cap.dur)G.cap=null}
   if(G.capQ&&G.capQ.length){const q=G.capQ[0];if(G.tAll>=q.at){G.capQ.shift();cap(q.text,q.dur,true)}}
   switch(G.mode){
-    case 'ready':G.timer-=dt;if(G.timer<=0)nextPitch();break;
+    case 'ready':introTick(dt);G.timer-=dt;if(G.timer<=0)nextPitch();break;
     case 'bwait':if(G.derby){G.timer-=dt;if(G.timer<=0)startPitch(derbyPitch());break}G.timer-=dt;if(G.timer<=0&&!HD()&&(G.bases[1]||G.bases[2]||G.bases[3])&&Math.random()<0.004&&doBalk())break;if(G.timer<=0&&!cpuPickoff())startPitch(cpuPitchout()||cpuPitch(G.balls,G.strikes,G.stam[defT()],G.pit[defT()].ctl));break;
     case 'pitch':updPitch(dt);break;
     case 'pause':G.timer-=dt;if(G.timer<=0){const f=G.fn;G.fn=null;f&&f()}break;
@@ -3355,7 +3365,8 @@ cv.addEventListener('pointerdown',e=>{
     if(lDef()&&P.S.humanD){act('rt');return}
     if(lBat()&&P.S.humanR){const p=ptr(e);if(p.y>108&&p.y<206&&p.x>230&&p.x<730)act('rr',p.x<480?-1:1);else act('rj');return}
   }}
-  if(G.mode==='field'&&G.play&&(G.play.rp||(G.play.brawl&&!G.mp))){G.play.t=G.play.endT;return}
+  if(G.mode==='ready'&&G.intro){act('sk');return}
+  if(skipOK()){act('sk');return}
   if(G.mode==='field'&&G.play&&G.play.phase==='decide'&&lDef()){
     const p=ptr(e);let best=0,bd=36;
     for(let k=1;k<=4;k++){const q=fp(BASE[k].x,BASE[k].y,0),d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=k}}
@@ -3385,7 +3396,7 @@ addEventListener('keydown',e=>{
   if(!G||G.over)return;
   if(G.paused||!rs.hidden){if(e.key==='Escape')closeRoster();return}
   const k=e.key;
-  if(G.mode==='field'&&G.play&&(G.play.rp||(G.play.brawl&&!G.mp))&&(k===' '||k==='Escape'||k==='Enter')){e.preventDefault();G.play.t=G.play.endT;return}
+  if((k===' '||k==='Escape'||k==='Enter')&&((G.mode==='ready'&&G.intro)||skipOK())){e.preventDefault();act('sk');return}
   {const P=G.play;if(G.mode==='field'&&P&&P.rd&&P.S&&P.S.started&&!P.S.res){
     if(lBat()&&P.S.humanR){
       if(k==='ArrowLeft'||k==='a'||k==='A'){e.preventDefault();act('rr',-1);return}
@@ -3472,7 +3483,7 @@ function loop(now){
   const dt=Math.min(0.05,(now-last)/1000);last=now;
   try{
     if(G&&G.mp)mpTick(dt);else update(dt);
-    draw();sync();
+    draw();sync();try{AUD.tick(dt)}catch(e){}try{introAuto()}catch(e){}
     loopErr=0;
     if((fitN=(fitN+1)%30)===0&&!document.body.classList.contains('mob')){
       const ov=document.documentElement.scrollHeight-innerHeight;
@@ -3498,7 +3509,7 @@ requestAnimationFrame(loop);
 const MP={on:false,phase:'idle',role:0,code:'',room:null,label:null,peerLabel:null,frame:0,acc:0,myUp:-1,peerUp:-1,
   out:[],recvN:0,peerAck:0,sched:new Map(),rnd:null,rc:0,hashes:new Map(),peerH:new Map(),hf:-1,hv:0,
   speed:1,desync:false,lastAdv:0,lastPeer:0,done:false,inns:3,seed:0,poll:0,busy:false};
-const MP_STEP=1/60,MP_ALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789',MP_KINDS=new Set(['th','sw','bu','st','sl','tg','pk','pb','ib','sh','ps','ph','rr','rj','rt']);
+const MP_STEP=1/60,MP_ALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789',MP_KINDS=new Set(['th','sw','bu','st','sl','tg','pk','pb','ib','sh','ps','ph','rr','rj','rt','sk']);
 const mpEl=id=>document.getElementById(id);
 const mpNow=()=>performance.now();
 
@@ -4079,8 +4090,9 @@ const sfk=(K,u)=>{for(let i=1;i<K.length;i++)if(u<=K[i][0]){const a=K[i-1],b=K[i
 function sideFig(c,X,Y,sc,o){
   const face=o.face>=0?1:-1,ph=o.ph||0,u=o.u||0,k=o.kind||'stand',col=o.col||{c:'#888',d:'#444'};
   const shirt=o.black?'#1b1d24':col.c,dark=o.black?'#101218':col.d,pants=o.black?'#3a3f4d':'#f3efe4',skin='#e8b98f';
-  let H=47,lean=0.2,fN=[12,0],fF=[-10,0],gl=[26,-16],th=[16,-24],bendG=-1,bendT=-1,glFirst=false,tFront=false,lying=false,sit=false;
+  let H=47,lean=0.2,fN=[12,0],fF=[-10,0],gl=[26,-16],th=[16,-24],bendG=-1,bendT=-1,glFirst=false,tFront=false,lying=false,sit=false,batA=null;
   switch(k){
+    case 'bat':{batA=o.ba==null?-0.9:o.ba;const sw=CL(o.u||0,0,1);H=44-3*sw;lean=.2+.5*sw;fN=[15+8*sw,0];fF=[-14-4*sw,0];gl=[20,-8];th=[18,-7];bendG=1;bendT=1;break}
     case 'stand':H=45;lean=.3;fN=[14,0];fF=[-12,0];gl=[30,-20];th=[16,-26];break;
     case 'run':{const s=Math.sin(ph),cc=Math.cos(ph);H=48-3*Math.abs(cc);lean=.34;fN=[28*s,Math.max(0,20*cc)];fF=[-28*s,Math.max(0,-20*cc)];
       gl=[18+11*Math.sin(ph+PI),-16+8*Math.cos(ph)];th=o.ball?[8,8]:[14+11*s,-16+8*Math.cos(ph+PI)];tFront=!!o.ball;bendT=o.ball?1:-1;break}
@@ -4094,6 +4106,7 @@ function sideFig(c,X,Y,sc,o){
     case 'slide':sit=true;break;
     case 'lying':lying=true;break;
   }
+  if(o.carry&&k==='run')batA=1.25;
   const dx=(x)=>X+face*sc*x,dy=(y)=>Y-sc*y;
   let hip,chest,head,sh,kN,aN,kF,aF;
   if(lying){hip=[0,9];chest=[30,13];head=[46,17];sh=[28,13];aN=[2,5];aF=[-38,5];kN=[-18,10];kF=[-18,8];gl=[44,6];th=[40,2]}
@@ -4138,6 +4151,7 @@ function sideFig(c,X,Y,sc,o){
     c.restore();
   }
   const out={g:[dx(gl[0]),dy(gl[1])],t:[dx(th[0]),dy(th[1])],head:[dx(head[0]),dy(head[1])]};
+  if(batA!=null){const hx=out.t[0],hy=out.t[1],ux=face*Math.cos(batA),uy=-Math.sin(batA);c.lineCap='round';c.strokeStyle='#6b4423';c.lineWidth=3.6*sc;c.beginPath();c.moveTo(hx-ux*9*sc,hy-uy*9*sc);c.lineTo(hx+ux*16*sc,hy+uy*16*sc);c.stroke();c.strokeStyle='#d9b27a';c.lineWidth=7.2*sc;c.beginPath();c.moveTo(hx+ux*16*sc,hy+uy*16*sc);c.lineTo(hx+ux*62*sc,hy+uy*62*sc);c.stroke();c.fillStyle='#e4c590';c.beginPath();c.arc(hx+ux*62*sc,hy+uy*62*sc,3.6*sc,0,7);c.fill()}
   if(o.ball){c.fillStyle='#fff';c.beginPath();c.arc(out.t[0],out.t[1],4.2*sc,0,7);c.fill();c.strokeStyle='#d13a30';c.lineWidth=1;c.beginPath();c.arc(out.t[0],out.t[1],2.8*sc,-0.9,0.9);c.stroke()}
   c.globalAlpha=1;return out;
 }
@@ -4407,4 +4421,344 @@ function derbyShowEnd(){
     prev&&prev.call(again,e);
   };
 })();
+</script>
+<script>'use strict';
+// ============================================================================
+//  사운드: 관중 환호/응원가(드럼+박수+트럼펫) + 선수별 등장곡. 전부 WebAudio로 즉석 합성(외부 파일·저작권 음원 없음).
+//  게임 시뮬레이션과 무관(독립 난수 사용) → 온라인 락스텝에 영향 없음.
+// ============================================================================
+const AUD=(()=>{
+  const A={on:true,bgm:true,ready:false};
+  try{A.on=localStorage.getItem('hb_snd')!=='0';A.bgm=localStorage.getItem('hb_bgm')!=='0'}catch(e){}
+  let DST=null,o=null,nb=null,amb=null,sizz=null,chantG=null,walkG=null,wk=null,nextBar=0,bar=0,lv=0.3,lvT=0.3,lastChant=0,toast=null;
+  const hash=s=>{let h=2166136261;for(const ch of String(s)){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
+  const prng=seed=>{let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}};
+  const mtof=m=>440*Math.pow(2,(m-69)/12);
+  const rnd=prng(12345);
+  function ctx(){
+    if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();
+    if(AC.state==='suspended')AC.resume();
+    if(!o){
+      o=AC.createGain();o.gain.value=0.9;const c=AC.createDynamicsCompressor();c.threshold.value=-14;c.ratio.value=5;o.connect(c).connect(AC.destination);
+      // 공용 소음 버퍼(분홍 소음 비슷하게)
+      const n=AC.sampleRate*3,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);let l=0;for(let i=0;i<n;i++){const w=rnd()*2-1;l=l*0.86+w*0.14;d[i]=l*3.2+w*0.25}
+      nb=b;
+      chantG=AC.createGain();chantG.gain.value=0;chantG.connect(o);
+      walkG=AC.createGain();walkG.gain.value=0;walkG.connect(o);
+      amb=AC.createGain();amb.gain.value=0;amb.connect(o);
+      const s1=AC.createBufferSource();s1.buffer=nb;s1.loop=true;const f1=AC.createBiquadFilter();f1.type='bandpass';f1.frequency.value=650;f1.Q.value=0.5;s1.connect(f1).connect(amb);s1.start();
+      const s2=AC.createBufferSource();s2.buffer=nb;s2.loop=true;s2.playbackRate.value=1.3;const f2=AC.createBiquadFilter();f2.type='bandpass';f2.frequency.value=1700;f2.Q.value=0.7;const g2=AC.createGain();g2.gain.value=0.45;s2.connect(f2).connect(g2).connect(amb);s2.start();
+    }
+    A.ready=true;return AC;
+  }
+  A.ctx=ctx;
+  const nz=(t,dur,fq,q,vol,att,type)=>{const s=AC.createBufferSource();s.buffer=nb;s.loop=true;s.playbackRate.value=0.8+rnd()*0.5;const f=AC.createBiquadFilter();f.type=type||'bandpass';f.frequency.value=fq;f.Q.value=q;const g=AC.createGain();g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);s.connect(f).connect(g).connect(DST||o);s.start(t,rnd()*2);s.stop(t+dur+0.05)};
+  const osc=(dst,t,fq,dur,type,vol,a,lp,glide)=>{const s=AC.createOscillator(),g=AC.createGain();s.type=type;s.frequency.setValueAtTime(fq,t);if(glide)s.frequency.exponentialRampToValueAtTime(glide,t+dur);
+    g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+(a||0.01));g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    let n=s;if(lp){const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=lp;s.connect(f);n=f}n.connect(g).connect(dst);s.start(t);s.stop(t+dur+0.05)};
+  // ---------- 관중 환호 ----------
+  A.cheer=(a,dur)=>{if(!A.on)return;try{ctx();a=a||1;dur=dur||2.0;const t=AC.currentTime+0.02;
+    nz(t,dur,600,0.6,0.26*a,0.28,'bandpass');nz(t,dur*0.9,1300,0.7,0.2*a,0.3,'bandpass');nz(t,dur*0.8,2600,0.8,0.1*a,0.25,'bandpass');
+    for(let i=0;i<7;i++){const f=200+rnd()*160,tt=t+rnd()*0.35;const s=AC.createOscillator(),g=AC.createGain(),b1=AC.createBiquadFilter(),b2=AC.createBiquadFilter();
+      s.type='sawtooth';s.frequency.setValueAtTime(f,tt);s.frequency.linearRampToValueAtTime(f*1.35,tt+0.4);b1.type='bandpass';b1.frequency.value=800;b1.Q.value=4;b2.type='bandpass';b2.frequency.value=1250;b2.Q.value=5;
+      g.gain.setValueAtTime(0.0001,tt);g.gain.linearRampToValueAtTime(0.028*a,tt+0.25);g.gain.exponentialRampToValueAtTime(0.0001,tt+dur*0.8);
+      const lf=AC.createOscillator(),lg=AC.createGain();lf.frequency.value=5.5+rnd()*2;lg.gain.value=f*0.02;lf.connect(lg).connect(s.frequency);lf.start(tt);lf.stop(tt+dur);
+      s.connect(b1).connect(g);s.connect(b2).connect(g);g.connect(o);s.start(tt);s.stop(tt+dur)}
+    A.clap(a*0.5,dur*0.8,t+0.3)}catch(e){}};
+  A.clap=(a,dur,t0)=>{if(!A.on)return;try{ctx();const t=t0||AC.currentTime;const n=Math.floor(dur*16*a+8);for(let i=0;i<n;i++){const tt=t+rnd()*dur;nz(tt,0.06,2200+rnd()*1800,1.2,0.05*(0.4+0.6*(1-i/n)),0.003,'bandpass')}}catch(e){}};
+  A.groan=(a)=>{if(!A.on)return;try{ctx();a=a||1;const t=AC.currentTime+0.02;nz(t,1.3,420,0.7,0.2*a,0.2,'bandpass');
+    for(let i=0;i<5;i++){const f=230+rnd()*70;osc(o,t+rnd()*0.2,f,1.0,'sawtooth',0.02*a,0.2,900,f*0.62)}}catch(e){}};
+  A.boo=A.groan;
+  A.horn=()=>{if(!A.on)return;try{ctx();const t=AC.currentTime+0.1,n=[67,67,67,72,67,72,76];const d=[.16,.16,.16,.3,.16,.16,.7];let x=t;
+    n.forEach((m,i)=>{osc(o,x,mtof(m),d[i]+0.12,'sawtooth',0.07,0.015,2400);osc(o,x,mtof(m)*2,d[i]+0.08,'square',0.02,0.015,2200);x+=d[i]+0.03})}catch(e){}};
+  // ---------- 상황별 함성 크기 ----------
+  A.ex=0;A.lastCh=-9;
+  const favT=()=>{try{return G&&G.mp?MP.role:0}catch(e){return 0}};
+  const lev=()=>{if(!G)return 1;let l=1;if(G.max&&G.inn>=G.max-1)l+=0.3;if(Math.abs(G.score[0]-G.score[1])<=1)l+=0.2;if(G.bases&&(G.bases[2]||G.bases[3]))l+=0.15;if(G.derby)l+=0.2;return l};
+  const EV=[[/^홈런!!$/,'off',1.7],[/^3루타$/,'off',1.0],[/^(2루타|장타!)$/,'off',0.85],[/^(안타|내야안타|번트 안타)$/,'off',0.6],
+    [/^(도루 성공!|더블 스틸!)$/,'off',0.5],[/^희생플라이$/,'off',0.45],[/^(런다운 탈출!|런다운 생환!)$/,'off',0.55],[/^(볼넷|데드볼|고의사구)$/,'off',0.25],
+    [/^병살타$/,'def',0.75],[/삼진/,'def',0.6],[/^호수비!$/,'def',0.9],[/^(견제사|도루 실패|런다운 아웃)/,'def',0.55],[/아웃/,'def',0.35],
+    [/^(송구 실책|실책 출루|견제 실책|보크!|야수선택)$/,'off',0.2]];
+  // 응원하는 팀(fav)에 좋은 일 → 큰 환호, 상대에 좋은 일 → 작은 탄식 + 멀리서 들리는 상대 응원
+  A.crowd=(good,m,big)=>{
+    const t=AC.currentTime,gap=t-A.lastCh;m=Math.min(2.4,m);
+    if(good){
+      const k=gap<1.2?0.55:1;
+      if(m<0.45){A.clap(m*1.2*k,0.9)}
+      else{A.cheer(m*k,0.9+m*1.5);if(m>=0.8)A.clap(0.5*m*k,1.4);A.rumble(m*k,0.8+m)}
+      A.ex=Math.min(1.2,A.ex+m*0.5);A.lastCh=t;
+    }else{
+      if(m>=0.5){A.groan(0.22+0.38*Math.min(m,1.4));A.cheer(0.16*m,0.9)}
+      A.ex=Math.min(1.2,A.ex+m*0.15);
+    }
+  };
+  A.rumble=(a,dur)=>{try{ctx();const t=AC.currentTime+0.02;nz(t,dur,180,0.5,0.22*a,0.25,'bandpass');nz(t,dur*0.8,90,0.6,0.25*a,0.3,'lowpass')}catch(e){}};
+  A.react=text=>{if(!A.on||!A.ready||!G)return;
+    try{const T=String(text);
+      if(T==='홈런!!'){const good=G.half===favT();A.crowd(good,1.7*lev(),true);if(good)A.horn();return}
+      for(const [re,side,mag] of EV){if(re.test(T)){const ben=side==='off'?G.half:1-G.half;A.crowd(ben===favT(),mag*lev());return}}
+      if(T==='동점! 서든데스'||/승리|종료|끝|라운드/.test(T)){A.cheer(0.6,1.6)}
+    }catch(e){}};
+  A.intro=(k,team)=>{if(!A.on||!A.ready)return;try{const good=team===favT();if(k==='bat'){if(good){A.cheer(0.55,1.8);A.clap(0.5,2.2)}else A.clap(0.22,1.6)}else{if(good){A.clap(0.45,1.8);A.cheer(0.3,1.4)}else A.clap(0.2,1.3)}}catch(e){}};
+  // ---------- 응원가 (공격 팀 응원단: 드럼 + 박수 + 트럼펫 리프) ----------
+  const RIFF=[[0,4,7,4,0,4,7,12],[0,3,7,3,0,3,7,10]];
+  function chantBar(t,team,v){
+    DST=chantG;try{chantBar2(t,team,v)}finally{DST=null}
+  }
+  function chantBar2(t,team,v){
+    const BPM=124,B=60/BPM,r=RIFF[team&1];
+    for(let b=0;b<4;b++){
+      const x=t+b*B;
+      if(b%2===0){osc(chantG,x,120,0.18,'sine',0.5*v,0.003,0,48)}
+      else{nz(x,0.1,1500,0.9,0.13*v,0.003,'bandpass')}
+      for(const q of (b===3?[0,0.5]:[0.0])){nz(x+q*B,0.05,2400,1.2,0.12*v,0.002,'bandpass')}
+    }
+    // 박수 "짝짝 짝짝짝"
+    for(const q of [0,1,2,2.5,3]){nz(t+q*B,0.045,2300,1.4,0.1*v,0.002,'bandpass');nz(t+q*B+0.012,0.04,3100,1.4,0.06*v,0.002,'bandpass')}
+    // 트럼펫 리프 (한 박에 2음)
+    const root=bar%2?65:67;
+    for(let i=0;i<8;i++){const m=root+r[i]-(i<4?0:0),x=t+i*B/2;osc(chantG,x,mtof(m),B/2*0.9,'sawtooth',0.04*v,0.012,1900);osc(chantG,x,mtof(m)+1.2,B/2*0.9,'square',0.012*v,0.012,1800)}
+    bar++;
+  }
+  // ---------- 등장곡 ----------
+  const SCALES={minP:[0,3,5,7,10],majP:[0,2,4,7,9],dor:[0,2,3,5,7,9,10],mix:[0,2,4,5,7,9,10]};
+  const PROG={
+    up:[[0,7,9,5],[0,5,7,5],[0,9,5,7],[0,7,5,7]],
+    dark:[[0,8,3,10],[0,5,3,7],[0,3,8,7],[0,10,8,7]]
+  };
+  const ADJ=['불꽃','질주','천둥','폭풍','번개','강철','황금','한밤','무쇠','질풍','맹렬','불타는'];
+  const NOUN=['스윙','승부','타격','한 방','홈런포','타이밍','에이스','마운드','돌직구','질주','전설'];
+  function compose(key,kind){
+    const R=prng(hash(key+kind)),pit=kind==='pit';
+    const bpm=pit?84+Math.floor(R()*28):112+Math.floor(R()*38),B=60/bpm;
+    const minor=pit?true:R()<0.45,scale=SCALES[minor?(R()<0.5?'minP':'dor'):(R()<0.6?'majP':'mix')];
+    const prog=PROG[minor?'dark':'up'][Math.floor(R()*4)],root=(pit?36:41)+Math.floor(R()*7);
+    const lead=pit?(R()<0.5?'sawtooth':'square'):['square','sawtooth','triangle','square'][Math.floor(R()*4)];
+    const style=pit?(R()<0.5?'half':'rock'):['rock','four','funk','half'][Math.floor(R()*4)];
+    const rhythms=[[1,0,1,0,1,0,1,0],[1,0,0,1,1,0,1,0],[1,1,0,1,1,0,1,1],[1,0,1,1,0,1,1,0],[1,0,0,1,0,1,1,0]];
+    const rh=[rhythms[Math.floor(R()*rhythms.length)],rhythms[Math.floor(R()*rhythms.length)]];
+    const mel=[];let step=Math.floor(R()*scale.length);
+    const motif=[];
+    for(let i=0;i<8;i++){if(rh[0][i]){step=Math.max(0,Math.min(scale.length*2-1,step+[-2,-1,-1,0,1,1,2][Math.floor(R()*7)]));motif.push(step)}else motif.push(-1)}
+    const bars=[];
+    for(let b=0;b<4;b++){
+      const v=motif.map(s=>s<0?-1:b===1?(s+2)%(scale.length*2):b===3?(s<3?s:Math.max(0,s-2)):s);
+      if(b===3){v[0]=0}
+      bars.push({chord:prog[b],notes:v,rhy:rh[b&1]});
+    }
+    const title=ADJ[hash(key+'a')%ADJ.length]+' '+NOUN[hash(key+'n')%NOUN.length];
+    return {bpm,B,scale,root,lead,style,bars,minor,title,pit,len:4*4*B};
+  }
+  const cache=new Map();
+  A.walk=(kind,p,team)=>{
+    if(!A.on||!A.bgm||!p)return;
+    try{
+      ctx();const pit=kind==='pit',key=(p.name||'')+(p.num||''),sg=cache.get(key+kind)||(cache.set(key+kind,compose(key,kind)),cache.get(key+kind));
+      A.walkFade(0.15);
+      const t0=AC.currentTime+0.12,B=sg.B,g=AC.createGain();g.gain.setValueAtTime(0.0001,t0);g.gain.linearRampToValueAtTime(1,t0+0.05);g.connect(walkG);
+      walkG.gain.cancelScheduledValues(AC.currentTime);walkG.gain.setValueAtTime(0.0001,AC.currentTime);walkG.gain.linearRampToValueAtTime(0.9,AC.currentTime+0.1);
+      sg.bars.forEach((bar,bi)=>{
+        const bt=t0+bi*4*B,ch=sg.root+bar.chord,tri=sg.minor?[0,3,7]:[0,4,7];
+        // 코드(패드)
+        for(const iv of tri)osc(g,bt,mtof(ch+12+iv),4*B*0.98,'triangle',0.035,0.06,1500);
+        // 베이스
+        const bp=sg.style==='four'||sg.style==='funk'?[0,0.5,1,1.5,2,2.5,3,3.5]:[0,1.5,2,3];
+        for(const q of bp)osc(g,bt+q*B,mtof(ch-12),B*(bp.length>4?0.4:0.8),sg.pit?'sawtooth':'triangle',0.11,0.01,500);
+        // 리드
+        bar.notes.forEach((s,i)=>{if(s<0)return;const oct=Math.floor(s/sg.scale.length),m=ch+24+sg.scale[s%sg.scale.length]+oct*12-(oct>1?12:0);
+          osc(g,bt+i*B/2,mtof(m),B/2*0.92,sg.lead,0.06,0.008,2600);if(sg.lead!=='triangle')osc(g,bt+i*B/2,mtof(m)*1.004,B/2*0.9,sg.lead,0.02,0.008,2200)});
+        // 드럼
+        for(let q=0;q<4;q++){
+          const x=bt+q*B;
+          const kick=sg.style==='four'?true:sg.style==='half'?(q===0||(q===2&&bi%2)):q%2===0;
+          const snare=sg.style==='half'?q===2:q%2===1;
+          if(kick)osc(g,x,150,0.2,'sine',0.55,0.002,0,45);
+          if(snare){nz(x,0.14,1900,0.8,0.2,0.002,'bandpass');osc(g,x,190,0.08,'triangle',0.15,0.002)}
+          const hh=sg.style==='four'?[0.5]:[0,0.5];for(const h of hh)nz(x+h*B,0.04,7000,1,0.05,0.002,'highpass');
+          if(sg.style==='funk'&&q===1)nz(x+B*0.75,0.04,7000,1,0.06,0.002,'highpass');
+        }
+      });
+      wk={g,end:t0+sg.len};
+      toast={t:0,dur:3.6};try{let e=document.getElementById('audToast');if(!e){e=document.createElement('div');e.id='audToast';e.style.cssText='position:fixed;left:50%;top:14px;transform:translateX(-50%);background:rgba(10,16,30,.88);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:7px 16px;font:700 14px system-ui,sans-serif;z-index:9999;pointer-events:none;transition:opacity .4s;opacity:0';document.body.appendChild(e)}e.textContent='♪ '+(kind==='pit'?'투수 ':'타자 ')+p.name+' 등장곡 · '+sg.title;e.style.opacity='1';clearTimeout(A._tt);A._tt=setTimeout(()=>{e.style.opacity='0'},3600)}catch(_){}
+    }catch(e){}
+  };
+  A.walkFade=(s)=>{try{if(!AC||!walkG)return;const t=AC.currentTime;walkG.gain.cancelScheduledValues(t);walkG.gain.setValueAtTime(Math.max(walkG.gain.value,0.0001),t);walkG.gain.linearRampToValueAtTime(0.0001,t+(s||1.0))}catch(e){}};
+  A.toast=()=>toast;
+  A.setOn=v=>{A.on=!!v;try{localStorage.setItem('hb_snd',v?'1':'0')}catch(e){}if(!v)A.silence()};
+  A.setBgm=v=>{A.bgm=!!v;try{localStorage.setItem('hb_bgm',v?'1':'0')}catch(e){}if(!v)A.silence()};
+  A.silence=()=>{try{if(!AC||!o)return;A.walkFade(0.2);const t=AC.currentTime;chantG.gain.cancelScheduledValues(t);chantG.gain.setTargetAtTime(0,t,0.1);amb.gain.cancelScheduledValues(t);amb.gain.setTargetAtTime(0,t,0.1)}catch(e){}};
+  // ---------- 매 프레임: 관중 분위기 / 응원가 스케줄 ----------
+  A.tick=dt=>{
+    if(!A.ready||!AC||!o||!G)return;
+    const t=AC.currentTime;
+    if(!A.on){return}
+    if(toast){toast.t+=dt;if(toast.t>toast.dur)toast=null}
+    // 분위기 강도
+    let tgt=0.22;
+    if(G&&!G.over){
+      const rn=(G.bases[1]?1:0)+(G.bases[2]?1:0)+(G.bases[3]?1:0);
+      tgt+=rn*0.07+((G.bases[2]||G.bases[3])?0.08:0)+(G.strikes>=2?0.08:0)+(G.balls>=3?0.05:0);
+      if(G.max&&G.inn>=G.max-1&&Math.abs(G.score[0]-G.score[1])<=2)tgt+=0.2;
+      if(G.derby)tgt+=0.15;
+    }
+    lvT=Math.min(1,tgt);lv+=(lvT-lv)*Math.min(1,dt*0.6);
+    A.ex*=Math.exp(-dt*0.35);
+    // 득점·역전·경기 종료에 반응
+    try{const sc=G.score;if(A._sc&&A._g===G){for(const i of [0,1]){const d=sc[i]-A._sc[i];if(d>0){const was=A._sc[i]-A._sc[1-i],now=sc[i]-sc[1-i];let m=0.55+0.25*Math.min(d,4);if(was<=0&&now>0)m+=0.35;if(was<0&&now===0)m+=0.25;if(G.max&&G.inn>=G.max&&i===1&&now>0)m+=0.6;A.crowd(i===favT(),m*lev())}}
+      if(G.over&&!A._over){A._over=1;const w=sc[0]>sc[1]?0:1;if(w===favT()){A.cheer(1.8,4);A.horn();A.clap(1,3.5);A.rumble(1.2,3)}else{A.groan(1);A.clap(0.4,3)}}}
+      if(A._g!==G){A._g=G;A._over=0}A._sc=[sc[0],sc[1]]}catch(e){}
+    const tense=(G.mode==='pitch'&&!G.derby)?0.78:1;A.tn=(A.tn==null?1:A.tn)+(tense-(A.tn==null?1:A.tn))*Math.min(1,dt*4);
+    amb.gain.setTargetAtTime((0.016+lv*0.085+A.ex*0.09+0.006*Math.sin(t*0.7)+0.004*Math.sin(t*2.3))*A.tn,t,0.3);
+    // 응원가
+    const live=G&&!G.over&&(G.mode==='bwait'||G.mode==='pitch'||G.mode==='ready'||G.mode==='aim'||G.mode==='steal'),on=A.bgm&&live;
+    const walking=wk&&t<wk.end-0.2&&walkG.gain.value>0.1;
+    const vol=on?(walking?0.0:0.7+lv*0.5+A.ex*0.3):0;
+    chantG.gain.setTargetAtTime(vol,t,walking?0.1:0.6);
+    if(on&&!walking){
+      if(nextBar<t-0.5)nextBar=t+0.15;
+      if(nextBar<t+0.35){chantBar(nextBar,G.half,0.8);nextBar+=4*60/124}
+    }else if(!on)nextBar=0;
+  };
+  return A;
+})();
+// 첫 조작 때 오디오 컨텍스트를 깨운다 (브라우저 자동재생 정책)
+for(const ev of ['pointerdown','keydown','touchend'])addEventListener(ev,()=>{try{AUD.ctx()}catch(e){}},{once:false,passive:true});
+</script>
+
+<script>
+let audLastPit={0:null,1:null};
+function audPA(){return;
+  if(!G||G.derby)return;
+  const t=defT(),pp=G.pit[t],b=batter();
+  if(pp&&audLastPit[t]!==pp){audLastPit[t]=pp;AUD.walk('pit',pp,t)}
+  else if(b)AUD.walk('bat',b,G.half);
+}
+(function(){
+  const vb=document.getElementById('vb');if(!vb)return;
+  const mk=(lbl,get,set)=>{const b=document.createElement('button');b.className='chip';const r=()=>{b.textContent=lbl+(get()?' ON':' OFF');b.classList.toggle('on',get())};b.onclick=()=>{set(!get());r()};r();return b};
+  const sp=document.createElement('span');sp.textContent='사운드';vb.appendChild(sp);
+  const sg=document.createElement('div');sg.className='seg';sg.appendChild(mk('🔊 관중',()=>AUD.on,v=>AUD.setOn(v)));sg.appendChild(mk('🎵 응원가·등장곡',()=>AUD.bgm,v=>AUD.setBgm(v)));vb.appendChild(sg);
+})();
+</script>
+<script>'use strict';
+// ============================================================================
+//  등장 모션(타자·투수 소개 컷) — 시뮬레이션 시간에 묶여 있어 온라인에서도 동일하게 진행됨. 모든 등장/교체 연출은 건너뛰기('sk') 가능.
+// ============================================================================
+let INTRO_ON=true;try{INTRO_ON=localStorage.getItem('hb_intro')!=='0'}catch(e){}
+let _introReq=null;
+const skipOK=()=>{const P=G&&G.play;return !!(G&&!G.over&&G.mode==='field'&&P&&(P.sub||P.rp)&&!P.rd&&!P.steal&&!P.done)};
+function doSkip(){
+  if(!G||G.over)return;
+  if(G.mode==='ready'&&G.intro){G.intro=null;G.timer=Math.min(G.timer,0.6);G.fade=0.3;try{AUD.walkFade(0.5)}catch(e){}return}
+  if(skipOK()){G.play.t=G.play.endT;try{AUD.walkFade(0.3)}catch(e){}}
+}
+function introStart(){
+  if(!G||G.derby)return;
+  const t=defT(),pp=G.pit[t],b=batter();
+  G.introPit=G.introPit||[null,null];
+  let k='bat',pl=b,team=G.half;
+  if(pp&&G.introPit[t]!==pp){G.introPit[t]=pp;k='pit';pl=pp;team=t}
+  if(!pl)return;
+  const D=k==='pit'?3.3:2.7;
+  G.intro={k,t:0,D,team,p:pl,ord:G.order[G.half]};
+  G.timer=Math.max(G.timer,D+0.35);
+  try{AUD.walk(k,pl,team);AUD.intro(k,team)}catch(e){}
+}
+function introTick(dt){
+  if(G.introPend){G.introPend=false;introStart()}
+  const I=G.intro;if(!I)return;
+  I.t+=dt;
+  if(I.k==='bat'){if(!I.a&&I.t>=1.55){I.a=1;sfx('swing')}}
+  else{if(!I.a&&I.t>=2.16){I.a=1;sfx('mitt')}if(!I.b&&I.t>=2.86){I.b=1;sfx('mitt')}}
+  if(I.t>=I.D)G.intro=null;
+}
+function introAuto(){if(G&&G.intro&&!INTRO_ON&&_introReq!==G.intro){_introReq=G.intro;act('sk')}}
+function drawIntro(){
+  const I=G.intro,c=ctx,t=I.t,D=I.D,bat=I.k==='bat',TM=TEAMS[I.team],col={c:TM.c,d:TM.d},p=I.p;
+  const al=Math.min(smooth(t/0.3),smooth((D-t)/0.3));
+  c.save();
+  c.drawImage(sideBG(),0,0);
+  // 홈플레이트 / 마운드
+  c.fillStyle='#f3efe4';c.beginPath();c.moveTo(150,sfY(.84)-4);c.lineTo(190,sfY(.84)-4);c.lineTo(190,sfY(.84)+2);c.lineTo(170,sfY(.84)+9);c.lineTo(150,sfY(.84)+2);c.closePath();c.fill();
+  c.fillStyle='#c98a52';c.beginPath();c.ellipse(560,sfY(.5)+8,70,14,0,0,7);c.fill();c.fillStyle='#f3efe4';c.fillRect(548,sfY(.5)+5,24,3);
+  let fx,fy;
+  if(bat){
+    let x,kind,ba=-0.9,u=0;const d=.8;
+    if(t<1.1){x=-70+320*smooth(t/1.1);kind='run'}
+    else{x=250;kind='bat';
+      if(t<1.4){ba=-1.1+0.1*Math.sin(t*16)}
+      else if(t<1.85){const f=smooth((t-1.4)/0.45);ba=-1.1+2.5*smooth(f);u=f}
+      else if(t<2.2){const f=smooth((t-1.85)/0.35);ba=1.4-0.2*f;u=1-0.3*f}
+      else{const f=smooth((t-2.2)/0.3);ba=0.95*(1-f)+(-0.9)*f+0.07*Math.sin(t*14)*f;u=0.7*(1-f)}}
+    fx=x;fy=sfY(d);
+    // 스포트라이트
+    const g=c.createRadialGradient(fx,fy-50,40,fx,fy-50,420);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.6)');c.fillStyle=g;c.fillRect(0,0,W,H);
+    sideFig(c,x,fy,sfS(d),{face:1,col,kind,ph:t*9,ba,u,lab:p.num,noGlove:true,carry:true});
+  }else{
+    const d=.5,cd=.88,cy=sfY(cd),px0=1040,px1=575;let x,kind='hold',u=0,ball=true;
+    if(t<1.3){x=px0+(px1-px0)*smooth(t/1.3);kind='run';ball=true}
+    else{x=px1;
+      if(t>=1.5&&t<2.2){kind='throw';u=(t-1.5)/0.7;ball=u<0.52}
+      else if(t>=2.2&&t<2.9){kind='throw';u=(t-2.2)/0.7;ball=u<0.52}
+    }
+    fx=x;fy=sfY(d);
+    const g=c.createRadialGradient(fx,fy-50,40,fx,fy-50,420);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.6)');c.fillStyle=g;c.fillRect(0,0,W,H);
+    // 포수
+    const caught=(t>=2.16&&t<2.5)||(t>=2.86&&t<3.2);
+    sideFig(c,215,cy,sfS(cd),{face:1,col:{c:TEAMS[I.team].c,d:TEAMS[I.team].d},kind:caught?'catch':'stand',u:caught?CL(((t-2.16)%0.7)/0.25,0,1):0,lab:'포'});
+    sideFig(c,x,fy,sfS(d),{face:-1,col,kind,ph:t*9,u,ball,lab:''});
+    // 공 비행
+    for(const [r0,r1] of [[1.864,2.164],[2.564,2.864]]){if(t>=r0&&t<r1){const f=(t-r0)/(r1-r0),sx=px1-34,sy=fy-72,ex=232,ey=cy-52;c.fillStyle='#fff';c.beginPath();c.arc(sx+(ex-sx)*f,sy+(ey-sy)*f+Math.sin(f*PI)*-6,4.2,0,7);c.fill();c.strokeStyle='#d13a30';c.lineWidth=1;c.beginPath();c.arc(sx+(ex-sx)*f,sy+(ey-sy)*f+Math.sin(f*PI)*-6,2.8,-0.9,0.9);c.stroke()}}
+  }
+  // 레터박스 + 라벨
+  const bh=44*smooth(t/0.25);
+  c.fillStyle='#05070d';c.fillRect(0,0,W,bh);c.fillRect(0,H-bh,W,bh);
+  c.fillStyle=TM.c;c.fillRect(0,bh-3,W,3);c.fillRect(0,H-bh,W,3);
+  tx(c,(bat?'⚾ 타자 소개':'⚾ 투수 소개')+'  ·  '+TM.n,24,30,20,'#fff','left',FONT_D);
+  tx(c,'클릭 · Space : 건너뛰기  ⏭',W-24,H-16,14,'#e6edf8','right',FONT_B,'700');
+  // 이름 카드
+  const w=440,h=128,ent=smooth((t-0.25)/0.5),cx=bat?W-w-120+(1-ent)*(w+160):34-(1-ent)*(w+80),cyy=66;
+  c.fillStyle='rgba(8,14,28,.86)';rr(c,cx,cyy,w,h,12);c.fill();c.fillStyle=TM.c;rr(c,cx,cyy,10,h,5);c.fill();
+  c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=1.5;rr(c,cx,cyy,w,h,12);c.stroke();
+  c.fillStyle=TM.c;c.beginPath();c.arc(cx+50,cyy+48,28,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=2;c.stroke();
+  tx(c,bat?String(p.num):'투',cx+50,cyy+59,p.num>=100?20:28,'#fff','center',FONT_D);
+  tx(c,p.name,cx+92,cyy+46,32,'#fff','left',FONT_D);
+  let sub,line,bars;
+  if(bat){
+    const sb=G.st&&G.st.b&&G.st.b[I.team]?G.st.b[I.team].get(p):null,pa=sb?(sb.ab||0):0;
+    sub=`${p.gr}학년 · ${I.ord+1}번 타자${p.tag?' · '+p.tag:''}`;
+    line=pa?`오늘 ${sb.ab}타수 ${sb.h}안타${sb.hr?' · 홈런 '+sb.hr:''}${sb.rbi?' · '+sb.rbi+'타점':''}`:'오늘 첫 타석';
+    bars=[['컨택',CL((p.con-.4)/.5,0,1)],['파워',CL((p.pow-.55)/.6,0,1)],['주력',CL((p.spd-.85)/.3,0,1)],['선구',CL((p.eye-.35)/.55,0,1)]];
+  }else{
+    const sp=G.st&&G.st.p&&G.st.p[I.team]?G.st.p[I.team].get(p):null;
+    sub=`${p.role}${p.tag?' · '+p.tag:''} · ${p.hand}투 ${SLOTN[p.slot||'over']}`;
+    line=sp&&sp.outs?`오늘 ${fIp(sp.outs)}이닝 ${sp.h}피안타 ${sp.k}탈삼진 ${sp.r}실점`:(p.role==='선발'?'선발 등판':'구원 등판');
+    bars=[['제구',CL((p.ctl-.6)/.35,0,1)],['구위',CL(((p.vel||0)+5)/12,0,1)],['체력',CL((G.stam[I.team]||100)/100,0,1)]];
+  }
+  tx(c,sub,cx+92,cyy+70,15,'#c9d6f0','left',FONT_B,'700');
+  tx(c,line,cx+92,cyy+92,14,'#ffd86b','left',FONT_B,'700');
+  const bw=(w-34)/bars.length;
+  bars.forEach(([n,v],i)=>{const bx=cx+24+i*bw;tx(c,n,bx,cyy+114,12,'#9fb3d8','left',FONT_B,'700');c.fillStyle='rgba(255,255,255,.14)';rr(c,bx+34,cyy+105,bw-58,8,4);c.fill();c.fillStyle=TM.c;rr(c,bx+34,cyy+105,Math.max(6,(bw-58)*v*ent),8,4);c.fill()});
+  if(al<1){c.fillStyle=`rgba(0,0,0,${1-al})`;c.fillRect(0,0,W,H)}
+  c.restore();
+}
+(function(){
+  const vb=document.getElementById('vb');if(!vb)return;
+  const b=document.createElement('button');b.className='chip';const r=()=>{b.textContent='🎬 등장모션 '+(INTRO_ON?'ON':'OFF');b.classList.toggle('on',INTRO_ON)};
+  b.onclick=()=>{INTRO_ON=!INTRO_ON;try{localStorage.setItem('hb_intro',INTRO_ON?'1':'0')}catch(e){}r()};r();
+  const g=vb.querySelector('.seg:last-of-type');(g||vb).appendChild(b);
+})();
+</script>
+<script>'use strict';
+// 비디오 판독 오버레이: 간발의 차(0.09초 이내) 아웃/세이프 장면을 슬로모션으로 다시 보여준다. 판정은 이미 확정된 결과를 그대로 확인(번복 없음).
+function drawReview(){
+  const P=G.play,K=P.close0,c=ctx,t=P.t,done=t>=K.tC+0.35,col=K.out?'#ff6a55':'#5fe08a';
+  c.fillStyle='rgba(20,90,200,.95)';rr(c,22,136,176,28,6);c.fill();tx(c,'🔍 비디오 판독',110,156,16,'#fff','center',FONT_D);
+  if(t>K.tC-0.35&&t<K.tC+0.35){c.fillStyle='rgba(0,0,0,.55)';rr(c,22,170,130,28,6);c.fill();tx(c,'🐢 슬로모션',87,190,15,'#ffd86b','center',FONT_D)}
+  const bw=380,bh=84,x=(W-bw)/2,y=H-150;
+  c.fillStyle='rgba(6,10,22,.9)';rr(c,x,y,bw,bh,12);c.fill();c.strokeStyle=done?col:'#8fb4ff';c.lineWidth=3;rr(c,x,y,bw,bh,12);c.stroke();
+  const base=K.k===4?'홈':K.k+'루';
+  if(!done){tx(c,'판독 중'+'.'.repeat(1+((t*3)|0)%3),W/2,y+38,28,'#cfe0ff','center',FONT_D);tx(c,`${base} · ${K.who}`,W/2,y+66,15,'#9fb3d8','center',FONT_B,'700')}
+  else{tx(c,K.out?'OUT · 아웃':'SAFE · 세이프',W/2,y+44,38,col,'center',FONT_D);tx(c,`판정 유지 · ${base} · 간발의 차 ${K.m.toFixed(2)}초`,W/2,y+70,15,'#e6edf8','center',FONT_B,'700')}
+}
 </script>
