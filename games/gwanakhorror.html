@@ -666,6 +666,7 @@ function cmat(c, r = .8, extra) { const k = 'c' + c + '_' + r + (extra ? JSON.st
 const BATCH = {}; const LVL_MESH = {};
 function box(x0, y0, z0, x1, y1, z1, mat, lvl = 0) {
   if (x0 > x1) [x0, x1] = [x1, x0]; if (y0 > y1) [y0, y1] = [y1, y0]; if (z0 > z1) [z0, z1] = [z1, z0];
+  if (typeof DEBUG !== 'undefined' && DEBUG) (window.DBGBOX = window.DBGBOX || []).push([lvl, x0, y0, z0, x1, y1, z1]);
   const ms = Array.isArray(mat) ? mat : [mat, mat, mat, mat, mat, mat];
   const cx = Math.floor((x0 + x1) / 64), cz = Math.floor((z0 + z1) / 64);
   const F = [
@@ -803,7 +804,10 @@ function addCol(l, x0, z0, x1, z1, o = {}) {
 }
 function colQuery(g, x, z, r) { STAMP++; const out = []; for (let i = Math.floor((x - r) / GC); i <= Math.floor((x + r) / GC); i++)for (let j = Math.floor((z - r) / GC); j <= Math.floor((z + r) / GC); j++) { const a = g.get(i + ',' + j); if (a) for (const c of a) if (c._s !== STAMP) { c._s = STAMP; out.push(c); } } return out; }
 function moveCircle(p, dx, dz, r, l, mon) {
-  p.x += dx; p.z += dz; const L = W.COL[l]; if (!L) return;
+  const n = Math.max(1, Math.ceil(Math.hypot(dx, dz) / .1)); for (let i = 0; i < n; i++) moveCircle1(p, dx / n, dz / n, r, l, mon);
+}
+function moveCircle1(p, dx, dz, r, l, mon) {
+  const ox = p.x, oz = p.z; p.x += dx; p.z += dz; const L = W.COL[l]; if (!L) return;
   for (let it = 0; it < 3; it++) {
     const cs = colQuery(mon ? L.gw : L.ga, p.x, p.z, r); let hit = false;
     for (const c of cs) {
@@ -813,6 +817,8 @@ function moveCircle(p, dx, dz, r, l, mon) {
     }
     if (!hit) break;
   }
+  // 안전장치: 처리 후에도 벽 내부에 있으면(모서리 비비기 등) 이전 위치로 되돌림
+  for (const c of colQuery(mon ? L.gw : L.ga, p.x, p.z, 0)) { if (c.off || (mon && c.door) || (!mon && c.monOnly)) continue; if (p.x > c.x0 + .01 && p.x < c.x1 - .01 && p.z > c.z0 + .01 && p.z < c.z1 - .01) { p.x = ox; p.z = oz; break; } }
 }
 function los(l, x0, z0, x1, z1) {
   const L = W.COL[l]; if (!L) return true; const mnx = Math.min(x0, x1), mxx = Math.max(x0, x1), mnz = Math.min(z0, z1), mxz = Math.max(z0, z1), dx = x1 - x0, dz = z1 - z0;
@@ -1408,8 +1414,8 @@ const STO = { x0: STO0.x0 + FX, x1: STO0.x1 + FX, z0: STO0.z0 + FZ, z1: STO0.z1 
 const fbox = (x0, y0, z0, x1, y1, z1, m, l) => box(x0 + FX, y0, z0 + FZ, x1 + FX, y1, z1 + FZ, m, l);
 const fcol = (l, x0, z0, x1, z1, o) => addCol(l, x0 + FX, z0 + FZ, x1 + FX, z1 + FZ, o);
 const fsign = (t, x, y, z, l, d, w, h) => sign(t, x + FX, y, z + FZ, l, d, w, h);
-const fwx = (x0, x1, z, th, y0, y1, m, l, gaps = [], ...r) => wallX(x0 + FX, x1 + FX, z + FZ, th, y0, y1, m, l, gaps.map(g => ({ ...g, a: g.a + FX, b: g.b + FX })), ...r);
-const fwz = (z0, z1, x, th, y0, y1, m, l, gaps = [], ...r) => wallZ(z0 + FZ, z1 + FZ, x + FX, th, y0, y1, m, l, gaps.map(g => ({ ...g, a: g.a + FZ, b: g.b + FZ })), ...r);
+const fwx = (x0, x1, z, th, y0, y1, m, l, gaps = [], col = true, cl = 0) => wallX(x0 + FX, x1 + FX, z + FZ, th, y0, y1, m, l, gaps.map(g => ({ ...g, a: g.a + FX, b: g.b + FX })), col, cl);
+const fwz = (z0, z1, x, th, y0, y1, m, l, gaps = [], col = true, cl = 0) => wallZ(z0 + FZ, z1 + FZ, x + FX, th, y0, y1, m, l, gaps.map(g => ({ ...g, a: g.a + FZ, b: g.b + FZ })), col, cl);
 function curtain(wx, y1, y2, zN, l) {
   const g = new THREE.BoxGeometry(2.2, y2 - y1, .035); g.translate(1.1, 0, 0);
   const m = new THREE.Mesh(g, getMat('drape')); m.position.set(wx - 1.1, (y1 + y2) / 2, zN + .035); regObj(m, l);
