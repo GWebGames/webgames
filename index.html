@@ -407,6 +407,14 @@ footer .flinks a:hover{color:var(--foam)}
     body:['## 추가','대결 모드에 상대 점수 표시','## 수정','일시정지 후 블록이 한 칸 내려가던 문제']},
    ============================================================ */
 const NOTICES=[
+  {date:'2026-11-22', tag:'공지', title:'신규 게임 2종 추가 · 베타 테스트',
+   body:[
+     '## 추가',
+     'Commit Message:V · 멸망의 이야기 — 우주의 붕괴 끝에서 눈을 뜬 주인공의 멸망 이야기를 따라가는 도트풍 스토리 게임 (made by 심훈철)',
+     'Breakwater Protocol — 항만 컨테이너 터미널에서 벌어지는 3D 슈팅 게임, 웨이브로 몰려오는 적과 보스를 상대하세요 (made by 윤준우)',
+     '## 베타 테스트 안내',
+     '이 게임은 베타 테스트 중이에요. 용량이 커서 처음 불러올 때 시간이 조금 걸릴 수 있고, 기기에 따라 느리거나 오류가 날 수 있어요. 문제가 있으면 페이지 아래 오류 제보 링크로 알려 주세요.'
+   ]},
   {date:'2026-11-15', tag:'패치', title:'기간별 베스트 · 내 프로필 · 편의 기능 추가',
    body:[
      '## 추가',
@@ -1016,7 +1024,7 @@ const GAMES=[
     tags:['스토리'],
     label:'new', labelDate:'2026-11-18',
     title:'Commit Message:V · 멸망의 이야기', hanja:'',
-    desc:'우주의 붕괴, 인류의 변이, 차원의 균열 끝에서 눈을 뜬 주인공의 멸망 이야기. 캠퍼스를 돌아다니며 사람들과 대화하고 이야기를 이어 가는 도트풍 스토리 게임이에요.',
+    desc:'우주의 붕괴, 인류의 변이, 차원의 균열 끝에서 눈을 뜬 주인공의 멸망 이야기. 캠퍼스를 돌아다니며 사람들과 대화하고 이야기를 이어 가는 도트풍 스토리 게임이에요. made by 심훈철',
     keys:'WASD/방향키 이동 · Enter/클릭 상호작용·진행 · 모바일 조이스틱',
     src:'games/commitmessage.html',
     ready:true,
@@ -1025,6 +1033,26 @@ const GAMES=[
       <g fill="#5f8f73" font-family="monospace" font-size="9"><text x="14" y="26">&gt; UNIVERSE COLLAPSE...</text><text x="14" y="40">&gt; RED GIANT...</text><text x="14" y="54">&gt; AWAKENING...</text></g>
       <text x="160" y="104" text-anchor="middle" font-family="monospace" font-size="24" font-weight="700" fill="#b9f5cf">Commit Message:V</text>
       <text x="160" y="128" text-anchor="middle" font-family="monospace" font-size="8" fill="#5f8f73" letter-spacing="3">THE TALE OF EXTINCTION</text>
+    </svg>`
+  },
+  {
+    id:'breakwater',
+    tags:['액션','서바이벌'],
+    label:'beta',
+    title:'Breakwater Protocol', hanja:'',
+    desc:'항만 컨테이너 터미널을 배경으로 한 3D 슈팅 게임. 몰려오는 적과 드론, 거대한 보스를 소총·샷건·수류탄으로 상대하며 살아남으세요. made by 윤준우',
+    keys:'WASD 이동 · 마우스 조준·발사 · R 재장전 · G 수류탄 · C 슬라이딩 · F 오버드라이브 · Tab 점수판 · Esc 일시정지 · 모바일 터치 지원',
+    src:'games/breakwater.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="bwsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2a3d"/><stop offset="1" stop-color="#e08a4a"/></linearGradient></defs>
+      <rect width="320" height="180" fill="url(#bwsky)"/>
+      <circle cx="250" cy="96" r="22" fill="#ffd9a0" opacity=".85"/>
+      <rect y="112" width="320" height="68" fill="#232b36"/>
+      <g fill="#10161e"><path d="M40 112V40h8v72zM100 112V40h8v72zM36 40h76v8H36zM30 28h48v6H30z"/><path d="M48 48l52 64M100 48l-52 64" stroke="#10161e" stroke-width="2" fill="none"/><path d="M110 34h110v4H110z"/><rect x="214" y="34" width="4" height="30"/></g>
+      <g><rect x="150" y="126" width="38" height="20" fill="#c8402b"/><rect x="190" y="126" width="38" height="20" fill="#2f6e8a"/><rect x="170" y="106" width="38" height="20" fill="#d9a441"/><rect x="232" y="132" width="36" height="14" fill="#5a6b3a"/></g>
+      <g stroke="#ffd24a" stroke-width="1.5" opacity=".9"><path d="M60 170l70-34"/><path d="M60 170l92-26" opacity=".6"/></g>
+      <circle cx="160" cy="98" r="7" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M160 86v6M160 104v6M148 98h6M166 98h6" stroke="#fff" stroke-width="1.5"/>
     </svg>`
   }
 ];
@@ -1342,7 +1370,7 @@ async function loadMine(){
    게임들은 최고 기록·저장 데이터를 이 브라우저(localStorage)에 저장해요. 로비와 게임은 같은 주소라서 로비가 그걸 읽어
    내 계정에 백업하고, 다른 기기·브라우저에서 로그인하면 내려받아요.
    ※ 새 게임이 localStorage 에 저장하는 키가 있으면 아래 SYNC_KEYS 에 이름을 추가하세요. */
-const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pd_save2','pd_sb','rest_in_server_v1','rhythm_boat_fishing_v1','toe_save_v1','toe_seen_v1','toe_bkclr_v1','toe_bkseen_v1','toe_card_v1','toe_cardpaid_v1','toe_pubck_v1','ka_lv','ka_tr','ka_c','jg_nick','jg_bt_0','jg_bt_1','jg_bt_2','jg_bt_3','jg_bt_4','lobby-badges-seen','pogeun_farm_v1'];
+const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pd_save2','pd_sb','rest_in_server_v1','rhythm_boat_fishing_v1','breakwater','toe_save_v1','toe_seen_v1','toe_bkclr_v1','toe_bkseen_v1','toe_card_v1','toe_cardpaid_v1','toe_pubck_v1','ka_lv','ka_tr','ka_c','jg_nick','jg_bt_0','jg_bt_1','jg_bt_2','jg_bt_3','jg_bt_4','lobby-badges-seen','pogeun_farm_v1'];
 const SYNC_MAX=300000; /* 키 하나당 최대 글자 수 */
 const encKey=k=>k.replace(/\./g,'__dot__');
 const hashStr=v=>{if(v==null)return null;let h=5381;for(let i=0;i<v.length;i++)h=((h<<5)+h+v.charCodeAt(i))|0;return v.length+':'+h;};
