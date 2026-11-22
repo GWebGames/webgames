@@ -413,7 +413,7 @@ const NOTICES=[
      'Commit Message:V · 멸망의 이야기 — 우주의 붕괴 끝에서 눈을 뜬 주인공의 멸망 이야기를 따라가는 도트풍 스토리 게임 (made by 심훈철)',
      'Breakwater Protocol — 항만 컨테이너 터미널에서 벌어지는 3D 슈팅 게임, 웨이브로 몰려오는 적과 보스를 상대하세요 (made by 윤준우)',
      '## 베타 테스트 안내',
-     '이 게임은 베타 테스트 중이에요. 용량이 커서 처음 불러올 때 시간이 조금 걸릴 수 있고, 기기에 따라 느리거나 오류가 날 수 있어요. 문제가 있으면 페이지 아래 오류 제보 링크로 알려 주세요.'
+     '이 게임은 베타 테스트 중이에요. 별도 사이트가 새 탭에서 열리고, 처음 불러올 때 시간이 걸리거나 기기에 따라 느리거나 오류가 날 수 있어요. 문제가 있으면 페이지 아래 오류 제보 링크로 알려 주세요.'
    ]},
   {date:'2026-11-15', tag:'패치', title:'기간별 베스트 · 내 프로필 · 편의 기능 추가',
    body:[
@@ -1040,9 +1040,10 @@ const GAMES=[
     tags:['액션','서바이벌'],
     label:'beta',
     title:'Breakwater Protocol', hanja:'',
-    desc:'항만 컨테이너 터미널을 배경으로 한 3D 슈팅 게임. 몰려오는 적과 드론, 거대한 보스를 소총·샷건·수류탄으로 상대하며 살아남으세요. made by 윤준우',
-    keys:'WASD 이동 · 마우스 조준·발사 · R 재장전 · G 수류탄 · C 슬라이딩 · F 오버드라이브 · Tab 점수판 · Esc 일시정지 · 모바일 터치 지원',
-    src:'games/breakwater.html',
+    desc:'끝없는 포위전에서 항만을 지켜 내는 3D 슈팅 게임. 레일건을 충전해 엘리트 적을 부수고, 폭풍 해일을 버티며, 5웨이브마다 나타나는 보스에 맞서세요. 새 탭에서 열려요. made by 윤준우',
+    keys:'WASD 이동 · 마우스 조준·발사 · R 재장전 · G 수류탄 · 모바일 터치 지원',
+    href:'https://breakwater-lrpzvmom.manus.game/',
+    src:'',
     ready:true,
     thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
       <defs><linearGradient id="bwsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2a3d"/><stop offset="1" stop-color="#e08a4a"/></linearGradient></defs>
@@ -1172,6 +1173,13 @@ paintThemeBtn();
 
 /* ---------- 게임 열기 / 닫기 ---------- */
 function openGame(g){
+  if(g.href){ /* 외부 사이트로 연결되는 게임: 새 탭에서 열어요(로비와 분리돼 더 안전) */
+    const a=document.createElement('a');a.href=g.href;a.target='_blank';a.rel='noopener noreferrer';
+    document.body.appendChild(a);a.click();a.remove();
+    track(g);
+    try{localStorage.setItem('lobby-last',g.id);}catch(e){}
+    return;
+  }
   current=g;
   track(g);
   startPresence(g);
