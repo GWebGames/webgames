@@ -407,6 +407,13 @@ footer .flinks a:hover{color:var(--foam)}
     body:['## 추가','대결 모드에 상대 점수 표시','## 수정','일시정지 후 블록이 한 칸 내려가던 문제']},
    ============================================================ */
 const NOTICES=[
+  {date:'2026-11-24', tag:'공지', title:'신규 게임 2종 추가',
+   body:[
+     '## 추가',
+     '수능 감독관 체험 — 교실의 수험생 20명 중 숨어 있는 부정행위자 5명을 찾아내는 3D 감독관 체험 게임',
+     '철혈의 대장간 — 광석을 캐고 제련해 장비를 만들고 강화하는 중세 대장장이 이야기, 동굴의 보스에 도전하세요',
+     '진행 기록(철혈의 대장간)은 브라우저에 저장되고, 로그인하면 다른 기기에서도 이어서 할 수 있어요.'
+   ]},
   {date:'2026-11-22', tag:'공지', title:'신규 게임 2종 추가 · 베타 테스트',
    body:[
      '## 추가',
@@ -1055,6 +1062,44 @@ const GAMES=[
       <g stroke="#ffd24a" stroke-width="1.5" opacity=".9"><path d="M60 170l70-34"/><path d="M60 170l92-26" opacity=".6"/></g>
       <circle cx="160" cy="98" r="7" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M160 86v6M160 104v6M148 98h6M166 98h6" stroke="#fff" stroke-width="1.5"/>
     </svg>`
+  },
+  {
+    id:'proctor',
+    tags:['시뮬'],
+    label:'new', labelDate:'2026-11-24',
+    title:'수능 감독관 체험', hanja:'',
+    desc:'교실의 수험생 20명 중 숨어 있는 부정행위자 5명을 찾아내는 3D 감독관 체험. 멀리서 관찰하고 확대해서 단서를 찾되, 평범한 학생을 잘못 적발하면 민원이 쌓여요.',
+    keys:'WASD 이동 · Shift 달리기 · 마우스 시점 · E 적발 · 우클릭/Z 확대 · Esc 일시정지 · 모바일 조이스틱',
+    src:'games/proctor.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="320" height="180" fill="#0d1626"/>
+      <rect x="20" y="14" width="280" height="38" rx="3" fill="#1c5a3a" stroke="#6b4a2a" stroke-width="4"/>
+      <text x="160" y="40" text-anchor="middle" font-size="16" font-weight="800" fill="#f6f1e4">1교시 국어 · 08:40</text>
+      <g fill="#d9c9a0"><rect x="34" y="84" width="46" height="22" rx="2"/><rect x="104" y="84" width="46" height="22" rx="2"/><rect x="170" y="84" width="46" height="22" rx="2"/><rect x="240" y="84" width="46" height="22" rx="2"/><rect x="34" y="132" width="46" height="22" rx="2"/><rect x="104" y="132" width="46" height="22" rx="2"/><rect x="170" y="132" width="46" height="22" rx="2"/><rect x="240" y="132" width="46" height="22" rx="2"/></g>
+      <g fill="#4aa8ff"><circle cx="57" cy="72" r="9"/><circle cx="127" cy="72" r="9"/><circle cx="193" cy="72" r="9"/><circle cx="263" cy="72" r="9"/><circle cx="57" cy="120" r="9"/><circle cx="193" cy="120" r="9"/><circle cx="263" cy="120" r="9"/></g>
+      <circle cx="127" cy="120" r="9" fill="#e0382f"/>
+      <g stroke="#ffb703" stroke-width="2" fill="none"><circle cx="127" cy="120" r="20"/><path d="M127 92v12M127 136v12M99 120h12M143 120h12"/></g>
+    </svg>`
+  },
+  {
+    id:'medievalforge',
+    tags:['시뮬','액션'],
+    label:'new', labelDate:'2026-11-24',
+    title:'철혈의 대장간', hanja:'',
+    desc:'돌바람 동굴에서 몬스터를 베고 광석을 캐 와 제련하고, 대장간에서 망치질로 장비를 만들어 강화하는 중세 대장장이 이야기. 좋은 장비를 갖추고 동굴 깊은 곳의 보스에 도전해 보세요.',
+    keys:'WASD/방향키 이동 · 클릭/터치 공격·채굴 · 모바일 조이스틱',
+    src:'games/medievalforge.html',
+    ready:true,
+    thumb:`<svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="mfg" cx=".5" cy=".7" r=".8"><stop offset="0" stop-color="#7a3a14"/><stop offset="1" stop-color="#20120b"/></radialGradient></defs>
+      <rect width="320" height="180" fill="url(#mfg)"/>
+      <g fill="#2b2f36"><path d="M70 130h150v14H70z"/><path d="M96 112h100q-10 18-24 18H120q-14 0-24-18z"/></g>
+      <g transform="rotate(-35 230 70)"><rect x="224" y="40" width="8" height="64" fill="#8b5a2b"/><rect x="204" y="34" width="48" height="18" rx="2" fill="#9aa4b0"/></g>
+      <path d="M110 108l66-14 8 8-66 14z" fill="#ff7a1a"/><path d="M112 106l60-12" stroke="#ffd24a" stroke-width="3"/>
+      <g fill="#ffd24a"><circle cx="150" cy="84" r="2"/><circle cx="166" cy="76" r="1.6"/><circle cx="136" cy="78" r="1.4"/><circle cx="182" cy="86" r="1.8"/></g>
+      <path d="M20 170q40-16 80-4t80-2" stroke="#ff7a1a" stroke-width="3" fill="none" opacity=".5"/>
+    </svg>`
   }
 ];
 
@@ -1378,7 +1423,7 @@ async function loadMine(){
    게임들은 최고 기록·저장 데이터를 이 브라우저(localStorage)에 저장해요. 로비와 게임은 같은 주소라서 로비가 그걸 읽어
    내 계정에 백업하고, 다른 기기·브라우저에서 로그인하면 내려받아요.
    ※ 새 게임이 localStorage 에 저장하는 키가 있으면 아래 SYNC_KEYS 에 이름을 추가하세요. */
-const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pd_save2','pd_sb','rest_in_server_v1','rhythm_boat_fishing_v1','breakwater','toe_save_v1','toe_seen_v1','toe_bkclr_v1','toe_bkseen_v1','toe_card_v1','toe_cardpaid_v1','toe_pubck_v1','ka_lv','ka_tr','ka_c','jg_nick','jg_bt_0','jg_bt_1','jg_bt_2','jg_bt_3','jg_bt_4','lobby-badges-seen','pogeun_farm_v1'];
+const SYNC_KEYS=['hansan-best','hansan-rec','exam_stock_best_score','bg3d_nick','bg3d_mode','tetris-muted','tetris-best','sb-unlocked','itTycoon.v1','gwanak_story_v1','hb_pv','hb_fv','lobby-nick','lobby-favs','pd_save2','pd_sb','rest_in_server_v1','rhythm_boat_fishing_v1','medievalForge_v2','breakwater','toe_save_v1','toe_seen_v1','toe_bkclr_v1','toe_bkseen_v1','toe_card_v1','toe_cardpaid_v1','toe_pubck_v1','ka_lv','ka_tr','ka_c','jg_nick','jg_bt_0','jg_bt_1','jg_bt_2','jg_bt_3','jg_bt_4','lobby-badges-seen','pogeun_farm_v1'];
 const SYNC_MAX=300000; /* 키 하나당 최대 글자 수 */
 const encKey=k=>k.replace(/\./g,'__dot__');
 const hashStr=v=>{if(v==null)return null;let h=5381;for(let i=0;i<v.length;i++)h=((h<<5)+h+v.charCodeAt(i))|0;return v.length+':'+h;};
